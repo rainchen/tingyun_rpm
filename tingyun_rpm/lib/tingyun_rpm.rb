@@ -46,5 +46,3 @@ if defined?(Rails::VERSION)
 else
   TingYun::Frameworks.init_start
 end
-
-

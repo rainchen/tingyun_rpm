@@ -46,6 +46,8 @@ module TingYun
                   :rails3
                 when 4
                   :rails4
+                when 5
+                  :rails5
                 else
                   ::TingYun::Agent.logger.error "Detected unsupported Rails version #{Rails::VERSION::STRING}"
               end

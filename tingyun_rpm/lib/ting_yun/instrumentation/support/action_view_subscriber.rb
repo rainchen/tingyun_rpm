@@ -7,7 +7,7 @@ require 'ting_yun/agent'
 
 module TingYun
   module Instrumentation
-    module Rails4
+    module Rails
       class ActionViewSubscriber < TingYun::Instrumentation::Support::EventedSubscriber
 
         def start(name, id, payload) #THREAD_LOCAL_ACCESS
@@ -94,25 +94,3 @@ module TingYun
     end
   end
 end
-
-TingYun::Support::LibraryDetection.defer do
-  @name = :rails4_view
-
-  depends_on do
-    defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 4
-  end
-
-  depends_on do
-    !TingYun::Agent.config[:disable_view_instrumentation] &&
-        !TingYun::Instrumentation::Rails4::ActionViewSubscriber.subscribed?
-  end
-
-  executes do
-    TingYun::Agent.logger.info 'Installing Rails 4 view instrumentation'
-  end
-
-  executes do
-    TingYun::Instrumentation::Rails4::ActionViewSubscriber.subscribe(/render_.+\.action_view$/)
-  end
-end
-#
