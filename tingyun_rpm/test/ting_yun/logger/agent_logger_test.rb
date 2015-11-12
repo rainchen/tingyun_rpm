@@ -31,6 +31,7 @@ class AgentLoggerTest < Minitest::Test
 
   def test_create_log_from_config
   	@logger = TingYun::Logger::AgentLogger.new
+  	@logger.info('hello')
   	wrapped_logger = @logger.instance_variable_get(:@log) 
   	logdev = wrapped_logger.instance_variable_get(:@logdev)
   	expected_logpath = File.expand_path(::TingYun::Agent.config[:'nbs.agent_log_file_path'] + ::TingYun::Agent.config[:'nbs.agent_log_file_name'])
@@ -216,7 +217,7 @@ class AgentLoggerTest < Minitest::Test
     assert_logged "thoughts", "thoughts"
   end
 
-  
+
 
   #
   # Helpers
