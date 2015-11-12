@@ -36,14 +36,14 @@ class Minitest::Test
       test_method_name = self.__name__
     end
 
-    p NewRelic::Agent.logger.info("*** #{self.class}##{test_method_name} **")
+    # NewRelic::Agent.logger.info("*** #{self.class}##{test_method_name} **")
 
     @__thread_count = ruby_threads.count
     super
   end
 
   def after_teardown
-    unfreeze_time
+    # unfreeze_time
 
     threads = ruby_threads
     if @__thread_count != threads.count
@@ -79,7 +79,7 @@ if ENV["NO_RAILS"]
   require 'tingyun_rpm'
 else
   begin
-    require 'config/environment'
+    # require 'config/environment'
     require 'tingyun_rpm'
   rescue LoadError
     puts "Running tests in standalone mode."

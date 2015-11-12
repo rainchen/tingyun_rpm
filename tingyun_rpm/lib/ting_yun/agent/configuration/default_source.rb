@@ -21,7 +21,7 @@ module TingYun
         attr_reader :defaults
 
         extend Forwardable
-        def_delegators :@defaults, :has_key?, :each, :merge, :delete, :keys, :[], :to_hash
+        def_delegators :@defaults, :keys,:has_key?,:[]
 
         def initialize
           @defaults = default_values
@@ -124,28 +124,28 @@ module TingYun
           :description => 'Your Ting Yun <a href="">license key</a>.'
         },
         :'nbs.agent_enabled' => {
-          :default => DefaultSource.agent_enabled,
+          :default => true,
           :public => true,
           :type => Boolean,
           :allowed_from_server => false,
           :description => 'Enable or disable the agent.'
         },
         :"nbs.app_name" => {
-          :default => DefaultSource.app_name,
+          :default => '',
           :public => true,
           :type => String,
           :allowed_from_server => false,
           :description => 'Semicolon-delimited list of Naming your application.'
         },
         :"nbs.auto_app_naming" => {
-          :default => DefaultSource.auto_app_naming,
+          :default => true,
           :public => true,
           :type => Boolean,
           :allowed_from_server => false,
           :description => 'Enable or disable to identify the application name'
         },
         :"nbs.agent_log_file_name" => {
-          :default => DefaultSource.audit_log_path,
+          :default => '',
           :public => true,
           :type => String,
           :allowed_from_server => false,
@@ -187,7 +187,6 @@ module TingYun
           :public => true,
           :type => String,
           :allowed_from_server => false,
-          :exclude_from_reported_settings => true,
           :description => 'Defines a user for communicating with Ting Yun via a proxy server.'
         },
         :"nbs.proxy_password" => {
@@ -200,14 +199,15 @@ module TingYun
           :description => 'Defines a password for communicating with Ting Yun via a proxy server.'
         },
         :"nbs.host" => {
-          :default => '',
+          :default => 'dc1.networkbench.com',
           :public => false,
           :type => String,
           :allowed_from_server => false,
           :description => "URI for the Ting Yun data collection service."
         },
         :"nbs.port" => {
-          :default => DefaultSource.port,
+          :default => nil,
+          :allow_nil => true,
           :public => false,
           :type => Fixnum,
           :allowed_from_server => false,
@@ -299,7 +299,8 @@ module TingYun
           :description => 'Enable or disable action traces'
         },
         :'nbs.action_tracer.action_threshold' => {
-          :default => DefaultSource.action_tracer_action_threshold,
+          :default => nil,
+          :allow_nil => true,
           :public => true,
           :type => Fixnum,
           :allowed_from_server => true,
@@ -370,6 +371,7 @@ module TingYun
         },
         :'nbs.rum.script' => {
           :default => nil,
+          :allow_nil => true,
           :public => false,
           :type => String,
           :allowed_from_server => true,
