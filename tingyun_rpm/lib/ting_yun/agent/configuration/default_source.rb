@@ -36,11 +36,7 @@ module TingYun
         def self.auto_app_naming
           Proc.new{ true}
         end
-        def self.audit_log_path
-           Proc.new {
-            # File.join(NewRelic::Agent.config[:log_file_path], 'newrelic_audit.log')
-          }
-        end
+
         def self.agent_enabled
           # Proc.new {
           #   TingYun::Agent.config[:enabled] &&
@@ -144,12 +140,19 @@ module TingYun
           :allowed_from_server => false,
           :description => 'Enable or disable to identify the application name'
         },
+        :"nbs.agent_log_file_path" => {
+          :default => '',
+          :public => true,
+          :type => String,
+          :allowed_from_server => false,
+          :description => 'Specifies a path to the audit log file '
+        },
         :"nbs.agent_log_file_name" => {
           :default => '',
           :public => true,
           :type => String,
           :allowed_from_server => false,
-          :description => 'Specifies a path to the audit log file (including the filename).'
+          :description => 'log  filename.'
         },
         :"nbs.audit_mode" => {
           :default => false,
