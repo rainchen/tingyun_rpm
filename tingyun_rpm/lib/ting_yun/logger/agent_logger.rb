@@ -5,13 +5,14 @@ require 'thread'
 require 'logger'
 require 'ting_yun/logger/log_once'
 require 'ting_yun/logger/memory_logger'
-require 'ting_yun/agent/support/hostname'
+require 'ting_yun/support/hostname'
 
 
 module TingYun
-   #fortest
+  #fortest
   module Agent
-    CONFIG  = {}
+    CONFIG = {}
+
     def self.config
       ::TingYun::Agent::CONFIG
     end
@@ -59,7 +60,7 @@ module TingYun
       # default behavior of backtraces logged at debug, use one of the methods
       # above and pass an Exception as one of the args.
       def log_exception(level, e, backtrace_level=level)
-        @log.send(level, "%p: %s" % [ e.class, e.message ])
+        @log.send(level, "%p: %s" % [e.class, e.message])
         @log.send(backtrace_level) do
           backtrace = backtrace_from_exception(e)
           if backtrace
@@ -86,7 +87,7 @@ module TingYun
         e.backtrace
       end
 
-      # Allows for passing exceptions in explicitly, which format with backtrace
+      # Allows for passing exception.rb in explicitly, which format with backtrace
       def format_and_send(level, *msgs, &block)
         if block
           if @log.send("#{level}?")
@@ -98,8 +99,10 @@ module TingYun
 
         msgs.flatten.each do |item|
           case item
-          when Exception then log_exception(level, item, :debug)
-          else @log.send(level, item)
+            when Exception then
+              log_exception(level, item, :debug)
+            else
+              @log.send(level, item)
           end
         end
         nil
@@ -120,12 +123,12 @@ module TingYun
       end
 
       def create_log_to_file(root)
-        path = find_or_create_file_path(::TingYun::Agent.config[:'nbs.agent_log_file_path'], root)
+        path = find_or_create_file_path(::TingYun::Agent.config[:agent_log_file_path], root)
         if path.nil?
           @log = ::Logger.new(STDOUT)
-          warn("Error creating log directory #{::TingYun::Agent.config[:'nbs.agent_log_file_path']}, using standard out for logging.")
+          warn("Error creating log directory #{::TingYun::Agent.config[:agent_log_file_path]}, using standard out for logging.")
         else
-          file_path = "#{path}/#{::TingYun::Agent.config[:'nbs.agent_log_file_name']}"
+          file_path = "#{path}/#{::TingYun::Agent.config[:agent_log_file_name]}"
           begin
             @log = ::Logger.new(file_path)
           rescue => e
@@ -140,12 +143,12 @@ module TingYun
       end
 
       def wants_stdout?
-        ::TingYun::Agent.config[:'nbs.agent_log_file_name'].upcase == "STDOUT"
+        ::TingYun::Agent.config[:agent_log_file_name].upcase == "STDOUT"
       end
 
       def find_or_create_file_path(path_setting, root)
-        for abs_path in [ File.expand_path(path_setting),
-                          File.expand_path(File.join(root, path_setting)) ] do
+        for abs_path in [File.expand_path(path_setting),
+                         File.expand_path(File.join(root, path_setting))] do
           if File.directory?(abs_path) || (Dir.mkdir(abs_path) rescue nil)
             return abs_path[%r{^(.*?)/?$}]
           end
@@ -154,15 +157,15 @@ module TingYun
       end
 
       def set_log_level!
-        @log.level = AgentLogger.log_level_for(::TingYun::Agent.config[:'nbs.agent_log_level'])
+        @log.level = AgentLogger.log_level_for(::TingYun::Agent.config[:agent_log_level])
       end
 
       LOG_LEVELS = {
-        "debug" => ::Logger::DEBUG,
-        "info"  => ::Logger::INFO,
-        "warn"  => ::Logger::WARN,
-        "error" => ::Logger::ERROR,
-        "fatal" => ::Logger::FATAL,
+          "debug" => ::Logger::DEBUG,
+          "info" => ::Logger::INFO,
+          "warn" => ::Logger::WARN,
+          "error" => ::Logger::ERROR,
+          "fatal" => ::Logger::FATAL,
       }
 
       def self.log_level_for(level)
@@ -170,7 +173,7 @@ module TingYun
       end
 
       def set_log_format!
-        @hostname = TingYun::Agent::Support::Hostname.get
+        @hostname = TingYun::Support::Hostname.get
         @prefix = wants_stdout? ? '** [TingYun]' : ''
         @log.formatter = Proc.new do |severity, timestamp, progname, msg|
           "#{@prefix}[#{timestamp.strftime("%m/%d/%y %H:%M:%S %z")} #{@hostname} (#{$$})] #{severity} : #{msg}\n"
@@ -181,12 +184,6 @@ module TingYun
         StartupLogger.instance.dump(self)
       end
 
-    end
-
-    # In an effort to not lose messages during startup, we trap them in memory
-    # The real logger will then dump its contents out when it arrives.
-    class StartupLogger < MemoryLogger
-      include Singleton
     end
   end
 end

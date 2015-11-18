@@ -1,15 +1,15 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
 
-require File.expand_path(File.join(File.dirname(__FILE__),'..','..','..','test_helper'))
-require 'ting_yun/agent/configuration/default_source'
+require File.expand_path(File.join(File.dirname(__FILE__),'..','..','test_helper'))
+require 'ting_yun/configuration/default_source'
 
-module TingYun::Agent::Configuration
+module TingYun::Configuration
   class DefaultSourceTest < Minitest::Test
 
     def setup
       @default_source = DefaultSource.new
-      @defaults = ::TingYun::Agent::Configuration::DEFAULTS
+      @defaults = ::TingYun::Configuration::DEFAULTS
     end
 
     def test_default_values_have_a_public_setting

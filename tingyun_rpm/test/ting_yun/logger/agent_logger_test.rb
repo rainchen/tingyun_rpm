@@ -21,8 +21,8 @@ class AgentLoggerTest < Minitest::Test
   LEVELS = [:fatal, :error, :warn, :info, :debug]
 
   def setup
-  	::TingYun::Agent.config[:'nbs.agent_log_file_path'] = "log/"
-    ::TingYun::Agent.config[:'nbs.agent_log_file_name'] = "test.log"
+  	::TingYun::Agent.config[:agent_log_file_path] = "log/"
+    ::TingYun::Agent.config[:agent_log_file_name] = "test.log"
   end
 
   def teardown
@@ -33,7 +33,7 @@ class AgentLoggerTest < Minitest::Test
   	@logger = TingYun::Logger::AgentLogger.new
   	wrapped_logger = @logger.instance_variable_get(:@log) 
   	logdev = wrapped_logger.instance_variable_get(:@logdev)
-  	expected_logpath = File.expand_path(::TingYun::Agent.config[:'nbs.agent_log_file_path'] + ::TingYun::Agent.config[:'nbs.agent_log_file_name'])
+  	expected_logpath = File.expand_path(::TingYun::Agent.config[:agent_log_file_path] + ::TingYun::Agent.config[:agent_log_file_name])
 
   	assert_kind_of( Logger, wrapped_logger )
   	assert_kind_of( File, logdev.dev )
@@ -41,14 +41,14 @@ class AgentLoggerTest < Minitest::Test
   end
 
   def test_log_level
-  	::TingYun::Agent.config[:'nbs.agent_log_level'] = 'unknown'
+  	::TingYun::Agent.config[:agent_log_level] = 'unknown'
 
   	@logger = TingYun::Logger::AgentLogger.new
   	wrapped_logger = @logger.instance_variable_get(:@log) 
 
   	assert_equal(::Logger::INFO , wrapped_logger.level)
 
-  	::TingYun::Agent.config[:'nbs.agent_log_level'] = 'debug'
+  	::TingYun::Agent.config[:agent_log_level] = 'debug'
 
   	@logger = TingYun::Logger::AgentLogger.new
   	wrapped_logger = @logger.instance_variable_get(:@log) 
@@ -63,7 +63,7 @@ class AgentLoggerTest < Minitest::Test
   end
 
   def test_forwards_calls_to_logger
-  	::TingYun::Agent.config[:'nbs.agent_log_level'] = 'info'
+  	::TingYun::Agent.config[:agent_log_level] = 'info'
 
   	logger = create_basic_logger
 
