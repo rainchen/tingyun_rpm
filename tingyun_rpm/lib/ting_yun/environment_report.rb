@@ -62,17 +62,17 @@ module TingYun
     report_on('Ruby patchlevel') { RUBY_PATCHLEVEL.to_s }
     report_on('JRuby version') { JRUBY_VERSION }
     report_on('Java VM version') { ENV_JAVA['java.vm.version'] }
-    report_on('Logical Processors') { ::NewRelic::Agent::SystemInfo.num_logical_processors }
-    report_on('Physical Cores') { ::NewRelic::Agent::SystemInfo.num_physical_cores }
-    report_on('Arch') { ::NewRelic::Agent::SystemInfo.processor_arch }
-    report_on('OS version') { ::NewRelic::Agent::SystemInfo.os_version }
-    report_on('OS') { ::NewRelic::Agent::SystemInfo.ruby_os_identifier }
-    report_on('Database adapter') do
-      ActiveRecord::Base.configurations[NewRelic::Control.instance.env]['adapter']
-    end
+    report_on('Logical Processors') { ::TingYun::Support::SystemInfo.num_logical_processors }
+    report_on('Physical Cores') { ::TingYun::Support::SystemInfo.num_physical_cores }
+    report_on('Arch') { ::TingYun::Support::SystemInfo.processor_arch }
+    report_on('OS version') { ::TingYun::Support::SystemInfo.os_version }
+    report_on('OS') { ::TingYun::Support::SystemInfo.ruby_os_identifier }
+    # report_on('Database adapter') do
+    #   ActiveRecord::Base.configurations[NewRelic::Control.instance.env]['adapter']
+    # end
     report_on('Framework') { Agent.config[:framework].to_s }
     report_on('Dispatcher') { Agent.config[:dispatcher].to_s }
-    report_on('Environment') { NewRelic::Control.instance.env }
+    # report_on('Environment') { NewRelic::Control.instance.env }
     report_on('Rails version') { ::Rails::VERSION::STRING }
     report_on('Rails threadsafe') do
       ::Rails.configuration.action_controller.allow_concurrency
@@ -98,17 +98,17 @@ module TingYun
           if value
             data[key] = value
 
-            Agent.record_metric("Supportability/EnvironmentReport/success", 0.0)
-            Agent.record_metric("Supportability/EnvironmentReport/success/#{key}", 0.0)
+            # Agent.record_metric("Supportability/EnvironmentReport/success", 0.0)
+            # Agent.record_metric("Supportability/EnvironmentReport/success/#{key}", 0.0)
           else
             Agent.logger.debug("EnvironmentReport ignoring value for #{key.inspect} which came back falsey: #{value.inspect}")
-            Agent.record_metric("Supportability/EnvironmentReport/empty", 0.0)
-            Agent.record_metric("Supportability/EnvironmentReport/empty/#{key}", 0.0)
+            # Agent.record_metric("Supportability/EnvironmentReport/empty", 0.0)
+            # Agent.record_metric("Supportability/EnvironmentReport/empty/#{key}", 0.0)
           end
         rescue => e
           Agent.logger.debug("EnvironmentReport failed to retrieve value for #{key.inspect}: #{e}")
-          Agent.record_metric("Supportability/EnvironmentReport/error", 0.0)
-          Agent.record_metric("Supportability/EnvironmentReport/error/#{key}", 0.0)
+          # Agent.record_metric("Supportability/EnvironmentReport/error", 0.0)
+          # Agent.record_metric("Supportability/EnvironmentReport/error/#{key}", 0.0)
         end
         data
       end

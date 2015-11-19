@@ -7,6 +7,25 @@ module TingYun
   module Agent
     module InstanceMethods
       module Start
+
+        # Check to see if the agent should start, returning +true+ if it should.
+        def agent_should_start?
+          return false if already_started? || disabled?
+          unless app_name_configured?
+            Agent.logger.error "No application name configured.",
+                               "The Agent cannot start without at least one. Please check your ",
+                               "tingyun.yml and ensure that it is valid and has at least one ",
+                               "value set for app_name in the",
+                               "environment."
+            return false
+          end
+          return true
+        end
+
+        def started?
+          @started
+        end
+
         # Check whether we have already started, which is an error condition
         def already_started?
           if started?

@@ -6,6 +6,7 @@ require 'ting_yun/agent/instance_methods'
 
 
 
+
 # The Agent is a singleton that is instantiated when the plugin is
 # activated.  It collects performance data from ruby applications
 # in realtime as the application runs, and periodically sends that
@@ -14,8 +15,13 @@ require 'ting_yun/agent/instance_methods'
 module TingYun
   module Agent
     class Agent
+
+      # service for communicating with collector
+      attr_accessor :service
+
       extend ClassMethods
       include InstancMethods
+
 
       def start
         return unless agent_should_start?
