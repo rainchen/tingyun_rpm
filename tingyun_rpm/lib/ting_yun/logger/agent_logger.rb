@@ -6,17 +6,10 @@ require 'logger'
 require 'ting_yun/logger/log_once'
 require 'ting_yun/logger/memory_logger'
 require 'ting_yun/support/hostname'
+require 'ting_yun/logger/null_logger'
 
 
 module TingYun
-  #fortest
-  module Agent
-    CONFIG = {}
-
-    def self.config
-      ::TingYun::Agent::CONFIG
-    end
-  end
   module Logger
     class AgentLogger
       include LogOnce
@@ -139,7 +132,7 @@ module TingYun
       end
 
       def create_null_logger
-        @log = ::NewRelic::Agent::NullLogger.new
+        @log = ::TingYun::Logger::NullLogger.new
       end
 
       def wants_stdout?

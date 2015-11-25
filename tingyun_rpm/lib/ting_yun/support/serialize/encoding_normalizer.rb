@@ -2,6 +2,8 @@
 # This file is distributed under Ting Yun's license terms.
 
 # This module was normalize the date encode
+require 'ting_yun/support/language_support'
+
 
 module TingYun
   module Support

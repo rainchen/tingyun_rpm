@@ -1,20 +1,19 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
-require 'forwardable'
 require 'ting_yun/configuration/manager'
 require 'ting_yun/logger/startup_logger'
+
 
 module TingYun
   module Agent
     extend self
-    extend Forwardable
 
     @agent = nil
     @logger = nil
-
     @config = ::TingYun::Configuration::Manager.new
 
     attr_reader :config
+
 
     def agent
       return @agent if @agent

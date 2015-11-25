@@ -1,8 +1,9 @@
-# encoding: utf-8
+ # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
 
 require 'base64'
 require 'zlib'
+require 'ting_yun/support/serialize/json_wrapper'
 
 module TingYun
   module Support
@@ -25,9 +26,9 @@ module TingYun
             normalize_encodings = if opts[:skip_normalization]
                                     false
                                   else
-                                    Agent.config[:normalize_json_string_encodings]
+                                    TingYun::Agent.config[:normalize_json_string_encodings]
                                   end
-            # json = ::NewRelic::JSONWrapper.dump(data, :normalize => normalize_encodings)
+            json = JSONWrapper.dump(data, :normalize => normalize_encodings)
             Base64.encode64(Compressed.encode(json))
           end
         end

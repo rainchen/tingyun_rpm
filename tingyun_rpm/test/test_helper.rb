@@ -24,6 +24,7 @@ end
 
 require 'hometown'
 Hometown.watch(::Thread)
+require 'agent_helper'
 
 # Set up a watcher for leaking agent threads out of tests.  It'd be nice to
 # disable the threads everywhere, but not all tests have tingyun.yml loaded to
@@ -36,7 +37,7 @@ class Minitest::Test
       test_method_name = self.__name__
     end
 
-    # NewRelic::Agent.logger.info("*** #{self.class}##{test_method_name} **")
+     # TingYun::Agent.logger.info("*** #{self.class}##{test_method_name} **")
 
     @__thread_count = ruby_threads.count
     super

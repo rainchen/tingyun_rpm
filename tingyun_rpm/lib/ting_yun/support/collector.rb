@@ -14,11 +14,11 @@ module TingYun
       end
 
       def api_collector
-        @api_collector ||= Collector.new(Agent.config[:api_host], Agent.config[:api_port])
+        @api_collector ||= Collector.new(TingYun::Agent.config[:api_host], TingYun::Agent.config[:api_port])
       end
 
       def collector_from_host(hostname=nil)
-        Collector.new(hostname || Agent.config[:api_host], Agent.config[:api_port])
+        Collector.new(hostname || TingYun::Agent.config[:api_host], TingYun::Agent.config[:api_port])
       end
 
     end

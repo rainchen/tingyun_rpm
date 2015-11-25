@@ -14,15 +14,13 @@ module TingYun
 
 
       def reset_to_default_configuration
-        Agent.config.remove_config_type(:manual)
-        Agent.config.remove_config_type(:server)
+        TingYun::Agent.config.remove_config_type(:manual)
+        TingYun::Agent.config.remove_config_type(:server)
       end
 
-      def drop_the_buffered_data
+      def drop_buffered_data
 
       end
-
-
     end
   end
 end

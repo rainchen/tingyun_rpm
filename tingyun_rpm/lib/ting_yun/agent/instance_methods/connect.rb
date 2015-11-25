@@ -4,6 +4,7 @@ require 'ting_yun/support/exception'
 require 'ting_yun/support/hostname'
 require 'ting_yun/configuration/server_source'
 require 'ting_yun/agent/instance_methods/handle_errors'
+require 'ting_yun/environment_report'
 
 
 module TingYun
@@ -14,7 +15,7 @@ module TingYun
         include HandleErrors
 
         # number of attempts we've made to contact the server
-        attr_accessor :connect_attempt_count
+        attr_accessor :connect_attempts
 
         # Disconnect just sets connected to false, which prevents
         # the agent from trying to connect again
@@ -47,9 +48,8 @@ module TingYun
         end
 
         def note_connect_failure
-          self.connect_attempt_count += 1
+          self.connect_attempts += 1
         end
-
 
         def generate_environment_report
           @environment_report = environment_for_connect
@@ -61,7 +61,7 @@ module TingYun
         # require calls in Rails environments, so this method should only
         # be called synchronously from on the main thread.
         def environment_for_connect
-          # Agent.config[:send_environment_info] ? Array(EnvironmentReport.new) : []
+          ::TingYun::Agent.config[:send_environment_info] ? Array(EnvironmentReport.new) : []
         end
 
         # Initializes the hash of settings that we send to the
@@ -70,25 +70,26 @@ module TingYun
           settings = {
               :pid => $$,
               :host => local_host,
-              :app_name => Agent.config.app_names,
+              :app_name => ::TingYun::Agent.config.app_names,
               :language => 'ruby',
-              :agent_version => TingYun::VERSION::STRING,
+              :agent_version => ::TingYun::VERSION::STRING,
               :environment => @environment_report
           }
           settings
         end
 
         def local_host
-          Hostname.get
+          TingYun::Support::Hostname.get
         end
 
         # Returns connect data passed back from the server
-        def return_server_config
+        def connect_to_server
           @service.connect(connect_settings)
         end
 
-        def connect_and_merge_server_config_data
-          finish_setup(return_server_config)
+        #merge server config
+        def query_server_for_configuration
+          finish_setup(connect_to_server)
         end
 
         # * <tt>:keep_retrying => false</tt> to only try to connect once, and
@@ -99,35 +100,35 @@ module TingYun
         #   agent run and Ting Yun sees it as a separate instance (default is false).
         def keep_retrying_or_force_reconnect?(options,&blk)
           defaults = {
-              :keep_retrying => Agent.config[:keep_retrying],
-              :force_reconnect => Agent.config[:force_reconnect]
+              :keep_retrying => ::TingYun::Agent.config[:keep_retrying],
+              :force_reconnect => ::TingYun::Agent.config[:force_reconnect]
           }
           opts = defaults.merge(options)
           return unless should_connect?(opts[:force_reconnect])
 
           yield
 
-        rescue ForceRestartException => e
+        rescue TingYun::Support::Exception::ForceRestartException => e
           handle_force_restart(e)
           retry
-        rescue ForceDisconnectException => e
+        rescue TingYun::Support::Exception::ForceDisconnectException => e
           handle_force_disconnect(e)
-        rescue LicenseException => e
+        rescue TingYun::Support::Exception::LicenseException => e
           handle_license_error(e)
-        rescue UnrecoverableAgentException => e
+        rescue TingYun::Support::Exception::UnrecoverableAgentException => e
           handle_unrecoverable_agent_error(e)
         rescue StandardError, Timeout::Error, ServerConnectionException => e
           log_error(e)
           if opts[:keep_retrying]
             note_connect_failure
-            Agent.logger.info "Will re-attempt in #{connect_retry_period} seconds"
+            ::TingYun::Agent.logger.info "Will re-attempt in #{connect_retry_period} seconds"
             sleep connect_retry_period
             retry
           else
             disconnect
           end
         rescue Exception => e
-          Agent.logger.error "Exception of unexpected type during Agent#connect():", e
+          ::TingYun::Agent.logger.error "Exception of unexpected type during Agent#connect():", e
           handle_other_error(e)
         end
 
@@ -138,17 +139,17 @@ module TingYun
         # separately.
         #
         def finish_setup(config_data)
-          return if config_data
-          Agent.logger.debug "Server provided config: #{config_data.inspect}"
-          server_config = ServerSource.new(config_data, Agent.config)
-          Agent.config.replace_or_add_config(server_config)
-          log_connection!(config_data)
+          return if config_data == nil
+
+          ::TingYun::Agent.logger.debug "Server provided config: #{config_data.inspect}"
+          server_config = TingYun::Configuration::ServerSource.new(config_data, ::TingYun::Agent.config)
+          ::TingYun::Agent.config.replace_or_add_config(server_config)
+          #log_connection!(config_data)
         end
 
         def log_connection!(config_data)
 
         end
-
       end
     end
   end

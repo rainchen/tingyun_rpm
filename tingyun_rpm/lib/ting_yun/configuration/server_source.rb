@@ -16,6 +16,10 @@ module TingYun
         TOP_LEVEL_KEYS.concat add_array
       end
 
+      def self.remove_top_level_keys_for_testing(remove_arry)
+        remove_arry.each{|i| TOP_LEVEL_KEYS.delete(i)}
+      end
+
       def initialize(connect_reply, existing_config={})
         merged_settings = {}
 

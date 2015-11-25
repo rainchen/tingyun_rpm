@@ -1,7 +1,7 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
 module TingYun
-  module TingYunService
+  class TingYunService
     module Request
 
       #Posts to the specified server, only try to request twice if there any exception in the first time
@@ -17,21 +17,22 @@ module TingYun
         begin
           attempts += 1
           conn = http_connection
-          Agent.logger.debug "Sending request to #{opts[:collector]}#{opts[:uri]}"
+          TingYun::Agent.logger.debug "Sending request to #{opts[:collector]}#{opts[:uri]}"
           TingYun::Support::TimerLib.timeout(@request_timeout) do
             response = conn.request(request)
           end
         rescue *CONNECTION_ERRORS => e
           close_shared_connection
           if attempts < max_attempts
-            Agent.logger.debug("Retrying request to #{opts[:collector]}#{opts[:uri]} after #{e}")
+            TingYun::Agent.logger.debug("Retrying request to #{opts[:collector]}#{opts[:uri]} after #{e}")
             retry
           else
-            raise ServerConnectionException, "Recoverable error talking to #{@collector} after #{attempts} attempts: #{e}"
+            raise TingYun::Support::Exception::ServerConnectionException, "Recoverable error talking to #{@collector} after #{attempts} attempts: #{e}"
           end
         end
 
-        Agent.logger.debug "Received response, status: #{response.code}, encoding: '#{response['content-encoding']}'"
+        TingYun::Agent.logger.debug "Received response, status: #{response.code}, encoding: '#{response['content-encoding']}'"
+
 
         case response
           when Net::HTTPSuccess
@@ -54,10 +55,10 @@ module TingYun
 
 
 
-      def compress_request_if_needed(request)
+      def compress_request_if_needed(data)
         encoding = 'identity'
         if data.size > 64*1024
-          data = Encoders::Compressed.encode(data)
+          data = TingYun::Support::Serialize::Encoders::Compressed.encode(data)
           encoding = 'deflate'
         end
         check_post_size(data)
@@ -65,9 +66,9 @@ module TingYun
       end
 
       def check_post_size(post)
-        return if post.size < Agent.config[:post_size_limit]
-        Agent.logger.debug "Tried to send too much data: #{post.size} bytes"
-        raise UnrecoverableServerException.new('413 Request Entity Too Large')
+        return if post.size < TingYun::Agent.config[:post_size_limit]
+        TingYun::Agent.logger.debug "Tried to send too much data: #{post.size} bytes"
+        raise TingYun::Support::Exception::UnrecoverableServerException.new('413 Request Entity Too Large')
       end
 
       def user_agent

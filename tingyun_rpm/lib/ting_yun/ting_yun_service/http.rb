@@ -7,7 +7,7 @@ require 'ting_yun/ting_yun_service/request'
 require 'ting_yun/ting_yun_service/connection'
 
 module TingYun
-  module TingYunService
+  class TingYunService
     module Http
 
       include Ssl
@@ -16,7 +16,7 @@ module TingYun
 
       def remote_method_uri(method)
         params = {'licenseKey'=> @license_key,'appSessionKey' => @app_session_key,'version' => @data_version}
-        uri = '#{method}'
+        uri = method.to_s
         uri << '?' + params.map do |k,v|
           next unless v
           "#{k}=#{v}"

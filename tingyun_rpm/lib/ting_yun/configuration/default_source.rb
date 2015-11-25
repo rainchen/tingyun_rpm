@@ -9,9 +9,9 @@ module TingYun
 
     # Helper since default Procs are evaluated in the context of this module
     def self.value_of(key)
-      # Proc.new do
-      #   NewRelic::Agent.config[key]
-      # end
+      Proc.new do
+        TingYun::Agent.config[key]
+      end
     end
 
     class Boolean;
@@ -21,7 +21,8 @@ module TingYun
       attr_reader :defaults
 
       extend Forwardable
-      def_delegators :@defaults, :keys, :has_key?, :[]
+      def_delegators :@defaults, :has_key?, :each, :merge, :delete, :keys, :[], :to_hash
+
 
       def initialize
         @defaults = default_values
@@ -54,7 +55,7 @@ module TingYun
 
       def self.audit_log_path
         Proc.new {
-          File.join(NewRelic::Agent.config[:log_file_path], 'newrelic_audit.log')
+          File.join(TingYun::Agent.config[:log_file_path], 'newrelic_audit.log')
         }
       end
 
@@ -62,7 +63,7 @@ module TingYun
       # normalize encodings since it's safest and fast. Without that support
       # the conversions are too expensive, so only enable if overridden to.
       def self.normalize_json_string_encodings
-        Proc.new { NewRelic::LanguageSupport.supports_string_encodings? }
+        Proc.new { TingYun::Support::LanguageSupport.supports_string_encodings? }
       end
 
 
@@ -71,12 +72,10 @@ module TingYun
       end
 
       def self.port
-        Proc.new { NewRelic::Agent.config[:ssl] ? 443 : 80 }
+        Proc.new {TingYun::Agent.config[:ssl] ? 443 : 80 }
       end
 
-      def self.action_tracer_action_threshold
-        Proc.new { NewRelic::Agent.config[:apdex_f] * 4 }
-      end
+
 
 
       def self.config_search_paths
@@ -187,14 +186,14 @@ module TingYun
             :description => 'Enable or disable to identify the application name'
         },
         :agent_log_file_path => {
-            :default => '',
+            :default => 'log/',
             :public => true,
             :type => String,
             :allowed_from_server => false,
             :description => 'Specifies a path to the audit log file '
         },
         :agent_log_file_name => {
-            :default => '',
+            :default => 'test.log',
             :public => true,
             :type => String,
             :allowed_from_server => false,
@@ -240,7 +239,7 @@ module TingYun
             :public => true,
             :type => String,
             :allowed_from_server => false,
-            :description => 'Log level for agent logging: critical, error, warning, info, verbose or debug.'
+            :description => 'Log level for agent logging: fatal, error, warn, info, debug.'
         },
         :proxy_host => {
             :default => nil,

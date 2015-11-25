@@ -32,7 +32,7 @@ module TingYun
             @backend_name = :json
             return true
           rescue StandardError, ScriptError => err
-            Agent.logger.debug "%p while loading JSON library: %s" % [err, err.message] if defined?(TingYun::Agent) && TingYun::Agent.respond_to?(:logger)
+            TingYun::Agent.logger.debug "%p while loading JSON library: %s" % [err, err.message] if defined?(TingYun::Agent) && TingYun::Agent.respond_to?(:logger)
           end
         end
 

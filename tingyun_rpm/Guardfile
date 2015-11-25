@@ -20,5 +20,6 @@ guard :minitest, :test_folders => ['test/ting_yun'], :all_after_pass => false do
   watch(%r{^lib/(.+)\.rb$})     { |m| "test/#{m[1]}_test.rb" }
   watch(%r{^test/.+_test\.rb$})
   watch('test/test_helper.rb')  { "test/tingyun" }
+  watch('test/agent_helper.rb') { "test/tingyun" }
 
 end

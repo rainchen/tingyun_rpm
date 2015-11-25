@@ -1,6 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__),'..','..','test_helper'))
 require 'ting_yun/logger/agent_logger'
 require 'ting_yun/logger/null_logger'
+require 'ting_yun/agent'
 
 class ArrayLogDevice
   def initialize( array=[] )
@@ -21,34 +22,36 @@ class AgentLoggerTest < Minitest::Test
   LEVELS = [:fatal, :error, :warn, :info, :debug]
 
   def setup
-  	::TingYun::Agent.config[:agent_log_file_path] = "log/"
-    ::TingYun::Agent.config[:agent_log_file_name] = "test.log"
+    TingYun::Agent.config.add_config_for_testing(
+        :log_file_path => "log/",
+        :log_file_name => "testlog.log",
+        :log_level     => :info)
   end
 
   def teardown
-    ::TingYun::Agent.config.clear
+    ::TingYun::Agent.config.reset_to_defaults
   end
 
   def test_create_log_from_config
   	@logger = TingYun::Logger::AgentLogger.new
   	wrapped_logger = @logger.instance_variable_get(:@log) 
   	logdev = wrapped_logger.instance_variable_get(:@logdev)
-  	expected_logpath = File.expand_path(::TingYun::Agent.config[:agent_log_file_path] + ::TingYun::Agent.config[:agent_log_file_name])
+  	expected_log_path = File.expand_path(::TingYun::Agent.config[:agent_log_file_path] + ::TingYun::Agent.config[:agent_log_file_name])
 
   	assert_kind_of( Logger, wrapped_logger )
   	assert_kind_of( File, logdev.dev )
-  	assert_equal( expected_logpath, logdev.filename )
+  	assert_equal( expected_log_path, logdev.filename )
   end
 
   def test_log_level
-  	::TingYun::Agent.config[:agent_log_level] = 'unknown'
+  	::TingYun::Agent.config.add_config_for_testing(:agent_log_level => 'unknown')
 
   	@logger = TingYun::Logger::AgentLogger.new
   	wrapped_logger = @logger.instance_variable_get(:@log) 
 
   	assert_equal(::Logger::INFO , wrapped_logger.level)
 
-  	::TingYun::Agent.config[:agent_log_level] = 'debug'
+  	::TingYun::Agent.config.add_config_for_testing(:agent_log_level => 'debug')
 
   	@logger = TingYun::Logger::AgentLogger.new
   	wrapped_logger = @logger.instance_variable_get(:@log) 
@@ -63,7 +66,7 @@ class AgentLoggerTest < Minitest::Test
   end
 
   def test_forwards_calls_to_logger
-  	::TingYun::Agent.config[:agent_log_level] = 'info'
+    ::TingYun::Agent.config.add_config_for_testing(:agent_log_level => 'info')
 
   	logger = create_basic_logger
 

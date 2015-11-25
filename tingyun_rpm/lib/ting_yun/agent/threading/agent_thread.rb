@@ -6,18 +6,18 @@ module TingYun
     module Threading
       class AgentThread
 
-        def self.create_thread(label, &blk)
-          Agent.logger.debug("Creating Ting Yun thread: #{label}")
+        def self.create(label, &blk)
+          TingYun::Agent.logger.debug("Creating Ting Yun thread: #{label}")
           wrapped_blk = Proc.new do
             begin
               blk.call
             rescue => e
-              Agent.logger.error("Thread #{label} exited with error", e)
+              TingYun::Agent.logger.error("Thread #{label} exited with error", e)
             rescue Exception => e
-              Agent.logger.error("Thread #{label} exited with exception. Re-raising in case of interupt.", e)
+              TingYun::Agent.logger.error("Thread #{label} exited with exception. Re-raising in case of interupt.", e)
               raise
             ensure
-              Agent.logger.debug("Exiting TingYun thread: #{label}")
+              TingYun::Agent.logger.debug("Exiting TingYun thread: #{label}")
             end
           end
 

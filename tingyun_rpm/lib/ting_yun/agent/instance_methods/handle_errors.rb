@@ -5,7 +5,7 @@
 
 module TingYun
   module Agent
-    module Instance_methods
+    module InstanceMethods
       module HandleErrors
         # When the server sends us an error with the license key, we
         # want to tell the user that something went wrong, and let
@@ -15,14 +15,14 @@ module TingYun
         # no longer try to connect to the server, saving the
         # application and the server load
         def handle_license_error(error)
-          Agent.logger.error(\
+          TingYun::Agent.logger.error(\
               error.message, \
               "You need to obtain a valid license key, or to upgrade your account.")
           disconnect
         end
 
         def handle_unrecoverable_agent_error(error)
-          Agent.logger.error(error.message)
+          TingYun::Agent.logger.error(error.message)
           disconnect
           shutdown
         end
@@ -31,17 +31,17 @@ module TingYun
         # to tell the user what happened, since this is not an error
         # we can handle gracefully.
         def log_error(error)
-          Agent.logger.error "Error establishing connection with Ting Yun Service at #{server}:", error
+          TingYun::Agent.logger.error "Error establishing connection with Ting Yun Service at #{server}:", error
         end
 
         # Handles an unknown error in the worker thread by logging
         # it and disconnecting the agent, since we are now in an
         # unknown state.
         def handle_other_error(error)
-          Agent.logger.error "Unhandled error in worker thread, disconnecting this agent process:"
+          TingYun::Agent.logger.error "Unhandled error in worker thread, disconnecting this agent process:"
           # These errors are fatal (that is, they will prevent the agent from
           # reporting entirely), so we really want backtraces when they happen
-          Agent.logger.log_exception(:error, error)
+          TingYun::Agent.logger.log_exception(:error, error)
           disconnect
         end
 
@@ -49,14 +49,14 @@ module TingYun
         # this clears the data, clears connection attempts, and
         # waits a while to reconnect.
         def handle_force_restart(error)
-          Agent.logger.debug error.message
+          TingYun::Agent.logger.debug error.message
           drop_buffered_data
           @service.force_restart if @service
           @connect_state = :pending
           sleep 30
         end
         def handle_force_disconnect(error)
-          Agent.logger.warn "Ting Yun forced this agent to disconnect (#{error.message})"
+          TingYun::Agent.logger.warn "Ting Yun forced this agent to disconnect (#{error.message})"
           disconnect
         end
 

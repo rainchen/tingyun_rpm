@@ -1,5 +1,6 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
+require "ting_yun/agent"
 
 module TingYun
   module Agent

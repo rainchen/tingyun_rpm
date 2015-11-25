@@ -3,7 +3,7 @@
 require 'ting_yun/support/path'
 
 module TingYun
-  module TingYunService
+  class TingYunService
     module Ssl
 
       def setup_connection_for_ssl(conn)
@@ -22,7 +22,7 @@ module TingYun
       def ssl_cert_store
         path = cert_file_path
         if !@ssl_cert_store || path != @cached_cert_store_path
-          Agent.logger.debug("Creating SSL certificate store from file at #{path}")
+          TingYun::Agent.logger.debug("Creating SSL certificate store from file at #{path}")
           @ssl_cert_store = OpenSSL::X509::Store.new
           @ssl_cert_store.add_file(path)
           @cached_cert_store_path = path
@@ -31,8 +31,8 @@ module TingYun
       end
 
       def cert_file_path
-        if path_override = Agent.config[:ca_bundle_path]
-          Agent.logger.warn("Couldn't find CA bundle from configured ca_bundle_path: #{path_override}") unless File.exist? path_override
+        if path_override = TingYun::Agent.config[:ca_bundle_path]
+          TingYun::Agent.logger.warn("Couldn't find CA bundle from configured ca_bundle_path: #{path_override}") unless File.exist? path_override
           path_override
         else
           File.expand_path(File.join(TingYun::Support::Path.ting_yun_root, 'cert', 'cacert.pem'))

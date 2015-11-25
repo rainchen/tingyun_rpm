@@ -3,7 +3,7 @@
 
 
 module TingYun
-  module TingYunService
+  class TingYunService
     module Connection
       # Return a Net::HTTP connection object to make a call to the collector.
       # We'll reuse the same handle for cases where we're using keep-alive, or
@@ -31,37 +31,37 @@ module TingYun
       end
 
       def start_connection(conn)
-        Agent.logger.debug("Opening TCP connection to #{conn.address}:#{conn.port}")
+        TingYun::Agent.logger.debug("Opening TCP connection to #{conn.address}:#{conn.port}")
         TingYun::Support::TimerLib.timeout(@request_timeout) { conn.start }
         conn
       end
 
 
       def create_http_connection
-        if Agent.config[:proxy_host]
-          Agent.logger.debug("Using proxy server #{Agent.config[:proxy_host]}:#{Agent.config[:proxy_port]}")
+        if TingYun::Agent.config[:proxy_host]
+          TingYun::Agent.logger.debug("Using proxy server #{TingYun::Agent.config[:proxy_host]}:#{TingYun::Agent.config[:proxy_port]}")
 
           proxy = Net::HTTP::Proxy(
-              Agent.config[:proxy_host],
-              Agent.config[:proxy_port],
-              Agent.config[:proxy_user],
-              Agent.config[:proxy_pass]
+              TingYun::Agent.config[:proxy_host],
+              TingYun::Agent.config[:proxy_port],
+              TingYun::Agent.config[:proxy_user],
+              TingYun::Agent.config[:proxy_pass]
           )
           conn = proxy.new(@collector.name, @collector.port)
         else
           conn = Net::HTTP.new(@collector.name, @collector.port)
         end
 
-        setup_connection_for_ssl(conn) if Agent.config[:ssl]
+        setup_connection_for_ssl(conn) if TingYun::Agent.config[:ssl]
         setup_connection_timeouts(conn)
-        Agent.logger.debug("Created net/http handle to #{conn.address}:#{conn.port}")
+        TingYun::Agent.logger.debug("Created net/http handle to #{conn.address}:#{conn.port}")
 
         conn
       end
 
       def close_shared_connection
         if @shared_tcp_connection
-          Agent.logger.debug("Closing shared TCP connection to #{@shared_tcp_connection.address}:#{@shared_tcp_connection.port}")
+          TingYun::Agent.logger.debug("Closing shared TCP connection to #{@shared_tcp_connection.address}:#{@shared_tcp_connection.port}")
           @shared_tcp_connection.finish if @shared_tcp_connection.started?
           @shared_tcp_connection = nil
         end
@@ -72,8 +72,8 @@ module TingYun
         # We use Timeout explicitly instead of this
         conn.read_timeout = nil
 
-        if conn.respond_to?(:keep_alive_timeout) && Agent.config[:aggressive_keepalive]
-          conn.keep_alive_timeout = Agent.config[:keep_alive_timeout]
+        if conn.respond_to?(:keep_alive_timeout) && TingYun::Agent.config[:aggressive_keepalive]
+          conn.keep_alive_timeout = TingYun::Agent.config[:keep_alive_timeout]
         end
       end
     end

@@ -3,6 +3,7 @@
 require 'ting_yun/logger/agent_logger'
 require 'ting_yun/agent/class_methods'
 require 'ting_yun/agent/instance_methods'
+require 'ting_yun/ting_yun_service'
 
 
 
@@ -20,7 +21,7 @@ module TingYun
       attr_accessor :service
 
       extend ClassMethods
-      include InstancMethods
+      include InstanceMethods
 
 
       def start
@@ -34,7 +35,7 @@ module TingYun
       # data.
       def shutdown
         return unless started?
-        Agent.logger.info "Starting Agent shutdown"
+        TingYun::Agent.logger.info "Starting Agent shutdown"
         reset_to_default_configuration
         @started = nil
       end
@@ -47,8 +48,8 @@ module TingYun
 
       def connect(option={})
         keep_retrying_or_force_reconnect?(option) do
-          Agent.logger.debug "Connecting Process to Ting Yun: #$0"
-          connect_and_merge_server_config_data #connnect
+          TingYun::Agent.logger.debug "Connecting Process to Ting Yun: #$0"
+          query_server_for_configuration #connnect
           @connected_pid = $$
           @connect_state = :connected
         end
@@ -59,7 +60,9 @@ module TingYun
       def initialize
         @started = false
         @environment_report = nil
-        @service = nil
+        @service = TingYunService.new
+        @connect_state = :pending #[:pending, :connected, :disconnected]
+        @connect_attempts = 0
       end
     end
   end

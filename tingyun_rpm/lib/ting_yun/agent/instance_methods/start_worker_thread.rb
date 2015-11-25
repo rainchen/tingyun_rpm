@@ -8,8 +8,8 @@ module TingYun
     module InstanceMethods
       module StartWorkerThread
         def start_worker_thread(connection_options={})
-          Agent.logger.debug "Creating Ruby Agent worker thread."
-          @worker_thread = AgentThread.create_thread('Worker Loop') do
+          TingYun::Agent.logger.debug "Creating Ruby Agent worker thread."
+          @worker_thread = TingYun::Agent::Threading::AgentThread.create('Worker Loop') do
             deferred_work!(connection_options)
           end
         end
@@ -27,7 +27,7 @@ module TingYun
           if connected?
             create_and_run_event_loop
           else
-            Agent.logger.debug "No connection.  Worker thread ending."
+            TingYun::Agent.logger.debug "No connection.  Worker thread ending."
           end
         end
 

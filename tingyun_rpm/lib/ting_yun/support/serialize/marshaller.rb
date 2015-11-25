@@ -4,7 +4,7 @@ require 'ting_yun/agent'
 require 'ting_yun/support/exception'
 
 module TingYun
-  class Support
+  module Support
     module Serialize
       class Marshaller
         def parsed_error(error)
@@ -13,13 +13,13 @@ module TingYun
 
           exception = case error_type
                         when 'TingYun::Support::Exception::LicenseException'
-                          LicenseException.new(error_message)
+                          TingYun::Support::Exception::LicenseException.new(error_message)
                         when 'TingYun::Support::Exception::ForceRestartException'
-                          ForceRestartException.new(error_message)
+                          TingYun::Support::Exception::ForceRestartException.new(error_message)
                         when 'TingYun::Support::Exception::ForceDisconnectException'
-                          ForceDisconnectException.new(error_message)
+                          TingYun::Support::Exception::ForceDisconnectException.new(error_message)
                         else
-                          CollectorError.new("#{error['error_type']}: #{error['message']}")
+                          TingYun::Support::Exception::CollectorError.new("#{error['error_type']}: #{error['message']}")
                       end
 
           exception
@@ -28,7 +28,7 @@ module TingYun
         def prepare(data, options={})
           encoder = options[:encoder] || default_encoder
           if data.respond_to?(:to_collector_array)
-            # data.to_collector_array(encoder)
+            data.to_collector_array(encoder)
           elsif data.kind_of?(Array)
             data.map { |element| prepare(element, options) }
           else
@@ -42,6 +42,10 @@ module TingYun
 
         def self.human_readable?
           false
+        end
+
+        def return_value_for_testing(data)
+          return_value(data)
         end
 
         protected

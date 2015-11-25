@@ -2,7 +2,6 @@
 # This file is distributed under Ting Yun's license terms.
 
 require File.expand_path(File.join(File.dirname(__FILE__),'..','..','test_helper'))
-require 'ting_yun/configuration/dotted_hash'
 require 'ting_yun/configuration/manager'
 require 'ting_yun/agent'
 
@@ -99,6 +98,21 @@ module TingYun::Configuration
 
     def test_evaluate_procs_returns_original_value_if_it_does_not_respond_to_call
       assert_equal 'test', @manager.evaluate_procs('test')
+    end
+
+    def test_sources_applied_in_correct_order
+      # in order of precedence
+      server_source = ServerSource.new('data_report_period' => 3, 'capture_params' => true)
+      manual_source = ManualSource.new(:data_report_period  => 2, :bar => 'bar', :capture_params => true)
+
+      # load them out of order, just to prove that load order
+      # doesn't determine precedence
+      @manager.replace_or_add_config(manual_source)
+      @manager.replace_or_add_config(server_source)
+
+      assert_equal 2,     @manager['data_report_period']
+      assert_equal 'bar', @manager['bar']
+      assert_equal true, @manager['capture_params']
     end
 
   end

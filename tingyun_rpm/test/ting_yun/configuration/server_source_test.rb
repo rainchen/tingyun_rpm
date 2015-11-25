@@ -22,10 +22,17 @@ module TingYun::Configuration
       @source = ServerSource.new(config)
     end
 
+    def teardown
+      ServerSource.remove_top_level_keys_for_testing([:TOP_LEVEL_KEYS,:other,:another,:daemon_debug,:dispatcher])
+    end
 
 
     def test_initialize
       	assert_equal [:daemon_debug] ,@source.keys.find_all {|key| ServerSource::TOP_LEVEL_KEYS.include?(key) }
+    end
+    def test_server_corver_default_value
+        TingYun::Agent.config.replace_or_add_config(@source)
+        assert TingYun::Agent.config[:daemon_debug],TingYun::Agent.config[:daemon_debug].to_s
     end
   end
 end

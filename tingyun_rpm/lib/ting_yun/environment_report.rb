@@ -70,8 +70,8 @@ module TingYun
     # report_on('Database adapter') do
     #   ActiveRecord::Base.configurations[NewRelic::Control.instance.env]['adapter']
     # end
-    report_on('Framework') { Agent.config[:framework].to_s }
-    report_on('Dispatcher') { Agent.config[:dispatcher].to_s }
+    report_on('Framework') { TingYun::Agent.config[:framework].to_s }
+    report_on('Dispatcher') { TingYun::Agent.config[:dispatcher].to_s }
     # report_on('Environment') { NewRelic::Control.instance.env }
     report_on('Rails version') { ::Rails::VERSION::STRING }
     report_on('Rails threadsafe') do
@@ -101,12 +101,12 @@ module TingYun
             # Agent.record_metric("Supportability/EnvironmentReport/success", 0.0)
             # Agent.record_metric("Supportability/EnvironmentReport/success/#{key}", 0.0)
           else
-            Agent.logger.debug("EnvironmentReport ignoring value for #{key.inspect} which came back falsey: #{value.inspect}")
+            TingYun::Agent.logger.debug("EnvironmentReport ignoring value for #{key.inspect} which came back falsey: #{value.inspect}")
             # Agent.record_metric("Supportability/EnvironmentReport/empty", 0.0)
             # Agent.record_metric("Supportability/EnvironmentReport/empty/#{key}", 0.0)
           end
         rescue => e
-          Agent.logger.debug("EnvironmentReport failed to retrieve value for #{key.inspect}: #{e}")
+          TingYun::Agent.logger.debug("EnvironmentReport failed to retrieve value for #{key.inspect}: #{e}")
           # Agent.record_metric("Supportability/EnvironmentReport/error", 0.0)
           # Agent.record_metric("Supportability/EnvironmentReport/error/#{key}", 0.0)
         end

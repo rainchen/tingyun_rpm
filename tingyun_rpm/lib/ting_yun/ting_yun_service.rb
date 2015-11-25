@@ -9,6 +9,7 @@ require 'ting_yun/support/collector'
 require 'ting_yun/support/serialize/encodes'
 require 'ting_yun/support/timer_lib'
 require 'ting_yun/support/exception'
+require 'ting_yun/support/serialize/json_marshaller'
 
 module TingYun
   class TingYunService
@@ -20,23 +21,26 @@ module TingYun
 
     DATA_COLLECTOR = "redirect.networkbench.com".freeze
 
-    attr_accessor :request_timeout, :tingyun_id_secret, :app_session_key, :data_version
+    attr_accessor :request_timeout, :ting_yun_id_secret, :app_session_key, :data_version
 
-    def initialize(license_key=nil,collector=Support.collector)
-      @license_key = license_key || Agent.config[:license_key]
-      @request_timeout = Agent.config[:timeout]
+    def initialize(license_key=nil,collector=TingYun::Support.collector)
+      @license_key = license_key || TingYun::Agent.config[:license_key]
+      @request_timeout = TingYun::Agent.config[:timeout]
       @collector = collector
-      @tingyun_id_secret = nil
+      @ting_yun_id_secret = nil
       @ssl_cert_store = nil
       @shared_tcp_connection = nil
       @data_version = nil
-      @marshaller = JsonMarshaller.new
+      @marshaller =TingYun::Support::Serialize::JsonMarshaller.new
     end
 
-    def connnect(setting={})
+    def connect(setting={})
       if host = get_redirect_host
-        @collector = Support.collector_from_host(host)
+        @collector = TingYun::Support.collector_from_host(host)
       end
+      response = invoke_remote(:connect, [settings])
+      @agent_id = response['agent_run_id']
+      response
     end
 
     def init_agent_app
@@ -45,6 +49,10 @@ module TingYun
 
     def get_redirect_host
       invoke_remote(:getRedirectHost)
+    end
+
+    def force_restart
+      close_shared_connection
     end
 
     # send a message via post to the actual server. This attempts
@@ -59,7 +67,7 @@ module TingYun
 
       data, size, serialize_finish_time = nil
       begin
-        data = @marshaller.dump(payload, options)
+        data = @marshaller.(payload, options)
       rescue StandardError, SystemStackError => e
         handle_serialization_error(method, e)
       end

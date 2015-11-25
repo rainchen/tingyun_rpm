@@ -3,6 +3,8 @@
 require 'ting_yun/configuration/default_source'
 require 'ting_yun/configuration/environment_source'
 require 'ting_yun/configuration/yaml_source'
+require 'ting_yun/configuration/server_source'
+require 'ting_yun/configuration/manual_source'
 
 
 module TingYun
@@ -18,7 +20,7 @@ module TingYun
       end
 
       def has_key?(key)
-        @cache.has_key?[key]
+        @cache.has_key?(key)
       end
 
       def keys
@@ -40,6 +42,8 @@ module TingYun
         @default_source = DefaultSource.new
         @environment_source = EnvironmentSource.new
         @yaml_source = nil
+        @server_source  = nil
+        @manual_source = nil
         # @callbacks = Hash.new {|hash,key| hash[key] =[]}#存放需要merge本地和服务端配置的info'
 
         @configs_for_testing = []
@@ -80,30 +84,23 @@ module TingYun
 
       def remove_config_type(sym)
         source = case sym
-                   when :environment then
-                     @environment_source
-                   when :server then
-                     @server_source
-                   when :manual then
-                     @manual_source
-                   when :yaml then
-                     @yaml_source
-                   when :default then
-                     @default_source
+                   when :environment then   @environment_source
+                   when :server      then   @server_source
+                   when :manual      then   @manual_source
+                   when :yaml        then   @yaml_source
+                   when :default     then   @default_source
                  end
-
         remove_config(source)
       end
 
 
       def remove_config(source)
         case source
-          when YamlSource then
-            @yaml_source = nil
-          when DefaultSource then
-            @default_source = nil
-          when EnvironmentSource then
-            @environment_source = nil
+          when YamlSource         then  @yaml_source          = nil
+          when DefaultSource      then  @default_source       = nil
+          when EnvironmentSource  then  @environment_source   = nil
+          when ManualSource       then  @manual_source        = nil
+          when ServerSource       then  @server_source        = nil
           else
             @configs_for_testing.delete_if { |src, lvl| src == source }
         end
@@ -121,12 +118,11 @@ module TingYun
         #invoke_callbacks(:add,source)
 
         case source
-          when YamlSource then
-            @yaml_source = source
-          when DefaultSource then
-            @default_source = source
-          when EnvironmentSource then
-            @environment_source = source
+          when YamlSource        then   @yaml_source          = source
+          when DefaultSource     then   @default_source       = source
+          when EnvironmentSource then   @environment_source   = source
+          when ServerSource      then   @server_source        = source
+          when ManualSource      then   @manual_source        = source
           else
             TingYun::Agent.logger.warn("Invalid config format; config will be ignored: #{source}")
         end
@@ -191,7 +187,7 @@ module TingYun
       private
 
       def config_stack
-        stack = [@environment_source, @yaml_source, @default_source]
+        stack = [@environment_source, @server_source, @manual_source, @yaml_source, @default_source]
 
         stack.compact!
 
