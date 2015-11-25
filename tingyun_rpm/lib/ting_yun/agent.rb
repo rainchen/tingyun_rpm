@@ -4,7 +4,6 @@ require 'forwardable'
 require 'ting_yun/configuration/manager'
 require 'ting_yun/logger/startup_logger'
 
-
 module TingYun
   module Agent
     extend self

@@ -48,7 +48,7 @@ module TingYun
       def connect(option={})
         keep_retrying_or_force_reconnect?(option) do
           Agent.logger.debug "Connecting Process to Ting Yun: #$0"
-          connect_to_server_and_merge_server_config_data #connnect
+          connect_and_merge_server_config_data #connnect
           @connected_pid = $$
           @connect_state = :connected
         end

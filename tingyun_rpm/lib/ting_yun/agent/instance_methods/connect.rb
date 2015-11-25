@@ -1,14 +1,17 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
-require 'ting_yun/agent/exception'
+require 'ting_yun/support/exception'
 require 'ting_yun/support/hostname'
 require 'ting_yun/configuration/server_source'
+require 'ting_yun/agent/instance_methods/handle_errors'
 
 
 module TingYun
   module Agent
     module InstanceMethods
       module Connect
+
+        include HandleErrors
 
         # number of attempts we've made to contact the server
         attr_accessor :connect_attempt_count
@@ -80,12 +83,12 @@ module TingYun
         end
 
         # Returns connect data passed back from the server
-        def connect_to_server_and_return_config_data
+        def return_server_config
           @service.connect(connect_settings)
         end
 
-        def connect_to_server_and_merge_server_config_data
-          finish_setup(connect_to_server_and_return_config_data)
+        def connect_and_merge_server_config_data
+          finish_setup(return_server_config)
         end
 
         # * <tt>:keep_retrying => false</tt> to only try to connect once, and

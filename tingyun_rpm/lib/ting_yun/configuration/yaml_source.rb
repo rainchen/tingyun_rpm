@@ -1,5 +1,5 @@
 require 'ting_yun/configuration/dotted_hash'
-require 'ting_yun/language_support'
+require 'ting_yun/support/language_support'
 require 'erb'
 
 module TingYun
@@ -103,7 +103,7 @@ module TingYun
       end
 
       def with_yaml_engine
-        return yield unless TingYun::LanguageSupport.needs_syck?
+        return yield unless TingYun::Support::LanguageSupport.needs_syck?
 
         yamler = ::YAML::ENGINE.yamler
         ::YAML::ENGINE.yamler = 'syck'

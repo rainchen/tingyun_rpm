@@ -1,0 +1,47 @@
+# encoding: utf-8
+# This file is distributed under Ting Yun's license terms.
+
+#
+
+module TingYun
+  module Support
+    module Exception
+      # An exception that is thrown by the server if the agent license is invalid.
+      class LicenseException < StandardError;
+      end
+
+      # An exception that forces an agent to stop reporting until its mongrel is restarted.
+      class ForceDisconnectException < StandardError;
+      end
+
+      # An exception that forces an agent to restart.
+      class ForceRestartException < StandardError;
+      end
+
+      # Used to blow out of a periodic task without logging a an error, such as for routine
+      # failures.
+      class ServerConnectionException < StandardError;
+      end
+
+      # When a post is either too large or poorly formatted we should
+      # drop it and not try to resend
+      class UnrecoverableServerException < ServerConnectionException;
+      end
+
+      # An unrecoverable client-side error that prevents the agent from continuing
+      class UnrecoverableAgentException < ServerConnectionException;
+      end
+
+      # An error while serializing data for the collector
+      class SerializationError < StandardError;
+      end
+
+      class BackgroundLoadingError < StandardError;
+      end
+
+      # Used to wrap errors reported to agent by the collector
+      class CollectorError < StandardError;
+      end
+    end
+  end
+end

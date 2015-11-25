@@ -5,7 +5,7 @@ require File.expand_path(File.join(File.dirname(__FILE__),'..','..','test_helper
 require 'ting_yun/configuration/yaml_source'
 require 'ting_yun/agent'
 require 'ting_yun/configuration/dotted_hash'
-require 'ting_yun/language_support'
+require 'ting_yun/support/language_support'
 
 
 module TingYun::Configuration

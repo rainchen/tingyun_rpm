@@ -58,6 +58,14 @@ module TingYun
         }
       end
 
+      # On Rubies with string encodings support (1.9.x+), default to always
+      # normalize encodings since it's safest and fast. Without that support
+      # the conversions are too expensive, so only enable if overridden to.
+      def self.normalize_json_string_encodings
+        Proc.new { NewRelic::LanguageSupport.supports_string_encodings? }
+      end
+
+
       def self.app_name
         Proc.new { NewRelic::Control.instance.env }
       end
@@ -267,6 +275,28 @@ module TingYun
             :exclude_from_reported_settings => true,
             :description => 'Defines a password for communicating with Ting Yun via a proxy server.'
         },
+        :aggressive_keepalive => {
+            :default => true,
+            :public => false,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'If true, attempt to keep the TCP connection to the collector alive between harvests.'
+        },
+        :keep_alive_timeout => {
+            :default => 60,
+            :public => false,
+            :type => Fixnum,
+            :allowed_from_server => true,
+            :description => 'Timeout for keep alive on TCP connection to collector if supported by Ruby version. Only used in conjunction when aggressive_keepalive is enabled.'
+        },
+        :ca_bundle_path => {
+            :default => nil,
+            :allow_nil => true,
+            :public => true,
+            :type => String,
+            :allowed_from_server => false,
+            :description => "Manual override for the path to your local CA bundle. This CA bundle will be used to validate the SSL certificate presented by Ting Yun's data collection service."
+        },
         :host => {
             :default => 'dc1.networkbench.com',
             :public => false,
@@ -289,6 +319,20 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => false,
             :description => 'Enable or disable SSL for transmissions to the Ting Yun'
+        },
+        :timeout => {
+            :default => 2 * 60, # 2 minutes
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => false,
+            :description => 'Maximum number of seconds to attempt to contact the  collector.'
+        },
+        :post_size_limit => {
+            :default => 2 * 1024 * 1024, # 2MB
+            :public => false,
+            :type => Fixnum,
+            :allowed_from_server => true,
+            :description => 'Maximum number of bytes to send to the data collection service.'
         },
         :'action_tracer.log_sql' => {
             :default => false,
@@ -459,6 +503,13 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => false,
             :description => 'Enable or disable transmission of application environment information to the Ting Yun data collection service.'
+        },
+        :normalize_json_string_encodings => {
+            :default => DefaultSource.normalize_json_string_encodings,
+            :public => false,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'Controls whether to normalize string encodings prior to serializing data for the collector to JSON.'
         }
     }.freeze
   end
