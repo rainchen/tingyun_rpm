@@ -11,6 +11,7 @@ require 'ting_yun/support/timer_lib'
 require 'ting_yun/support/exception'
 require 'ting_yun/support/serialize/json_marshaller'
 require 'ting_yun/ting_yun_service/upload_service'
+require 'ting_yun/version'
 
 module TingYun
   class TingYunService
@@ -33,7 +34,7 @@ module TingYun
       @ting_yun_id_secret = nil
       @ssl_cert_store = nil
       @shared_tcp_connection = nil
-      @data_version = nil
+      @data_version = TingYun::VERSION::STRING
       @marshaller =TingYun::Support::Serialize::JsonMarshaller.new
       @metric_id_cache = {}
     end
