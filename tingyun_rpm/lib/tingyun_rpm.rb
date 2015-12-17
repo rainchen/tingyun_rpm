@@ -1,11 +1,4 @@
 # encoding: utf-8
-module TingYun
-  # Your code goes here...
-
-  
-end
-
-# encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
 
 # == TingYun  Initialization
