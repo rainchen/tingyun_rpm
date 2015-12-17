@@ -6,7 +6,7 @@ require  'ting_yun/instrumentation/support/controller_instrumentation'
 
 module TingYun
   module Instrumentation
-    class ActionControllerSubscriber < EventedSubscriber
+    class ActionControllerSubscriber < TingYun::Instrumentation::Support::EventedSubscriber
 
       def start(name, id, payload)
         state = TransactionState.tl_get
@@ -28,7 +28,7 @@ module TingYun
 
 
 
-      class ControllerEvent < Event
+      class ControllerEvent < TingYun::Instrumentation::Support::Event
 
         attr_accessor :parent
         attr_reader :queue_start, :request
