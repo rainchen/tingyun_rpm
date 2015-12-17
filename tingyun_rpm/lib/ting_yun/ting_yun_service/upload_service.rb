@@ -14,11 +14,11 @@ module TingYun
             :type => "perfMetrics",
             :timeFrom=>timeslice_start.to_i,
             :timeTo =>timeslice_end.to_i,
-            :interval=> nil,
+            :interval=> 60,
             :actions => action_array,
-            :apdex => nil,
-            :components => nil,
-            :general => nil
+            :apdex => [],
+            :components => [],
+            :general => []
         }
 
         result = invoke_remote(
