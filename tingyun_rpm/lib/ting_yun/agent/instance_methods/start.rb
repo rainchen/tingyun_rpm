@@ -113,7 +113,7 @@ module TingYun
         def correct_license_length
           key = TingYun::Agent.config[:license_key]
 
-          if key.length == 40
+          if key.length > 0
             true
           else
             TingYun::Agent.logger.error("Invalid license key: #{key}")
