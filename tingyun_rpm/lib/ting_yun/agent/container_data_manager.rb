@@ -26,7 +26,6 @@ module TingYun
       end
 
       def transmit_data
-        now = Time.now
         ::TingYun::Agent.logger.debug('Sending data to Ting Yun Service')
 
         @service.session do

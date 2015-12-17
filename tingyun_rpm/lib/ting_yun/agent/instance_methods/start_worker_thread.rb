@@ -40,6 +40,8 @@ module TingYun
             transmit_data
           end
           @event_loop.fire_every(Agent.config[:data_report_period], :report_data)
+
+          @event_loop.run
         end
       end
     end

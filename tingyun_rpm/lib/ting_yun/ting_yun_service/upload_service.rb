@@ -7,12 +7,24 @@ module TingYun
     module UploadService
 
       def metric_data(stats_hash)
+        binding.pry
         timeslice_start = stats_hash.started_at
         timeslice_end  = stats_hash.harvested_at || Time.now
         metric_data_array = build_metric_data_array(stats_hash)
+        upload_data = {
+            :type => "perfMetrics",
+            :timeFrom=>timeslice_start.to_i,
+            :timeTo =>timeslice_end.to_i,
+            :interval=> nil,
+            :actions => nil,
+            :apdex => metric_data_array,
+            :components => nil,
+            :general => nil
+        }
+
         result = invoke_remote(
-            :metric_data,
-            [@agent_id, timeslice_start.to_f, timeslice_end.to_f, metric_data_array],
+            :upload,
+            [upload_data],
             :item_count => metric_data_array.size
         )
         fill_metric_id_cache(result)
@@ -55,7 +67,6 @@ module TingYun
         # re-aggregation of the same metric data into the next post, so just log
         TingYun::Agent.logger.error("Failed to fill metric ID cache from response, error details follow ", e)
       end
-
     end
   end
 end

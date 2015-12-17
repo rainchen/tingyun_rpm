@@ -67,7 +67,7 @@ module TingYun
       start_time = Time.now
 
       data, size, serialize_finish_time = nil
-      payload = payload[0]  if method== :initAgentApp
+      payload = payload[0]  if method == :initAgentApp
       begin
         data = @marshaller.dump(payload, options)
       rescue StandardError, SystemStackError => e
