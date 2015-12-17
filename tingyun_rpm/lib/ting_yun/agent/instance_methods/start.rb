@@ -1,6 +1,7 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
 require 'ting_yun/frameworks'
+require 'ting_yun/version'
 
 # before the real start,do check and log things
 module TingYun
