@@ -63,7 +63,7 @@ module TingYun
       def harvest_from_container(container, endpoint)
         items =[]
         begin
-          items = container.harvest!
+          items = container.harvest! if TingYun::Agent.config[:'nbs.agent_enabled']
         rescue => e
           TingYun::Agent.logger.error("Failed to harvest #{endpoint} data, resetting. Error: ", e)
           container.reset!

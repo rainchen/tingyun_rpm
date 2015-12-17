@@ -26,8 +26,8 @@ module TingYun
       end
 
       def record_metrics(event)
-        exclusive = event.duration
-        TingYun::Agent.agent.stats_engine.record_scoped_and_unscoped_metrics(event.metric_name, nil, event.duration, exclusive)
+        exclusive = event.duration * 1000
+        TingYun::Agent.agent.stats_engine.record_scoped_and_unscoped_metrics(event.metric_name, nil, event.duration*1000, exclusive)
       end
 
 
