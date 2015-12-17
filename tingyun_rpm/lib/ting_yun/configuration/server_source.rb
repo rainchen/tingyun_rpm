@@ -10,6 +10,11 @@ module TingYun
       # response, but should still be merged in as config settings to the
       # main agent configuration.
       TOP_LEVEL_KEYS = [
+          "applicationId",
+          "enabled",
+          "appSessionKey",
+          "dataSentInterval",
+          "apdex_t"
       ]
 
       def self.add_top_level_keys_for_testing(add_array)
@@ -20,14 +25,12 @@ module TingYun
         remove_arry.each{|i| TOP_LEVEL_KEYS.delete(i)}
       end
 
-      def initialize(connect_reply, existing_config={})
+      def initialize(connect_reply)
         merged_settings = {}
 
         merge_top_level_keys(merged_settings, connect_reply)
-        # merge_agent_config_hash(merged_settings, connect_reply)
-        # fix_transaction_threshold(merged_settings)
+        merge_agent_config_hash(merged_settings, connect_reply)
         filter_keys(merged_settings)
-
         # apply_feature_gates(merged_settings, connect_reply, existing_config)
 
         # The value under this key is a hash mapping transaction name strings
@@ -49,8 +52,8 @@ module TingYun
       end
 
       def merge_agent_config_hash(merged_settings, connect_reply)
-        if connect_reply['agent_config']
-          merged_settings.merge!(connect_reply['agent_config'])
+        if connect_reply['config']
+          merged_settings.merge!(connect_reply['config'])
         end
       end
 
@@ -78,32 +81,6 @@ module TingYun
         end
       end
 
-      # These feature gates are not intended to be bullet-proof, but only to
-      # avoid the overhead of collecting and transmitting additional data if
-      # the user's subscription level precludes its use. The server is the
-      # ultimate authority regarding subscription levels, so we expect it to
-      # do the real enforcement there.
-      def apply_feature_gates(merged_settings, connect_reply, existing_config)
-        gated_features = {
-            'transaction_tracer.enabled' => 'collect_traces',
-            'slow_sql.enabled' => 'collect_traces',
-            'error_collector.enabled' => 'collect_errors',
-            'analytics_events.enabled' => 'collect_analytics_events',
-            'custom_insights_events.enabled' => 'collect_custom_events'
-        }
-        gated_features.each do |config_key, gate_key|
-          if connect_reply.has_key?(gate_key)
-            allowed_by_server = connect_reply[gate_key]
-            requested_value = ungated_value(config_key, merged_settings, existing_config)
-            effective_value = (allowed_by_server && requested_value)
-            merged_settings[config_key] = effective_value
-          end
-        end
-      end
-
-      def ungated_value(key, merged_settings, existing_config)
-        merged_settings.has_key?(key) ? merged_settings[key] : existing_config[key.to_sym]
-      end
     end
   end
 end

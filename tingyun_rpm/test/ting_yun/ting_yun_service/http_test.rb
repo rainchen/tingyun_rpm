@@ -16,7 +16,7 @@ class TingYun::TingYunService
       @app_session_key = "456"
       @data_version    = "789"
 
-      assert_equal "test?licenseKey=123&appSessionKey=456&version=789" ,remote_method_uri(:test)
+      assert_equal "/test?licenseKey=123&appSessionKey=456&version=789" ,remote_method_uri(:test)
     end
 
     def test_uri_with_string_method
@@ -24,7 +24,7 @@ class TingYun::TingYunService
       @app_session_key = "456"
       @data_version    = "789"
 
-      assert_equal "test?licenseKey=123&appSessionKey=456&version=789" ,remote_method_uri("test")
+      assert_equal "/test?licenseKey=123&appSessionKey=456&version=789" ,remote_method_uri("test")
     end
 
     def test_uri_with_nil
@@ -32,7 +32,9 @@ class TingYun::TingYunService
       @app_session_key = "456"
       @data_version    = "789"
 
-      assert_equal "?licenseKey=123&appSessionKey=456&version=789" ,remote_method_uri(nil)
+      assert_equal "/?licenseKey=123&appSessionKey=456&version=789" ,remote_method_uri(nil)
     end
+
+
   end
 end

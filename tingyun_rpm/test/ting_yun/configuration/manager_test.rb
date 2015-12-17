@@ -4,6 +4,8 @@
 require File.expand_path(File.join(File.dirname(__FILE__),'..','..','test_helper'))
 require 'ting_yun/configuration/manager'
 require 'ting_yun/agent'
+require 'ting_yun/configuration/yaml_source'
+require 'ting_yun/configuration/server_source'
 
 
 module TingYun::Configuration
@@ -22,6 +24,35 @@ module TingYun::Configuration
       @manager.add_config_for_testing(config)
       assert_equal 'string', @manager[:string]
       assert_equal 'symbol', @manager['symbol']
+    end
+
+
+    def test_should_decide_by_all_config
+      assert @manager[:'nbs.agent_enabled'], 'default should true, but actual is false'
+
+      test_yml_path = File.expand_path(File.join(File.dirname(__FILE__),
+                                                 '..','..',
+                                                 'config','tingyun.yml'))
+      yaml = YamlSource.new(test_yml_path, 'test')
+      server_able = TingYun::Configuration::ServerSource.new({"config" =>{'nbs.agent_enabled' => true}})
+
+      server_unable = TingYun::Configuration::ServerSource.new({"config" =>{'nbs.agent_enabled' => false}})
+      manual  = { :'nbs.agent_enabled' => true }
+
+      @manager.replace_or_add_config(server_unable)
+      assert  !@manager[:'nbs.agent_enabled']
+      @manager.replace_or_add_config(yaml)
+      assert  !@manager[:'nbs.agent_enabled']
+      @manager.replace_or_add_config(manual)
+      assert  !@manager[:'nbs.agent_enabled']
+
+    end
+
+    def test_default_will_corver
+      assert '', @manager[:license_key]
+      with_config(:license_key => '999-999-999') do
+        assert '999-999-999', @manager[:license_key]
+      end
     end
 
     def test_should_apply_config_sources_in_order
@@ -114,6 +145,7 @@ module TingYun::Configuration
       assert_equal 'bar', @manager['bar']
       assert_equal true, @manager['capture_params']
     end
+
 
   end
 end

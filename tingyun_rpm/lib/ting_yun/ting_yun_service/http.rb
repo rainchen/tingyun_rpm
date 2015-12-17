@@ -1,5 +1,7 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
+
+require 'zlib'
 require 'net/https'
 require 'net/http'
 require 'ting_yun/ting_yun_service/ssl'
@@ -16,12 +18,22 @@ module TingYun
 
       def remote_method_uri(method)
         params = {'licenseKey'=> @license_key,'appSessionKey' => @app_session_key,'version' => @data_version}
-        uri = method.to_s
+        uri = "/" + method.to_s
         uri << '?' + params.map do |k,v|
           next unless v
           "#{k}=#{v}"
         end.compact.join('&')
         uri
+      end
+
+      # Decompresses the response from the server, if it is gzip
+      # encoded, otherwise returns it verbatim
+      def decompress_response(response)
+        if response['content-encoding'] == 'gzip'
+          Zlib::GzipReader.new(StringIO.new(response.body)).read
+        else
+          response.body
+        end
       end
     end
   end

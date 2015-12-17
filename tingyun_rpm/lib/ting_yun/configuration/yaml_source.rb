@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'ting_yun/configuration/dotted_hash'
 require 'ting_yun/support/language_support'
 require 'erb'
@@ -23,6 +24,7 @@ module TingYun
         rescue ScriptError, StandardError => e
           log_failure("Failed to read or parse configuration file at #{path}", e)
         end
+        booleanify_values(config, 'nbs.agent_enabled', 'enabled')
         super(config, true)
       end
 
@@ -58,9 +60,7 @@ module TingYun
           when ManualSource
             based_on = 'API call'
         end
-        # This is not a failure, since we do support running without a
-        # tingyun.yml (configured with just ENV). It is, however, uncommon,
-        # so warn about it since it's very likely to be unintended.
+
         TingYun::Agent.logger.warn(
             "No configuration file found. Working directory = #{Dir.pwd}",
             "Looked in these locations (based on #{based_on}): #{candidate_paths.join(", ")}"
@@ -110,6 +110,21 @@ module TingYun
         result = yield
         ::YAML::ENGINE.yamler = yamler
         result
+      end
+
+      def booleanify_values(config, *keys)
+        # auto means defer ro default
+        keys.each do |option|
+          if config[option] == 'auto'
+            config.delete(option)
+          elsif !config[option].nil? && !is_boolean?(config[option])
+            config[option] = !!(config[option] =~ /yes|on|true/i)
+          end
+        end
+      end
+
+      def is_boolean?(value)
+        value == !!value
       end
 
       def log_failure(*messages)

@@ -39,8 +39,19 @@ module TingYun
       class BackgroundLoadingError < StandardError;
       end
 
+      class UnsupportedMediaType < StandardError
+      end
       # Used to wrap errors reported to agent by the collector
       class CollectorError < StandardError;
+      end
+
+      #This is the base class for all errors that we want to record , It provides the
+      # standard support text at the front of the message, and is used for flagging
+      # agent errors when checking queue limits.
+      class InternalAgentError < StandardError
+        def initialize(msg=nil)
+          super("Ruby agent internal error. Please contact support referencing this error.\n #{msg}")
+        end
       end
     end
   end

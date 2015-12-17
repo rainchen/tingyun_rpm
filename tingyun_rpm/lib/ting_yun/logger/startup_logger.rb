@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'ting_yun/logger/memory_logger'
 require 'singleton'
 

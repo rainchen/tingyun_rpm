@@ -1,6 +1,6 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
-
+require 'ting_yun/frameworks'
 
 # before the real start,do check and log things
 module TingYun
@@ -9,6 +9,7 @@ module TingYun
       module Start
 
         # Check to see if the agent should start, returning +true+ if it should.
+        # should hava the vaild app_name, unstart-state and able to start
         def agent_should_start?
           return false if already_started? || disabled?
           unless app_name_configured?
@@ -35,26 +36,26 @@ module TingYun
         end
 
         # The agent is disabled when it is not force enabled by the
-        # 'agent_enabled' option (e.g. in a manual start), or
+        # 'nbs.agent_enabled' option (e.g. in a manual start), or
         # enabled normally through the configuration file
         def disabled?
-          !TingYun::Agent.config[:agent_enabled]
+          !TingYun::Agent.config[:'nbs.agent_enabled']
         end
 
-        def log_the_startup
-          log_the_environment
-          log_the_dispatcher
-          log_the_app_name
+        def log_startup
+          log_environment
+          log_dispatcher
+          log_app_name
         end
 
-        def log_the_environment
-
+        def log_environment
+          Agent.logger.info "Environment: #{::TingYun::Frameworks.framework.env}"
         end
 
         # Logs the dispatcher to the log file to assist with
         # debugging. When no debugger is present, logs this fact to
         # assist with proper dispatcher detection
-        def log_the_dispatcher
+        def log_dispatcher
           dispatcher_name = TingYun::Agent.config[:dispatcher].to_s
 
           if dispatcher_name.empty?
@@ -64,11 +65,11 @@ module TingYun
           end
         end
 
-        def log_the_app_name
+        def log_app_name
           TingYun::Agent.logger.info "Application: #{TingYun::Agent.config.app_names.join(", ")}"
         end
 
-        def is_sinatra_app?
+        def sinatra_app?
           (
           defined?(Sinatra::Application) &&
               Sinatra::Application.respond_to?(:run) &&
@@ -85,7 +86,7 @@ module TingYun
 
         # Warn the user if they have configured their agent not to
         # send data, that way we can see this clearly in the log file
-        def is_monitoring?
+        def monitoring?
           if TingYun::Agent.config[:monitor_mode]
             true
           else
@@ -101,7 +102,7 @@ module TingYun
             true
           else
             TingYun::Agent.logger.warn("No license key found. " +
-                                  "This often means your tingyun.yml file was not found, or it lacks a section for the running environment. You may also want to try linting your tingyun.yml to ensure it is valid YML.")
+                                  "This often means your tingyun.yml file was not found, or it lacks a section for the running environment,'#{::TingYun::Frameworks.framework.env}'. You may also want to try linting your tingyun.yml to ensure it is valid YML.")
             false
           end
         end
@@ -146,19 +147,22 @@ module TingYun
         # Sanity-check the agent configuration and start the agent,
         # setting up the worker thread and the exit handler to shut
         # down the agent
-        def check_config_and_start_the_agent
-          return unless is_monitoring? && has_correct_license_key?
+        def check_config_and_start_agent
+          return unless monitoring? && has_correct_license_key?
           return if is_using_forking_dispatcher?
-          setup_and_start_the_agent
+          setup_and_start_agent
         end
 
         # This is the shared method between the main agent startup and the
         # after_fork call restarting the thread in deferred dispatchers.
         #
         # Treatment of @started and env report is important to get right.
-        def setup_and_start_the_agent(options={})
+        def setup_and_start_agent(options={})
           @started = true
+          generate_environment_report
+          install_exit_handler
           start_worker_thread(options)
+
         end
       end
     end

@@ -104,7 +104,7 @@ module TingYun
       def create_log(root, override_logger)
         if !override_logger.nil?
           @log = override_logger
-        elsif ::TingYun::Agent.config[:agent_enabled] == false
+        elsif ::TingYun::Agent.config[:'nbs.agent_enabled'] == false
           create_null_logger
         else
           if wants_stdout?
@@ -173,6 +173,7 @@ module TingYun
         end
       end
 
+      #send the statup log info from memory to the agent log
       def gather_startup_logs
         StartupLogger.instance.dump(self)
       end

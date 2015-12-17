@@ -24,13 +24,13 @@ class TingYun::Agent::InstanceMethods::StartTest < MiniTest::Test
 
 
   def test_disabled_positive
-    with_config(:agent_enabled => false) do
+    with_config(:'nbs.agent_enabled' => false) do
       assert disabled?
     end
   end
 
   def test_disabled_negative
-    with_config(:agent_enabled => true) do
+    with_config(:'nbs.agent_enabled' => true) do
       assert !disabled?
     end
   end
@@ -42,22 +42,22 @@ class TingYun::Agent::InstanceMethods::StartTest < MiniTest::Test
   end
 
   def test_agent_should_start?
-    TingYun::Agent.config.add_config_for_testing(:agent_enabled => true )
+    TingYun::Agent.config.add_config_for_testing(:'nbs.agent_enabled' => true )
     refute agent_should_start?,"should be false"
     TingYun::Agent.config.reset_to_defaults
     @started = false
-    refute agent_should_start?,"should be false"
+    assert agent_should_start?,"should be false"
   end
 
   def test_monitoring_positive
     with_config(:monitor_mode => true) do
-      assert is_monitoring?
+      assert monitoring?
     end
   end
 
   def test_monitoring_negative
     with_config(:monitor_mode => false) do
-      assert !is_monitoring?
+      assert !monitoring?
     end
   end
 

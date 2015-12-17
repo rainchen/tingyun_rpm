@@ -54,8 +54,8 @@ module TingYun
           if data.respond_to?(:has_key?)
             if data.has_key?('exception')
               raise parsed_error(data['exception'])
-            elsif data.has_key?('return_value')
-              return data['return_value']
+            elsif data.has_key?('result')
+              return data['result']
             end
           end
           ::TingYun::Agent.logger.debug("Unexpected response from collector: #{data}")

@@ -3,6 +3,8 @@
 
 
 require 'forwardable'
+require 'ting_yun/agent'
+require 'ting_yun/frameworks'
 
 module TingYun
   module Configuration
@@ -28,6 +30,44 @@ module TingYun
         @defaults = default_values
       end
 
+      def self.framework
+        Proc.new {
+          case
+            when defined?(::TingYun::TEST) then
+              :test
+            when defined?(::Merb) && defined?(::Merb::Plugins) then
+              :merb
+            when defined?(::Rails::VERSION)
+              case Rails::VERSION::MAJOR
+                when 0..2
+                  :rails
+                when 3
+                  :rails3
+                when 4
+                  :rails4
+                else
+                  ::TingYun::Agent.logger.error "Detected unsupported Rails version #{Rails::VERSION::STRING}"
+              end
+            when defined?(::Sinatra) && defined?(::Sinatra::Base) then
+              :sinatra
+            when defined?(::TingYun::IA) then
+              :external
+            else
+              :ruby
+          end
+        }
+      end
+
+      def self.config_path
+        Proc.new {
+          found_path = TingYun::Agent.config[:config_search_paths].detect do |file|
+            File.expand_path(file) if File.exist? file
+          end
+          found_path || ''
+        }
+      end
+
+
       def default_values
         result = {}
         ::TingYun::Configuration::DEFAULTS.each do |key, value|
@@ -41,17 +81,9 @@ module TingYun
       end
 
       def self.dispatcher
-        Proc.new { :dispatcher }
+        Proc.new { ::TingYun::Frameworks.framework.local_env.discovered_dispatcher }
       end
 
-      def self.agent_enabled
-        # Proc.new {
-        #   TingYun::Agent.config[:enabled] &&
-        #   (TingYun::Agent.config[:developer_mode] || TingYun::Agent.config[:monitor_mode]) &&
-        #   TingYun::Agent::Autostart.agent_should_start?
-        # }
-        Proc.new { true }
-      end
 
       def self.audit_log_path
         Proc.new {
@@ -68,16 +100,18 @@ module TingYun
 
 
       def self.app_name
-        Proc.new { NewRelic::Control.instance.env }
+        Proc.new { ::TingYun::Frameworks.framework.env }
       end
 
       def self.port
-        Proc.new {TingYun::Agent.config[:ssl] ? 443 : 80 }
+        Proc.new { TingYun::Agent.config[:ssl] ? 443 : 80 }
       end
 
-
-
-
+      def self.agent_enabled
+        Proc.new {
+          TingYun::Agent.config[:enabled]
+        }
+      end
       def self.config_search_paths
         Proc.new {
           paths = [
@@ -85,10 +119,10 @@ module TingYun
               File.join("tingyun.yml")
           ]
 
-          # if TingYun::Agent.instance.root
-          #   paths << File.join(NewRelic::Control.instance.root, "config", "tingyun.yml")
-          #   paths << File.join(NewRelic::Control.instance.root, "tingyun.yml")
-          # end
+          if ::TingYun::Frameworks.framework.root
+            paths << File.join(::TingYun::Frameworks.framework.root, "config", "tingyun.yml")
+            paths << File.join(::TingYun::Frameworks.framework.root, "tingyun.yml")
+          end
 
           if ENV["HOME"]
             paths << File.join(ENV["HOME"], ".tingyun", "tingyun.yml")
@@ -105,56 +139,6 @@ module TingYun
         }
       end
     end
-    AUTOSTART_BLACKLISTED_RAKE_TASKS = [
-        'about',
-        'assets:clean',
-        'assets:clobber',
-        'assets:environment',
-        'assets:precompile',
-        'assets:precompile:all',
-        'db:create',
-        'db:drop',
-        'db:fixtures:load',
-        'db:migrate',
-        'db:migrate:status',
-        'db:rollback',
-        'db:schema:cache:clear',
-        'db:schema:cache:dump',
-        'db:schema:dump',
-        'db:schema:load',
-        'db:seed',
-        'db:setup',
-        'db:structure:dump',
-        'db:version',
-        'doc:app',
-        'log:clear',
-        'middleware',
-        'notes',
-        'notes:custom',
-        'rails:template',
-        'rails:update',
-        'routes',
-        'secret',
-        'spec',
-        'spec:features',
-        'spec:requests',
-        'spec:controllers',
-        'spec:helpers',
-        'spec:models',
-        'spec:views',
-        'spec:routing',
-        'spec:rcov',
-        'stats',
-        'test',
-        'test:all',
-        'test:all:db',
-        'test:recent',
-        'test:single',
-        'test:uncommitted',
-        'time:zones:all',
-        'tmp:clear',
-        'tmp:create'
-    ].join(',').freeze
 
     DEFAULTS = {
         :license_key => {
@@ -164,15 +148,15 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Your Ting Yun <a href="">license key</a>.'
         },
-        :agent_enabled => {
+        :'nbs.agent_enabled' => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => false,
+            :allowed_from_server => true,
             :description => 'Enable or disable the agent.'
         },
         :app_name => {
-            :default => '',
+            :default => DefaultSource.app_name,
             :public => true,
             :type => String,
             :allowed_from_server => false,
@@ -214,7 +198,7 @@ module TingYun
             :description => 'Autodetected application component that reports metrics to Ting YUN.'
         },
         :framework => {
-            :default => :framework,
+            :default => DefaultSource.framework,
             :public => false,
             :type => Symbol,
             :allowed_from_server => false,
@@ -274,18 +258,61 @@ module TingYun
             :exclude_from_reported_settings => true,
             :description => 'Defines a password for communicating with Ting Yun via a proxy server.'
         },
+        :host => {
+            :default => 'redirect.networkbench.com',
+            :public => false,
+            :type => String,
+            :allowed_from_server => false,
+            :description => "URI for the Ting Yun data collection service."
+        },
+        :port => {
+            :default => DefaultSource.port,
+            :allow_nil => true,
+            :public => false,
+            :type => Fixnum,
+            :allowed_from_server => false,
+            :description => 'Port for the Ting Yun data collection service.'
+        },
+        :api_host => {
+            :default => 'dc1.networkbench.com',
+            :public => false,
+            :type => String,
+            :allowed_from_server => false,
+            :description => 'API host for Ting Yun.'
+        },
+        :api_port => {
+            :default => value_of(:port),
+            :public => false,
+            :type => Fixnum,
+            :allowed_from_server => false,
+            :description => 'Port for the New Relic API host.'
+        },
+        :disable_middleware_instrumentation => {
+            :default      => false,
+            :public       => true,
+            :type         => Boolean,
+            :allowed_from_server => false,
+            :description  => 'Defines whether the agent will wrap third-party middlewares in instrumentation (regardless of whether they are installed via Rack::Builder or Rails).'
+        },
+        :disable_view_instrumentation => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'Enable or disable view instrumentation.'
+        },
         :aggressive_keepalive => {
             :default => true,
             :public => false,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'If true, attempt to keep the TCP connection to the collector alive between harvests.'
         },
         :keep_alive_timeout => {
             :default => 60,
             :public => false,
             :type => Fixnum,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Timeout for keep alive on TCP connection to collector if supported by Ruby version. Only used in conjunction when aggressive_keepalive is enabled.'
         },
         :ca_bundle_path => {
@@ -295,21 +322,6 @@ module TingYun
             :type => String,
             :allowed_from_server => false,
             :description => "Manual override for the path to your local CA bundle. This CA bundle will be used to validate the SSL certificate presented by Ting Yun's data collection service."
-        },
-        :host => {
-            :default => 'dc1.networkbench.com',
-            :public => false,
-            :type => String,
-            :allowed_from_server => false,
-            :description => "URI for the Ting Yun data collection service."
-        },
-        :port => {
-            :default => nil,
-            :allow_nil => true,
-            :public => false,
-            :type => Fixnum,
-            :allowed_from_server => false,
-            :description => 'Port for the Ting Yun data collection service.'
         },
         :ssl => {
             :default => true,
@@ -330,8 +342,15 @@ module TingYun
             :default => 2 * 1024 * 1024, # 2MB
             :public => false,
             :type => Fixnum,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Maximum number of bytes to send to the data collection service.'
+        },
+        :data_report_period => {
+            :default => 60,
+            :public => false,
+            :type => Fixnum,
+            :allowed_from_server => false,
+            :description => 'Number of seconds betwixt connections to the Ting Yun data collection service.'
         },
         :'action_tracer.log_sql' => {
             :default => false,
@@ -351,63 +370,70 @@ module TingYun
             :default => '',
             :public => true,
             :type => String,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable Specifies url'
         },
         :auto_action_naming => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable to use default name '
         },
         :capture_params => {
             :default => false,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable the capture of HTTP request parameters to be attached to transaction traces and traced errors.'
+        },
+        :config_path => {
+            :default => DefaultSource.config_path,
+            :public => true,
+            :type => String,
+            :allowed_from_server => false,
+            :description => 'Path to <b>tingyun.yml</b>. When omitted the agent will check (in order) <b>config/tingyun.yml</b>, <b>tingyun.yml</b>, <b>$HOME/.tingyun/tingyun.yml</b> and <b>$HOME/tingyun.yml</b>.'
         },
         :ignored_params => {
             :default => '',
             :public => true,
             :type => String,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable Specifies HTTP request parameters '
         },
         :"error_collector.enabled" => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable recording of traced errors and error count metrics.'
         },
         :"error_collector.ignored_status_codes" => {
             :default => '',
             :public => true,
             :type => String,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable Specifies HTTP response code '
         },
         :web_action_uri_params_captured => {
             :default => '',
             :public => true,
             :type => String,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable Specifies WebAction request parameters  '
         },
         :external_url_params_captured => {
             :default => '',
             :public => true,
             :type => String,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable Specifies External  request parameters  '
         },
         :'action_tracer.enabled' => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable action traces'
         },
         :'action_tracer.action_threshold' => {
@@ -415,70 +441,70 @@ module TingYun
             :allow_nil => true,
             :public => true,
             :type => Fixnum,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'The agent will collect traces for action that exceed this time threshold (in millisecond). Specify a int value or <code><a href="">apdex_f</a></code>.'
         },
         :'action_tracer.record_sql' => {
             :default => 'obfuscate',
             :public => true,
             :type => String,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Obfuscation level for SQL queries reported in action trace nodes. Valid options are <code>obfuscated</code>, <code>raw</code>, <code>off</code>.'
         },
         :'action_tracer.slow_sql' => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable collection of slow SQL queries.'
         },
         :'action_tracer.slow_sql_threshold' => {
             :default => 500,
             :public => true,
             :type => Fixnum,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'The agent will collect traces for slow_sql that exceed this time threshold (in millisecond). Specify a int value or <code><a href="">apdex_f</a></code>.'
         },
         :'action_tracer.explain_enabled' => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable the collection of explain plans in action traces. This setting will also apply to explain plans in Slow SQL traces if slow_sql.explain_enabled is not set separately.'
         },
         :'action_tracer.explain_threshold' => {
             :default => 500,
             :public => true,
             :type => Fixnum,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Threshold (in millisecond) above which the agent will collect explain plans. Relevant only when <code><a href="">explain_enabled</a></code> is true.'
         },
         :'action_tracer.stack_trace_threshold' => {
             :default => 500,
             :public => true,
             :type => Fixnum,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Threshold (in millisecond) above which the agent will collect stack_trace.'
         },
         :'action_tracer.nbsua' => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable to trace nbs web request'
         },
         :'transaction_tracer.enabled' => {
             :default => false,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable transaction traces'
         },
         :'rum.enabled' => {
             :default => false,
             :public => false,
             :type => Boolean,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'Enable or disable page load timing (sometimes referred to as real user monitoring or RUM).'
         },
         :'rum.script' => {
@@ -486,14 +512,14 @@ module TingYun
             :allow_nil => true,
             :public => false,
             :type => String,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'RUM Script URI'
         },
         :'rum.sample_ratio' => {
             :default => 1,
             :public => true,
             :type => Fixnum,
-            :allowed_from_server => true,
+            :allowed_from_server => false,
             :description => 'RUM per'
         },
         :send_environment_info => {
@@ -510,6 +536,7 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Controls whether to normalize string encodings prior to serializing data for the collector to JSON.'
         }
+
     }.freeze
   end
 end

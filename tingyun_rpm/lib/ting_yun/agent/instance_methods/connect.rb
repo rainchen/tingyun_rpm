@@ -55,25 +55,39 @@ module TingYun
           @environment_report = environment_for_connect
         end
 
+        # We've seen objects in the environment report (Rails.env in
+        # particular) that can't seralize to JSON. Cope with that here and
+        # clear out so downstream code doesn't have to check again.
+        def sanitize_environment_report
+          if !@service.valid_to_marshal?(@environment_report)
+            @environment_report = {}
+          end
+        end
+
+
         # Checks whether we should send environment info, and if so,
         # returns the snapshot from the local environment.
         # Generating the EnvironmentReport has the potential to trigger
         # require calls in Rails environments, so this method should only
         # be called synchronously from on the main thread.
         def environment_for_connect
-          ::TingYun::Agent.config[:send_environment_info] ? Array(EnvironmentReport.new) : []
+          ::TingYun::Agent.config[:send_environment_info] ? TingYun::EnvironmentReport.new.data : {}
         end
+
 
         # Initializes the hash of settings that we send to the
         # server. Returns a literal hash containing the options
         def connect_settings
+          sanitize_environment_report
           settings = {
               :pid => $$,
+              :port => nil,
               :host => local_host,
-              :app_name => ::TingYun::Agent.config.app_names,
-              :language => 'ruby',
-              :agent_version => ::TingYun::VERSION::STRING,
-              :environment => @environment_report
+              :appName => ::TingYun::Agent.config.app_names,
+              :language => 'Ruby',
+              :agentVersion => ::TingYun::VERSION::STRING,
+              :env => @environment_report,
+              :config => ::TingYun::Agent.config.to_collector_hash
           }
           settings
         end
@@ -98,14 +112,7 @@ module TingYun
         # * <tt>force_reconnect => true</tt> if you want to establish a new connection
         #   to the server before running the worker loop.  This means you get a separate
         #   agent run and Ting Yun sees it as a separate instance (default is false).
-        def keep_retrying_or_force_reconnect?(options,&blk)
-          defaults = {
-              :keep_retrying => ::TingYun::Agent.config[:keep_retrying],
-              :force_reconnect => ::TingYun::Agent.config[:force_reconnect]
-          }
-          opts = defaults.merge(options)
-          return unless should_connect?(opts[:force_reconnect])
-
+        def catch_errors
           yield
 
         rescue TingYun::Support::Exception::ForceRestartException => e
@@ -132,7 +139,6 @@ module TingYun
           handle_other_error(e)
         end
 
-
         # Takes a hash of configuration data returned from the
         # server and uses it to set local variables and to
         # initialize various parts of the agent that are configured
@@ -141,14 +147,28 @@ module TingYun
         def finish_setup(config_data)
           return if config_data == nil
 
+          if config_data['config']
+            ::TingYun::Agent.logger.debug "Using config from server"
+          end
           ::TingYun::Agent.logger.debug "Server provided config: #{config_data.inspect}"
-          server_config = TingYun::Configuration::ServerSource.new(config_data, ::TingYun::Agent.config)
+          server_config = TingYun::Configuration::ServerSource.new(config_data)
           ::TingYun::Agent.config.replace_or_add_config(server_config)
           #log_connection!(config_data)
         end
 
         def log_connection!(config_data)
+          ::TingYun::Agent.logger.debug "Connected to TingYun Service at #{@service.collector.name}"
+          ::TingYun::Agent.logger.debug "Application Run       = #{@service.applicationId}."
+          ::TingYun::Agent.logger.debug "Connection data = #{config_data.inspect}"
+          if config_data['messages'] && config_data['messages'].any?
+            log_collector_messages(config_data['messages'])
+          end
+        end
 
+        def log_collector_messages(messages)
+          messages.each do |message|
+            ::TingYun::Agent.logger.send(message['level'].downcase, message['message'])
+          end
         end
       end
     end

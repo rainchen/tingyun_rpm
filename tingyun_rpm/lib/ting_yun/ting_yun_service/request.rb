@@ -1,5 +1,7 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
+require 'ting_yun/support/exception'
+
 module TingYun
   class TingYunService
     module Request
@@ -11,8 +13,10 @@ module TingYun
         request.content_type = "application/octet-stream"
         request.body = opts[:data]
 
+        response = nil
         attempts = 0
         max_attempts = 2
+
 
         begin
           attempts += 1
@@ -30,7 +34,6 @@ module TingYun
             raise TingYun::Support::Exception::ServerConnectionException, "Recoverable error talking to #{@collector} after #{attempts} attempts: #{e}"
           end
         end
-
         TingYun::Agent.logger.debug "Received response, status: #{response.code}, encoding: '#{response['content-encoding']}'"
 
 
@@ -38,17 +41,17 @@ module TingYun
           when Net::HTTPSuccess
             true # do nothing
           when Net::HTTPUnauthorized
-            raise LicenseException, 'Invalid license key, please visit support.newrelic.com'
+            raise TingYun::Support::Exception::LicenseException, 'Invalid license key, please visit support.newrelic.com'
           when Net::HTTPServiceUnavailable
-            raise ServerConnectionException, "Service unavailable (#{response.code}): #{response.message}"
+            raise TingYun::Support::Exception::ServerConnectionException, "Service unavailable (#{response.code}): #{response.message}"
           when Net::HTTPGatewayTimeOut
-            raise ServerConnectionException, "Gateway timeout (#{response.code}): #{response.message}"
+            raise TingYun::Support::Exception::ServerConnectionException, "Gateway timeout (#{response.code}): #{response.message}"
           when Net::HTTPRequestEntityTooLarge
-            raise UnrecoverableServerException, '413 Request Entity Too Large'
+            raise TingYun::Support::Exception::UnrecoverableServerException, '413 Request Entity Too Large'
           when Net::HTTPUnsupportedMediaType
-            raise UnrecoverableServerException, '415 Unsupported Media Type'
+            raise TingYun::Support::Exception::UnsupportedMediaType, '415 Unsupported Media Type'
           else
-            raise ServerConnectionException, "Unexpected response from server (#{response.code}): #{response.message}"
+            raise TingYun::Support::Exception::ServerConnectionException, "Unexpected response from server (#{response.code}): #{response.message}"
         end
         response
       end
@@ -78,6 +81,14 @@ module TingYun
         zlib_version = ''
         zlib_version << "zlib/#{Zlib.zlib_version}" if defined?(::Zlib) && Zlib.respond_to?(:zlib_version)
         "NBS Newlens Agent/#{TingYun::VERSION::STRING} #{ruby_description}#{zlib_version}"
+      end
+
+      def valid_to_marshal?(data)
+        @marshaller.dump(data)
+        true
+      rescue StandardError, SystemStackError => e
+        TingYun::Agent.logger.warn("Unable to marshal environment report on connect.", e)
+        false
       end
     end
   end

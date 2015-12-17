@@ -10,21 +10,24 @@ require 'ting_yun/support/serialize/encodes'
 require 'ting_yun/support/timer_lib'
 require 'ting_yun/support/exception'
 require 'ting_yun/support/serialize/json_marshaller'
+require 'ting_yun/ting_yun_service/record_service'
 
 module TingYun
   class TingYunService
     include Http
+    include RecordService
 
     CONNECTION_ERRORS = [Timeout::Error, EOFError, SystemCallError, SocketError].freeze
 
     PROTOCOL_VERSION = 1
 
-    DATA_COLLECTOR = "redirect.networkbench.com".freeze
 
-    attr_accessor :request_timeout, :ting_yun_id_secret, :app_session_key, :data_version
+    attr_accessor :request_timeout, :ting_yun_id_secret, :app_session_key, :data_version, :metric_id_cache
 
     def initialize(license_key=nil,collector=TingYun::Support.collector)
-      @license_key = license_key || TingYun::Agent.config[:license_key]
+      @applicationId = nil
+      @appSessionKey = nil
+      @license_key = license_key || TingYun::Agent.config[:'license_key']
       @request_timeout = TingYun::Agent.config[:timeout]
       @collector = collector
       @ting_yun_id_secret = nil
@@ -32,19 +35,17 @@ module TingYun
       @shared_tcp_connection = nil
       @data_version = nil
       @marshaller =TingYun::Support::Serialize::JsonMarshaller.new
+      @metric_id_cache = {}
     end
 
-    def connect(setting={})
+    def connect(settings={})
       if host = get_redirect_host
-        @collector = TingYun::Support.collector_from_host(host)
+         @collector = TingYun::Support.collector_from_host(host)
       end
-      response = invoke_remote(:connect, [settings])
-      @agent_id = response['agent_run_id']
+      response = invoke_remote(:initAgentApp, [settings])
+      @applicationId = response['applicationId']
+      @appSessionKey = response['appSessionKey']
       response
-    end
-
-    def init_agent_app
-      invoke_remote(:initAgentApp)
     end
 
     def get_redirect_host
@@ -60,14 +61,15 @@ module TingYun
     # enough to be worth compressing, and handles any errors the
     # server may return
 
-    private
+    # private
 
-    def invoke_remote(method, payload = [], options = {})
+    def invoke_remote(method, payload=[], options = {})
       start_time = Time.now
 
       data, size, serialize_finish_time = nil
+      payload = payload[0]  if method== :initAgentApp
       begin
-        data = @marshaller.(payload, options)
+        data = @marshaller.dump(payload, options)
       rescue StandardError, SystemStackError => e
         handle_serialization_error(method, e)
       end
@@ -78,12 +80,13 @@ module TingYun
 
       uri = remote_method_uri(method)
 
+      full_uri = "#{@collector}#{uri}"
+
       response = send_request(:data      => data,
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
-    ensure
-
+      @marshaller.load(decompress_response(response))
     end
 
     def handle_serialization_error(method, e)
@@ -92,6 +95,8 @@ module TingYun
       error.set_backtrace(e.backtrace)
       raise error
     end
+
+
 
 
 

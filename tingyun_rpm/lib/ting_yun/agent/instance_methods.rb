@@ -18,9 +18,10 @@ module TingYun
         TingYun::Agent.config.remove_config_type(:server)
       end
 
-      def drop_buffered_data
-
+      def stop_event_loop
+        @event_loop.stop if @event_loop
       end
+
     end
   end
 end

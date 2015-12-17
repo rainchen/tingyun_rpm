@@ -72,8 +72,8 @@ module TingYun::Configuration
 
     def test_set_key_by_type_uses_the_default_type
       ENV['TING_YUN_TEST'] = 'true'
-      @environment_source.set_key_by_type(:agent_enabled, 'TING_YUN_TEST')
-      assert_equal true, @environment_source[:agent_enabled]
+      @environment_source.set_key_by_type(:'nbs.agent_enabled', 'TING_YUN_TEST')
+      assert_equal true, @environment_source[:'nbs.agent_enabled']
     end
 
     def test_set_key_with_ting_yun_prefix
@@ -95,7 +95,7 @@ module TingYun::Configuration
     end
 
     def test_convert_environment_key_to_config_key_respects_aliases
-      assert_applied_boolean('TINGYUN_AGENT_ENABLED', :agent_enabled)
+      assert_applied_boolean('TINGYUN_NBS.AGENT_ENABLED', :'nbs.agent_enabled')
     end
 
     def test_convert_environment_key_to_config_key_allows_underscores_as_dots

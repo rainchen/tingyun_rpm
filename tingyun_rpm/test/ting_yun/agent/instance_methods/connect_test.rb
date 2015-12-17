@@ -7,6 +7,7 @@ require 'ting_yun/agent'
 require 'ting_yun/ting_yun_service'
 require 'ting_yun/configuration/server_source'
 require 'ting_yun/support/exception'
+require 'ting_yun/frameworks'
 
 
 class TingYun::Agent::InstanceMethods::ConnectTest < MiniTest::Test
@@ -63,8 +64,8 @@ class TingYun::Agent::InstanceMethods::ConnectTest < MiniTest::Test
   end
 
   def test_connect_settings_have_environment_report
-    generate_environment_report
-    assert connect_settings[:environment].detect{ |(k, _)|
+     generate_environment_report
+    assert connect_settings[:env].detect{ |(k, _)|
              k == 'Gems'
            }, "expected connect_settings to include gems from environment"
   end
@@ -72,7 +73,7 @@ class TingYun::Agent::InstanceMethods::ConnectTest < MiniTest::Test
   def test_environment_for_connect_negative
     with_config(:send_environment_info => false) do
       generate_environment_report
-      assert_equal [], connect_settings[:environment]
+      assert_equal Hash.new, connect_settings[:env]
     end
   end
 
@@ -81,7 +82,7 @@ class TingYun::Agent::InstanceMethods::ConnectTest < MiniTest::Test
       TingYun::Agent.config.expects(:app_names).returns(["apps"])
       @local_host = "lo-calhost"
       @environment_report = {}
-      keys = %w(pid host app_name language agent_version environment).map(&:to_sym)
+      keys = %w(pid host appName language agentVersion env).map(&:to_sym)
       settings = connect_settings
       keys.each do |k|
         assert_includes(settings.keys, k)
@@ -108,18 +109,18 @@ class TingYun::Agent::InstanceMethods::ConnectTest < MiniTest::Test
   def test_keep_retrying_or_force_reconnect?
     @connect_state = :unknown
 
-    keep_retrying_or_force_reconnect?(:force_reconnect => true) do
+    catch_errors do
       raise TingYun::Support::Exception::ForceDisconnectException.new("raise a ForceDisconnectException ")
     end
     assert_equal :disconnected, @connect_state
     @connect_state = :unknown
-    keep_retrying_or_force_reconnect?(:force_reconnect => true) do
+    catch_errors do
       raise TingYun::Support::Exception::LicenseException.new("raise a LicenseException ")
     end
     assert_equal :disconnected, @connect_state
 
     @connect_state = :unknown
-    keep_retrying_or_force_reconnect?(:force_reconnect => true) do
+  catch_errors do
       raise TingYun::Support::Exception::UnrecoverableAgentException.new("raise a UnrecoverableAgentException ")
     end
     assert_equal :disconnected, @connect_state
@@ -153,12 +154,13 @@ class TingYun::Agent::InstanceMethods::ConnectTest < MiniTest::Test
     error = TingYun::Support::Exception::ForceRestartException.new
     # twice, because we expect it to retry the block
     self.expects(:handle_force_restart).with(error).twice
-    keep_retrying_or_force_reconnect?({}) do
+    catch_errors do
       # needed to keep it from looping infinitely in the test
       @runs += 1
       raise error unless @runs > 2
     end
     assert_equal 3, @runs, 'should retry the block when it fails'
   end
+
 
 end

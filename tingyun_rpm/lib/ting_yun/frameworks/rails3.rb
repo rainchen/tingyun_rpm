@@ -4,7 +4,7 @@ require 'ting_yun/frameworks/rails'
 
 module TingYun
   module Frameworks
-    class Rails3 < TingYun::Frameworks::rails
+    class Rails3 < TingYun::Frameworks::Rails
 
       def env
         @env ||= ::Rails.env.to_s
@@ -21,7 +21,6 @@ module TingYun
       def version
         @rails_version ||= TingYun::Support::VersionNumber.new(::Rails::VERSION::STRING)
       end
-
     end
   end
 end

@@ -7,7 +7,7 @@ module TingYun
   module Agent
     module InstanceMethods
       module StartWorkerThread
-        def start_worker_thread(connection_options={})
+        def  start_worker_thread(connection_options={})
           TingYun::Agent.logger.debug "Creating Ruby Agent worker thread."
           @worker_thread = TingYun::Agent::Threading::AgentThread.create('Worker Loop') do
             deferred_work!(connection_options)
@@ -23,16 +23,23 @@ module TingYun
         # never return from this method unless we're shutting down
         # the agent
         def deferred_work!(connection_options)
-          connect(connection_options)
-          if connected?
-            create_and_run_event_loop
-          else
-            TingYun::Agent.logger.debug "No connection.  Worker thread ending."
+          catch_errors do
+            connect!(connection_options)
+            if connected?
+              create_and_run_event_loop
+            else
+              TingYun::Agent.logger.debug "No connection.  Worker thread ending."
+            end
           end
         end
 
         def create_and_run_event_loop
-          @event_loop = EventLoop.new
+          @event_loop = TingYun::Agent::Event::EventLoop.new
+
+          @event_loop.on(:report_data) do
+            transmit_data
+          end
+          @event_loop.fire_every(Agent.config[:data_report_period], :report_data)
         end
       end
     end

@@ -9,15 +9,13 @@ test:
   host: localhost
   port: 3000
   log_level: info
-  agent_enabled: false
+  nbs.agent_enabled: false
   monitor_mode: false
   developer_mode: true
   disable_samplers: true
   api_host: 127.0.0.1
   api_port: 443
-  message: '<%= generated_for_user %>'
-  license_key: '<%= license_key %>'
-  agent_enabled: auto
+  license_key: '888-888-888'
   apdex_t: 1.1
   app_name:
     - a

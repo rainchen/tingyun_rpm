@@ -115,7 +115,6 @@ module TingYun
 
       def replace_or_add_config(source)
         source.freeze
-        #invoke_callbacks(:add,source)
 
         case source
           when YamlSource        then   @yaml_source          = source
@@ -130,20 +129,7 @@ module TingYun
 
       end
 
-      def invoke_callbacks(direction, source)
-        return unless source
-        source.keys.each do |key|
-          if @cache[key]!= source[key]
-            @callbacks[key].each do |proc|
-              if direction == :add
-                proc.call(source[key])
-              else
-                proc.call(@cache[key])
-              end
-            end
-          end
-        end
-      end
+
 
       def source(key)
         config_stack.each do |config|
@@ -184,13 +170,28 @@ module TingYun
       end
 
 
+
+
+      def to_collector_hash
+        DottedHash.new(flattened).to_hash.delete_if do |k, v|
+          default = DEFAULTS[k]
+          if default
+            default[:exclude_from_reported_settings]
+          else
+            # In our tests, we add totally bogus configs, because testing.
+            # In those cases, there will be no default. So we'll just let
+            # them through.
+            false
+          end
+        end
+      end
+
       private
 
       def config_stack
         stack = [@environment_source, @server_source, @manual_source, @yaml_source, @default_source]
 
         stack.compact!
-
         @configs_for_testing.each do |config, at_start|
           if at_start
             stack.insert(0, config)

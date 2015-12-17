@@ -24,8 +24,7 @@ module TingYun::Configuration
 
     def test_should_apply_erb_transformations
       assert_equal 'heyheyhey', @source[:erb_value]
-      assert_equal '', @source[:message]
-      assert_equal '', @source[:license_key]
+      assert_equal '888-888-888', @source[:license_key]
     end
 
     def test_config_booleans

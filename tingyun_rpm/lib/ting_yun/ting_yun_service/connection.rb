@@ -76,6 +76,43 @@ module TingYun
           conn.keep_alive_timeout = TingYun::Agent.config[:keep_alive_timeout]
         end
       end
+
+      # One session with the service's endpoint.  In this case the session
+      # represents 1 tcp connection which may transmit multiple HTTP requests
+      # via keep-alive.
+      def session(&block)
+        raise ArgumentError, "#{self.class}#shared_connection must be passed a block" unless block_given?
+
+        begin
+          t0 = Time.now
+          @in_session = true
+          if TingYun::Agent.config[:aggressive_keepalive]
+            session_with_keepalive(&block)
+          else
+            session_without_keepalive(&block)
+          end
+        rescue *CONNECTION_ERRORS => e
+          elapsed = Time.now - t0
+          raise TingYun::Support::Exception::ServerConnectionException, "Recoverable error connecting to #{@collector} after #{elapsed} seconds: #{e}"
+        ensure
+          @in_session = false
+        end
+      end
+
+      def session_with_keepalive(&block)
+        establish_shared_connection
+        block.call
+      end
+
+      def session_without_keepalive(&block)
+        begin
+          establish_shared_connection
+          block.call
+        ensure
+          close_shared_connection
+        end
+      end
+
     end
   end
 end

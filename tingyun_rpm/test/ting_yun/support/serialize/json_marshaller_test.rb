@@ -9,7 +9,7 @@ module TingYun::Support::Serialize
     end
 
     def test_json_marshaller_handles_responses_from_collector
-      assert_equal ['beep', 'boop'], @json_marshaller.load('{"return_value": ["beep","boop"]}')
+      assert_equal ['beep', 'boop'], @json_marshaller.load('{"result": ["beep","boop"]}')
     end
 
 

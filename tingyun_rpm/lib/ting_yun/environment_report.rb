@@ -1,5 +1,6 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
+require 'ting_yun/support/system_info'
 
 module TingYun
   # The EnvironmentReport is responsible for analyzing the application's
@@ -43,7 +44,7 @@ module TingYun
     ####################################
     report_on('Gems') do
       begin
-        Bundler.rubygems.all_specs.map { |gem| "#{gem.name}(#{gem.version})" }
+       (Bundler.rubygems.all_specs.map { |gem| "#{gem.name}(#{gem.version})" }).join(',')
       rescue
         # There are certain rubygem, bundler, rails combinations (e.g. gem
         # 1.6.2, rails 2.3, bundler 1.2.3) where the code above throws an error
@@ -52,10 +53,10 @@ module TingYun
         Bundler.load.specs.map do |spec|
           version = (spec.respond_to?(:version) && spec.version)
           spec.name + (version ? "(#{version})" : "")
-        end
+        end.join(',')
       end
     end
-    report_on('Plugin List') { ::Rails.configuration.plugins.to_a }
+    report_on('Plugin List') { ::Rails.configuration.plugins.to_a.join(',')}
     report_on('Ruby version') { RUBY_VERSION }
     report_on('Ruby description') { RUBY_DESCRIPTION }
     report_on('Ruby platform') { RUBY_PLATFORM }
@@ -67,12 +68,12 @@ module TingYun
     report_on('Arch') { ::TingYun::Support::SystemInfo.processor_arch }
     report_on('OS version') { ::TingYun::Support::SystemInfo.os_version }
     report_on('OS') { ::TingYun::Support::SystemInfo.ruby_os_identifier }
-    # report_on('Database adapter') do
-    #   ActiveRecord::Base.configurations[NewRelic::Control.instance.env]['adapter']
-    # end
+    report_on('Database adapter') do
+      ActiveRecord::Base.configurations[::TingYun::Frameworks.framework.env]['adapter']
+    end
     report_on('Framework') { TingYun::Agent.config[:framework].to_s }
     report_on('Dispatcher') { TingYun::Agent.config[:dispatcher].to_s }
-    # report_on('Environment') { NewRelic::Control.instance.env }
+    report_on('Environment') { ::TingYun::Frameworks.framework.env }
     report_on('Rails version') { ::Rails::VERSION::STRING }
     report_on('Rails threadsafe') do
       ::Rails.configuration.action_controller.allow_concurrency
@@ -98,17 +99,17 @@ module TingYun
           if value
             data[key] = value
 
-            # Agent.record_metric("Supportability/EnvironmentReport/success", 0.0)
-            # Agent.record_metric("Supportability/EnvironmentReport/success/#{key}", 0.0)
+            ::TingYun::Agent.record_metric("Supportability/EnvironmentReport/success", 0.0)
+            ::TingYun::Agent.record_metric("Supportability/EnvironmentReport/success/#{key}", 0.0)
           else
-            TingYun::Agent.logger.debug("EnvironmentReport ignoring value for #{key.inspect} which came back falsey: #{value.inspect}")
-            # Agent.record_metric("Supportability/EnvironmentReport/empty", 0.0)
-            # Agent.record_metric("Supportability/EnvironmentReport/empty/#{key}", 0.0)
+            ::TingYun::Agent.logger.debug("EnvironmentReport ignoring value for #{key.inspect} which came back falsey: #{value.inspect}")
+            ::TingYun::Agent.record_metric("Supportability/EnvironmentReport/empty", 0.0)
+            ::TingYun::Agent.record_metric("Supportability/EnvironmentReport/empty/#{key}", 0.0)
           end
         rescue => e
-          TingYun::Agent.logger.debug("EnvironmentReport failed to retrieve value for #{key.inspect}: #{e}")
-          # Agent.record_metric("Supportability/EnvironmentReport/error", 0.0)
-          # Agent.record_metric("Supportability/EnvironmentReport/error/#{key}", 0.0)
+          ::TingYun::Agent.logger.debug("EnvironmentReport failed to retrieve value for #{key.inspect}: #{e}")
+          ::TingYun::Agent.record_metric("Supportability/EnvironmentReport/error", 0.0)
+          ::TingYun::Agent.record_metric("Supportability/EnvironmentReport/error/#{key}", 0.0)
         end
         data
       end
