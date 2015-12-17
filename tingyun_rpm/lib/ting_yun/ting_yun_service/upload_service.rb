@@ -20,13 +20,11 @@ module TingYun
             :components => [],
             :general => []
         }
-        TingYun::Agent.logger.info("上传性能数据:", upload_data) if TingYun::Agent.config[:'nbs.audit_mode']
         result = invoke_remote(
             :upload,
             [upload_data],
             :item_count => action_array.size
         )
-        TingYun::Agent.logger.info("性能数据返回:", result) if TingYun::Agent.config[:'nbs.audit_mode']
         fill_metric_id_cache(result)
         result
       end

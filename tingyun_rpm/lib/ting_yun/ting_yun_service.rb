@@ -79,15 +79,15 @@ module TingYun
 
       data, encoding = compress_request_if_needed(data)
       size = data.size
-
+      TingYun::Agent.logger.info("上传数据:", data) if TingYun::Agent.config[:'nbs.audit_mode']
       uri = remote_method_uri(method)
-
       full_uri = "#{@collector}#{uri}"
-
+      TingYun::Agent.logger.info("请求url:", full_uri) if TingYun::Agent.config[:'nbs.audit_mode']
       response = send_request(:data      => data,
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
+      TingYun::Agent.logger.info("返回数据:", response) if TingYun::Agent.config[:'nbs.audit_mode']
       @marshaller.load(decompress_response(response))
     end
 
