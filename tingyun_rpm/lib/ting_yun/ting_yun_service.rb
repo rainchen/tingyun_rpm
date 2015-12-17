@@ -10,12 +10,12 @@ require 'ting_yun/support/serialize/encodes'
 require 'ting_yun/support/timer_lib'
 require 'ting_yun/support/exception'
 require 'ting_yun/support/serialize/json_marshaller'
-require 'ting_yun/ting_yun_service/record_service'
+require 'ting_yun/ting_yun_service/upload_service'
 
 module TingYun
   class TingYunService
     include Http
-    include RecordService
+    include UploadService
 
     CONNECTION_ERRORS = [Timeout::Error, EOFError, SystemCallError, SocketError].freeze
 

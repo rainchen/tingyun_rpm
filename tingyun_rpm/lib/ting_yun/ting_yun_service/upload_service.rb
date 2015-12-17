@@ -4,7 +4,7 @@ require 'ting_yun/metrics/metric_data'
 
 module TingYun
   class TingYunService
-    module RecordService
+    module UploadService
 
       def metric_data(stats_hash)
         timeslice_start = stats_hash.started_at
