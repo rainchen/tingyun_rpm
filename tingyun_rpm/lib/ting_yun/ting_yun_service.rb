@@ -44,6 +44,7 @@ module TingYun
          @collector = TingYun::Support.collector_from_host(host)
       end
       response = invoke_remote(:initAgentApp, [settings])
+      TingYun::Agent.logger.info("initAgentApp response:", response) if TingYun::Agent.config[:'nbs.audit_mode']
       @applicationId = response['applicationId']
       @appSessionKey = response['appSessionKey']
       response
