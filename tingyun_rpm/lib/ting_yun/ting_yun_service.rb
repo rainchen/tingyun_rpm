@@ -87,7 +87,7 @@ module TingYun
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
-      TingYun::Agent.logger.info("返回数据:", response) if TingYun::Agent.config[:'nbs.audit_mode']
+      TingYun::Agent.logger.info("返回数据:", response.body) if TingYun::Agent.config[:'nbs.audit_mode']
       @marshaller.load(decompress_response(response))
     end
 
