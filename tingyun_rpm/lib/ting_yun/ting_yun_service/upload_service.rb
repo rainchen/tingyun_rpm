@@ -7,17 +7,16 @@ module TingYun
     module UploadService
 
       def metric_data(stats_hash)
-        binding.pry
         timeslice_start = stats_hash.started_at
         timeslice_end  = stats_hash.harvested_at || Time.now
-        metric_data_array = build_metric_data_array(stats_hash)
+        action_array = build_metric_data_array(stats_hash)
         upload_data = {
             :type => "perfMetrics",
             :timeFrom=>timeslice_start.to_i,
             :timeTo =>timeslice_end.to_i,
             :interval=> nil,
-            :actions => nil,
-            :apdex => metric_data_array,
+            :actions => action_array,
+            :apdex => nil,
             :components => nil,
             :general => nil
         }
@@ -25,30 +24,29 @@ module TingYun
         result = invoke_remote(
             :upload,
             [upload_data],
-            :item_count => metric_data_array.size
+            :item_count => action_array.size
         )
         fill_metric_id_cache(result)
         result
       end
 
       # The collector wants to recieve metric data in a format that's different
-      # from how we store it internally, so this method handles the translation.
+      # from how we store it inte -nally, so this method handles the translation.
       # It also handles translating metric names to IDs using our metric ID cache.
       def build_metric_data_array(stats_hash)
-        metric_data_array = []
+        action_array = []
         stats_hash.each do |metric_spec, stats|
           # Omit empty stats as an optimization
           unless stats.is_reset?
             metric_id = metric_id_cache[metric_spec]
             metric_data = if metric_id
-                            TingYun::Metrics::MetricData.new(nil, stats, metric_id)
+                            action_array <<[metric_id,[stats.call_count,stats.total_call_time,stats.total_exclusive_time,stats.max_call_time,stats.min_call_time,stats.sum_of_squares]]
                           else
-                            TingYun::Metrics::MetricData.new(metric_spec, stats, nil)
+                            action_array <<[{"name" =>metric_spec.name },[stats.call_count,stats.total_call_time,stats.total_exclusive_time,stats.max_call_time,stats.min_call_time,stats.sum_of_squares]]
                           end
-            metric_data_array << metric_data
           end
         end
-        metric_data_array
+        action_array
       end
 
 
@@ -56,10 +54,14 @@ module TingYun
       # metric cache so we can save the collector some work by
       # sending integers instead of strings the next time around
       def fill_metric_id_cache(pairs_of_specs_and_ids)
-        Array(pairs_of_specs_and_ids).each do |metric_spec_hash, metric_id|
-          metric_spec = MetricSpec.new(metric_spec_hash['name'],
-                                       metric_spec_hash['scope'])
-          metric_id_cache[metric_spec] = metric_id
+        pairs_of_specs_and_ids.each do |_,value|
+          if value.is_a? Array
+            value.each do |array|
+              if array.is_a? Array
+                metric_id_cache[array[0]["name"]] = array[1]
+              end
+            end
+          end
         end
       rescue => e
         # If we've gotten this far, we don't want this error to propagate and
