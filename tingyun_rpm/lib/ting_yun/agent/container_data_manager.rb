@@ -76,13 +76,13 @@ module TingYun
         TingYun::Agent.logger.debug("Sending #{items.size} items to #{endpoint}")
         begin
           @service.send(endpoint, items)
-        rescue ForceRestartException, ForceDisconnectException
+        rescue ::TingYun::Support::Exception::ForceRestartException, ::TingYun::Support::Exception::ForceDisconnectException
           raise
-        rescue SerializationError => e
+        rescue ::TingYun::Support::Exception::SerializationError => e
           TingYun::Agent.logger.warn("Failed to serialize data for #{endpoint}, discarding. Error: ", e)
-        rescue UnrecoverableServerException => e
+        rescue ::TingYun::Support::Exception::UnrecoverableServerException => e
           TingYun::Agent.logger.warn("#{endpoint} data was rejected by remote service, discarding. Error: ", e)
-        rescue ServerConnectionException => e
+        rescue ::TingYun::Support::Exception::ServerConnectionException => e
           TingYun::Agent.logger.debug("Unable to send #{endpoint} data, will try again later. Error: ", e)
           container.merge!(items)
         rescue => e
