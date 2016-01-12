@@ -61,7 +61,7 @@ module TingYun
         # checks the size of the error queue to make sure we are under
         # the maximum limit, and logs a warning if we are over the limit.
         def over_queue_limit?(message)
-          over_limit = (@errors.reject{|err| err.is_internal}.length >= @capacity)
+          over_limit = (@errors.reject { |err| err.is_internal }.length >= @capacity)
           if over_limit
             ::TingYun::Agent.logger.warn("The error reporting queue has reached #{@capacity}. The error detail for this and subsequent errors will not be transmitted to TingYun  until the queued errors have been sent: #{message}")
           end
