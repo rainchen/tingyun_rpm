@@ -14,6 +14,7 @@ module TingYun
         request.body = opts[:data]
         response = nil
         max_attempts = 2
+        attempts = 0
         begin
           attempts += 1
           conn = http_connection
