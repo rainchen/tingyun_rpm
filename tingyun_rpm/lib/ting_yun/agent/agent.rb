@@ -60,6 +60,7 @@ module TingYun
         }
         opts = defaults.merge(option)
 
+
         return unless should_connect?(opts[:force_reconnect])
         TingYun::Agent.logger.debug "Connecting Process to Ting Yun: #$0"
         query_server_for_configuration #connnect

@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'ting_yun/agent/collector/stats_engine/stats_hash'
-require 'ting_yun/agent/collector/rules_engine'
 require 'ting_yun/agent/collector/stats_engine/metric_stats'
 
 module TingYun

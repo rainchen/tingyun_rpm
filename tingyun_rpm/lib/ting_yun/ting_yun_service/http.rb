@@ -17,6 +17,7 @@ module TingYun
       include Connection
 
       def remote_method_uri(method)
+
         params = {'licenseKey'=> @license_key,'version' => @data_version,'appSessionKey' => @appSessionKey}
 
         uri = "/" + method.to_s

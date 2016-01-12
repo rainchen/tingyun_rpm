@@ -8,7 +8,6 @@ require 'ting_yun/constants'
 
 module TingYun
   module Instrumentation
-
     class ActionViewSubscriber < TingYun::Instrumentation::Support::EventedSubscriber
 
 
@@ -42,8 +41,8 @@ module TingYun
         TingYun::Agent.logger.log_exception(:error, error)
       end
 
-      class RenderEvent < TingYun::Instrumentation::Support::Event
 
+      class RenderEvent < TingYun::Instrumentation::Support::Event
         def recordable?
           name[0] == '!' ||
               metric_name == 'View/text template/Rendering' ||

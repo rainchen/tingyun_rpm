@@ -10,6 +10,7 @@ require 'ting_yun/support/serialize/encodes'
 require 'ting_yun/support/timer_lib'
 require 'ting_yun/support/exception'
 require 'ting_yun/support/serialize/json_marshaller'
+
 require 'ting_yun/ting_yun_service/upload_service'
 require 'ting_yun/version'
 
@@ -17,7 +18,9 @@ require 'ting_yun/version'
 module TingYun
   class TingYunService
     include Http
+
     include UploadService
+
 
     CONNECTION_ERRORS = [Timeout::Error, EOFError, SystemCallError, SocketError].freeze
 
@@ -45,6 +48,7 @@ module TingYun
          @collector = TingYun::Support.collector_from_host(host)
       end
       response = invoke_remote(:initAgentApp, [settings])
+
       TingYun::Agent.logger.info("initAgentApp response:", response) if TingYun::Agent.config[:'nbs.audit_mode']
 
       @applicationId = response['applicationId']
@@ -71,6 +75,7 @@ module TingYun
       start_time = Time.now
 
       data, size, serialize_finish_time = nil
+
       payload = payload[0]  if method == :initAgentApp
 
       begin
@@ -87,10 +92,13 @@ module TingYun
       full_uri = "#{@collector}#{uri}"
       TingYun::Agent.logger.info("请求url:", full_uri) if TingYun::Agent.config[:'nbs.audit_mode']
 
+      full_uri = "#{@collector}#{uri}"
+
       response = send_request(:data      => data,
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
+
       TingYun::Agent.logger.info("返回数据:", response.body) if TingYun::Agent.config[:'nbs.audit_mode']
 
       @marshaller.load(decompress_response(response))

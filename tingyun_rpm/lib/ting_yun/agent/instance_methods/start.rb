@@ -3,6 +3,7 @@
 require 'ting_yun/frameworks'
 require 'ting_yun/version'
 
+
 # before the real start,do check and log things
 module TingYun
   module Agent
