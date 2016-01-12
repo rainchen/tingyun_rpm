@@ -6,7 +6,7 @@ module TingYun
   class TingYunService
     module Request
 
-      #Posts to the specified server, only try to request twice if there any exception in the first time
+      #Posts to the specified server, retry every minute if ServerConnectionException
       def send_request(opts)
         request = Net::HTTP::Post.new(opts[:uri], 'CONTENT-ENCODING' => opts[:encoding], 'HOST' => opts[:collector].name)
         request['user-agent'] = user_agent
@@ -14,10 +14,6 @@ module TingYun
         request.body = opts[:data]
 
         response = nil
-        attempts = 0
-        max_attempts = 2
-
-
         begin
           attempts += 1
           conn = http_connection
@@ -26,13 +22,9 @@ module TingYun
             response = conn.request(request)
           end
         rescue *CONNECTION_ERRORS => e
-          close_shared_connection
-          if attempts < max_attempts
-            TingYun::Agent.logger.debug("Retrying request to #{opts[:collector]}#{opts[:uri]} after #{e}")
-            retry
-          else
-            raise TingYun::Support::Exception::ServerConnectionException, "Recoverable error talking to #{@collector} after #{attempts} attempts: #{e}"
-          end
+          TingYun::Agent.logger.error("Recoverable error talking to #{@collector}")
+          sleep 60
+          retry
         end
         TingYun::Agent.logger.debug "Received response, status: #{response.code}, encoding: '#{response['content-encoding']}'"
 

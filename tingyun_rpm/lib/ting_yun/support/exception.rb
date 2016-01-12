@@ -18,6 +18,16 @@ module TingYun
       class ForceRestartException < StandardError;
       end
 
+      # An exception that forces an agent to restart.
+      class InvalidDataException < StandardError;
+      end
+
+      class ExpiredConfigurationException < StandardError;
+      end
+
+      # An exception that forces an agent to restart initAgentApp.
+      class InvalidDataTokenException < StandardError;
+      end
       # Used to blow out of a periodic task without logging a an error, such as for routine
       # failures.
       class ServerConnectionException < StandardError;

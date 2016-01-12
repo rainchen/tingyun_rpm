@@ -8,18 +8,20 @@ module TingYun
     module Serialize
       class Marshaller
         def parsed_error(error)
-          error_type = error['error_type']
-          error_message = error['message']
+          error_code = error['errorCode']
+          error_message = error['errorMessage']
 
-          exception = case error_type
-                        when 'TingYun::Support::Exception::LicenseException'
+          exception = case error_code
+                        when 460
                           TingYun::Support::Exception::LicenseException.new(error_message)
-                        when 'TingYun::Support::Exception::ForceRestartException'
-                          TingYun::Support::Exception::ForceRestartException.new(error_message)
-                        when 'TingYun::Support::Exception::ForceDisconnectException'
-                          TingYun::Support::Exception::ForceDisconnectException.new(error_message)
+                        when 461
+                          TingYun::Support::Exception::InvalidDataTokenException.new(error_message)
+                        when 462
+                          TingYun::Support::Exception::InvalidDataException.new(error_message)
+                        when 470
+                          TingYun::Support::Exception::ExpiredConfigurationException.new("error_message")
                         else
-                          TingYun::Support::Exception::CollectorError.new("#{error['error_type']}: #{error['message']}")
+                          TingYun::Support::Exception::CollectorError.new("#{error_code}: #{error_message}")
                       end
 
           exception
@@ -52,10 +54,12 @@ module TingYun
 
         def return_value(data)
           if data.respond_to?(:has_key?)
-            if data.has_key?('exception')
-              raise parsed_error(data['exception'])
-            elsif data.has_key?('result')
-              return data['result']
+            if data.has_key?('status') && data.has_key?('result')
+              if data['status'] =="error"
+                raise parsed_error(data['result'])
+              else
+                return data['result']
+              end
             end
           end
           ::TingYun::Agent.logger.debug("Unexpected response from collector: #{data}")
