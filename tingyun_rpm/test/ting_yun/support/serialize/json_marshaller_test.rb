@@ -8,17 +8,6 @@ module TingYun::Support::Serialize
      @json_marshaller = TingYun::Support::Serialize::JsonMarshaller.new
     end
 
-    def test_json_marshaller_handles_responses_from_collector
-      assert_equal ['beep', 'boop'], @json_marshaller.load('{"result": ["beep","boop"]}')
-    end
-
-
-    def test_json_marshaller_handles_errors_from_collector
-      assert_raises(TingYun::Support::Exception::CollectorError,
-                    'JavaCrash: error message') do
-        @json_marshaller.load('{"exception": {"message": "error message", "error_type": "JavaCrash"}}')
-      end
-    end
 
     def test_json_marshaller_logs_on_empty_response_from_collector
       expects_logging(:error, includes('Empty'), any_parameters)

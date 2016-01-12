@@ -99,10 +99,10 @@ module TingYun::Metrics
       stats = TingYun::Metrics::Stats.new
       stats.record_data_point(1.0)
       stats.record_data_point(2.0, 1.0)
-      md = TingYun::Metrics::MetricData.new(TingYun::Metrics::MetricSpec.new('Custom/test/method', 'scope'),
+      md = TingYun::Metrics::MetricData.new(TingYun::Metrics::MetricSpec.new('Custom/test/method', 'parent'),
                                     stats, nil)
-      expected = [ {'name' => 'Custom/test/method', 'scope' => 'scope'},
-                   [2, 3.0, 2.0, 1.0, 2.0, 5.0] ]
+      expected = [ {'name' => 'Custom/test/method', 'parent' => 'parent'},
+                   [2, 3.0, 2.0, 1.0, 5.0] ]
       assert_equal expected, md.to_collector_array
     end
 
@@ -112,7 +112,7 @@ module TingYun::Metrics
       stats.record_data_point(2.0, 1.0)
       md = TingYun::Metrics::MetricData.new(TingYun::Metrics::MetricSpec.new('Custom/test/method', 'scope'),
                                     stats, 1234)
-      expected = [ 1234, [2, 3.0, 2.0, 1.0, 2.0, 5.0] ]
+      expected = [ 1234, [2, 3.0, 2.0, 1.0, 5.0] ]
       assert_equal expected, md.to_collector_array
     end
 
@@ -121,7 +121,7 @@ module TingYun::Metrics
       stats.record_data_point(1.0)
       stats.record_data_point(2.0, 1.0)
       md = TingYun::Metrics::MetricData.new(nil, stats, 1234)
-      expected = [ 1234, [2, 3.0, 2.0, 1.0, 2.0, 5.0] ]
+      expected = [ 1234, [2, 3.0, 2.0, 1.0, 5.0] ]
       assert_equal expected, md.to_collector_array
     end
 
@@ -136,7 +136,7 @@ module TingYun::Metrics
       stats.sum_of_squares = Rational(6, 1)
 
       md = TingYun::Metrics::MetricData.new(nil, stats, 1234)
-      expected = [1234, [1, 2.0, 3.0, 4.0, 5.0, 6.0]]
+      expected = [1234, [1, 2.0, 3.0, 4.0, 6.0]]
       assert_equal expected, md.to_collector_array
     end
 
@@ -150,7 +150,7 @@ module TingYun::Metrics
       stats.sum_of_squares = Exception.new("Boo")
 
       md = TingYun::Metrics::MetricData.new(nil, stats, 1234)
-      expected = [1234, [0, 0, 0, 0, 0, 0]]
+      expected = [1234, [0, 0.0, 0.0, 0.0, 0.0]]
       assert_equal expected, md.to_collector_array
     end
 

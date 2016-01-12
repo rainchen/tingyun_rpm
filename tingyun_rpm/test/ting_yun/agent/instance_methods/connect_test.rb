@@ -120,11 +120,10 @@ class TingYun::Agent::InstanceMethods::ConnectTest < MiniTest::Test
     assert_equal :disconnected, @connect_state
 
     @connect_state = :unknown
-  catch_errors do
+    catch_errors do
       raise TingYun::Support::Exception::UnrecoverableAgentException.new("raise a UnrecoverableAgentException ")
     end
     assert_equal :disconnected, @connect_state
-    assert @shutdown
 
   end
   def drop_buffered_data
@@ -148,19 +147,5 @@ class TingYun::Agent::InstanceMethods::ConnectTest < MiniTest::Test
     self.expects(:disconnect)
     handle_other_error(error)
   end
-
-  def test_force_restart
-    @runs = 0
-    error = TingYun::Support::Exception::ForceRestartException.new
-    # twice, because we expect it to retry the block
-    self.expects(:handle_force_restart).with(error).twice
-    catch_errors do
-      # needed to keep it from looping infinitely in the test
-      @runs += 1
-      raise error unless @runs > 2
-    end
-    assert_equal 3, @runs, 'should retry the block when it fails'
-  end
-
 
 end

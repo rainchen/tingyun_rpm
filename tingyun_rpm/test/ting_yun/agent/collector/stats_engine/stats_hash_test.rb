@@ -78,7 +78,8 @@ module TingYun::Agent::Collector
       assert_equal(2, stats.apdex_t)
       assert_equal(3, stats.apdex_f)
       assert_equal(99, stats.min_call_time)
-      assert_equal(99, stats.max_call_time)
+      assert_equal(0, stats.max_call_time)
+      assert_equal(0, stats.sum_of_squares)
     end
 
     def test_merge_merges
