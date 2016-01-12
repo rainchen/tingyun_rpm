@@ -11,10 +11,12 @@ module TingYun
       # main agent configuration.
       TOP_LEVEL_KEYS = [
           "applicationId",
+          "tingyunIdSecret",
           "enabled",
           "appSessionKey",
           "dataSentInterval",
-          "apdex_t"
+          "apdex_t",
+          "config"
       ]
 
       def self.add_top_level_keys_for_testing(add_array)
