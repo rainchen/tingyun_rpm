@@ -29,6 +29,7 @@ if defined?(Rails::VERSION)
       class Railtie < Rails::Railtie
 
         initializer "tingyun_rpm.start_plugin" do |app|
+          TingYun::Agent.logger.info('initialize tingyun_rpm start_plugin')
           TingYun::Frameworks.init_start(:config => app.config)
         end
       end

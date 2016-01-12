@@ -73,8 +73,9 @@ module TingYun
     # private
 
     def invoke_remote(method, payload=[], options = {})
-      start_time = Time.now
-
+      if !TingYun::Agent.config[:'nbs.agent_enabled']
+        payload = []
+      end
       data, size, serialize_finish_time = nil
 
       payload = payload[0]  if method == :initAgentApp

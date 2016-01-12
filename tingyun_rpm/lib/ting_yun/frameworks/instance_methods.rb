@@ -58,11 +58,9 @@ module TingYun
 
         TingYun::Agent.agent = TingYun::Agent::Agent.instance
 
-        if TingYun::Agent.config[:'nbs.agent_enabled'] && !TingYun::Agent.agent.started?
+        if !TingYun::Agent.agent.started?
           start_agent
           install_instrumentation
-        elsif !TingYun::Agent.config[:'nbs.agent_enabled']
-          #发送空数据
         else
           LibraryDetection.detect!
         end
