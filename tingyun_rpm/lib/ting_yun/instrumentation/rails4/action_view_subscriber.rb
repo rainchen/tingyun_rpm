@@ -8,7 +8,9 @@ require 'ting_yun/constants'
 
 module TingYun
   module Instrumentation
+
     class ActionViewSubscriber < TingYun::Instrumentation::Support::EventedSubscriber
+
 
       def start(name, id, payload)#THREAD_LOCAL_ACCESS
         event = RenderEvent.new(name, Time.now, nil, id, payload)
@@ -26,8 +28,10 @@ module TingYun
       end
 
       def record_metrics(event)
+
         exclusive = event.duration * 1000
         TingYun::Agent.agent.stats_engine.record_scoped_and_unscoped_metrics(event.metric_name, nil, event.duration*1000, exclusive)
+
       end
 
 
@@ -39,6 +43,7 @@ module TingYun
       end
 
       class RenderEvent < TingYun::Instrumentation::Support::Event
+
         def recordable?
           name[0] == '!' ||
               metric_name == 'View/text template/Rendering' ||

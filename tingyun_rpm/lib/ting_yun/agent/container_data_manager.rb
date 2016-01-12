@@ -26,6 +26,7 @@ module TingYun
       end
 
       def transmit_data
+
         ::TingYun::Agent.logger.debug('Sending data to Ting Yun Service')
 
         @service.session do
@@ -63,7 +64,9 @@ module TingYun
       def harvest_from_container(container, endpoint)
         items =[]
         begin
+
           items = container.harvest! if TingYun::Agent.config[:'nbs.agent_enabled']
+
         rescue => e
           TingYun::Agent.logger.error("Failed to harvest #{endpoint} data, resetting. Error: ", e)
           container.reset!
@@ -75,6 +78,7 @@ module TingYun
         TingYun::Agent.logger.debug("Sending #{items.size} items to #{endpoint}")
         begin
           @service.send(endpoint, items)
+
         rescue ::TingYun::Support::Exception::ForceRestartException, ::TingYun::Support::Exception::ForceDisconnectException
           raise
         rescue ::TingYun::Support::Exception::SerializationError => e
@@ -82,6 +86,7 @@ module TingYun
         rescue ::TingYun::Support::Exception::UnrecoverableServerException => e
           TingYun::Agent.logger.warn("#{endpoint} data was rejected by remote service, discarding. Error: ", e)
         rescue ::TingYun::Support::Exception::ServerConnectionException => e
+
           TingYun::Agent.logger.debug("Unable to send #{endpoint} data, will try again later. Error: ", e)
           container.merge!(items)
         rescue => e

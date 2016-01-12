@@ -13,6 +13,7 @@ require 'ting_yun/support/serialize/json_marshaller'
 require 'ting_yun/ting_yun_service/upload_service'
 require 'ting_yun/version'
 
+
 module TingYun
   class TingYunService
     include Http
@@ -45,6 +46,7 @@ module TingYun
       end
       response = invoke_remote(:initAgentApp, [settings])
       TingYun::Agent.logger.info("initAgentApp response:", response) if TingYun::Agent.config[:'nbs.audit_mode']
+
       @applicationId = response['applicationId']
       @appSessionKey = response['appSessionKey']
       response
@@ -70,6 +72,7 @@ module TingYun
 
       data, size, serialize_finish_time = nil
       payload = payload[0]  if method == :initAgentApp
+
       begin
         data = @marshaller.dump(payload, options)
       rescue StandardError, SystemStackError => e
@@ -83,11 +86,13 @@ module TingYun
       uri = remote_method_uri(method)
       full_uri = "#{@collector}#{uri}"
       TingYun::Agent.logger.info("请求url:", full_uri) if TingYun::Agent.config[:'nbs.audit_mode']
+
       response = send_request(:data      => data,
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
       TingYun::Agent.logger.info("返回数据:", response.body) if TingYun::Agent.config[:'nbs.audit_mode']
+
       @marshaller.load(decompress_response(response))
     end
 
