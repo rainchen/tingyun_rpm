@@ -401,6 +401,14 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Enable or disable Specifies HTTP request parameters '
         },
+        :apdex_t => {
+            :default => 500,
+            :public => true,
+            :type => Integer,
+            :allowed_from_server => true,
+            :deprecated => true,
+            :description => 'millisecond'
+        },
         :"error_collector.enabled" => {
             :default => true,
             :public => true,
