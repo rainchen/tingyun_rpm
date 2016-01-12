@@ -10,6 +10,10 @@ module TingYun
       class LicenseException < StandardError;
       end
 
+      # An exception that is thrown by the server, drop the data.
+      class UnKnownServerException < StandardError;
+      end
+
       # An exception that forces an agent to stop reporting until its mongrel is restarted.
       class ForceDisconnectException < StandardError;
       end

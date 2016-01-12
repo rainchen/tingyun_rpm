@@ -14,14 +14,12 @@ module TingYun
           exception = case error_code
                         when 460
                           TingYun::Support::Exception::LicenseException.new(error_message)
-                        when 461
-                          TingYun::Support::Exception::InvalidDataTokenException.new(error_message)
                         when 462
                           TingYun::Support::Exception::InvalidDataException.new(error_message)
-                        when 470
-                          TingYun::Support::Exception::ExpiredConfigurationException.new("error_message")
+                        when -1
+                          TingYun::Support::Exception::UnKnownServerException.new(error_message)
                         else
-                          TingYun::Support::Exception::CollectorError.new("#{error_code}: #{error_message}")
+                          TingYun::Support::Exception::UnrecoverableAgentException.new("#{error_code}: #{error_message}")
                       end
 
           exception

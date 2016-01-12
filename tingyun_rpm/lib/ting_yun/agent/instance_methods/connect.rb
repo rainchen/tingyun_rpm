@@ -122,9 +122,11 @@ module TingYun
           handle_force_disconnect(e)
         rescue TingYun::Support::Exception::LicenseException => e
           handle_license_error(e)
+        rescue TingYun::Support::Exception::InvalidDataException => e
+          handle_invalid_data_error(e)
         rescue TingYun::Support::Exception::UnrecoverableAgentException => e
           handle_unrecoverable_agent_error(e)
-        rescue StandardError, Timeout::Error, ServerConnectionException => e
+        rescue StandardError, Timeout::Error, TingYun::Support::Exception::ServerConnectionException => e
           log_error(e)
           if opts[:keep_retrying]
             note_connect_failure

@@ -12,8 +12,8 @@ module TingYun
         request['user-agent'] = user_agent
         request.content_type = "application/octet-stream"
         request.body = opts[:data]
-
         response = nil
+        max_attempts = 2
         begin
           attempts += 1
           conn = http_connection
@@ -22,9 +22,13 @@ module TingYun
             response = conn.request(request)
           end
         rescue *CONNECTION_ERRORS => e
-          TingYun::Agent.logger.error("Recoverable error talking to #{@collector}")
-          sleep 60
-          retry
+          close_shared_connection
+          if attempts < max_attempts
+            TingYun::Agent.logger.debug("Retrying request to #{opts[:collector]}#{opts[:uri]} after #{e}")
+            retry
+          else
+            raise TingYun::Support::Exception::ServerConnectionException, "Recoverable error talking to #{@collector} after #{attempts} attempts: #{e}"
+          end
         end
         TingYun::Agent.logger.debug "Received response, status: #{response.code}, encoding: '#{response['content-encoding']}'"
 

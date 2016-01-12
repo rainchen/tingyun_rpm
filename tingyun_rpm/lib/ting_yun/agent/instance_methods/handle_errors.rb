@@ -60,6 +60,11 @@ module TingYun
           disconnect
         end
 
+        def handle_invalid_data_error(error)
+          TingYun::Agent.logger.error(error.message)
+          drop_buffered_data
+        end
+
       end
     end
   end
