@@ -1,9 +1,0 @@
-LanguageSupportTest 和 SystemInfoTest 的测试没写
-
-StatsHash 为什么要分@scoped 和 @unscoped
-
-stats里的record_apdex是什么
-
-defaultsource里的config_search_paths
-
-config/test少 install_devmode_route
