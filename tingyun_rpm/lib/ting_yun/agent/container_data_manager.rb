@@ -30,7 +30,8 @@ module TingYun
       def transmit_data
         ::TingYun::Agent.logger.debug('Sending data to Ting Yun Service')
 
-        @service.session do
+        @service.session do # use http keep-alive
+          harvest_and_send_errors
           harvest_and_send_timeslice_data
         end
       end
@@ -39,6 +40,9 @@ module TingYun
         harvest_and_send_from_container(@stats_engine, :metric_data)
       end
 
+      def harvest_and_send_errors
+        harvest_and_send_from_container(@error_collector.error_trace_array, :error_data)
+      end
 
       # Harvests data from the given container, sends it to the named endpoint
       # on the service, and automatically merges back in upon a recoverable

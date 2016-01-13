@@ -14,7 +14,7 @@ module TingYun
         action_array, adpex_array, general_array, components_array, errors_array = build_metric_data_array(stats_hash)
 
         upload_data = {
-            :type => "perfMetrics",
+            :type => 'perfMetrics',
             :timeFrom => timeslice_start.to_i,
             :timeTo => timeslice_end.to_i,
             :interval => 60,
@@ -24,11 +24,8 @@ module TingYun
             :general => general_array,
             :errors  => errors_array
         }
-        result = invoke_remote(
-            :upload,
-            [upload_data],
-            :item_count => action_array.size
-        )
+
+        result = invoke_remote(:upload,[upload_data])
         fill_metric_id_cache(result)
         result
       end
@@ -85,6 +82,20 @@ module TingYun
         # re-aggregation of the same metric data into the next post, so just log
         TingYun::Agent.logger.error("Failed to fill metric ID cache from response, error details follow ", e)
       end
+    end
+
+    def error_data(unsent_errors)
+      trace_array = []
+
+      unsent_errors.errors.each do |error|
+
+      end
+      upload_data = {
+          :type => 'errorTraceData',
+          :errors => trace_array
+      }
+
+      invoke_remote(:upload, [upload_data])
     end
   end
 end
