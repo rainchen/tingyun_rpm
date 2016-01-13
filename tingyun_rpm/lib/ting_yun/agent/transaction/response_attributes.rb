@@ -5,7 +5,6 @@ module TingYun
     class Transaction
       class ResponseAttributes
         def initialize
-          @custom_attributes = {}
           @agent_attributes  = {}
         end
 
