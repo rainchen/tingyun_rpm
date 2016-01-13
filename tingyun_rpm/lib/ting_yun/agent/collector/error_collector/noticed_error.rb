@@ -15,7 +15,7 @@ module TingYun
                       :stack_trace, :attributes_from_notice_error, :attributes,
                       :http_code
 
-        attr_reader   :exception_id, :is_internal
+        attr_reader :exception_id, :is_internal
 
 
         def initialize(path, exception, timestamp = Time.now)

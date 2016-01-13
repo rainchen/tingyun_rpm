@@ -66,7 +66,7 @@ module TingYun
 
           @lock = Mutex.new
 
-          @error_trace_array = ::TingYun::Agent::Collector::ErrorCollector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
+          @error_trace_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
         end
 
         # See TingYun::Agent.notice_error for options and commentary
