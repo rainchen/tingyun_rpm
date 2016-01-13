@@ -58,6 +58,7 @@ module TingYun
           end
         end
 
+
         # checks the size of the error queue to make sure we are under
         # the maximum limit, and logs a warning if we are over the limit.
         def over_queue_limit?(message)

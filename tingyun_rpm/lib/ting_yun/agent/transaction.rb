@@ -5,6 +5,7 @@ require 'ting_yun/support/helper'
 require 'ting_yun/agent/method_tracer_helpers'
 require 'ting_yun/agent/transaction/transaction_metrics'
 require 'ting_yun/agent/transaction/request_attributes'
+require 'ting_yun/agent/transaction/response_attributes'
 
 
 module TingYun
@@ -66,7 +67,7 @@ module TingYun
 
         @error_recorded = false
 
-        @attributes = nil #暂时放着
+        @response_attributes = TingYun::Agent::Transaction::ResponseAttributes.new
 
         if request = options[:request]
           @request_attributes = TingYun::Agent::Transaction::RequestAttributes.new request
@@ -211,18 +212,41 @@ module TingYun
       end
 
       def commit!(state, end_time, outermost_node_name)
+        assign_agent_attributes
         record_summary_metrics(outermost_node_name, end_time)
         record_apdex(state, end_time)
         record_exceptions
         merge_metrics
       end
 
+      def assign_agent_attributes
+
+        if http_response_code
+          add_agent_attribute(:httpResponseCode, http_response_code.to_s)
+        end
+
+        if response_content_type
+          add_agent_attribute(:'response.headers.contentType', response_content_type)
+        end
+
+
+        if @request_attributes
+          @request_attributes.assign_agent_attributes self
+        end
+
+      end
+
+      def add_agent_attribute(key, value)
+        @response_attributes.add_agent_attribute(key, value)
+      end
+
       #collector error
       def had_error?
-        # @exceptions.each do |exception, _|
-        #   return true unless TingYun::Agent.instance.error_collector.error_is_ignored?(exception)
-        # end
-        false
+       if @exceptions.empty?
+         return false
+       else
+         return true
+       end
       end
 
       def record_exceptions
@@ -231,8 +255,8 @@ module TingYun
 
             options[:uri]      ||= request_path if request_path
             options[:port]       = request_port if request_port
-            options[:metric]     = best_name
-            options[:attributes] = @attributes
+            options[:metric_name]     = best_name
+            options[:attributes] = @response_attributes
 
             @error_recorded = !!::TingYun::Agent.instance.error_collector.notice_error(exception, options) || @error_recorded
           end
