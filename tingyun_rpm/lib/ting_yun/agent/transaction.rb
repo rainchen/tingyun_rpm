@@ -48,7 +48,8 @@ module TingYun
                     :default_name,
                     :metrics,
                     :http_response_code,
-                    :response_content_type
+                    :response_content_type,
+                    :error_recorded
 
 
       def initialize(category, options)
@@ -63,6 +64,9 @@ module TingYun
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
         @metrics = TingYun::Agent::TransactionMetrics.new
 
+        @error_recorded = false
+
+        @attributes = nil #暂时放着
 
         if request = options[:request]
           @request_attributes = TingYun::Agent::Transaction::RequestAttributes.new request
@@ -224,7 +228,13 @@ module TingYun
       def record_exceptions
         unless @exceptions.empty?
           @exceptions.each do |exception, options|
-            ::TingYun::Agent.instance.error_collector.notice_error(exception, options)
+
+            options[:uri]      ||= request_path if request_path
+            options[:port]       = request_port if request_port
+            options[:metric]     = best_name
+            options[:attributes] = @attributes
+
+            @error_recorded = !!::TingYun::Agent.instance.error_collector.notice_error(exception, options) || @error_recorded
           end
         end
       end
