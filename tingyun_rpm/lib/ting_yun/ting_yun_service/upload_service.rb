@@ -85,14 +85,9 @@ module TingYun
     end
 
     def error_data(unsent_errors)
-      trace_array = []
-
-      unsent_errors.errors.each do |error|
-
-      end
       upload_data = {
           :type => 'errorTraceData',
-          :errors => trace_array
+          :errors => unsent_errors
       }
 
       invoke_remote(:upload, [upload_data])
