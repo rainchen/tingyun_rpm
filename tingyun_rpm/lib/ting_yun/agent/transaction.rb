@@ -99,7 +99,6 @@ module TingYun
         txn
       rescue => e
         TingYun::Agent.logger.error("Exception during Transaction.start", e)
-        raise e
       end
 
       def self.start_new_transaction(state, category, options)

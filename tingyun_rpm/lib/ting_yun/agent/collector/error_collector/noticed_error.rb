@@ -4,7 +4,6 @@
 #
 
 require 'ting_yun/support/exception'
-require 'ting_yun/support/helper'
 
 module TingYun
   module Agent
@@ -68,13 +67,14 @@ module TingYun
         include TingYun::Support::Coerce
 
         def to_collector_array(encoder=nil)
-           [TingYun::Helper.time_to_millis(timestamp),
+           [timestamp.to_i,
             string(metric_name),
             int(response_attributes.agent_attributes[:httpResponseCode]),
             string(exception_class_name),
+            string(message),
             count_error,
             string(request_uri),
-            error_params
+            error_params.to_s
            ]
         end
 
@@ -90,7 +90,7 @@ module TingYun
           {
             :threadName => thread_name,
             :httpStatus => int(response_attributes.agent_attributes[:httpResponseCode]),
-            :referer    => string(response_attributes.agent_attributes[:'request.headers.referer'])
+            :referer    => string(response_attributes.agent_attributes[:'request.headers.referer']) || ''
           }
         end
 
