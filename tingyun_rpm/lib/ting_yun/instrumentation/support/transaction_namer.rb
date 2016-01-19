@@ -30,7 +30,7 @@ module TingYun
               "#{category.to_s}/" # for internal use only
           end
         end
-        
+
 
         def self.name_for(txn, traced_obj, category, options={})
           "#{prefix_for_category(txn, category)}#{path_name(traced_obj, options)}"
