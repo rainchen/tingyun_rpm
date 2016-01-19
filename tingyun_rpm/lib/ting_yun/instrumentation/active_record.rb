@@ -4,6 +4,7 @@ require 'ting_yun/agent'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/active_record_helper'
 require 'ting_yun/support/helper'
+require 'ting_yun/agent/method_tracer'
 
 
 module TingYun
@@ -31,17 +32,11 @@ module TingYun
       end
 
       def log_with_tingyun_instrumentation(*args, &block)
-        state = ::TingYun::Agent::TransactionState.tl_get
-
         sql, name, _ = args
-
         metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(
                                                                     TingYun::Helper.correctly_encoded(name),
                                                                     TingYun::Helper.correctly_encoded(sql),
                                                                     @config && @config[:adapter])
-
-        scoped_metric = metrics.first
-
         TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
           log_without_tingyun_instrumentation(*args, &block)
         end

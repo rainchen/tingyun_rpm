@@ -8,7 +8,7 @@ require 'ting_yun/agent'
 module TingYun
   module Instrumentation
     module Support
-      class ControllerInstrumentation
+      module ControllerInstrumentation
 
         NR_DEFAULT_OPTIONS    = {}.freeze          unless defined?(NR_DEFAULT_OPTIONS   )
 

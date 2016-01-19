@@ -28,12 +28,12 @@ module TingYun
             end
           end
           metrics = [ALL_WEB,ALL]
-          metrics << operation.upcase unless operation.nil?
+          metrics << operation
           metrics = metrics.map do |suffix|
             product_suffixed_rollup(product,suffix)
           end
 
-          metrics.unshift metric_name(product, collection, operation) unless operation.nil?
+          metrics.unshift metric_name(product, collection, operation)
           metrics
         end
 
