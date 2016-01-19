@@ -36,7 +36,7 @@ end
 
 
 TingYun::Support::LibraryDetection.defer do
-  @name = :rails4_controller
+  @name = :rails3_controller
 
   depends_on do
     defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 3
@@ -53,6 +53,7 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     class ActionController::Base
       include TingYun::Instrumentation::Support::ControllerInstrumentation
+      include TingYun::Instrumentation::Rails3::ActionController
     end
   end
 end

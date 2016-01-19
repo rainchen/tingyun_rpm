@@ -8,7 +8,7 @@ require 'ting_yun/agent'
 module TingYun
   module Instrumentation
     module Support
-      class ControllerInstrumentation
+      module ControllerInstrumentation
 
         NR_DEFAULT_OPTIONS    = {}.freeze          unless defined?(NR_DEFAULT_OPTIONS   )
 
@@ -19,7 +19,7 @@ module TingYun
           state.request = self.request
           trace_options = args.last.is_a?(Hash) ? args.last : NR_DEFAULT_OPTIONS
           category = trace_options[:category] || :controller
-          txn_options = create_transaction_options(trace_options)
+          txn_options = create_transaction_options(trace_options, category)
 
           begin
              txn = TingYun::Agent::Transaction.start(state, category, txn_options)
@@ -30,13 +30,13 @@ module TingYun
               raise
             end
           ensure
-            Transaction.stop(state)
+            TingYun::Agent::Transaction.stop(state)
           end
         end
 
         protected
 
-        def create_transaction_options(trace_options)
+        def create_transaction_options(trace_options, category)
           txn_options = {}
 
           txn_options[:request] ||= request if respond_to?(:request)
