@@ -49,7 +49,6 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     ActionView::TemplateRenderer.class_eval do
-      include TingYun::Agent::MethodTracer
       # namespaced helper methods
 
       def render_with_tingyun(context, options)
@@ -57,7 +56,7 @@ TingYun::Support::LibraryDetection.defer do
         @details = extract_details(options) if respond_to? :extract_details, true
         identifier = determine_template(options) ? determine_template(options).identifier : nil
         scope_name = "View/#{TingYun::Agent::Instrumentation::Rails3::ActionView.template_metric(identifier, options)}/Rendering"
-        trace_execution_scoped scope_name do
+        TingYun::Agent::MethodTracer.trace_execution_scoped scope_name do
           render_without_newrelic(context, options)
         end
       end
@@ -67,12 +66,11 @@ TingYun::Support::LibraryDetection.defer do
     end
 
     ActionView::PartialRenderer.class_eval do
-      include TingYun::Agent::MethodTracer
 
       def instrument_with_newrelic(name, payload = {}, &block)
         identifier = payload[:identifier]
         scope_name = "View/#{TingYun::Agent::Instrumentation::Rails3::ActionView.template_metric(identifier)}/Partial"
-        trace_execution_scoped(scope_name) do
+        TingYun::Agent::MethodTracer.trace_execution_scoped(scope_name) do
           instrument_without_tingyun(name, payload, &block)
         end
       end
@@ -97,7 +95,6 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     ActionView::Template.class_eval do
-      include TingYun::Agent::MethodTracer
       def render_with_tingyun(*args, &block)
         options = if @virtual_path && @virtual_path.starts_with?('/') # file render
                     {:file => true }
@@ -105,7 +102,7 @@ TingYun::Support::LibraryDetection.defer do
                     {}
                   end
         str = "View/#{TingYun::Agent::Instrumentation::Rails3::ActionView.template_metric(@identifier, options)}/#{TingYun::Agent::Instrumentation::Rails3::ActionView.render_type(@identifier)}"
-        trace_execution_scoped str do
+        TingYun::Agent::MethodTracer.trace_execution_scoped str do
           render_without_tingyun(*args, &block)
         end
       end
