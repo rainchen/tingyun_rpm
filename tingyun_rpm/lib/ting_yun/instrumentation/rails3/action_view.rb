@@ -57,7 +57,7 @@ TingYun::Support::LibraryDetection.defer do
         identifier = determine_template(options) ? determine_template(options).identifier : nil
         scope_name = "View/#{TingYun::Agent::Instrumentation::Rails3::ActionView.template_metric(identifier, options)}/Rendering"
         TingYun::Agent::MethodTracer.trace_execution_scoped scope_name do
-          render_without_newrelic(context, options)
+          render_without_tingyun(context, options)
         end
       end
 
@@ -67,7 +67,7 @@ TingYun::Support::LibraryDetection.defer do
 
     ActionView::PartialRenderer.class_eval do
 
-      def instrument_with_newrelic(name, payload = {}, &block)
+      def instrument_with_tingyun(name, payload = {}, &block)
         identifier = payload[:identifier]
         scope_name = "View/#{TingYun::Agent::Instrumentation::Rails3::ActionView.template_metric(identifier)}/Partial"
         TingYun::Agent::MethodTracer.trace_execution_scoped(scope_name) do
