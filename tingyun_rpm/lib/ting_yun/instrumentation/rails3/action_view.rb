@@ -55,7 +55,7 @@ TingYun::Support::LibraryDetection.defer do
         # This is needed for rails 3.2 compatibility
         @details = extract_details(options) if respond_to? :extract_details, true
         identifier = determine_template(options) ? determine_template(options).identifier : nil
-        scope_name = "View/#{TingYun::Agent::Instrumentation::Rails3::ActionView.template_metric(identifier, options)}/Rendering"
+        scope_name = "View/#{TingYun::Instrumentation::Rails3::ActionView.template_metric(identifier, options)}/Rendering"
         TingYun::Agent::MethodTracer.trace_execution_scoped scope_name do
           render_without_tingyun(context, options)
         end
@@ -69,7 +69,7 @@ TingYun::Support::LibraryDetection.defer do
 
       def instrument_with_tingyun(name, payload = {}, &block)
         identifier = payload[:identifier]
-        scope_name = "View/#{TingYun::Agent::Instrumentation::Rails3::ActionView.template_metric(identifier)}/Partial"
+        scope_name = "View/#{TingYun::Instrumentation::Rails3::ActionView.template_metric(identifier)}/Partial"
         TingYun::Agent::MethodTracer.trace_execution_scoped(scope_name) do
           instrument_without_tingyun(name, payload, &block)
         end
@@ -101,7 +101,7 @@ TingYun::Support::LibraryDetection.defer do
                   else
                     {}
                   end
-        str = "View/#{TingYun::Agent::Instrumentation::Rails3::ActionView.template_metric(@identifier, options)}/#{TingYun::Agent::Instrumentation::Rails3::ActionView.render_type(@identifier)}"
+        str = "View/#{TingYun::Instrumentation::Rails3::ActionView.template_metric(@identifier, options)}/#{TingYun::Agent::Instrumentation::Rails3::ActionView.render_type(@identifier)}"
         TingYun::Agent::MethodTracer.trace_execution_scoped str do
           render_without_tingyun(*args, &block)
         end
