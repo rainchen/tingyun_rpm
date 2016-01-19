@@ -84,6 +84,6 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     ActiveSupport::Notifications.subscribe('sql.active_record',
                                            TingYun::Instrumentation::Rails4::ActiveRecordSubscriber.new)
-    ::TingYun::Instrumentation::Support::ActiveRecordHelper.instrument_writer_methods
+    ::TingYun::Instrumentation::Support::ActiveRecordHelper.instrument_additional_methods
   end
 end

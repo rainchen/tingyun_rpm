@@ -14,7 +14,12 @@ module TingYun
         ACTIVE_RECORD = "ActiveRecord".freeze unless defined?(ACTIVE_RECORD)
 
         # Used by both the AR 3.x and 4.x instrumentation
-        def instrument_writer_methods
+        def instrument_additional_methods
+          instrument_save_methods
+          instrument_relation_methods
+        end
+
+        def instrument_save_methods
           ::ActiveRecord::Base.class_eval do
             alias_method :save_without_tingyun, :save
 
@@ -32,6 +37,9 @@ module TingYun
               end
             end
           end
+        end
+
+        def instrument_relation_methods
 
           ::ActiveRecord::Relation.class_eval do
             alias_method :update_all_without_tingyun, :update_all
@@ -61,12 +69,12 @@ module TingYun
         end
 
         def metrics_for(name, sql, adapter_name)
-          product   = map_product(adapter_name)
-          splits    = split_name(name)
-          model     = model_from_splits(splits)
+          product = map_product(adapter_name)
+          splits = split_name(name)
+          model = model_from_splits(splits)
           operation = operation_from_splits(splits, sql)
 
-          TingYun::Agent::Datastores::MetricHelper.metrics_for(product,operation,model,ACTIVE_RECORD)
+          TingYun::Agent::Datastores::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD)
         end
 
 
@@ -101,16 +109,16 @@ module TingYun
         # known operations coming in. Anything not matching the list is fine,
         # it just needs to get downcased directly for use.
         OPERATION_NAMES = {
-            'Find'    => 'SELECT',
-            'Load'    => 'SELECT',
-            'Count'   => 'SELECT',
-            'Exists'  => 'SELECT',
-            'Create'  => 'INSERT',
+            'Find' => 'SELECT',
+            'Load' => 'SELECT',
+            'Count' => 'SELECT',
+            'Exists' => 'SELECT',
+            'Create' => 'INSERT',
             'Columns' => 'SELECT',
             'Indexes' => 'SELECT',
             'Destroy' => 'DELETE',
-            'Update'  => 'UPDATE',
-            'Save'    => 'INSERT'
+            'Update' => 'UPDATE',
+            'Save' => 'INSERT'
         }.freeze unless defined?(OPERATION_NAMES)
 
         def map_operation(raw_operation)
@@ -121,38 +129,38 @@ module TingYun
         end
 
         PRODUCT_NAMES = {
-            "mysql"      => "MySQL",
-            "mysql2"     => "MySQL",
+            "mysql" => "MySQL",
+            "mysql2" => "MySQL",
 
             "postgresql" => "Postgres",
 
-            "sqlite3"    => "SQLite",
+            "sqlite3" => "SQLite",
 
             # https://rubygems.org/gems/activerecord-jdbcpostgresql-adapter
-            "jdbcmysql"  => "MySQL",
+            "jdbcmysql" => "MySQL",
 
             # https://rubygems.org/gems/activerecord-jdbcpostgresql-adapter
             "jdbcpostgresql" => "Postgres",
 
             # https://rubygems.org/gems/activerecord-jdbcsqlite3-adapter
-            "jdbcsqlite3"    => "SQLite",
+            "jdbcsqlite3" => "SQLite",
 
             # https://rubygems.org/gems/activerecord-jdbcderby-adapter
-            "derby"      => "Derby",
-            "jdbcderby"  => "Derby",
+            "derby" => "Derby",
+            "jdbcderby" => "Derby",
 
             # https://rubygems.org/gems/activerecord-jdbc-adapter
-            "jdbc"       => "JDBC",
+            "jdbc" => "JDBC",
 
             # https://rubygems.org/gems/activerecord-jdbcmssql-adapter
-            "jdbcmssql"  => "MSSQL",
-            "mssql"      => "MSSQL",
+            "jdbcmssql" => "MSSQL",
+            "mssql" => "MSSQL",
 
             # https://rubygems.org/gems/activerecord-sqlserver-adapter
-            "sqlserver"  => "MSSQL",
+            "sqlserver" => "MSSQL",
 
             # https://rubygems.org/gems/activerecord-odbc-adapter
-            "odbc"       => "ODBC",
+            "odbc" => "ODBC",
 
             # https://rubygems.org/gems/activerecord-oracle_enhanced-adapter
             "oracle_enhanced" => "Oracle"
@@ -161,7 +169,7 @@ module TingYun
         DEFAULT_PRODUCT_NAME = "Database".freeze unless defined?(DEFAULT_PRODUCT_NAME)
 
         def map_product(adapter_name)
-          PRODUCT_NAMES.fetch(adapter_name,DEFAULT_PRODUCT_NAME)
+          PRODUCT_NAMES.fetch(adapter_name, DEFAULT_PRODUCT_NAME)
         end
       end
     end

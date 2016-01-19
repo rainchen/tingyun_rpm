@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'ting_yun/agent'
+require 'ting_yun/agent/transaction/transaction_state'
 
 module TingYun
   module Agent
@@ -53,6 +54,26 @@ module TingYun
         else
           metrics = [first_name].concat(other_names)
           stat_engine.record_unscoped_metrics(state, metrics, duration, exclusive)
+        end
+      end
+
+      def trace_execution_scoped(metric_names, options={}) #THREAD_LOCAL_ACCESS
+        state = TingYun::Agent::Transaction::TransactionState.tl_get
+
+        metric_names = Array(metric_names)
+        first_name   = metric_names.shift
+        return yield unless first_name
+
+        additional_metrics_callback = options[:additional_metrics_callback]
+        start_time = Time.now.to_f
+        expected_scope = trace_execution_scoped_header(state, start_time)
+
+        begin
+          result = yield
+          metric_names += Array(additional_metrics_callback.call) if additional_metrics_callback
+          result
+        ensure
+          trace_execution_scoped_footer(state, start_time, first_name, metric_names, expected_scope, options)
         end
       end
 

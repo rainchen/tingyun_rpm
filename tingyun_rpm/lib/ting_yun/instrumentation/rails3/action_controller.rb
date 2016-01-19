@@ -53,7 +53,6 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     class ActionController::Base
       include TingYun::Instrumentation::Support::ControllerInstrumentation
-      include TingYun::Instrumentation::Rails3::ActionController
     end
   end
 end

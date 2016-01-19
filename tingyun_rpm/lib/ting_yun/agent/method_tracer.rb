@@ -6,6 +6,7 @@
 
 require 'ting_yun/frameworks' unless defined?(TingYun::Frameworks::Framework)
 require 'ting_yun/support/helper'
+require 'ting_yun/agent/method_tracer_helpers'
 
 module TingYun
   module Agent
@@ -51,6 +52,15 @@ module TingYun
 
       def self.extended klass
         klass.extend ClassMethods
+      end
+
+
+
+      def trace_execution_scoped(metric_names, options={}) #THREAD_LOCAL_ACCESS
+        TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metric_names, options) do
+          # Using an implicit block avoids object allocation for a &block param
+          yield
+        end
       end
 
       # Defines methods used at the class level, for adding instrumentation
