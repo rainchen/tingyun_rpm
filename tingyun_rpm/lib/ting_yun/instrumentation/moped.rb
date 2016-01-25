@@ -6,6 +6,9 @@ require 'ting_yun/agent/datastore'
 module TingYun
   module Instrumentation
     module Moped
+
+      MONGODB = 'MongoDB'.freeze
+
       def self.included(instrumented_class)
         instrumented_class.class_eval do
           unless instrumented_class.method_defined?(:log_without_tingyun_instrumentation)
@@ -33,7 +36,8 @@ module TingYun
                         nil
                     end
 
-        TingYun::Agent::Datastore.wrap('MongoDB', operation, collection) do
+        res = nil
+        TingYun::Agent::Datastore.wrap(MONGODB, operation, collection) do
           res = log_without_tingyun_instrumentation(operations, &blk)
         end
 
@@ -74,7 +78,6 @@ end
 
 TingYun::Support::LibraryDetection.defer do
   named :mongo_moped
-
   depends_on do
     defined?(::Moped)
   end

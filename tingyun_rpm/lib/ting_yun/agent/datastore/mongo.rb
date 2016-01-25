@@ -15,8 +15,7 @@ module TingYun
         end
 
         def self.unsupported_2x?
-          defined?(::Mongo::VERSION) && VersionNumber.new(::Mongo::VERSION).major_version == 2 &&
-              !self.monitoring_enabled?
+          defined?(::Mongo::VERSION) && VersionNumber.new(::Mongo::VERSION).major_version == 2 && monitoring_enabled?
         end
 
         def self.supported_version?

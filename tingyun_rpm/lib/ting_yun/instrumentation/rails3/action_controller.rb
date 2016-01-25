@@ -9,6 +9,7 @@ module TingYun
       module ActionController
 
         def tingyun_metric_path(action_name_override = nil)
+
           action = action_name_override || action_name
           if action_name_override || self.class.action_methods.include?(action)
             "#{self.class.controller_path}/#{action}"
@@ -53,6 +54,7 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     class ActionController::Base
       include TingYun::Instrumentation::Support::ControllerInstrumentation
+      include TingYun::Instrumentation::Rails3::ActionController
     end
   end
 end
