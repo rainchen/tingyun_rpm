@@ -53,7 +53,7 @@ TingYun::Support::LibraryDetection.defer do
         alias_method :connect_without_tingyun, :connect
 
         def connect(*args, &block)
-          NewRelic::Agent::Datastores.wrap("Redis", "connect") do
+          TingYun::Agent::Datastore.wrap("Redis", "connect") do
             connect_without_tingyun(*args, &block)
           end
         end

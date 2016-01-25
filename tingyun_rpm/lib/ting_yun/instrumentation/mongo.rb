@@ -84,7 +84,7 @@ TingYun::Support::LibraryDetection.defer do
   end
 
   depends_on do
-    TingYun::Agent::Datastore::Mongo.supported_version?
+    TingYun::Agent::Datastore::Mongo.supported_version? && !TingYun::Agent::Datastore::Mongo.unsupported_2x?
   end
 
   executes do

@@ -8,8 +8,8 @@ module TingYun
     module Mongo2
       def self.install_mongo_command_subscriber
         require 'ting_yun/instrumentation/command_log_subscriber'
-        Mongo::Monitoring::Global.subscribe(
-            Mongo::Monitoring::COMMAND,
+        ::Mongo::Monitoring::Global.subscribe(
+            ::Mongo::Monitoring::COMMAND,
             TingYun::Instrumentation::CommandLogSubscriber.new
         )
       end
