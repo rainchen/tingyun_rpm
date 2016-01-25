@@ -24,14 +24,15 @@ module TingYun
         end
 
         def self.transform_operation(operation)
-          t_operation = case operation.upcase
-                        when 'INSERT'                                         then 'INSERT'
-                        when 'UPDATE'                                         then 'UPDATE'
-                        when 'CREATE', 'FIND_AND_MODIFY'                      then 'SAVE'
-                        when 'QUERY', 'COUNT', 'GET_MORE', 'AGGREGATE'        then 'FIND'
+          t_operation = case operation.to_s.upcase
+                        when 'INSERT'                                                then 'INSERT'
+                        when 'UPDATE'                                                then 'UPDATE'
+                        when 'CREATE', 'FIND_AND_MODIFY'                             then 'SAVE'
+                        when 'QUERY', 'COUNT', 'GET_MORE', 'AGGREGATE', 'FIND'       then 'FIND'
                         else
                           nil
                         end
+          t_operation
         end
       end
     end
