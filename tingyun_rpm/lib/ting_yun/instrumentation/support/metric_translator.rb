@@ -1,144 +1,45 @@
 # encoding: utf-8
 require 'ting_yun/agent'
 require 'ting_yun/agent/datastore/metric_helper'
+require 'ting_yun/agent/datastore/mongo'
 
 module TingYun
   module Instrumentation
     module Support
       module MetricTranslator
-        def self.metrics_for(name, payload)
-          payload ||= {}
-
-          if collection_in_selector?(payload)
-            command_key = command_key_from_selector(payload)
-            name = get_name_from_selector(command_key, payload)
-            collection = get_collection_from_selector(command_key, payload)
-          else
-            collection = payload[:collection]
-          end
-
-          # The 1.10.0 version of the mongo driver renamed 'remove' to
-          # 'delete', but for metric consistency with previous versions we
-          # want to keep it as 'remove'.
-          name = 'remove' if name.to_s == 'delete'
-
-          if self.find_one?(name, payload)
-            name = 'findOne'
-          elsif self.find_and_remove?(name, payload)
-            name = 'findAndRemove'
-          elsif self.find_and_modify?(name, payload)
-            name = 'findAndModify'
-          elsif self.create_indexes?(name, payload)
-            name = 'createIndexes'
-          elsif self.create_index?(name, payload)
-            name = 'createIndex'
-            collection = self.collection_name_from_index(payload)
-          elsif self.drop_indexes?(name, payload)
-            name = 'dropIndexes'
-          elsif self.drop_index?(name, payload)
-            name = 'dropIndex'
-          elsif self.re_index?(name, payload)
-            name = 'reIndex'
-          elsif self.group?(name, payload)
-            name = 'group'
-            collection = collection_name_from_group_selector(payload)
-          elsif self.rename_collection?(name, payload)
-            name = 'renameCollection'
-            collection = collection_name_from_rename_selector(payload)
-          end
-
-          build_metrics(name, collection)
-        rescue => e
-          TingYun::Agent.logger.debug("Failure during Mongo metric generation", e)
-          []
-        end
 
         MONGODB = 'MongoDB'.freeze
 
-        def self.build_metrics(name, collection)
+        def self.metrics_for(name, payload)
+          payload ||= {}
+
+          return nil  if collection_in_selector?(payload)
+
+          collection = payload[:collection]
+
+          if create_index?(name, payload)
+            collection = self.collection_name_from_index(payload)
+          elsif group?(name, payload)
+            collection = collection_name_from_group_selector(payload)
+          elsif rename_collection?(name, payload)
+            collection = collection_name_from_rename_selector(payload)
+          end
+
           TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB,
-                                                                name,
-                                                                collection)
+                                                              TingYun::Agent::Datastore::Mongo.transform_operation(name),
+                                                              collection)
+        rescue => e
+          TingYun::Agent.logger.debug("Failure during Mongo metric generation", e)
+          nil
         end
+
 
         def self.collection_in_selector?(payload)
-          payload[:collection] == '$cmd' && payload[:selector]
-        end
-
-        NAMES_IN_SELECTOR = [
-            :findandmodify,
-
-            "aggregate",
-            "count",
-            "group",
-            "mapreduce",
-
-            :distinct,
-
-            :createIndexes,
-            :deleteIndexes,
-            :reIndex,
-
-            :collstats,
-            :renameCollection,
-            :drop,
-        ]
-
-        def self.command_key_from_selector(payload)
-          selector = payload[:selector]
-          NAMES_IN_SELECTOR.find do |check_name|
-            selector.key?(check_name)
-          end
-        end
-
-        def self.get_name_from_selector(command_key, payload)
-          if command_key
-            command_key.to_sym
-          else
-            payload[:selector].first.first unless command_key
-          end
-        end
-
-        CMD_COLLECTION = "$cmd".freeze
-
-        def self.get_collection_from_selector(command_key, payload)
-          if command_key
-            payload[:selector][command_key]
-          else
-            CMD_COLLECTION
-          end
-        end
-
-        def self.find_one?(name, payload)
-          name == :find && payload[:limit] == -1
-        end
-
-        def self.find_and_modify?(name, payload)
-          name == :findandmodify
-        end
-
-        def self.find_and_remove?(name, payload)
-          name == :findandmodify && payload[:selector] && payload[:selector][:remove]
-        end
-
-        def self.create_indexes?(name, paylod)
-          name == :createIndexes
+          payload[:collection] == '$cmd'
         end
 
         def self.create_index?(name, payload)
           name == :insert && payload[:collection] == "system.indexes"
-        end
-
-        def self.drop_indexes?(name, payload)
-          name == :deleteIndexes && payload[:selector] && payload[:selector][:index] == "*"
-        end
-
-        def self.drop_index?(name, payload)
-          name == :deleteIndexes
-        end
-
-        def self.re_index?(name, payload)
-          name == :reIndex && payload[:selector] && payload[:selector][:reIndex]
         end
 
         def self.group?(name, payload)

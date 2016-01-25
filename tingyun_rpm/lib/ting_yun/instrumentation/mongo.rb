@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'ting_yun/agent'
-require 'ting_yun/agent/method_tracer'
+require 'ting_yun/instrumentation/support/metric_translator'
 
 module TingYun
   module Instrumentation
@@ -24,7 +24,7 @@ module TingYun
 
       def hook_instrument_method(target_class)
         target_class.class_eval do
-          include TingYun::Agent::MethodTracer
+          require 'ting_yun/agent/method_tracer'
 
           def ting_yun_generate_metrics(operation, payload = nil)
             payload ||= { :collection => self.name, :database => self.db.name }
@@ -34,7 +34,7 @@ module TingYun
           def instrument_with_ting_yun_trace(name, payload = {}, &block)
             metrics = ting_yun_generate_metrics(name, payload)
 
-            trace_execution_scoped(metrics) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
               instrument_without_ting_yun_trace(name, payload, &block)
             end
           end
@@ -48,7 +48,7 @@ module TingYun
         ::Mongo::Collection.class_eval do
           def save_with_ting_yun_trace(doc, opts = {}, &block)
             metrics = ting_yun_generate_metrics(:save)
-            trace_execution_scoped(metrics) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
               save_without_ting_yun_trace(doc, opts, &block)
             end
           end
@@ -62,7 +62,7 @@ module TingYun
         ::Mongo::Collection.class_eval do
           def ensure_index_with_ting_yun_trace(spec, opts = {}, &block)
             metrics = new_relic_generate_metrics(:ensureIndex)
-            trace_execution_scoped(metrics) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
               ensure_index_with_out_ting_yun_trace(spec, opts, &block)
             end
           end

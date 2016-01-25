@@ -25,10 +25,11 @@ module TingYun
 
         def self.transform_operation(operation)
           t_operation = case operation.to_s.upcase
-                        when 'INSERT'                                                then 'INSERT'
-                        when 'UPDATE'                                                then 'UPDATE'
-                        when 'CREATE', 'FIND_AND_MODIFY'                             then 'SAVE'
-                        when 'QUERY', 'COUNT', 'GET_MORE', 'AGGREGATE', 'FIND'       then 'FIND'
+                        when 'DELETE', 'FIND_AND_REMOVE', 'DELETEINDEXS', 'REMOVE'                       then 'destroy'
+                        when 'INSERT'                                                                    then 'INSERT'
+                        when 'UPDATE', 'RENAMECOLLECTION', 'REINDEX'                                     then 'UPDATE'
+                        when 'CREATE', 'FIND_AND_MODIFY', 'CREATEINDEXS', 'CREATEINDEX', 'REPINDEX'      then 'SAVE'
+                        when 'QUERY', 'COUNT', 'GET_MORE', 'AGGREGATE', 'FIND', 'FINDONE', 'GROUP'       then 'SECECT'
                         else
                           nil
                         end
