@@ -2,7 +2,7 @@
 
 
 require 'ting_yun/instrumentation/support/database'
-require 'ting_yun/agent/datastores/metric_helper'
+require 'ting_yun/agent/datastore/metric_helper'
 require 'ting_yun/agent'
 module TingYun
   module Instrumentation
