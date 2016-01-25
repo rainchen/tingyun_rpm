@@ -9,13 +9,23 @@ module TingYun
     module Datastore
 
 
-      def self.wrap(product, operation, collection = nil)
+      def self.wrap(product, operation, collection = nil, callback = nil)
         return yield unless operation
 
         metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, collection)
 
+        scoped_metric = metrics.last
+
         TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
-          yield
+          t0 = Time.now
+          begin
+            result = yield
+          ensure
+            if callback
+              elapsed_time = (Time.now - t0).to_f
+              callback.call(result, scoped_metric, elapsed_time)
+            end
+          end
         end
       end
     end
