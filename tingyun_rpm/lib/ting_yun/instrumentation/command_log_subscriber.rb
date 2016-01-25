@@ -3,6 +3,7 @@
 require 'ting_yun/agent'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/agent/datastore/metric_helper'
+require 'ting_yun/agent/datastore/mongo'
 
 
 module TingYun
@@ -64,7 +65,7 @@ module TingYun
       end
 
       def metrics(event)
-        TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB, event.command_name.upcase, collection(event))
+        TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB, TingYun::Agent::Datastore::Mongo.transform_operation(event.command_name), collection(event))
       end
 
     end

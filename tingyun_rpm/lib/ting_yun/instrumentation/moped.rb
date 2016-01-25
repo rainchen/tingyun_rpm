@@ -2,6 +2,7 @@
 
 require 'ting_yun/agent'
 require 'ting_yun/agent/datastore'
+require 'ting_yun/agent/datastore/mongo'
 
 module TingYun
   module Instrumentation
@@ -27,14 +28,7 @@ module TingYun
 
       def log_with_tingyun_instrumentation(operations, &blk)
         operation_name, collection = determine_operation_and_collection(operations.first)
-        operation = case operation_name
-                      when 'INSERT'                                         then 'INSERT'
-                      when 'UPDATE'                                         then 'UPDATE'
-                      when 'CREATE', 'FIND_AND_MODIFY'                      then 'SAVE'
-                      when 'QUERY', 'COUNT', 'GET_MORE', 'AGGREGATE'        then 'FIND'
-                      else
-                        nil
-                    end
+        operation = TingYun::Agent::Datastore::Mongo.transform_operation(operation_name)
 
         res = nil
         TingYun::Agent::Datastore.wrap(MONGODB, operation, collection) do

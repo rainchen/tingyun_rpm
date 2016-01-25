@@ -22,6 +22,17 @@ module TingYun
           # No version constant in < 2.0 versions of Mongo :(
           defined?(::Mongo) && (defined?(::Mongo::MongoClient) || monitoring_enabled?)
         end
+
+        def self.transform_operation(operation)
+          t_operation = case operation.upcase
+                        when 'INSERT'                                         then 'INSERT'
+                        when 'UPDATE'                                         then 'UPDATE'
+                        when 'CREATE', 'FIND_AND_MODIFY'                      then 'SAVE'
+                        when 'QUERY', 'COUNT', 'GET_MORE', 'AGGREGATE'        then 'FIND'
+                        else
+                          nil
+                        end
+        end
       end
     end
   end
