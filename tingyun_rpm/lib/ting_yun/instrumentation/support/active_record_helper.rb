@@ -74,7 +74,7 @@ module TingYun
           model = model_from_splits(splits)
           operation = operation_from_splits(splits, sql)
 
-          TingYun::Agent::Datastores::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD) if operation
+          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD) if operation
         end
 
 

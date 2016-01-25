@@ -13,7 +13,7 @@ module TingYun
 
       def self.included(instrumented_class)
         instrumented_class.class_eval do
-          unless instrumented_class.method_defined?(:log_without_newrelic_instrumentation)
+          unless instrumented_class.method_defined?(:log_without_tingyun_instrumentation)
             alias_method :log_without_tingyun_instrumentation, :log
             alias_method :log, :log_with_tingyun_instrumentation
             protected :log

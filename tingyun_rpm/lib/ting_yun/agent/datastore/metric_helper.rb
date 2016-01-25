@@ -2,7 +2,7 @@
 require 'ting_yun/agent/transaction/transaction_state'
 module TingYun
   module Agent
-    module Datastores
+    module Datastore
       module MetricHelper
 
 
