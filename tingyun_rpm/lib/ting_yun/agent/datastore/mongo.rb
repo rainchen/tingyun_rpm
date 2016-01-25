@@ -1,5 +1,5 @@
 # encoding: utf-8
-
+require 'ting_yun/support/version_number'
 module TingYun
   module Agent
     module Datastore
@@ -15,7 +15,7 @@ module TingYun
         end
 
         def self.unsupported_2x?
-          defined?(::Mongo::VERSION) && VersionNumber.new(::Mongo::VERSION).major_version == 2 && monitoring_enabled?
+          defined?(::Mongo::VERSION) && TingYun::Support::VersionNumber.new(::Mongo::VERSION).major_version == 2
         end
 
         def self.supported_version?
