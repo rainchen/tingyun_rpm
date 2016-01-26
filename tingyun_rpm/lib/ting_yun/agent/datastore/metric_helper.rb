@@ -12,7 +12,7 @@ module TingYun
 
         NOSQL =['MongoDB','Redis','Memcached'].freeze
 
-        def checkNosql(product)
+        def self.checkNosql(product)
           NOSQL.include?(product)
         end
 
