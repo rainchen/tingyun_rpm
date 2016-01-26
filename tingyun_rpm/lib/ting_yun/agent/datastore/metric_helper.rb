@@ -10,12 +10,26 @@ module TingYun
         ALL_BACKGROUND = "AllBackground".freeze
         ALL = "All".freeze
 
+        NOSQL =['MongoDB','Redis','Memcached'].freeze
+
+        def checkNosql(product)
+          NOSQL.include?(product)
+        end
+
         def self.metric_name(product, collection, operation)
-          "Database #{product}/#{collection}/#{operation}"
+          if checkNosql(product)
+            "#{product}/#{collection}/#{operation}"
+          else
+            "Database #{product}/#{collection}/#{operation}"
+          end
         end
 
         def self.product_suffixed_rollup(product,suffix)
-          "Database #{product}/NULL/#{suffix}"
+          if checkNosql(product)
+            "#{product}/NULL/#{suffix}"
+          else
+            "Database #{product}/NULL/#{suffix}"
+          end
         end
 
 

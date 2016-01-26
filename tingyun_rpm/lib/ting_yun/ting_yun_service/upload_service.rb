@@ -55,6 +55,10 @@ module TingYun
               general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+            elsif metric_spec.name.start_with?('MongoDB','Redis','Memcached') && !metric_spec.scope.empty?
+              components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+            elsif metric_spec.name.start_with?('MongoDB','Redis','Memcached') && metric_spec.scope.empty?
+              general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             end
           end
         end
