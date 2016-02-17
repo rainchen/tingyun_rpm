@@ -444,7 +444,7 @@ module TingYun
       end
 
       def transaction_sampler
-        agent.transaction_sampler
+        TingYun::Agent.instance.transaction_sampler
       end
 
     end
