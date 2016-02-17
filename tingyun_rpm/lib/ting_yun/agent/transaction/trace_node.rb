@@ -53,6 +53,10 @@ module TingYun
           @params = p
         end
 
+        protected
+        def parent_node=(s)
+          @parent_node = s
+        end
       end
     end
   end
