@@ -21,7 +21,7 @@ module TingYun
       def init_containers
         @stats_engine = TingYun::Agent::Collector::StatsEngine.new
         @error_collector = TingYun::Agent::Collector::ErrorCollector.new
-        @transaction_sampler = TingYun::Agent::Collector::transaction_sampler.new
+        @transaction_sampler = TingYun::Agent::Collector::TransactionSampler.new
       end
 
       def container_for_endpoint(endpoint)
