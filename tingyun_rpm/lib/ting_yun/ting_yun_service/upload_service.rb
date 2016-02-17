@@ -93,7 +93,14 @@ module TingYun
           :type => 'errorTraceData',
           :errors => unsent_errors
       }
+      invoke_remote(:upload, [upload_data])
+    end
 
+    def action_trace_data(traces)
+      upload_data = {
+          :type => 'actionTraceData',
+          :actionTraces => traces
+      }
       invoke_remote(:upload, [upload_data])
     end
   end

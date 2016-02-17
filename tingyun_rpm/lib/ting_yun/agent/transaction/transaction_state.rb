@@ -9,7 +9,7 @@ module TingYun
       class TransactionState
 
         # Request data
-        attr_accessor :request
+        attr_accessor :request, :transaction_sample_builder
         attr_reader   :current_transaction, :traced_method_stack
 
 
@@ -42,6 +42,7 @@ module TingYun
           @request = nil
           @current_transaction = transaction
           @traced_method_stack.clear
+          @transaction_sample_builder = nil
         end
       end
   end

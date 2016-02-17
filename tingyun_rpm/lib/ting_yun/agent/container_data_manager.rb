@@ -2,15 +2,18 @@
 require 'ting_yun/support/exception'
 require 'ting_yun/agent/collector/stats_engine'
 require 'ting_yun/agent/collector/error_collector'
+require 'ting_yun/agent/collector/transaction_sampler'
 
 module TingYun
-  module Agent
+  module Agentv
     module ContainerDataManager
 
       attr_reader :stats_engine, :error_collector
 
       def drop_buffered_data
         @stats_engine.reset!
+        @error_collector.reset!
+        @transaction_sampler.reset!
       end
 
       # private
@@ -18,6 +21,7 @@ module TingYun
       def init_containers
         @stats_engine = TingYun::Agent::Collector::StatsEngine.new
         @error_collector = TingYun::Agent::Collector::ErrorCollector.new
+        @transaction_sampler = TingYun::Agent::Collector::transaction_sampler.new
       end
 
       def container_for_endpoint(endpoint)
@@ -33,6 +37,7 @@ module TingYun
         @service.session do # use http keep-alive
           harvest_and_send_errors
           harvest_and_send_timeslice_data
+          harvest_and_send_transaction_traces
         end
       end
 
@@ -42,6 +47,10 @@ module TingYun
 
       def harvest_and_send_errors
         harvest_and_send_from_container(@error_collector.error_trace_array, :error_data)
+      end
+
+      def harvest_and_send_transaction_traces
+        harvest_and_send_from_container(@transaction_sampler, :action_trace_data)
       end
 
       # Harvests data from the given container, sends it to the named endpoint

@@ -109,6 +109,7 @@ module TingYun
       end
 
       def start(state)
+        transaction_sampler.on_start_transaction(state, start_time)
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
       end
@@ -210,8 +211,9 @@ module TingYun
         end
       end
 
-      def commit!(state, end_time, outermost_node_name)
+      def  commit!(state, end_time, outermost_node_name)
         assign_agent_attributes
+        transaction_sampler.on_finishing_transaction(state, self, end_time)
         record_summary_metrics(outermost_node_name, end_time)
         record_apdex(state, end_time)
         record_exceptions
@@ -439,6 +441,10 @@ module TingYun
 
       def best_name
         @frozen_name || @default_name || ::TingYun::Agent::UNKNOWN_METRIC
+      end
+
+      def transaction_sampler
+        agent.transaction_sampler
       end
 
     end
