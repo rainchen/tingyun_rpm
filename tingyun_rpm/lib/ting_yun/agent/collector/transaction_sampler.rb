@@ -14,7 +14,6 @@ module TingYun
           @lock = Mutex.new
           @sample_buffers = []
           @sample_buffers << TingYun::Agent::Collector::TransactionSampler::SlowestSampleBuffer.new
-          @sample_start = time.to_f
         end
 
 
