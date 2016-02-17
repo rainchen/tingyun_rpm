@@ -51,7 +51,8 @@ module TingYun
                     :http_response_code,
                     :response_content_type,
                     :error_recorded,
-                    :guid
+                    :guid,
+                    :response_attributes
 
 
       def initialize(category, options)
