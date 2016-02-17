@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 require 'ting_yun/agent/transaction_sample_builder'
+require 'ting_yun/agent/collector/transaction_sampler/slowest_sample_buffer'
+
 module TingYun
   module Agent
     module Collector
