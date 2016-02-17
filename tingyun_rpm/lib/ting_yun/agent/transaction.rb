@@ -50,10 +50,12 @@ module TingYun
                     :metrics,
                     :http_response_code,
                     :response_content_type,
-                    :error_recorded
+                    :error_recorded,
+                    :guid
 
 
       def initialize(category, options)
+        @guid = generate_guid
         @has_children = false
         @category = category
         @exceptions = {}
@@ -445,6 +447,19 @@ module TingYun
 
       def transaction_sampler
         TingYun::Agent.instance.transaction_sampler
+      end
+
+      HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
+      GUID_LENGTH = 16
+
+      # generate a random 64 bit uuid
+      private
+      def generate_guid
+        guid = ''
+        GUID_LENGTH.times do
+          guid << HEX_DIGITS[rand(16)]
+        end
+        guid
       end
 
     end
