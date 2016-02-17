@@ -11,7 +11,7 @@ module TingYun
 
         attr_reader  :root_node
 
-        def initialize
+        def initialize(start_time)
           @start_time = start_time
           @node_count = 0
           @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")

@@ -76,6 +76,26 @@ module TingYun
 
         end
 
+        def harvest!
+          return [] if enabled?
+
+          samples = @lock.synchronize do
+            @last_sample = nil
+            harvest_from_sample_buffers
+          end
+        end
+
+        def harvest_from_sample_buffers
+          result = []
+          @sample_buffers.each { |buffer| result.concat(buffer.harvest_samples) }
+          result.uniq
+        end
+
+
+        def merge!
+
+        end
+
 
 
 
