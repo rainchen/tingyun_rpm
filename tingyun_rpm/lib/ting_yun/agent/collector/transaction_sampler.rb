@@ -54,7 +54,7 @@ module TingYun
           state.transaction_sample_builder = nil
 
           last_trace = last_builder.trace
-          last_trace.transaction_name = txn.best_name
+          last_trace.metric_name = txn.best_name
           last_trace.uri = txn.request_path
           last_trace.guid = txn.guid
           last_trace.attributes = txn.response_attributes
