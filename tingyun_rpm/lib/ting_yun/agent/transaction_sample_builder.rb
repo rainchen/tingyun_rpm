@@ -19,7 +19,7 @@ module TingYun
           @current_node.add_called_node(node)
           @current_node = node
 
-          if @trace.count_nodes == node_limit
+          if @trace.node_count == node_limit
             ::TingYun::Agent.logger.debug("Node limit of #{node_limit} reached, ceasing collection.")
           end
         end
