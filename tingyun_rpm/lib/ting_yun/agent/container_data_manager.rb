@@ -5,7 +5,7 @@ require 'ting_yun/agent/collector/error_collector'
 require 'ting_yun/agent/collector/transaction_sampler'
 
 module TingYun
-  module Agentv
+  module Agent
     module ContainerDataManager
 
       attr_reader :stats_engine, :error_collector

@@ -211,7 +211,7 @@ module TingYun
         end
       end
 
-      def  commit!(state, end_time, outermost_node_name)
+      def commit!(state, end_time, outermost_node_name)
         assign_agent_attributes
         transaction_sampler.on_finishing_transaction(state, self, end_time)
         record_summary_metrics(outermost_node_name, end_time)
