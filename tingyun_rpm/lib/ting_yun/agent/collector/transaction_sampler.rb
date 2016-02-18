@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'ting_yun/agent/transaction_sample_builder'
+require 'ting_yun/agent/transaction/transaction_sample_builder'
 require 'ting_yun/agent/collector/transaction_sampler/slowest_sample_buffer'
 
 module TingYun
@@ -57,7 +57,7 @@ module TingYun
           last_trace.metric_name = txn.best_name
           last_trace.uri = txn.request_path
           last_trace.guid = txn.guid
-          last_trace.attributes = txn.response_attributes
+          last_trace.response_attributes = txn.response_attributes
 
           @lock.synchronize do
             @last_sample = last_trace
