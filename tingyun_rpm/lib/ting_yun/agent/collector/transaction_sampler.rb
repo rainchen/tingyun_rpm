@@ -51,6 +51,8 @@ module TingYun
           last_builder = state.transaction_sample_builder
           return unless last_builder && enabled?
 
+          last_builder.finish_trace(time.to_f)
+
           state.transaction_sample_builder = nil
 
           last_trace = last_builder.trace
@@ -77,7 +79,7 @@ module TingYun
         end
 
         def harvest!
-          return [] if enabled?
+          return [] unless enabled?
 
           samples = @lock.synchronize do
             @last_sample = nil

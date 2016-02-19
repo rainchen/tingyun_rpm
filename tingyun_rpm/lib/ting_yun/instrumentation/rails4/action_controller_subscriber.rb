@@ -66,10 +66,10 @@ module TingYun
         end
 
         def metric_name
-          unless TingYun::Agent.config[:'auto_app_naming']
-            TingYun::Agent.config[:'app_name']
-          else
+          if TingYun::Agent.config[:'nbs.auto_app_naming']
             @metric_name ||= "WebAction/Rails/#{metric_path}/#{metric_action}"
+          else
+            TingYun::Agent.config[:'app_name']
           end
         end
 
@@ -82,7 +82,7 @@ module TingYun
         end
 
         def path
-          path = payload[:path]
+          payload[:path]
         end
 
         def to_s

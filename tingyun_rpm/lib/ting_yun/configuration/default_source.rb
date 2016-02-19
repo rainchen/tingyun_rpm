@@ -76,10 +76,6 @@ module TingYun
         result
       end
 
-      def self.auto_app_naming
-        Proc.new { true }
-      end
-
       def self.dispatcher
         Proc.new { ::TingYun::Frameworks.framework.local_env.discovered_dispatcher }
       end
