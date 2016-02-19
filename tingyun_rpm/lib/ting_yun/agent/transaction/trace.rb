@@ -15,6 +15,7 @@ module TingYun
           @start_time = start_time
           @node_count = 0
           @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")
+          @prepared = false
         end
 
         def create_node(time_since_start, metric_name = nil)
@@ -45,6 +46,13 @@ module TingYun
 
 
           ]
+        end
+
+        def prepare_to_send!
+          return self if @prepared
+
+          @prepared = true
+          self
         end
       end
     end

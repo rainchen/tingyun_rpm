@@ -11,6 +11,8 @@ module TingYun
         # Request data
         attr_accessor :request, :transaction_sample_builder
         attr_reader   :current_transaction, :traced_method_stack
+        # Execution tracing on current thread
+        attr_accessor :untraced
 
 
         def self.tl_get
@@ -33,6 +35,7 @@ module TingYun
         end
 
         def initialize
+
           @current_transaction = nil
           @traced_method_stack = TingYun::Agent::TracedMethodStack.new
         end
@@ -44,6 +47,8 @@ module TingYun
           @traced_method_stack.clear
           @transaction_sample_builder = nil
         end
+
+
       end
   end
 end

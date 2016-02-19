@@ -83,6 +83,8 @@ module TingYun
             @last_sample = nil
             harvest_from_sample_buffers
           end
+
+          prepare_samples(samples)
         end
 
         def harvest_from_sample_buffers
@@ -91,6 +93,18 @@ module TingYun
           result.uniq
         end
 
+        def prepare_samples(samples)
+          samples.select do |sample|
+            begin
+              sample.prepare_to_send!
+            rescue => e
+              TingYun::Agent.logger.error("Failed to prepare transaction trace. Error: ", e)
+              false
+            else
+              true
+            end
+          end
+        end
 
         def merge!
 
