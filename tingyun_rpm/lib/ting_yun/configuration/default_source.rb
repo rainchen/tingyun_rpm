@@ -76,10 +76,6 @@ module TingYun
         result
       end
 
-      def self.auto_app_naming
-        Proc.new { true }
-      end
-
       def self.dispatcher
         Proc.new { ::TingYun::Frameworks.framework.local_env.discovered_dispatcher }
       end
@@ -112,6 +108,11 @@ module TingYun
           TingYun::Agent.config[:enabled]
         }
       end
+
+      def self.action_tracer_action_threshold
+        Proc.new { TingYun::Agent.config[:apdex_t] * 4 }
+      end
+
       def self.config_search_paths
         Proc.new {
           paths = [
@@ -148,6 +149,13 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Your Ting Yun <a href="">license key</a>.'
         },
+        :enabled => {
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable the agent.'
+        },
         :'nbs.agent_enabled' => {
             :default => true,
             :public => true,
@@ -162,12 +170,184 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Semicolon-delimited list of Naming your application.'
         },
-        :auto_app_naming => {
+        :'nbs.auto_app_naming' => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => false,
+            :allowed_from_server => true,
             :description => 'Enable or disable to identify the application name'
+        },
+        :'nbs.urls_captured' => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => '换行符分隔的URL正则表达式列表，缺省为采集全部URL。若指定此参数，则仅采集列表中的URL，忽略其它用户不关心URL '
+        },
+        :'nbs.ignored_params' => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => 'Enable or disable Specifies HTTP request parameters '
+        },
+        :"nbs.error_collector.enabled" => {
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable recording of traced errors and error count metrics.'
+        },
+        :"nbs.error_collector.ignored_status_codes" => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => 'Enable or disable Specifies HTTP response code '
+        },
+        :"nbs.error_collector.ignored_errors" => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => ''
+        },
+        :"nbs.error_collector.record_db_errors" => {
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => ' '
+        },
+        :'nbs.action_tracer.enabled' => {
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => '是否启用Web事务跟踪'
+        },
+        :'nbs.action_tracer.action_threshold' => {
+            :default => DefaultSource.action_tracer_action_threshold,
+            :allow_nil => true,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => true,
+            :description => 'The agent will collect traces for action that exceed this time threshold (in millisecond). Specify a int value or <code><a href="">apdex_f</a></code>.'
+        },
+        :'nbs.action_tracer.record_sql' => {
+            :default => 'obfuscated',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => 'Obfuscation level for SQL queries reported in action trace nodes. Valid options are <code>obfuscated</code>, <code>raw</code>, <code>off</code>.'
+        },
+        :'nbs.action_tracer.slow_sql' => {
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable collection of slow SQL queries.'
+        },
+        :'nbs.action_tracer.slow_sql_threshold' => {
+            :default => 500,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => true,
+            :description => 'The agent will collect traces for slow_sql that exceed this time threshold (in millisecond). Specify a int value or <code><a href="">apdex_f</a></code>.'
+        },
+        :'nbs.action_tracer.explain_enabled' => {
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable the collection of explain plans in action traces. This setting will also apply to explain plans in Slow SQL traces if slow_sql.explain_enabled is not set separately.'
+        },
+        :'nbs.action_tracer.explain_threshold' => {
+            :default => 500,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => true,
+            :description => 'Threshold (in millisecond) above which the agent will collect explain plans. Relevant only when <code><a href="">explain_enabled</a></code> is true.'
+        },
+        :'nbs.transaction_tracer.enabled' => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => '启用跨应用追踪'
+        },
+        :'nbs.action_tracer.nbsua' => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable to trace nbs web request'
+        },
+        :'nbs.rum.enabled' => {
+            :default => false,
+            :public => false,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable page load timing (sometimes referred to as real user monitoring or RUM).'
+        },
+        :'nbs.rum.script' => {
+            :default => nil,
+            :allow_nil => true,
+            :public => false,
+            :type => String,
+            :allowed_from_server => true,
+            :description => 'RUM Script URI'
+        },
+        :'nbs.rum.sample_ratio' => {
+            :default => 1,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => true,
+            :description => 'RUM per'
+        },
+        :'nbs.action_tracer.obfuscated_sql_fields' => {
+            :default => '',
+            :allow_nil => true,
+            :public => false,
+            :type => String,
+            :allowed_from_server => true,
+            :description => ''
+        },
+        :'nbs.action_tracer.action_name_functions' => {
+            :default => '',
+            :allow_nil => true,
+            :public => false,
+            :type => String,
+            :allowed_from_server => true,
+            :description => ''
+        },
+        :'nbs.action_tracer.remove_trailing_path' => {
+            :default => false,
+            :public => false,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => ''
+        },
+        :'nbs.action_tracer.stack_trace_threshold' => {
+            :default => 500,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => true,
+            :description => 'Threshold (in millisecond) above which the agent will collect stack_trace.'
+        },
+        :'nbs.external_url_params_captured' => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => 'Enable or disable Specifies External  request parameters  '
+        },
+        :'nbs.web_action_uri_params_captured' => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => 'Enable or disable Specifies WebAction request parameters  '
         },
         :agent_log_file_path => {
             :default => 'log/',
@@ -288,19 +468,19 @@ module TingYun
             :description => 'Port for the New Relic API host.'
         },
         :disable_middleware_instrumentation => {
-            :default      => false,
-            :public       => true,
-            :type         => Boolean,
+            :default => false,
+            :public => true,
+            :type => Boolean,
             :allowed_from_server => false,
-            :description  => 'Defines whether the agent will wrap third-party middlewares in instrumentation (regardless of whether they are installed via Rack::Builder or Rails).'
+            :description => 'Defines whether the agent will wrap third-party middlewares in instrumentation (regardless of whether they are installed via Rack::Builder or Rails).'
         },
         :disable_rack => {
-            :default      => false,
-            :public       => true,
-            :type         => Boolean,
+            :default => false,
+            :public => true,
+            :type => Boolean,
             :dynamic_name => true,
             :allowed_from_server => false,
-            :description  => 'Defines whether the agent will hook into Rack::Builder\'s <code>to_app</code> method to find gems to instrument during application startup.'
+            :description => 'Defines whether the agent will hook into Rack::Builder\'s <code>to_app</code> method to find gems to instrument during application startup.'
         },
         :disable_view_instrumentation => {
             :default => false,
@@ -417,13 +597,6 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Path to <b>tingyun.yml</b>. When omitted the agent will check (in order) <b>config/tingyun.yml</b>, <b>tingyun.yml</b>, <b>$HOME/.tingyun/tingyun.yml</b> and <b>$HOME/tingyun.yml</b>.'
         },
-        :ignored_params => {
-            :default => '',
-            :public => true,
-            :type => String,
-            :allowed_from_server => false,
-            :description => 'Enable or disable Specifies HTTP request parameters '
-        },
         :apdex_t => {
             :default => 500,
             :public => true,
@@ -432,126 +605,12 @@ module TingYun
             :deprecated => true,
             :description => 'millisecond'
         },
-        :"error_collector.enabled" => {
-            :default => true,
-            :public => true,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable recording of traced errors and error count metrics.'
-        },
-        :"error_collector.ignored_status_codes" => {
-            :default => '',
-            :public => true,
-            :type => String,
-            :allowed_from_server => false,
-            :description => 'Enable or disable Specifies HTTP response code '
-        },
-        :web_action_uri_params_captured => {
-            :default => '',
-            :public => true,
-            :type => String,
-            :allowed_from_server => false,
-            :description => 'Enable or disable Specifies WebAction request parameters  '
-        },
-        :external_url_params_captured => {
-            :default => '',
-            :public => true,
-            :type => String,
-            :allowed_from_server => false,
-            :description => 'Enable or disable Specifies External  request parameters  '
-        },
-        :'action_tracer.enabled' => {
-            :default => true,
-            :public => true,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable action traces'
-        },
-        :'action_tracer.action_threshold' => {
-            :default => nil,
-            :allow_nil => true,
+        :'transaction_tracer.limit_segments' => {
+            :default => 40,
             :public => true,
             :type => Fixnum,
-            :allowed_from_server => false,
-            :description => 'The agent will collect traces for action that exceed this time threshold (in millisecond). Specify a int value or <code><a href="">apdex_f</a></code>.'
-        },
-        :'action_tracer.record_sql' => {
-            :default => 'obfuscate',
-            :public => true,
-            :type => String,
-            :allowed_from_server => false,
-            :description => 'Obfuscation level for SQL queries reported in action trace nodes. Valid options are <code>obfuscated</code>, <code>raw</code>, <code>off</code>.'
-        },
-        :'action_tracer.slow_sql' => {
-            :default => true,
-            :public => true,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable collection of slow SQL queries.'
-        },
-        :'action_tracer.slow_sql_threshold' => {
-            :default => 500,
-            :public => true,
-            :type => Fixnum,
-            :allowed_from_server => false,
-            :description => 'The agent will collect traces for slow_sql that exceed this time threshold (in millisecond). Specify a int value or <code><a href="">apdex_f</a></code>.'
-        },
-        :'action_tracer.explain_enabled' => {
-            :default => true,
-            :public => true,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable the collection of explain plans in action traces. This setting will also apply to explain plans in Slow SQL traces if slow_sql.explain_enabled is not set separately.'
-        },
-        :'action_tracer.explain_threshold' => {
-            :default => 500,
-            :public => true,
-            :type => Fixnum,
-            :allowed_from_server => false,
-            :description => 'Threshold (in millisecond) above which the agent will collect explain plans. Relevant only when <code><a href="">explain_enabled</a></code> is true.'
-        },
-        :'action_tracer.stack_trace_threshold' => {
-            :default => 500,
-            :public => true,
-            :type => Fixnum,
-            :allowed_from_server => false,
-            :description => 'Threshold (in millisecond) above which the agent will collect stack_trace.'
-        },
-        :'action_tracer.nbsua' => {
-            :default => true,
-            :public => true,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable to trace nbs web request'
-        },
-        :'transaction_tracer.enabled' => {
-            :default => false,
-            :public => true,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable transaction traces'
-        },
-        :'rum.enabled' => {
-            :default => false,
-            :public => false,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable page load timing (sometimes referred to as real user monitoring or RUM).'
-        },
-        :'rum.script' => {
-            :default => nil,
-            :allow_nil => true,
-            :public => false,
-            :type => String,
-            :allowed_from_server => false,
-            :description => 'RUM Script URI'
-        },
-        :'rum.sample_ratio' => {
-            :default => 1,
-            :public => true,
-            :type => Fixnum,
-            :allowed_from_server => false,
-            :description => 'RUM per'
+            :allowed_from_server => true,
+            :description => 'Maximum number of transaction trace nodes to record in a single transaction trace.'
         },
         :send_environment_info => {
             :default => true,
@@ -567,7 +626,6 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Controls whether to normalize string encodings prior to serializing data for the collector to JSON.'
         }
-
     }.freeze
   end
 end
