@@ -15,7 +15,7 @@ module TingYun
           end
 
           def allow_sample?(sample)
-            sample.threshold && sample.duration >= sample.thresholdcontin
+            sample.threshold && sample.duration >= sample.threshold
           end
 
         end
