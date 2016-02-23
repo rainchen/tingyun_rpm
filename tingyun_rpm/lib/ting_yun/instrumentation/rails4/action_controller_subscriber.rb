@@ -67,7 +67,7 @@ module TingYun
 
         def metric_name
           unless TingYun::Agent.config[:'auto_app_naming']
-            TingYun::Agent.config[:'app_name']
+            @metric_name = "WebAction/#{payload[:path]}"
           else
             @metric_name ||= "WebAction/Rails/#{metric_path}/#{metric_action}"
           end
