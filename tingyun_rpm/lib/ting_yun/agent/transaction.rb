@@ -445,6 +445,17 @@ module TingYun
         @frozen_name || @default_name || ::TingYun::Agent::UNKNOWN_METRIC
       end
 
+      def agent
+        TingYun::Agent.instance
+      end
+
+      def transaction_sampler
+        agent.transaction_sampler
+      end
+
+      def sql_sampler
+        agent.sql_sampler
+      end
     end
   end
 end
