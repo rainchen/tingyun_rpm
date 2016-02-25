@@ -2,6 +2,7 @@
 require 'ting_yun/support/exception'
 require 'ting_yun/agent/collector/stats_engine'
 require 'ting_yun/agent/collector/error_collector'
+require 'ting_yun/agent/collector/sql_sampler'
 
 module TingYun
   module Agent
