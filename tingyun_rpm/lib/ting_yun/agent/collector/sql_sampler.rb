@@ -50,7 +50,7 @@ module TingYun
         end
 
         def notice_sql(sql, metric_name, config, duration, state=nil, explainer=nil) #THREAD_LOCAL_ACCESS sometimes
-          start_time = Time.now
+          start_time = Time.now.to_f
           state ||= TingYun::Agent::TransactionState.tl_get
           data = state.sql_sampler_transaction_data
           return unless data
@@ -227,7 +227,7 @@ module TingYun
 
         attr_reader :action_metric_name
         attr_reader :uri
-        attr_reader :obfuscated_sql
+        attr_reader :sql
         attr_reader :slow_sql
         attr_reader :params
 
@@ -237,7 +237,7 @@ module TingYun
 
           @action_metric_name = action_name
           @slow_sql = slow_sql
-          @obfuscated_sql = normalized_query
+          @sql = normalized_query
           @uri = uri
           @params[:stacktrace] = slow_sql.backtrace if slow_sql.backtrace
           record_data_point(float(slow_sql.duration))
@@ -258,7 +258,7 @@ module TingYun
         end
 
         def prepare_to_send
-          @obfuscated_sql = @slow_sql.sql unless need_to_obfuscate?
+          @sql = @slow_sql.sql unless need_to_obfuscate?
           @params[:explainPlan] = @slow_sql.explain if need_to_explain?
         end
 
@@ -279,7 +279,7 @@ module TingYun
               string(@action_metric_name),
               string(@slow_sql.metric_name),
               string(@uri),
-              string(sql),
+              string(@sql),
               int(@call_count),
               TingYun::Helper.time_to_millis(@total_call_time),
               TingYun::Helper.time_to_millis(@max_call_time),
