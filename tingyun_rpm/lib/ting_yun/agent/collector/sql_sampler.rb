@@ -24,6 +24,10 @@ module TingYun
       #
       class SqlSampler
 
+        MAX_SAMPLES = 10
+
+        attr_reader :sql_traces
+
         def initialize
           @sql_traces = {}
           @samples_lock = Mutex.new
