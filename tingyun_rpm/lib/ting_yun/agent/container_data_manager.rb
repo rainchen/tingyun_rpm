@@ -35,6 +35,7 @@ module TingYun
         @service.session do # use http keep-alive
           harvest_and_send_errors
           harvest_and_send_timeslice_data
+          harvest_and_send_slowest_sql
         end
       end
 
@@ -44,6 +45,10 @@ module TingYun
 
       def harvest_and_send_errors
         harvest_and_send_from_container(@error_collector.error_trace_array, :error_data)
+      end
+
+      def harvest_and_send_slowest_sql
+        harvest_and_send_from_container(@sql_sampler, :sql_trace)
       end
 
       # Harvests data from the given container, sends it to the named endpoint
