@@ -27,6 +27,7 @@ module TingYun
 
         def finish(name, id, payload) #THREAD_LOCAL_ACCESS
           return if payload[:name] == CACHED_QUERY_NAME
+          state = TingYun::Agent::TransactionState.tl_get
           event = pop_event(id)
           config = active_record_config_for_event(event)
           base_metric = record_metrics(event, config)
