@@ -7,7 +7,7 @@ module TingYun
   module Agent
     module ContainerDataManager
 
-      attr_reader :stats_engine, :error_collector
+      attr_reader :stats_engine, :error_collector, :sql_sampler
 
       def drop_buffered_data
         @stats_engine.reset!
@@ -18,6 +18,7 @@ module TingYun
       def init_containers
         @stats_engine = TingYun::Agent::Collector::StatsEngine.new
         @error_collector = TingYun::Agent::Collector::ErrorCollector.new
+        @sql_sampler  = TingYun::Agent::Collector::SqlSampler.new
       end
 
       def container_for_endpoint(endpoint)
