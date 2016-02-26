@@ -57,7 +57,12 @@ module TingYun
 
           if state.is_sql_recorded? && !metric_name.nil?
             if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold']
-              backtrace = caller.join("\n")
+              if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.stack_trace_threshold']
+                backtrace = caller.join("\n")
+              else
+                backtrace = []
+              end
+
               statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
               data.sql_data << SlowSql.new(statement, metric_name, duration, start_time, backtrace)
             end
@@ -239,7 +244,7 @@ module TingYun
           @slow_sql = slow_sql
           @sql = normalized_query
           @uri = uri
-          @params[:stacktrace] = slow_sql.backtrace if slow_sql.backtrace
+          @params[:stacktrace] = slow_sql.backtrace
           record_data_point(float(slow_sql.duration))
         end
 
@@ -248,7 +253,7 @@ module TingYun
             @action_metric_name = action_name
             @slow_sql = slow_sql
             @uri = uri
-            @params[:stacktrace] = slow_sql.backtrace if slow_sql.backtrace
+            @params[:stacktrace] = slow_sql.backtrace
           end
           record_data_point(float(slow_sql.duration))
         end
@@ -267,7 +272,7 @@ module TingYun
         end
 
         def need_to_explain?
-          Agent.config[:'nbs.action_tracer.explain_enabled']
+          Agent.config[:'nbs.action_tracer.explain_enabled'] &&  @slow_sql.duration * 1000 > TingYun::Agent.config[:'nbs.action_tracer.explain_threshold']
         end
 
 
