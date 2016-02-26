@@ -32,6 +32,17 @@ module TingYun
             Base64.encode64(Compressed.encode(json))
           end
         end
+        module CompressedJSON
+          def self.encode(data, opts={})
+            normalize_encodings = if opts[:skip_normalization]
+                                    false
+                                  else
+                                    TingYun::Agent.config[:normalize_json_string_encodings]
+                                  end
+            json = JSONWrapper.dump(data, :normalize => normalize_encodings)
+            Compressed.encode(json)
+          end
+        end
       end
     end
   end

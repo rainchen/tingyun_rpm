@@ -1,10 +1,19 @@
 # encoding: utf-8
 require 'ting_yun/metrics/metric_spec'
 require 'ting_yun/metrics/metric_data'
+require 'ting_yun/support/serialize/encodes'
 
 module TingYun
   class TingYunService
     module UploadService
+
+      def CompressedJSON
+        TingYun::Support::Serialize::Encoders::CompressedJSON
+      end
+
+      def Base64CompressedJSON
+        TingYun::Support::Serialize::Encoders::Base64CompressedJSON
+      end
 
       def metric_data(stats_hash)
 
@@ -103,7 +112,7 @@ module TingYun
           :sqlTraces => sql_trace
       }
 
-      invoke_remote(:upload, [upload_data])
+      invoke_remote(:upload, [upload_data] , :encoder=> CompressedJSON  )
     end
   end
 end

@@ -57,7 +57,7 @@ module TingYun
         end
 
         def default_encoder
-          Encoders::Compressed
+          Encoders::Base64CompressedJSON
         end
 
         def format
