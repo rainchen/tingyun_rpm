@@ -112,7 +112,7 @@ module TingYun
           :sqlTraces => sql_trace
       }
 
-      invoke_remote(:upload, [upload_data] , :encoder=> CompressedJSON  )
+      invoke_remote(:upload, [upload_data], :encoder=> CompressedJSON )
     end
   end
 end
