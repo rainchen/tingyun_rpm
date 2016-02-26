@@ -56,7 +56,7 @@ module TingYun
       SUPPORTED_ADAPTERS_FOR_EXPLAIN = %w[postgres postgresql mysql2 mysql sqlite].freeze
 
       def explain(sql, config, explainer=nil)
-        return unless explainer 
+        return unless explainer
 
         if sql[-3,3] == '...'
           TingYun::Agent.logger.debug('Unable to collect explain plan for truncated query.')
