@@ -58,7 +58,7 @@ module TingYun
       def explain(sql, config, explainer=nil)
         return unless explainer && is_select?(sql)
 
-        if statement[-3,3] == '...'
+        if sql[-3,3] == '...'
           TingYun::Agent.logger.debug('Unable to collect explain plan for truncated query.')
           return
         end
@@ -75,7 +75,7 @@ module TingYun
         end
 
         handle_exception_in_explain do
-          plan = explainer.call(config, statement)
+          plan = explainer.call(config, sql)
           return process_resultset(plan, adapter) if plan
         end
       end
