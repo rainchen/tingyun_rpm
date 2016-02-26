@@ -38,9 +38,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'yard'
 
   if RUBY_VERSION >= '1.9.3'
-    s.add_development_dependency 'guard'
-    s.add_development_dependency 'guard-minitest'
-    s.add_development_dependency 'rb-fsevent'
+    s.add_development_dependency 'guard', '= 2.12.5'
+    s.add_development_dependency 'guard-minitest', '= 2.4.4'
+    s.add_development_dependency 'rb-fsevent', '= 0.9.4'
   end
 
   # compatible with Ruby 1.8.7
@@ -48,9 +48,9 @@ Gem::Specification.new do |s|
 
   if RUBY_PLATFORM == 'java'
     s.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
-    s.add_development_dependency 'jruby-openssl', '~> 0.9.10'
+    s.add_development_dependency 'jruby-openssl'
   else
-    s.add_development_dependency 'sqlite3'
+    s.add_development_dependency 'sqlite3', '= 1.3.10'
   end
 
   if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx'
