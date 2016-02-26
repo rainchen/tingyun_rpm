@@ -96,5 +96,14 @@ module TingYun
 
       invoke_remote(:upload, [upload_data])
     end
+
+    def sql_trace(sql_trace)
+      upload_data = {
+          :type => 'sqlTraceData',
+          :errors => sql_trace
+      }
+
+      invoke_remote(:upload, [upload_data])
+    end
   end
 end
