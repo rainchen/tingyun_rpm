@@ -29,7 +29,7 @@ module TingYun
           @samples_lock = Mutex.new
         end
 
-        def enable?
+        def enabled?
           Agent.config[:'nbs.action_tracer.enabled'] &&
               Agent.config[:'nbs.action_tracer.slow_sql'] &&
                   TingYun::Agent::Database.should_record_sql?('nbs.action_tracer.record_sql')
