@@ -11,6 +11,16 @@ module TingYun
   module Instrumentation
     module ActiveRecord
 
+      EXPLAINER = lambda do |config, query|
+        connection = TingYun::Agent::Database.get_connection(config) do
+          ::ActiveRecord::Base.send("#{config[:adapter]}_connection",
+                                    config)
+        end
+        if connection && connection.respond_to?(:execute)
+          return connection.execute("EXPLAIN #{query}")
+        end
+      end
+
       def self.included(instrumented_class)
         instrumented_class.class_eval do
           unless instrumented_class.method_defined?(:log_without_tingyun_instrumentation)
@@ -32,13 +42,26 @@ module TingYun
       end
 
       def log_with_tingyun_instrumentation(*args, &block)
+        state = TingYun::Agent::TransactionState.tl_get
         sql, name, _ = args
         metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(
                                                                     TingYun::Helper.correctly_encoded(name),
                                                                     TingYun::Helper.correctly_encoded(sql),
                                                                     @config && @config[:adapter])
+
+        scoped_metric = metrics.first
+
         TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
-          log_without_tingyun_instrumentation(*args, &block)
+          t0 = Time.now
+          begin
+            log_without_tingyun_instrumentation(*args, &block)
+          ensure
+            elapsed_time = (Time.now - t0).to_f
+            TingYun::Agent.instance.sql_sampler.notice_sql(sql, scoped_metric,
+                                                            @config, elapsed_time,
+                                                            state, EXPLAINER)
+          end
+
         end
       end
 

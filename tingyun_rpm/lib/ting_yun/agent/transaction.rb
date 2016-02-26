@@ -109,6 +109,7 @@ module TingYun
       end
 
       def start(state)
+        sql_sampler.on_start_transaction(state, request_path)
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
       end
@@ -212,6 +213,9 @@ module TingYun
 
       def commit!(state, end_time, outermost_node_name)
         assign_agent_attributes
+
+        sql_sampler.on_finishing_transaction(state, @frozen_name)
+
         record_summary_metrics(outermost_node_name, end_time)
         record_apdex(state, end_time)
         record_exceptions
