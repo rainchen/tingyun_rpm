@@ -52,7 +52,7 @@ module TingYun
           return unless data
 
           if state.is_sql_recorded?
-            if duration > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold']
+            if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold']
               backtrace = caller.join("\n")
               statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
               data.sql_data << SlowSql.new(statement, metric_name, duration, start_time, backtrace)
