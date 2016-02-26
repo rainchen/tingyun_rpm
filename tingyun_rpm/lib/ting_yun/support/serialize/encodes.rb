@@ -43,6 +43,18 @@ module TingYun
             Compressed.encode(json)
           end
         end
+
+        module Json
+          def self.encode(data, opts={})
+            normalize_encodings = if opts[:skip_normalization]
+                                    false
+                                  else
+                                    TingYun::Agent.config[:normalize_json_string_encodings]
+                                  end
+            json = JSONWrapper.dump(data, :normalize => normalize_encodings)
+            return json
+          end
+        end
       end
     end
   end
