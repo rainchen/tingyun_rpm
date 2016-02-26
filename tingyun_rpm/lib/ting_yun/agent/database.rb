@@ -80,6 +80,17 @@ module TingYun
         end
       end
 
+      def adapter_from_config(config)
+        if config[:adapter]
+          return config[:adapter].to_s
+        elsif config[:uri] && config[:uri].to_s =~ /^jdbc:([^:]+):/
+          # This case is for Sequel with the jdbc-mysql, jdbc-postgres, or
+          # jdbc-sqlite3 gems.
+          return $1
+        end
+      end
+
+
       def parameterized?(sql)
         Obfuscator.instance.obfuscate_single_quote_literals(sql) =~ /\$\d+/
       end
