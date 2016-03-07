@@ -104,7 +104,7 @@ module TingYun
           noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
           noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING
           noticed_error.request_port = options.delete(:port)
-          noticed_error.response_attributes  = options.delete(:attributes)
+          noticed_error.attributes  = options.delete(:attributes)
 
           noticed_error.file_name   = sense_method(exception, :file_name)
           noticed_error.line_number = sense_method(exception, :line_number)

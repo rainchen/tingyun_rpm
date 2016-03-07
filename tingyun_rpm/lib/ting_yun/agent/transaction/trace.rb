@@ -7,7 +7,7 @@ module TingYun
     class Transaction
       class Trace
 
-        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :response_attributes, :start_time, :finished
+        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished
 
         attr_reader  :root_node
 
