@@ -2,13 +2,20 @@
 require 'ting_yun/support/exception'
 require 'ting_yun/agent/collector/stats_engine'
 require 'ting_yun/agent/collector/error_collector'
+
 require 'ting_yun/agent/collector/transaction_sampler'
+
+require 'ting_yun/agent/collector/sql_sampler'
+
 
 module TingYun
   module Agent
     module ContainerDataManager
 
-      attr_reader :stats_engine, :error_collector, :transaction_sampler
+
+      attr_reader :stats_engine, :error_collector, :transaction_sampler, :sql_sampler
+
+
 
       def drop_buffered_data
         @stats_engine.reset!
@@ -22,6 +29,7 @@ module TingYun
         @stats_engine = TingYun::Agent::Collector::StatsEngine.new
         @error_collector = TingYun::Agent::Collector::ErrorCollector.new
         @transaction_sampler = TingYun::Agent::Collector::TransactionSampler.new
+        @sql_sampler  = TingYun::Agent::Collector::SqlSampler.new
       end
 
       def container_for_endpoint(endpoint)
@@ -38,6 +46,7 @@ module TingYun
           harvest_and_send_errors
           harvest_and_send_timeslice_data
           harvest_and_send_transaction_traces
+          harvest_and_send_slowest_sql
         end
       end
 
@@ -49,8 +58,13 @@ module TingYun
         harvest_and_send_from_container(@error_collector.error_trace_array, :error_data)
       end
 
+
       def harvest_and_send_transaction_traces
         harvest_and_send_from_container(@transaction_sampler, :action_trace_data)
+
+      def harvest_and_send_slowest_sql
+        harvest_and_send_from_container(@sql_sampler, :sql_trace)
+
       end
 
       # Harvests data from the given container, sends it to the named endpoint
@@ -88,7 +102,12 @@ module TingYun
 
       def send_data_to_endpoint(endpoint, items, container)
         TingYun::Agent.logger.debug("Sending #{items.size} items to #{endpoint}")
-        @service.send(endpoint, items)
+        begin
+          @service.send(endpoint, items)
+        rescue => e
+          TingYun::Agent.logger.info("Unable to send #{endpoint} data, will try again later. Error: ", e)
+        end
+
       end
 
     end

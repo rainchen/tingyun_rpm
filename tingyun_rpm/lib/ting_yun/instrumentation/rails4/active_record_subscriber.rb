@@ -14,6 +14,7 @@ module TingYun
         def initialize
           # We cache this in an instance variable to avoid re-calling method
           # on each query.
+          @explainer = method(:get_explain_plan)
           super
         end
 
@@ -26,11 +27,38 @@ module TingYun
 
         def finish(name, id, payload) #THREAD_LOCAL_ACCESS
           return if payload[:name] == CACHED_QUERY_NAME
+          state = TingYun::Agent::TransactionState.tl_get
           event = pop_event(id)
           config = active_record_config_for_event(event)
-          record_metrics(event, config)
+          base_metric = record_metrics(event, config)
+          notice_sql(state, event, config, base_metric)
         rescue => e
           log_notification_error(e, name, 'finish')
+        end
+
+        def get_explain_plan( config, query )
+          connection = TingYun::Agent::Database.get_connection(config) do
+            ::ActiveRecord::Base.send("#{config[:adapter]}_connection",
+                                      config)
+          end
+          if connection && connection.respond_to?(:execute)
+            return connection.execute("EXPLAIN #{query}")
+          end
+        end
+
+        def notice_sql(state, event, config, metric)
+          stack  = state.traced_method_stack
+
+          # enter transaction trace node
+          frame = stack.push_frame(state, :active_record, event.time)
+
+          TingYun::Agent.instance.sql_sampler \
+            .notice_sql(event.payload[:sql], metric, config,
+                        TingYun::Helper.milliseconds_to_seconds(event.duration),
+                        state, @explainer)
+
+          # exit transaction trace node
+          stack.pop_frame(state, frame, metric, event.end)
         end
 
         def record_metrics(event, config)
@@ -39,6 +67,8 @@ module TingYun
                                                                                                    config && config[:adapter])
 
           TingYun::Agent.agent.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, event.duration)
+
+          base
         end
 
 

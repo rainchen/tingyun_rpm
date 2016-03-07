@@ -527,7 +527,7 @@ module TingYun
             :description => "Manual override for the path to your local CA bundle. This CA bundle will be used to validate the SSL certificate presented by Ting Yun's data collection service."
         },
         :ssl => {
-            :default => true,
+            :default => false,
             :allow_nil => true,
             :public => true,
             :type => Boolean,
