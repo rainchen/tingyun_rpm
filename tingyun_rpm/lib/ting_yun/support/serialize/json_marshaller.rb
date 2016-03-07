@@ -56,10 +56,6 @@ module TingYun
           raise
         end
 
-        def default_encoder
-          Encoders::Base64CompressedJSON
-        end
-
         def format
           'json'
         end

@@ -11,6 +11,8 @@ module TingYun
         # Request data
         attr_accessor :request
         attr_reader   :current_transaction, :traced_method_stack
+        # Sql Sampler Transaction Data
+        attr_accessor :sql_sampler_transaction_data
 
 
         def self.tl_get
@@ -42,6 +44,18 @@ module TingYun
           @request = nil
           @current_transaction = transaction
           @traced_method_stack.clear
+          @sql_sampler_transaction_data = nil
+        end
+
+        # TT's and SQL
+        attr_accessor :record_tt, :record_sql
+
+        def is_transaction_traced?
+          @record_tt != false
+        end
+
+        def is_sql_recorded?
+          @record_sql != false
         end
       end
   end

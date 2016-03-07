@@ -8,12 +8,12 @@ Gem::Specification.new do |s|
   s.name     = 'tingyun_rpm'
   s.version  = TingYun::VERSION::STRING
   s.author   = 'tingyun'
-  s.email    = 'support@tingyun.com'
-  s.homepage = 'http://tingyun.com/features/ruby.html'
+  # s.email    = 'support@tingyun.com'
+  # s.homepage = 'http://tingyun.com/features/ruby.html'
 
   s.licenses    = ['TingYun', 'MIT', 'Ruby']
   s.summary     = 'TingYun Ruby Agent'
-  s.description = 'TingYun Ruby Agent. (http://tingyun.com/features/ruby.html)'
+  # s.description = 'TingYun Ruby Agent. (http://tingyun.com/features/ruby.html)'
 
   s.required_ruby_version     = '>= 1.8.7'
   s.required_rubygems_version = '>= 1.3.5'

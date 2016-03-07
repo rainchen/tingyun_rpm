@@ -2,7 +2,7 @@
 require 'ting_yun/agent/transaction/transaction_state'
 module TingYun
   module Agent
-    module Datastores
+    module Datastore
       module MetricHelper
 
 
@@ -10,17 +10,35 @@ module TingYun
         ALL_BACKGROUND = "AllBackground".freeze
         ALL = "All".freeze
 
+        NOSQL =['MongoDB','Redis','Memcached'].freeze
+
+        def self.checkNosql(product)
+          NOSQL.include?(product)
+        end
+
         def self.metric_name(product, collection, operation)
-          "Database #{product}/#{collection}/#{operation}"
+          if checkNosql(product)
+            "#{product}/#{collection}/#{operation}"
+          else
+            "Database #{product}/#{collection}/#{operation}"
+          end
         end
 
         def self.product_suffixed_rollup(product,suffix)
-          "Database #{product}/NULL/#{suffix}"
+          if checkNosql(product)
+            "#{product}/NULL/#{suffix}"
+          else
+            "Database #{product}/NULL/#{suffix}"
+          end
         end
 
 
 
         def self.metrics_for(product, operation, collection = nil, generic_product = nil)
+          return nil if operation.nil?
+
+          operation = operation.to_s.upcase
+
           if overrides = overridden_operation_and_collection   # [method, model_name, product]
             if should_override?(overrides, product, generic_product)
               operation  = overrides[0] || operation
@@ -28,12 +46,12 @@ module TingYun
             end
           end
           metrics = [ALL_WEB,ALL]
-          metrics << operation.upcase unless operation.nil?
+          metrics << operation
           metrics = metrics.map do |suffix|
             product_suffixed_rollup(product,suffix)
           end
 
-          metrics.unshift metric_name(product, collection, operation) unless operation.nil?
+          metrics.unshift metric_name(product, collection, operation)
           metrics
         end
 

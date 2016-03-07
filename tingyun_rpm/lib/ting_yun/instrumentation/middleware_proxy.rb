@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'ting_yun/instrumentation/middleware_tracing'
-require 'ting_yun/instrumentation/support/middleware_helper'
+require 'ting_yun/instrumentation/support/transaction_namer'
 
 module TingYun
   module Instrumentation
@@ -52,7 +52,7 @@ module TingYun
       end
 
       def determine_prefix
-        TingYun::Instrumentation::Support::MiddlewareHelper::TransactionName.prefix_for_category(@category)
+        TingYun::Instrumentation::Support::TransactionNamer.prefix_for_category(nil,@category)
       end
 
       def determine_class_name

@@ -2,12 +2,13 @@
 require 'ting_yun/support/exception'
 require 'ting_yun/agent/collector/stats_engine'
 require 'ting_yun/agent/collector/error_collector'
+require 'ting_yun/agent/collector/sql_sampler'
 
 module TingYun
   module Agent
     module ContainerDataManager
 
-      attr_reader :stats_engine, :error_collector
+      attr_reader :stats_engine, :error_collector, :sql_sampler
 
       def drop_buffered_data
         @stats_engine.reset!
@@ -18,6 +19,7 @@ module TingYun
       def init_containers
         @stats_engine = TingYun::Agent::Collector::StatsEngine.new
         @error_collector = TingYun::Agent::Collector::ErrorCollector.new
+        @sql_sampler  = TingYun::Agent::Collector::SqlSampler.new
       end
 
       def container_for_endpoint(endpoint)
@@ -33,6 +35,7 @@ module TingYun
         @service.session do # use http keep-alive
           harvest_and_send_errors
           harvest_and_send_timeslice_data
+          harvest_and_send_slowest_sql
         end
       end
 
@@ -43,6 +46,11 @@ module TingYun
       def harvest_and_send_errors
         harvest_and_send_from_container(@error_collector.error_trace_array, :error_data)
       end
+
+      def harvest_and_send_slowest_sql
+        harvest_and_send_from_container(@sql_sampler, :sql_trace)
+      end
+
 
       # Harvests data from the given container, sends it to the named endpoint
       # on the service, and automatically merges back in upon a recoverable
@@ -79,7 +87,12 @@ module TingYun
 
       def send_data_to_endpoint(endpoint, items, container)
         TingYun::Agent.logger.debug("Sending #{items.size} items to #{endpoint}")
-        @service.send(endpoint, items)
+        begin
+          @service.send(endpoint, items)
+        rescue => e
+          TingYun::Agent.logger.info("Unable to send #{endpoint} data, will try again later. Error: ", e)
+        end
+
       end
 
     end

@@ -1,10 +1,23 @@
 # encoding: utf-8
 require 'ting_yun/metrics/metric_spec'
 require 'ting_yun/metrics/metric_data'
+require 'ting_yun/support/serialize/encodes'
 
 module TingYun
   class TingYunService
     module UploadService
+
+      def compressed_json
+        TingYun::Support::Serialize::Encoders::CompressedJSON
+      end
+
+      def base64_compressed_json
+        TingYun::Support::Serialize::Encoders::Base64CompressedJSON
+      end
+
+      def json
+        TingYun::Support::Serialize::Encoders::Json
+      end
 
       def metric_data(stats_hash)
 
@@ -55,6 +68,10 @@ module TingYun
               general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+            elsif metric_spec.name.start_with?('MongoDB','Redis','Memcached') && !metric_spec.scope.empty?
+              components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+            elsif metric_spec.name.start_with?('MongoDB','Redis','Memcached') && metric_spec.scope.empty?
+              general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             end
           end
         end
@@ -91,6 +108,16 @@ module TingYun
       }
 
       invoke_remote(:upload, [upload_data])
+    end
+
+
+    def sql_trace(sql_trace)
+      upload_data = {
+          :type => 'sqlTraceData',
+          :sqlTraces => sql_trace
+      }
+
+      invoke_remote(:upload, [upload_data], :encoder=> json )
     end
   end
 end
