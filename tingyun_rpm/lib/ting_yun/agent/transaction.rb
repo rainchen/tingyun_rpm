@@ -5,7 +5,7 @@ require 'ting_yun/support/helper'
 require 'ting_yun/agent/method_tracer_helpers'
 require 'ting_yun/agent/transaction/transaction_metrics'
 require 'ting_yun/agent/transaction/request_attributes'
-require 'ting_yun/agent/transaction/response_attributes'
+require 'ting_yun/agent/transaction/attributes'
 
 
 module TingYun
@@ -67,7 +67,7 @@ module TingYun
 
         @error_recorded = false
 
-        @response_attributes = TingYun::Agent::Transaction::ResponseAttributes.new
+        @attributes = TingYun::Agent::Transaction::Attributes.new
 
         if request = options[:request]
           @request_attributes = TingYun::Agent::Transaction::RequestAttributes.new request
@@ -242,7 +242,7 @@ module TingYun
       end
 
       def add_agent_attribute(key, value)
-        @response_attributes.add_agent_attribute(key, value)
+        @attributes.add_agent_attribute(key, value)
       end
 
       #collector error
@@ -261,7 +261,7 @@ module TingYun
             options[:uri]      ||= request_path if request_path
             options[:port]       = request_port if request_port
             options[:metric_name]     = best_name
-            options[:attributes] = @response_attributes
+            options[:attributes] = @attributes
 
             @error_recorded = !!::TingYun::Agent.instance.error_collector.notice_error(exception, options) || @error_recorded
           end

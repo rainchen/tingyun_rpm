@@ -13,7 +13,7 @@ module TingYun
 
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :request_uri, :request_port, :file_name, :line_number,
-                      :stack_trace, :attributes_from_notice_error, :response_attributes,
+                      :stack_trace, :attributes_from_notice_error, :attributes,
                       :count_error, :thread_name
 
         attr_reader :exception_id, :is_internal
@@ -71,7 +71,7 @@ module TingYun
 
            [timestamp.to_i,
             string(metric_name),
-            int(response_attributes.agent_attributes[:httpResponseCode]),
+            int(attributes.agent_attributes[:httpResponseCode]),
             string(exception_class_name),
             string(message),
             count_error,
@@ -91,9 +91,10 @@ module TingYun
         def custom_params
           {
             :threadName => thread_name,
-            :httpStatus => int(response_attributes.agent_attributes[:httpResponseCode]),
+            :httpStatus => int(attributes.agent_attributes[:httpResponseCode]),
 
-            :referer    => string(response_attributes.agent_attributes[:'request.headers.referer']) || ''
+            :referer    => string(attributes.agent_attributes[:'request.headers.referer']) || ''
+
           }
         end
 
