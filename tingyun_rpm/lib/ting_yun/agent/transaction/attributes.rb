@@ -3,11 +3,12 @@
 module TingYun
   module Agent
     class Transaction
-      class ResponseAttributes
+      class Attributes
 
         attr_accessor :agent_attributes
         def initialize
           @agent_attributes  = {}
+          @custom_attributes = {}
         end
 
         def add_agent_attribute(key, value)

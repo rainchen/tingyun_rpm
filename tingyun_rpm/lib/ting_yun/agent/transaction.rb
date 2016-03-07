@@ -224,13 +224,15 @@ module TingYun
       end
 
       def assign_agent_attributes
+  
+        add_agent_attribute(:threadName,  "pid-#{$$}");
 
         if http_response_code
-          add_agent_attribute(:httpResponseCode, http_response_code.to_s)
+          add_agent_attribute(:httpStatus, http_response_code.to_s)
         end
 
         if response_content_type
-          add_agent_attribute(:'response.headers.contentType', response_content_type)
+          add_agent_attribute(:contentType, response_content_type)
         end
 
 
