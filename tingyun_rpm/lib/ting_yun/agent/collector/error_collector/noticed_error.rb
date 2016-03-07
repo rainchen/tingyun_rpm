@@ -95,7 +95,7 @@ module TingYun
         end
 
         def request_params
-          {}
+          attributes.agent_attributes[:request_params]
         end
 
       end
