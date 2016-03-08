@@ -22,8 +22,8 @@ TingYun::Support::LibraryDetection.defer do
         end
       end
 
-      alias request_without_tingyun_trace request
-      alias request request_with_tingyun_trace
+      # alias request_without_tingyun_trace request
+      # alias request request_with_tingyun_trace
     end
   end
 end
