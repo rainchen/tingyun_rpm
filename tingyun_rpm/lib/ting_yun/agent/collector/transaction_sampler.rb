@@ -55,14 +55,14 @@ module TingYun
 
           state.transaction_sample_builder = nil
 
-          last_trace = last_builder.trace
-          last_trace.metric_name = txn.best_name
-          last_trace.uri = txn.request_path
-          last_trace.guid = txn.guid
-          last_trace.attributes = txn.attributes
+          final_trace = last_builder.trace
+          final_trace.metric_name = txn.best_name
+          final_trace.uri = txn.request_path
+          final_trace.guid = txn.guid
+          final_trace.attributes = txn.attributes
 
           @lock.synchronize do
-            @last_sample = last_trace
+            @last_sample = final_trace
             store_sample(@last_sample)
             @last_sample
           end
@@ -109,14 +109,12 @@ module TingYun
         end
 
         def merge!
-
+          @lock.synchronize do
+            @sample_buffers.each do |buffer|
+              buffer.store_previous(previous)
+            end
+          end
         end
-
-
-
-
-
-
 
         def reset!
           @lock.synchronize do
