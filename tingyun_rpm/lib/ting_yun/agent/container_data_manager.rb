@@ -62,6 +62,8 @@ module TingYun
       def harvest_and_send_transaction_traces
         harvest_and_send_from_container(@transaction_sampler, :action_trace_data)
 
+      end
+
       def harvest_and_send_slowest_sql
         harvest_and_send_from_container(@sql_sampler, :sql_trace)
 
