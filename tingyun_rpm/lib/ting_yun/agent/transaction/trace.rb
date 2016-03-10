@@ -1,4 +1,4 @@
-# encoding: utf-8
+  # encoding: utf-8
 require 'ting_yun/agent/transaction/trace_node'
 require 'ting_yun/support/helper'
 require 'ting_yun/support/coerce'
@@ -32,7 +32,14 @@ module TingYun
         def action_trace_data
           [
               @start_time,
+              request_params,
+              custom_params,
+
           ]
+        end
+
+        def trace_tree
+
         end
 
         def to_collector_array(encoder)
@@ -41,10 +48,9 @@ module TingYun
               TingYun::Helper.time_to_millis(duration),
               TingYun::Helper.correctly_encoded(metric_name),
               TingYun::Helper.correctly_encoded(uri),
-              action_trace_data
-
-
-
+              "action_trace_data",
+              "",
+              @guid
           ]
         end
 
@@ -53,6 +59,18 @@ module TingYun
 
           @prepared = true
           self
+        end
+
+        def custom_params
+          {
+              :threadName => thread_name,
+              :httpStatus => int(@attributes.agent_attributes[:httpResponseCode]),
+              :referer    => string(@attributes.agent_attributes[:referer]) || ''
+          }
+        end
+
+        def request_params
+          @attributes.agent_attributes[:request_params]
         end
       end
     end

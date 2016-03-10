@@ -71,8 +71,7 @@ module TingYun
 
         def request_params
           hash = {}
-          return hash if query_string.empty?
-
+          return hash if @query_string.empty?
           query_string.split("&").each do |param|
             _k,_v = param.strip.split("=")
             hash[-k] = _v unless _v.nil?

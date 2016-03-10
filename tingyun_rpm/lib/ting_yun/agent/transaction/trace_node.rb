@@ -8,7 +8,7 @@ module TingYun
       class TraceNode
 
         attr_reader :entry_timestamp, :parent_node, :called_nodes
-        attr_accessor :metric_name, :exit_timestamp
+        attr_accessor :metric_name, :exit_timestamp, :uri, :count, :klass, :method
 
 
 
@@ -19,6 +19,10 @@ module TingYun
           @entry_timestamp = timestamp
           @metric_name     = metric_name || UNKNOWN_NODE_NAME
           @called_nodes    = nil
+          @uri             = nil
+          @count           = 1
+          @klass           = nil
+          @method          = nil
         end
 
         def add_called_node(s)
@@ -41,6 +45,7 @@ module TingYun
           [TingYun::Helper.time_to_millis(entry_timestamp),
            TingYun::Helper.time_to_millis(exit_timestamp),
            TingYun::Support::Coerce.string(metric_name),
+           TingYun::Support::Coerce.string(@uri),
            (@params || {})] +
           [ (@called_nodes ? @called_nodes.map{|s| s.to_array} : []) ]
         end

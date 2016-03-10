@@ -14,6 +14,16 @@ module TingYun
             @samples = []
           end
 
+          #If a buffer needs to modify, override this method.
+          def allow_sample?(sample)
+            true
+          end
+
+          #If a buffer needs to modify, override this method.
+          def enabled?
+            true
+          end
+
           def reset!
             @samples = []
           end
@@ -69,15 +79,6 @@ module TingYun
             @samples.slice!(0..-(max_capacity + 1))
           end
 
-          #If a buffer needs to modify, override this method.
-          def allow_sample?(sample)
-            true
-          end
-
-          #If a buffer needs to modify, override this method.
-          def enabled?
-            true
-          end
 
           private
 

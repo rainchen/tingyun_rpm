@@ -14,9 +14,9 @@ module TingYun
             CAPACITY
           end
 
-          def allow_sample?(sample)
-            sample.threshold && sample.duration >= sample.threshold
-          end
+          # def allow_sample?(sample)
+          #   sample.threshold && sample.duration >= sample.threshold
+          # end
 
         end
       end
