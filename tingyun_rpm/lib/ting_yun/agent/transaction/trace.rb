@@ -24,7 +24,7 @@ module TingYun
         end
 
         def duration
-          (self.root_node.duration * 1000).round
+          @root_node.duration
         end
 
         include TingYun::Support::Coerce
@@ -39,7 +39,12 @@ module TingYun
         end
 
         def trace_tree
-
+          [
+              TingYun::Helper.time_to_millis(duration),
+              request_params,
+              custom_params,
+              []
+          ]
         end
 
         def to_collector_array(encoder)
@@ -48,7 +53,7 @@ module TingYun
               TingYun::Helper.time_to_millis(duration),
               TingYun::Helper.correctly_encoded(metric_name),
               TingYun::Helper.correctly_encoded(uri),
-              "action_trace_data",
+              encoder.encode(trace_tree),
               "",
               @guid
           ]

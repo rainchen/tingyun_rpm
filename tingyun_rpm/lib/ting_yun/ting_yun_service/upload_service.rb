@@ -114,7 +114,7 @@ module TingYun
           :type => 'actionTraceData',
           :actionTraces => traces
       }
-      invoke_remote(:upload, [upload_data])
+      invoke_remote(:upload, [upload_data], :encoder=> json)
     end
 
     def sql_trace(sql_trace)
