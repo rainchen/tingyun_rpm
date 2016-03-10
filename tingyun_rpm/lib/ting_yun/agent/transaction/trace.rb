@@ -7,7 +7,7 @@ module TingYun
     class Transaction
       class Trace
 
-        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished, :thread_name
+        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished
 
         attr_reader  :root_node
 
@@ -16,7 +16,6 @@ module TingYun
           @node_count = 0
           @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")
           @prepared = false
-          @thread_name = "pid-#{$$}"
         end
 
         def create_node(time_since_start, metric_name = nil)
@@ -69,8 +68,8 @@ module TingYun
 
         def custom_params
           {
-              :threadName => thread_name,
-              :httpStatus => int(@attributes.agent_attributes[:httpResponseCode]),
+              :threadName => string(attributes.agent_attributes[:threadName]),
+              :httpStatus => int(@attributes.agent_attributes[:httpStatus]),
               :referer    => string(@attributes.agent_attributes[:referer]) || ''
           }
         end

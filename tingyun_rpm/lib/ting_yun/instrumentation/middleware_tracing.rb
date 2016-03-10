@@ -55,6 +55,7 @@ module TingYun
           result = target.call(env)
 
           if first_middleware
+            binding.pry
             capture_http_response_code(state, result)
             capture_response_content_type(state, result)
           end
