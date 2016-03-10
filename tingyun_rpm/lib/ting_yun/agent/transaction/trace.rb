@@ -7,7 +7,7 @@ module TingYun
     class Transaction
       class Trace
 
-        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished
+        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished, :thread_name
 
         attr_reader  :root_node
 
@@ -16,6 +16,7 @@ module TingYun
           @node_count = 0
           @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")
           @prepared = false
+          @thread_name = "pid-#{$$}"
         end
 
         def create_node(time_since_start, metric_name = nil)
