@@ -28,16 +28,7 @@ module TingYun
         end
 
         include TingYun::Support::Coerce
-
-        def action_trace_data
-          [
-              @start_time,
-              request_params,
-              custom_params,
-
-          ]
-        end
-
+        
         def trace_tree
           [
               TingYun::Helper.time_to_millis(duration),
