@@ -74,7 +74,7 @@ module TingYun
           return hash if @query_string.empty?
           query_string.split("&").each do |param|
             _k,_v = param.strip.split("=")
-            hash[-k] = _v unless _v.nil?
+            hash[_k] = _v unless _v.nil?
           end
 
           return hash

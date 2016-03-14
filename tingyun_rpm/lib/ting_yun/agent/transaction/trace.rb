@@ -43,7 +43,7 @@ module TingYun
               TingYun::Helper.time_to_millis(duration),
               request_params,
               custom_params,
-              []
+              @root_node.to_array
           ]
         end
 

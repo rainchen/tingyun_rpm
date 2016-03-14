@@ -46,11 +46,10 @@ module TingYun
            TingYun::Helper.time_to_millis(exit_timestamp),
            TingYun::Support::Coerce.string(metric_name),
            TingYun::Support::Coerce.string(@uri),
-           TingYun::Support::Coerce.string(@count),
+           TingYun::Support::Coerce.int(@count),
            TingYun::Support::Coerce.string(@klass),
            TingYun::Support::Coerce.string(@method),
-           params]
-            +
+           params] +
           [ (@called_nodes ? @called_nodes.map{|s| s.to_array} : []) ]
         end
 
