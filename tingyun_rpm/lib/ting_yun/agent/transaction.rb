@@ -110,6 +110,7 @@ module TingYun
 
       def start(state)
         sql_sampler.on_start_transaction(state, request_path)
+        TingYun::Agent.instance.events.notify(:start_transaction)
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
       end

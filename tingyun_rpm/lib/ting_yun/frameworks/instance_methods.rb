@@ -54,6 +54,8 @@ module TingYun
           ::TingYun::Agent.logger = TingYun::Logger::AgentLogger.new(root, options.delete(:log))
         end
 
+        environment_name = options.delete(:env) and self.env = environment_name
+
         init_config(options)
 
         TingYun::Agent.agent = TingYun::Agent::Agent.instance
