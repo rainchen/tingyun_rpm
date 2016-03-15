@@ -62,7 +62,6 @@ module TingYun
               else
                 backtrace = []
               end
-
               statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
               data.sql_data << SlowSql.new(statement, metric_name, duration, start_time, backtrace)
             end
@@ -192,6 +191,7 @@ module TingYun
         attr_reader :duration
         attr_reader :backtrace
         attr_reader :start_time
+
 
         def initialize(statement, metric_name, duration, t0,  backtrace=nil)
           @start_time = t0
