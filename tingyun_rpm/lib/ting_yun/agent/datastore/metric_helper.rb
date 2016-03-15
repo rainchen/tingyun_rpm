@@ -18,9 +18,9 @@ module TingYun
 
         def self.metric_name(product, collection, operation)
           if checkNosql(product)
-            "#{product}/#{collection||"NULL"}/#{operation}"
+            "#{product}/#{collection}/#{operation}"
           else
-            "Database #{product}/#{collection||"NULL"}/#{operation}"
+            "Database #{product}/#{collection}/#{operation}"
           end
         end
 
@@ -35,6 +35,7 @@ module TingYun
 
 
         def self.metrics_for(product, operation, collection = nil, generic_product = nil)
+          return [] if collection.nil?
           operation = operation.to_s.upcase
           if overrides = overridden_operation_and_collection   # [method, model_name, product]
             if should_override?(overrides, product, generic_product)
