@@ -124,6 +124,7 @@ module TingYun
       }
 
       invoke_remote(:upload, [upload_data], :encoder=> json )
+
     end
   end
 end

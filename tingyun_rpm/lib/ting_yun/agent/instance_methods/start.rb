@@ -165,6 +165,47 @@ module TingYun
           start_worker_thread(options)
 
         end
+
+        # This method should be called in a forked process after a fork.
+        # It assumes the parent process initialized the agent, but does
+        # not assume the agent started.
+        #
+        # The call is idempotent, but not re-entrant.
+        #
+        # * It clears any metrics carried over from the parent process
+        # * Restarts the sampler thread if necessary
+        # * Initiates a new agent run and worker loop unless that was done
+        #   in the parent process and +:force_reconnect+ is not true
+        #
+        # Options:
+        # * <tt>:force_reconnect => true</tt> to force the spawned process to
+        #   establish a new connection, such as when forking a long running process.
+        #   The default is false--it will only connect to the server if the parent
+        #   had not connected.
+        # * <tt>:keep_retrying => false</tt> if we try to initiate a new
+        #   connection, this tells me to only try it once so this method returns
+        #   quickly if there is some kind of latency with the server.
+        def after_fork(options={})
+          needs_restart = false
+          @after_fork_lock.synchronize do
+            needs_restart = @dispatcher.needs_restart?
+            @dispatcher.mark_started
+          end
+
+          return if !needs_restart ||
+              !Agent.config[:'nbs.agent_enabled'] ||
+              !Agent.config[:monitor_mode] ||
+              disconnected?
+
+          ::TingYun::Agent.logger.debug "Starting the worker thread in #{Process.pid} (parent #{Process.ppid}) after forking."
+
+          # Clear out locks and stats left over from parent process
+          reset_objects_with_locks
+          drop_buffered_data
+
+          setup_and_start_agent(options)
+        end
+
       end
     end
   end

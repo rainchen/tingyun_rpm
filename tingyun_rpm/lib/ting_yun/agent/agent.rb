@@ -6,6 +6,8 @@ require 'ting_yun/agent/instance_methods'
 require 'ting_yun/ting_yun_service'
 require 'ting_yun/frameworks'
 require 'ting_yun/agent/container_data_manager'
+require 'ting_yun/agent/event/event_listener'
+require 'ting_yun/agent/dispatcher'
 
 
 # The Agent is a singleton that is instantiated when the plugin is
@@ -23,6 +25,7 @@ module TingYun
 
       # service for communicating with collector
       attr_accessor :service
+      attr_reader :events
 
       extend ClassMethods
       include InstanceMethods
@@ -112,6 +115,9 @@ module TingYun
         @service = TingYunService.new
         @connect_state = :pending #[:pending, :connected, :disconnected]
         @connect_attempts = 0
+        @events  = TingYun::Agent::Event::EventListener.new
+        @after_fork_lock = Mutex.new
+        @dispatcher = TingYun::Agent::Dispatcher.new(@events)
 
         init_containers
       end
