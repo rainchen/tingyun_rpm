@@ -50,7 +50,7 @@ module TingYun
            TingYun::Support::Coerce.string(@klass),
            TingYun::Support::Coerce.string(@method),
            params] +
-           (@called_nodes ? @called_nodes.map{|s| s.to_array} : [])
+           [(@called_nodes ? @called_nodes.map{|s| s.to_array} : [])]
         end
 
         def custom_params
