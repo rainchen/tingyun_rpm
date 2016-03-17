@@ -26,10 +26,13 @@ module TingYun
         @current_node
       end
 
-      def trace_exit(metric_name, time)
+      def trace_exit(metric_name, time, klass = metric_name, method = '', uri = '')
         @current_node.metric_name = metric_name
         @current_node.end_trace(time.to_f - @trace_start)
         @current_node = @current_node.parent_node
+        @current_node.klass = klass
+        @current_node.method = method
+        @current_node.uri = uri
       end
 
       def finish_trace(time=Time.now.to_f)

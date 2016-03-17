@@ -19,10 +19,10 @@ module TingYun
           @entry_timestamp = timestamp
           @metric_name     = metric_name || UNKNOWN_NODE_NAME
           @called_nodes    = nil
-          @uri             = nil
+          @uri             = ''
           @count           = 1
-          @klass           = nil
-          @method          = nil
+          @klass           = ''
+          @method          = ''
         end
 
         def add_called_node(s)
@@ -50,7 +50,7 @@ module TingYun
            TingYun::Support::Coerce.string(@klass),
            TingYun::Support::Coerce.string(@method),
            params] +
-          [ (@called_nodes ? @called_nodes.map{|s| s.to_array} : []) ]
+           (@called_nodes ? @called_nodes.map{|s| s.to_array} : [])
         end
 
         def custom_params
