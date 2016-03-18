@@ -82,7 +82,7 @@ module TingYun
         # @param explainer [Proc] for internal use only - 3rd-party clients must
         #                         not pass this parameter.
         #
-        def notice_sql(sql, config, duration, state=nil, explainer=nil)
+        def notice_sql(sql, metric_name, config, duration, state=nil, explainer=nil)
           # some statements (particularly INSERTS with large BLOBS
           # may be very large; we should trim them to a maximum usable length
           state ||= TingYun::Agent::TransactionState.tl_get
