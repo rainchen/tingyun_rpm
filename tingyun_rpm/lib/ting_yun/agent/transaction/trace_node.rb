@@ -61,6 +61,16 @@ module TingYun
           {}
         end
 
+        def []=(key, value)
+          # only create a parameters field if a parameter is set; this will save
+          # bandwidth etc as most nodes have no parameters
+          params[key] = value
+        end
+
+        def [](key)
+          params[key]
+        end
+
         def params
           @params ||= {}
         end
