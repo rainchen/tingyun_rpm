@@ -64,7 +64,11 @@ module TingYun
         def collect_explain_plans!
           return unless TingYun::Agent::Database.should_action_collect_explain_plans?
           threshold = TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
-
+          @root_node.each_call do |node|
+            if node.statement && node.duration > threshold
+              node[:explainPlan] = node.explain_sql
+            end
+          end
         end
 
         def prepare_sql_for_transmission!

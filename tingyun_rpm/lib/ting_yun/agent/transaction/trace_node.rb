@@ -1,6 +1,8 @@
 # encoding: utf-8
 require 'ting_yun/support/helper'
 require 'ting_yun/support/coerce'
+require 'ting_yun/agent/database'
+
 
 module TingYun
   module Agent
@@ -8,7 +10,7 @@ module TingYun
       class TraceNode
 
         attr_reader :entry_timestamp, :parent_node, :called_nodes
-        attr_accessor :metric_name, :exit_timestamp, :uri, :count, :klass, :method
+        attr_accessor :metric_name, :exit_timestamp, :uri, :count, :klass, :method, :statement
 
 
 
@@ -77,6 +79,26 @@ module TingYun
 
         def params=(p)
           @params = p
+        end
+
+        def each_call(&blk)
+          blk.call self
+
+          @called_nodes.each do |node|
+            node.each_call(blk)
+          end if @called_nodes
+
+        end
+
+        def explain_sql
+          return params[:explainPlan] if params.key?(:explainPlan)
+
+          return nil unless statement.respond_to?(:config) &&
+              statement.respond_to?(:explainer)
+
+          TingYun::Agent::Database.explain_sql(statement.sql,
+                                                statement.config,
+                                                statement.explainer)
         end
 
         protected
