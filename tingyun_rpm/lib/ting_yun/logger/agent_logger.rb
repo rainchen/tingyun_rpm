@@ -82,6 +82,7 @@ module TingYun
 
       # Allows for passing exception.rb in explicitly, which format with backtrace
       def format_and_send(level, *msgs, &block)
+        check_log_file
         if block
           if @log.send("#{level}?")
             msgs = Array(block.call)
@@ -99,6 +100,17 @@ module TingYun
           end
         end
         nil
+      end
+
+      def check_log_file
+        unless File.exist? @file_path
+          begin
+            @log = ::Logger.new(@file_path)
+          rescue => e
+            @log = ::Logger.new(STDOUT)
+            warn("check_log_file:  Failed creating logger for file #{file_path}, using standard out for logging.", e)
+          end
+        end
       end
 
       def create_log(root, override_logger)
@@ -121,9 +133,9 @@ module TingYun
           @log = ::Logger.new(STDOUT)
           warn("Error creating log directory #{::TingYun::Agent.config[:agent_log_file_path]}, using standard out for logging.")
         else
-          file_path = "#{path}/#{::TingYun::Agent.config[:agent_log_file_name]}"
+          @file_path = "#{path}/#{::TingYun::Agent.config[:agent_log_file_name]}"
           begin
-            @log = ::Logger.new(file_path)
+            @log = ::Logger.new(@file_path)
           rescue => e
             @log = ::Logger.new(STDOUT)
             warn("Failed creating logger for file #{file_path}, using standard out for logging.", e)
