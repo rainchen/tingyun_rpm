@@ -46,10 +46,6 @@ module TingYun
           # Might not be running if it does not think mongrel, thin, passenger, etc
           # is running, if it thinks it's a rake task, or if the nbs.agent_enabled is false.
           ::TingYun::Agent.logger.info("TingYun Agent is unable to run.")
-        else
-          # install_developer_mode(rails_config) if Agent.config[:developer_mode]
-          # install_browser_monitoring(rails_config)
-          # install_agent_hooks(rails_config)
         end
       rescue => e
         ::TingYun::Agent.logger.error("Failure during init_config for Rails. Is Rails required in a non-Rails app? Set TING_YUN_FRAMEWORK=ruby to avoid this message.",

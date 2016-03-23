@@ -146,8 +146,6 @@ module TingYun
           @subscriptions[event].each do |s|
             begin
               s.call(*args)
-            rescue TingYun::Support::Exception::UnKnownServerException
-              raise
             rescue => e
               errors << e
             end

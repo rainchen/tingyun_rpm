@@ -115,10 +115,16 @@ module TingYun
         def catch_errors
           yield
 
-        rescue ::TingYun::Support::Exception::UnKnownServerException => e
+        rescue TingYun::Support::Exception::ExpiredConfigurationException => e
+          handle_force_restart(e)
+          retry
+        rescue TingYun::Support::Exception::InvalidDataTokenException => e
+          handle_force_restart(e)
+          retry
+        rescue TingYun::Support::Exception::InvalidDataException => e
           handle_server_error(e)
           retry
-        rescue Exception => e
+        rescue => e
           handle_other_error(e)
         end
 
