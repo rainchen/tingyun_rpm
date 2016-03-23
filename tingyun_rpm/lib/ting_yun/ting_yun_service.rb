@@ -50,6 +50,7 @@ module TingYun
       TingYun::Agent.logger.info("initAgentApp response: #{response}") if TingYun::Agent.config[:'nbs.audit_mode']
       @applicationId = response['applicationId']
       @appSessionKey = response['appSessionKey']
+      @tingyunIdSecret  = response['appSessionKey']
       response
     end
 
