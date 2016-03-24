@@ -89,7 +89,7 @@ module TingYun
           builder = state.transaction_sample_builder
           if state.is_sql_recorded?
             statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
-            action_tracer_segment(builder, statement, duration, :statement)
+            action_tracer_segment(builder, statement, duration, :sql)
           end
         end
 
@@ -102,15 +102,13 @@ module TingYun
           return unless builder
           node = builder.current_node
           if node
-            if key == :statement
-              statement = node.statement
+            if key == :sql
+              statement = node[:sql]
               if(statement && !statement.sql.empty?)
                 statement.sql = self.class.truncate_message(statement.sql + "\n#{message.sql}") if statement.sql.length <= MAX_DATA_LENGTH
-                node[:sql] =  statement.sql
               else
                 # message is expected to have been pre-truncated by notice_sql
-                node.statement = message
-                node[:sql] =  message.sql
+                node[:sql] =  message
               end
             else
               node[key] = self.class.truncate_message(message)

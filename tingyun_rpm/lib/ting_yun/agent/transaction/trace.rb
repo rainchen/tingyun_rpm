@@ -55,7 +55,12 @@ module TingYun
           return self if @prepared
 
           if TingYun::Agent::Database.should_record_sql?('nbs.action_tracer.record_sql')
+            collect_explain_plans!
             prepare_sql_for_transmission!
+          else
+            @root_node.each_call do |node|
+              node.params.delete(:sql)
+            end
           end
           @prepared = true
           self
@@ -65,14 +70,26 @@ module TingYun
           return unless TingYun::Agent::Database.should_action_collect_explain_plans?
           threshold = TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
           @root_node.each_call do |node|
-            if node.statement && node.duration > threshold
+            if node[:sql] && node.duration > threshold
               node[:explainPlan] = node.explain_sql
             end
           end
         end
 
-        def prepare_sql_for_transmission!
+        def prepare_sql_for_transmission!(&block)
+          strategy = TingYun::Agent::Database.record_sql_method('nbs.action_tracer.record_sql')
+          @root_node.each_call do |node|
+            next unless node[:sql]
 
+            case strategy
+              when :obfuscated
+                node[:sql] = TingYun::Agent::Database.obfuscate_sql(node[:sql])
+              when :raw
+                node[:sql] = node[:sql].sql.to_s
+              else
+                node[:sql] = nil
+            end
+          end
         end
 
         def custom_params

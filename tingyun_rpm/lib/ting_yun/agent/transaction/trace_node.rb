@@ -10,7 +10,7 @@ module TingYun
       class TraceNode
 
         attr_reader :entry_timestamp, :parent_node, :called_nodes
-        attr_accessor :metric_name, :exit_timestamp, :uri, :count, :klass, :method, :statement
+        attr_accessor :metric_name, :exit_timestamp, :uri, :count, :klass, :method
 
 
 
@@ -84,15 +84,17 @@ module TingYun
         def each_call(&blk)
           blk.call self
 
-          @called_nodes.each do |node|
-            node.each_call(blk)
-          end if @called_nodes
-
+          if @called_nodes
+            @called_nodes.each do |node|
+              node.each_call(blk)
+            end
+          end
         end
 
         def explain_sql
           return params[:explainPlan] if params.key?(:explainPlan)
 
+          statement = params[:sql]
           return nil unless statement.respond_to?(:config) &&
               statement.respond_to?(:explainer)
 
