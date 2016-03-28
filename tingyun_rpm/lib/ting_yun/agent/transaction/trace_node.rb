@@ -86,7 +86,7 @@ module TingYun
 
           if @called_nodes
             @called_nodes.each do |node|
-              node.each_call(blk)
+              node.each_call(&blk)
             end
           end
         end

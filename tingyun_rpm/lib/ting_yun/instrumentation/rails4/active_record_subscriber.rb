@@ -58,7 +58,7 @@ module TingYun
                         state, @explainer)
 
           TingYun::Agent.instance.transaction_sampler \
-            .notice_sql(event.payload[:sql], metric, config,
+            .notice_sql(event.payload[:sql], config,
                         event.duration,
                         state, @explainer)
           # exit transaction trace node

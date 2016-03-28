@@ -62,7 +62,7 @@ module TingYun
 
       def explain(sql, config, explainer=nil)
 
-        return unless explainer
+        return unless explainer && is_select?(sql)
 
         if sql[-3,3] == '...'
           TingYun::Agent.logger.debug('Unable to collect explain plan for truncated query.')

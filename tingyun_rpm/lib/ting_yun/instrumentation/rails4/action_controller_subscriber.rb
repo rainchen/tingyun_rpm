@@ -77,6 +77,10 @@ module TingYun
           @controller_class.controller_path
         end
 
+        def metric_class
+          payload[:controller]
+        end
+
         def metric_action
           payload[:action]
         end

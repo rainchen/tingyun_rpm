@@ -82,7 +82,7 @@ module TingYun
         # @param explainer [Proc] for internal use only - 3rd-party clients must
         #                         not pass this parameter.
         #
-        def notice_sql(sql, metric_name, config, duration, state=nil, explainer=nil)
+        def notice_sql(sql, config, duration, state=nil, explainer=nil)
           # some statements (particularly INSERTS with large BLOBS
           # may be very large; we should trim them to a maximum usable length
           state ||= TingYun::Agent::TransactionState.tl_get
@@ -132,14 +132,21 @@ module TingYun
         # Appends a backtrace to a node if that node took longer
         # than the specified duration
         def append_backtrace(node, duration)
-          if duration >= Agent.config[:'nbs.action_tracer.stack_trace_threshold']
+          if duration*1000 >= Agent.config[:'nbs.action_tracer.stack_trace_threshold']
             node[:stacktrace] = (caller.reject! { |t| t.include?('tingyun_rpm') }).join("\n")
           end
         end
 
-        def notice_nosql_statement(statement, duration)
-
+        def notice_nosql(key, duration) #THREAD_LOCAL_ACCESS
+          builder = tl_builder
+          action_tracer_segment(builder, key, duration, :key)
         end
+
+        def notice_nosql_statement(statement, duration) #THREAD_LOCAL_ACCESS
+          builder = tl_builder
+          action_tracer_segment(builder, statement, duration, :statement)
+        end
+
 
         def harvest!
           return [] unless enabled?
