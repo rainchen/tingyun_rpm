@@ -157,7 +157,7 @@ module TingYun
             :description => 'Enable or disable the agent.'
         },
         :'nbs.agent_enabled' => {
-            :default => true,
+            :default => DefaultSource.agent_enabled,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,

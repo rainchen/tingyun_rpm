@@ -16,12 +16,6 @@ module TingYun
           ::TingYun::Agent.config[:'error_collector.enabled']
         end
 
-        def reset!
-          @lock.synchronize do
-            @errors = []
-          end
-        end
-
         def merge!(errors)
           errors.each do |error|
             add_to_error_queue(error)
