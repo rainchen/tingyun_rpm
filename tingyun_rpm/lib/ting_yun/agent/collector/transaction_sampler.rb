@@ -133,7 +133,7 @@ module TingYun
         # than the specified duration
         def append_backtrace(node, duration)
           if duration*1000 >= Agent.config[:'nbs.action_tracer.stack_trace_threshold']
-            node[:stacktrace] = (caller.reject! { |t| t.include?('tingyun_rpm') }).join("\n")
+            node[:stacktrace] = caller.reject! { |t| t.include?('tingyun_rpm') }
           end
         end
 
