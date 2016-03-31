@@ -17,10 +17,10 @@ module TingYun
         ensure
           finish_trace(state, t0, node, request, response)
         end
-
+        return response
       end
 
-      def start_trace
+      def start_trace(state, t0, request)
         stack = state.traced_method_stack
         node = stack.push_frame(state,:http_request,t0)
 
@@ -33,8 +33,8 @@ module TingYun
 
         begin
           if request
-            metrics = metrics_for(request)
-            scoped_metric = metrics.pop
+            metrics = metrics_for(request, response)
+            scoped_metric = metrics[-1]
 
             stats_engine.record_scoped_and_unscoped_metrics(state, scoped_metric, metrics, duration)
 
@@ -48,25 +48,23 @@ module TingYun
             stack.pop_frame(state, node, scoped_metric, t1)
           end
         end
+      rescue => err
+        TingYun::Agent.logger.error "Uncaught exception while finishing an HTTP request trace", err
 
       end
 
-      def metrics_for(request)
-        metrics = common_metrics( request )
+      def metrics_for(request, response)
+        metrics = common_metrics(request)
+
         metrics.concat metrics_for_regular_request( request )
 
         return metrics
       end
 
       def common_metrics(request)
-        metrics = [ "External/all" ]
-        metrics << "External/#{request.host}/all"
+        metrics = [ "External/NULL/ALL" ]
 
-        if TingYun::Agent::Transaction.recording_web_transaction?
-          metrics << "External/allWeb"
-        else
-          metrics << "External/allOther"
-        end
+        metrics << "External/NULL/AllWeb"
 
         return metrics
       end

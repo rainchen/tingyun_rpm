@@ -11,8 +11,6 @@ module TingYun
         # Request data
         attr_accessor :request, :transaction_sample_builder
         attr_reader   :current_transaction, :traced_method_stack
-        # Execution tracing on current thread
-        attr_accessor :untraced
         # Sql Sampler Transaction Data
         attr_accessor :sql_sampler_transaction_data
 
@@ -38,13 +36,16 @@ module TingYun
         end
 
         def initialize
-
+          @untraced = []
           @current_transaction = nil
           @traced_method_stack = TingYun::Agent::TracedMethodStack.new
         end
 
         # This starts the timer for the transaction.
         def reset(transaction=nil)
+          # We purposefully don't reset @untraced, @record_tt and @record_sql
+          # since those are managed by NewRelic::Agent.disable_* calls explicitly
+          # and (more importantly) outside the scope of a transaction
           @request = nil
           @current_transaction = transaction
           @traced_method_stack.clear
@@ -54,13 +55,18 @@ module TingYun
 
         # TT's and SQL
         attr_accessor :record_tt, :record_sql
+        attr_accessor :untraced
 
-        def is_transaction_traced?
-          @record_tt != false
+        def push_traced(should_trace)
+          @untraced << should_trace
         end
 
-        def is_sql_recorded?
-          @record_sql != false
+        def pop_traced
+          @untraced.pop if @untraced
+        end
+
+        def is_execution_traced?
+          @untraced.nil? || @untraced.last != false
         end
 
 
