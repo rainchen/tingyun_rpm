@@ -1,4 +1,9 @@
 # encoding: utf-8
-class TingYun::Http::GenericRequest
+module TingYun
+  module Http
+    class GenericRequest
+
+    end
+  end
 
 end
