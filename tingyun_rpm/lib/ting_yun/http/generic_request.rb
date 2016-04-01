@@ -5,5 +5,4 @@ module TingYun
 
     end
   end
-
 end

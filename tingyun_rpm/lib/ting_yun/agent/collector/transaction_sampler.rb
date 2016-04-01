@@ -133,17 +133,19 @@ module TingYun
         # than the specified duration
         def append_backtrace(node, duration)
           if duration*1000 >= Agent.config[:'nbs.action_tracer.stack_trace_threshold']
-            node[:stacktrace] = (caller.reject! { |t| t.include?('tingyun_rpm') }).join("\n")
+            node[:stacktrace] = caller.reject! { |t| t.include?('tingyun_rpm') }
           end
         end
 
         def notice_nosql(key, duration) #THREAD_LOCAL_ACCESS
           builder = tl_builder
+          return unless builder
           action_tracer_segment(builder, key, duration, :key)
         end
 
         def notice_nosql_statement(statement, duration) #THREAD_LOCAL_ACCESS
           builder = tl_builder
+          return unless builder
           action_tracer_segment(builder, statement, duration, :statement)
         end
 
@@ -190,6 +192,12 @@ module TingYun
           @lock.synchronize do
             @sample_buffers.each { |sample| sample.reset! }
           end
+        end
+
+        def add_node_info(params)
+          builder = tl_builder
+          return unless builder
+          params.each { |k,v| builder.current_node.instance_variable_set(('@'<<k.to_s).to_sym, v)  }
         end
       end
     end

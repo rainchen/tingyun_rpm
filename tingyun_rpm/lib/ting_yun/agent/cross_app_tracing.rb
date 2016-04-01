@@ -40,6 +40,7 @@ module TingYun
 
             if node
               node.name = scoped_metric
+              add_transaction_trace_info(request, response)
             end
           end
         ensure
@@ -51,6 +52,11 @@ module TingYun
       rescue => err
         TingYun::Agent.logger.error "Uncaught exception while finishing an HTTP request trace", err
 
+      end
+
+      def add_transaction_trace_info(request, response)
+        filtered_uri = request.uri.to_s
+        transaction_sampler.add_node_info(:uri => filtered_uri)
       end
 
       def metrics_for(request, response)
@@ -78,6 +84,10 @@ module TingYun
 
       def stats_engine
         ::TingYun::Agent.instance.stats_engine
+      end
+
+      def transaction_sampler
+        ::TingYun::Agent.instance.transaction_sampler
       end
 
     end
