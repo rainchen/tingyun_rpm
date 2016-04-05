@@ -65,8 +65,16 @@ module TingYun
           @untraced.pop if @untraced
         end
 
-        def is_execution_traced?
+        def execution_traced?
           @untraced.nil? || @untraced.last != false
+        end
+
+        def sql_recorded?
+          @record_sql != false
+        end
+
+        def transaction_traced?
+          @record_tt != false
         end
 
 

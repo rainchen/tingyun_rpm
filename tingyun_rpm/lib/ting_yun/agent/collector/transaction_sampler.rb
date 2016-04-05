@@ -2,6 +2,7 @@
 
 require 'ting_yun/agent/transaction/transaction_sample_builder'
 require 'ting_yun/agent/collector/transaction_sampler/slowest_sample_buffer'
+require 'ting_yun/agent/transaction/transaction_state'
 
 module TingYun
   module Agent
@@ -87,7 +88,7 @@ module TingYun
           # may be very large; we should trim them to a maximum usable length
           state ||= TingYun::Agent::TransactionState.tl_get
           builder = state.transaction_sample_builder
-          if state.is_sql_recorded?
+          if state.sql_recorded?
             statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
             action_tracer_segment(builder, statement, duration, :sql)
           end
@@ -198,6 +199,10 @@ module TingYun
           builder = tl_builder
           return unless builder
           params.each { |k,v| builder.current_node.instance_variable_set(('@'<<k.to_s).to_sym, v)  }
+        end
+
+        def tl_builder
+          TingYun::Agent::TransactionState.tl_get.transaction_sample_builder
         end
       end
     end

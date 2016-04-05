@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'ting_yun/agent/transaction/transaction_state'
+require 'ting_yun/support/http_clients/uri_util'
 
 module TingYun
   module Agent
@@ -10,7 +11,7 @@ module TingYun
       def tl_trace_http_request(request)
         t0 = Time.now
         state = TingYun::Agent::TransactionState.tl_get
-
+        return yield unless state.execution_traced?
         begin
           node = start_trace(state, t0, request)
           response = yield
@@ -55,7 +56,7 @@ module TingYun
       end
 
       def add_transaction_trace_info(request, response)
-        filtered_uri = request.uri.to_s
+        filtered_uri = TingYun::Agent::HTTPClients::URIUtil.filter_uri request.uri
         transaction_sampler.add_node_info(:uri => filtered_uri)
       end
 
