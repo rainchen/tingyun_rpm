@@ -62,17 +62,9 @@ module TingYun
               action_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Apdex')
               adpex_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('Database') && !metric_spec.scope.empty?
-              components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('Database') && metric_spec.scope.empty?
-              general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('MongoDB','Redis','Memcached') && !metric_spec.scope.empty?
-              components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('MongoDB','Redis','Memcached') && metric_spec.scope.empty?
-              general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('External')
+            elsif metric_spec.name.start_with?('Database','View','MongoDB','Redis','Memcached','External','Nested')
               if metric_spec.scope.empty?
                 general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
               else
