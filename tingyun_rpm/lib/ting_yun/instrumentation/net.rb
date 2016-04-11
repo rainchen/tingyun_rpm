@@ -11,7 +11,7 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     ::TingYun::Agent.logger.info 'Installing Net instrumentation'
     require 'ting_yun/agent/cross_app_tracing'
-    # require 'new_relic/agent/http_clients/net_http_wrappers'
+   
   end
 
   executes do

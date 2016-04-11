@@ -81,7 +81,7 @@ module TingYun
         # @param duration [Float] number of seconds the query took to execute
         # @param explainer [Proc] for internal use only - 3rd-party clients must
         #                         not pass this parameter.
-        #
+        # duration{:type => sec}
         def notice_sql(sql, config, duration, state=nil, explainer=nil)
           # some statements (particularly INSERTS with large BLOBS
           # may be very large; we should trim them to a maximum usable length
@@ -93,11 +93,26 @@ module TingYun
           end
         end
 
+        # duration{:type => sec}
+        def notice_nosql(key, duration) #THREAD_LOCAL_ACCESS
+          builder = tl_builder
+          action_tracer_segment(builder, key, duration, :key)
+        end
+
+        # duration{:type => sec}
+        def notice_nosql_statement(statement, duration) #THREAD_LOCAL_ACCESS
+          builder = tl_builder
+          action_tracer_segment(builder, statement, duration, :statement)
+        end
+
+
+
         MAX_DATA_LENGTH = 16384
         # This method is used to record metadata into the currently
         # active node like a sql query, memcache key, or Net::HTTP uri
         #
         # duration is milliseconds, float value.
+        # duration{:type => sec}
         def action_tracer_segment(builder, message, duration, key)
           return unless builder
           node = builder.current_node
@@ -135,16 +150,6 @@ module TingYun
           if duration*1000 >= Agent.config[:'nbs.action_tracer.stack_trace_threshold']
             node[:stacktrace] = caller.reject! { |t| t.include?('tingyun_rpm') }
           end
-        end
-
-        def notice_nosql(key, duration) #THREAD_LOCAL_ACCESS
-          builder = tl_builder
-          action_tracer_segment(builder, key, duration, :key)
-        end
-
-        def notice_nosql_statement(statement, duration) #THREAD_LOCAL_ACCESS
-          builder = tl_builder
-          action_tracer_segment(builder, statement, duration, :statement)
         end
 
 

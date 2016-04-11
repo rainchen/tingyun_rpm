@@ -9,7 +9,7 @@ require 'ting_yun/instrumentation/support/event_formatter'
 
 module TingYun
   module Instrumentation
-    class CommandLogSubscriber
+    class MongoCommandLogSubscriber
 
       MONGODB = 'MongoDB'.freeze
       GET_MORE = "getMore".freeze
@@ -34,6 +34,7 @@ module TingYun
           TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
               base, other_metrics, event.duration
           )
+          notice_nosql_statement(state, started_event, base, event.duration)
         rescue Exception => e
           log_notification_error('completed', e)
         end
@@ -85,7 +86,7 @@ module TingYun
         # enter transaction trace node
         frame = stack.push_frame(state, :mongo_db, end_time - duration)
 
-        TingYun::Agent.instance.transaction_sampler.notice_nosql_statement(generate_statement(event),duration)
+        TingYun::Agent.instance.transaction_sampler.notice_nosql_statement(generate_statement(event),duration*1000)
 
         # exit transaction trace node
         stack.pop_frame(state, frame, metric, end_time)

@@ -49,6 +49,7 @@ module TingYun
           end
         end
 
+        # duration{:type => sec}
         def notice_sql(sql, metric_name, config, duration, state=nil, explainer=nil) #THREAD_LOCAL_ACCESS sometimes
           start_time = Time.now.to_f
           state ||= TingYun::Agent::TransactionState.tl_get

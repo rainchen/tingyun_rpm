@@ -61,7 +61,7 @@ module TingYun
       def instrument_ensure_index
         ::Mongo::Collection.class_eval do
           def ensure_index_with_ting_yun_trace(spec, opts = {}, &block)
-            metrics = new_relic_generate_metrics(:ensureIndex)
+            metrics = ting_yun_generate_metrics(:ensureIndex)
             TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
               ensure_index_with_out_ting_yun_trace(spec, opts, &block)
             end
