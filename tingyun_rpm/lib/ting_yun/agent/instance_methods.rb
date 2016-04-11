@@ -23,6 +23,14 @@ module TingYun
       end
 
 
+      def push_trace_execution_flag(flag =false)
+        TransactionState.tl_get.push_traced(flag)
+      end
+
+      def pop_trace_execution_flag
+
+      end
+
     end
   end
 end

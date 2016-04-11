@@ -153,6 +153,24 @@ module TingYun
     end
 
 
+    # Yield to the block without collecting any metrics or traces in
+    # any of the subsequent calls.  If executed recursively, will keep
+    # track of the first entry point and turn on tracing again after
+    # leaving that block.  This uses the thread local TransactionState.
+    #
+    # @api public
+    #
+    def disable_all_tracing
+      return yield unless agent
+      begin
+        agent.push_trace_execution_flag(false)
+        yield
+      ensure
+        agent.pop_trace_execution_flag
+      end
+    end
+
+
 
   end
 end

@@ -2,6 +2,7 @@
 
 require 'ting_yun/agent/transaction/transaction_sample_builder'
 require 'ting_yun/agent/collector/transaction_sampler/slowest_sample_buffer'
+require 'ting_yun/agent/transaction/transaction_state'
 
 module TingYun
   module Agent
@@ -96,12 +97,14 @@ module TingYun
         # duration{:type => sec}
         def notice_nosql(key, duration) #THREAD_LOCAL_ACCESS
           builder = tl_builder
+          return unless builder
           action_tracer_segment(builder, key, duration, :key)
         end
 
         # duration{:type => sec}
         def notice_nosql_statement(statement, duration) #THREAD_LOCAL_ACCESS
           builder = tl_builder
+          return unless builder
           action_tracer_segment(builder, statement, duration, :statement)
         end
 
@@ -152,7 +155,6 @@ module TingYun
           end
         end
 
-
         def harvest!
           return [] unless enabled?
 
@@ -195,6 +197,16 @@ module TingYun
           @lock.synchronize do
             @sample_buffers.each { |sample| sample.reset! }
           end
+        end
+
+        def add_node_info(params)
+          builder = tl_builder
+          return unless builder
+          params.each { |k,v| builder.current_node.instance_variable_set(('@'<<k.to_s).to_sym, v)  }
+        end
+
+        def tl_builder
+          TingYun::Agent::TransactionState.tl_get.transaction_sample_builder
         end
       end
     end
