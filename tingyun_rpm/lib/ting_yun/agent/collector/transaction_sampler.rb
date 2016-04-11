@@ -87,7 +87,7 @@ module TingYun
           # may be very large; we should trim them to a maximum usable length
           state ||= TingYun::Agent::TransactionState.tl_get
           builder = state.transaction_sample_builder
-          if state.is_sql_recorded?
+          if state.sql_recorded?
             statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
             action_tracer_segment(builder, statement, duration, :sql)
           end

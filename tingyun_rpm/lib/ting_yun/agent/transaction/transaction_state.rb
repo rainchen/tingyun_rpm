@@ -55,11 +55,11 @@ module TingYun
         # TT's and SQL
         attr_accessor :record_tt, :record_sql
 
-        def is_transaction_traced?
+        def transaction_traced?
           @record_tt != false
         end
 
-        def is_sql_recorded?
+        def sql_recorded?
           @record_sql != false
         end
 
