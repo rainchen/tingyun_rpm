@@ -46,6 +46,11 @@ module TingYun
         end
       end
 
+      def should_action_collect_explain_plans?
+        should_record_sql?("nbs.action_tracer.record_sql") &&
+            Agent.config["nbs.action_tracer.explain_enabled".to_sym]
+      end
+
       def explain_sql(sql, config, explainer=nil)
         return nil unless sql && explainer && config
         _sql = sql.split(";\n")[0] # only explain the first
@@ -57,7 +62,7 @@ module TingYun
 
       def explain(sql, config, explainer=nil)
 
-        return unless explainer
+        return unless explainer && is_select?(sql)
 
         if sql[-3,3] == '...'
           TingYun::Agent.logger.debug('Unable to collect explain plan for truncated query.')
