@@ -21,8 +21,8 @@ module TingYun
           begin
             result = yield
           ensure
+            elapsed_time = (Time.now - t0).to_f
             if callback
-              elapsed_time = (Time.now - t0).to_f
               callback.call(result, scoped_metric, elapsed_time)
             end
           end

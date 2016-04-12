@@ -15,7 +15,7 @@ module TingYun
         def initialize(start_time)
           @start_time = start_time
           @node_count = 0
-          @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")
+          @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, 'ROOT')
           @prepared = false
         end
 
@@ -46,8 +46,8 @@ module TingYun
               TingYun::Helper.correctly_encoded(metric_name),
               TingYun::Helper.correctly_encoded(uri),
               encoder.encode(trace_tree),
-              "",
-              @guid
+              '',
+              guid
           ]
         end
 
@@ -95,13 +95,13 @@ module TingYun
         def custom_params
           {
               :threadName => string(attributes.agent_attributes[:threadName]),
-              :httpStatus => int(@attributes.agent_attributes[:httpStatus]),
-              :referer    => string(@attributes.agent_attributes[:referer]) || ''
+              :httpStatus => int(attributes.agent_attributes[:httpStatus]),
+              :referer    => string(attributes.agent_attributes[:referer]) || ''
           }
         end
 
         def request_params
-          @attributes.agent_attributes[:request_params]
+          attributes.agent_attributes[:request_params]
         end
       end
     end

@@ -9,7 +9,7 @@ module TingYun
     module Collector
       class TransactionSampler
 
-        attr_reader :last_sample
+        attr_accessor :last_sample
 
         def initialize
           @lock = Mutex.new
@@ -122,7 +122,7 @@ module TingYun
           if node
             if key == :sql
               statement = node[:sql]
-              if(statement && !statement.sql.empty?)
+              if statement && !statement.sql.empty?
                 statement.sql = self.class.truncate_message(statement.sql + "\n#{message.sql}") if statement.sql.length <= MAX_DATA_LENGTH
               else
                 # message is expected to have been pre-truncated by notice_sql
@@ -141,7 +141,7 @@ module TingYun
         def self.truncate_message(message)
           if message.length > (MAX_DATA_LENGTH - 4)
             message.slice!(MAX_DATA_LENGTH - 4..message.length)
-            message << "..."
+            message << '...'
           else
             message
           end
@@ -177,7 +177,7 @@ module TingYun
             begin
               sample.prepare_to_send!
             rescue => e
-              TingYun::Agent.logger.error("Failed to prepare transaction trace. Error: ", e)
+              TingYun::Agent.logger.error('Failed to prepare transaction trace. Error: ', e)
               false
             else
               true

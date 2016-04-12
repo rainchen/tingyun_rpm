@@ -10,7 +10,7 @@ module TingYun
         attr_reader :request_path, :referer, :accept, :content_length, :host,
                     :port, :user_agent, :request_method, :query_string
 
-        HTTP_ACCEPT_HEADER_KEY = "HTTP_ACCEPT".freeze
+        HTTP_ACCEPT_HEADER_KEY = 'HTTP_ACCEPT'.freeze
 
         def initialize request
           @request_path = path_from_request request
@@ -72,12 +72,12 @@ module TingYun
         def request_params
           hash = {}
           return hash if @query_string.empty?
-          query_string.split("&").each do |param|
-            _k,_v = param.strip.split("=")
+          query_string.split('&').each do |param|
+            _k,_v = param.strip.split('=')
             hash[_k] = _v unless _v.nil?
           end
 
-          return hash
+          hash
         end
 
         def referer_from_request request

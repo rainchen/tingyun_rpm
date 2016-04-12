@@ -27,7 +27,7 @@ module TingYun
           state = TingYun::Agent::TransactionState.tl_get
 
 
-          stop_transaction(state, event)
+          stop_transaction(state)
         rescue => e
           log_notification_error(e, name, 'finish')
         end
@@ -40,8 +40,8 @@ module TingYun
                                             :transaction_name => event.metric_name)
         end
 
-        def stop_transaction(state, event)
-          txn = state.current_transaction
+        def stop_transaction(state)
+          # txn = state.current_transaction
           TingYun::Agent::Transaction.stop(state)
         end
 

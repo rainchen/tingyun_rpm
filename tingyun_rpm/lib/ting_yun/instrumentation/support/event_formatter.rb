@@ -8,7 +8,8 @@ module TingYun
           result = {
               :operation => command_name,
               :database => database_name,
-              :collection => command.values.first
+              :collection => command.values.first,
+              :term => command.values.last
           }
           result
         end
