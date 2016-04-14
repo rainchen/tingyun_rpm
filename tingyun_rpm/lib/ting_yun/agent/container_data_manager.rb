@@ -12,9 +12,15 @@ module TingYun
 
       def drop_buffered_data
         @stats_engine.reset!
+        @sql_sampler.reset!
+        @error_collector.drop_buffered_data
       end
 
-      # private
+      def reset_objects_with_locks
+        init_containers
+      end
+
+
 
       def init_containers
         @stats_engine = TingYun::Agent::Collector::StatsEngine.new
@@ -71,7 +77,9 @@ module TingYun
       #
       def harvest_and_send_from_container(container,endpoint)
         items = harvest_from_container(container, endpoint)
-        send_data_to_endpoint(endpoint, items, container) unless items.empty?
+        if !items.empty? && TingYun::Agent.config[:'nbs.agent_enabled']
+          send_data_to_endpoint(endpoint, items, container)
+        end
       end
 
       def harvest_from_container(container, endpoint)
@@ -91,6 +99,8 @@ module TingYun
           @service.send(endpoint, items)
         rescue => e
           TingYun::Agent.logger.info("Unable to send #{endpoint} data, will try again later. Error: ", e)
+          container.merge!(items)
+          raise
         end
 
       end

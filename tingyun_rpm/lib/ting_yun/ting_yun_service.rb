@@ -23,17 +23,20 @@ module TingYun
     PROTOCOL_VERSION = 1
 
 
-    attr_accessor :request_timeout, :ting_yun_id_secret, :app_session_key, :data_version, :metric_id_cache
+    attr_accessor :request_timeout,
+                  :tingyunIdSecret,
+                  :appSessionKey,
+                  :data_version,
+                  :metric_id_cache,
+                  :applicationId,
+                  :ssl_cert_store,
+                  :shared_tcp_connection
 
     def initialize(license_key=nil,collector=TingYun::Support.collector)
-      @applicationId = nil
-      @appSessionKey = nil
+
       @license_key = license_key || TingYun::Agent.config[:'license_key']
       @request_timeout = TingYun::Agent.config[:timeout]
       @collector = collector
-      @ting_yun_id_secret = nil
-      @ssl_cert_store = nil
-      @shared_tcp_connection = nil
       @data_version = TingYun::VERSION::STRING
       @marshaller =TingYun::Support::Serialize::JsonMarshaller.new
       @metric_id_cache = {}
@@ -47,6 +50,7 @@ module TingYun
       TingYun::Agent.logger.info("initAgentApp response: #{response}") if TingYun::Agent.config[:'nbs.audit_mode']
       @applicationId = response['applicationId']
       @appSessionKey = response['appSessionKey']
+      @tingyunIdSecret  = response['appSessionKey']
       response
     end
 
@@ -55,9 +59,13 @@ module TingYun
     end
 
     def force_restart
+      @applicationId = nil
+      @appSessionKey = nil
+      @tingyunIdSecret = nil
       @metric_id_cache = {}
       close_shared_connection
     end
+
 
     # send a message via post to the actual server. This attempts
     # to automatically compress the data via zlib if it is large
@@ -80,7 +88,11 @@ module TingYun
       data, encoding = compress_request_if_needed(data)
       size = data.size
 
-      TingYun::Agent.logger.info("the prepare data: #{data}") if TingYun::Agent.config[:'nbs.audit_mode']
+      if TingYun::Agent.config[:'nbs.audit_mode']
+        TingYun::Agent.logger.info("the prepare data: #{data}")
+      else
+        TingYun::Agent.logger.info("prepare to send data")
+      end
 
       uri = remote_method_uri(method)
       full_uri = "#{@collector}#{uri}"
@@ -89,7 +101,12 @@ module TingYun
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
-      TingYun::Agent.logger.info("the return data: #{response.body}") if TingYun::Agent.config[:'nbs.audit_mode']
+
+      if TingYun::Agent.config[:'nbs.audit_mode']
+        TingYun::Agent.logger.info("the return data: #{response.body}")
+      else
+        TingYun::Agent.logger.info("the send-process end")
+      end
       @marshaller.load(decompress_response(response))
     end
 

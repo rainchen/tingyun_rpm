@@ -13,6 +13,7 @@ module TingYun
             'UPDATE',
             'DELETE',
             'INSERT',
+            'SHOW',
             'CALL'
         ]
 
@@ -23,7 +24,11 @@ module TingYun
           sql =TingYun::Helper.correctly_encoded(sql).gsub(SQL_COMMENT_REGEX, EMPTY_STRING)
           if sql =~ /(\w+)/
             op = $1.upcase
-            return op if KNOWN_OPERATIONS.include?(op)
+            if KNOWN_OPERATIONS.include?(op)
+              return op
+            else
+              return "CALL"
+            end
           end
         end
       end

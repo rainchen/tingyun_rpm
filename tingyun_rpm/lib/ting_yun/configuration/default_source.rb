@@ -157,7 +157,7 @@ module TingYun
             :description => 'Enable or disable the agent.'
         },
         :'nbs.agent_enabled' => {
-            :default => true,
+            :default => DefaultSource.agent_enabled,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,
@@ -391,7 +391,7 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Enable or disable the transmission of data to the collector.'
         },
-        :audit_mode => {
+        :'nbs.audit_mode' => {
             :default => false,
             :public => true,
             :type => Boolean,

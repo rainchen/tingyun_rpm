@@ -19,7 +19,7 @@ module TingYun
           state.request = self.request
           trace_options = args.last.is_a?(Hash) ? args.last : NR_DEFAULT_OPTIONS
           category = trace_options[:category] || :controller
-          txn_options = create_transaction_options(trace_options, category)
+          txn_options = create_transaction_options(trace_options, category, state)
 
           begin
              txn = TingYun::Agent::Transaction.start(state, category, txn_options)
@@ -34,9 +34,9 @@ module TingYun
           end
         end
 
-        protected
+        private
 
-        def create_transaction_options(trace_options, category)
+        def create_transaction_options(trace_options, category, state)
           txn_options = {}
 
           txn_options[:request] ||= request if respond_to?(:request)

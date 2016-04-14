@@ -58,11 +58,10 @@ module TingYun
           if state.is_sql_recorded? && !metric_name.nil?
             if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold']
               if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.stack_trace_threshold']
-                backtrace = caller.join("\n")
+                backtrace = (caller.reject! { |t| t.include?('tingyun_rpm') }).join("\n")
               else
-                backtrace = []
+                backtrace = ''
               end
-
               statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
               data.sql_data << SlowSql.new(statement, metric_name, duration, start_time, backtrace)
             end
@@ -192,6 +191,7 @@ module TingYun
         attr_reader :duration
         attr_reader :backtrace
         attr_reader :start_time
+
 
         def initialize(statement, metric_name, duration, t0,  backtrace=nil)
           @start_time = t0

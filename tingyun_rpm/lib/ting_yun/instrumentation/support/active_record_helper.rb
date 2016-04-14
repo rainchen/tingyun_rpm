@@ -71,10 +71,10 @@ module TingYun
         def metrics_for(name, sql, adapter_name)
           product = map_product(adapter_name)
           splits = split_name(name)
-          model = model_from_splits(splits)
+          model = model_from_splits(splits) || product
           operation = operation_from_splits(splits, sql)
 
-          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD) if operation
+          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD)
         end
 
 
