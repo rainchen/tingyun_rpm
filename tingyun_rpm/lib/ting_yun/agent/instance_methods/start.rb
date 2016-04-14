@@ -162,6 +162,8 @@ module TingYun
           @started = true
           generate_environment_report
           install_exit_handler
+          cpu_and_memory
+
           start_worker_thread(options)
 
         end
@@ -204,6 +206,10 @@ module TingYun
           drop_buffered_data
 
           setup_and_start_agent(options)
+        end
+
+        def cpu_and_memory
+          @middleware.load_samplers
         end
 
       end
