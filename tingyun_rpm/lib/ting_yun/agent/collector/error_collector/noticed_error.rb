@@ -6,7 +6,6 @@
 require 'ting_yun/support/exception'
 require 'ting_yun/support/coerce'
 
-
 module TingYun
   module Agent
     module Collector
