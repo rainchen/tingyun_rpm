@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 
-require 'new_relic/agent/datastores/mongo/obfuscator'
+require 'ting_yun/agent/datastores/mongo/obfuscator'
 
 module TingYun
   module Instrumentation

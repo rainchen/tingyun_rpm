@@ -149,7 +149,7 @@ module TingYun
           error_trace_array.notice_agent_error(exception)
         end
 
-        def drop_buffered_data
+        def reset!
           @error_trace_array.reset!
           nil
         end

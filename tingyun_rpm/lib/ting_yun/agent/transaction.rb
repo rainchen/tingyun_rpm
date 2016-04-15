@@ -50,10 +50,13 @@ module TingYun
                     :metrics,
                     :http_response_code,
                     :response_content_type,
-                    :error_recorded
+                    :error_recorded,
+                    :guid,
+                    :attributes
 
 
       def initialize(category, options)
+        @guid = generate_guid
         @has_children = false
         @category = category
         @exceptions = {}
@@ -109,6 +112,7 @@ module TingYun
       end
 
       def start(state)
+        transaction_sampler.on_start_transaction(state, start_time)
         sql_sampler.on_start_transaction(state, request_path)
         TingYun::Agent.instance.events.notify(:start_transaction)
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
@@ -216,6 +220,8 @@ module TingYun
         assign_agent_attributes
 
 
+        transaction_sampler.on_finishing_transaction(state, self, end_time)
+
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
 
@@ -226,13 +232,15 @@ module TingYun
       end
 
       def assign_agent_attributes
+  
+        add_agent_attribute(:threadName,  "pid-#{$$}");
 
         if http_response_code
-          add_agent_attribute(:httpResponseCode, http_response_code.to_s)
+          add_agent_attribute(:httpStatus, http_response_code.to_s)
         end
 
         if response_content_type
-          add_agent_attribute(:'response.headers.contentType', response_content_type)
+          add_agent_attribute(:contentType, response_content_type)
         end
 
 
@@ -452,13 +460,28 @@ module TingYun
         TingYun::Agent.instance
       end
 
-      def transaction_sampler
-        agent.transaction_sampler
-      end
-
       def sql_sampler
         agent.sql_sampler
       end
+
+
+      def transaction_sampler
+        TingYun::Agent.instance.transaction_sampler
+      end
+
+      HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
+      GUID_LENGTH = 16
+
+      # generate a random 64 bit uuid
+      private
+      def generate_guid
+        guid = ''
+        GUID_LENGTH.times do
+          guid << HEX_DIGITS[rand(16)]
+        end
+        guid
+      end
+
     end
   end
 end

@@ -18,6 +18,7 @@ module TingYun
       end
 
       def push_frame(state, tag, time = Time.now.to_f)
+        transaction_sampler.notice_push_frame(state, time) if sampler_enabled?
         frame = TracedMethodFrame.new(tag, time)
         @stack.push frame
         frame
@@ -25,9 +26,8 @@ module TingYun
 
       def pop_frame(state, expected_frame, name, time, deduct_call_time_from_parent=true)
         frame = fetch_matching_frame(expected_frame)
-
         note_children_time(frame, time, deduct_call_time_from_parent)
-
+        transaction_sampler.notice_pop_frame(state, name, time) if sampler_enabled?
         frame.name = name
         frame
       end
@@ -55,6 +55,17 @@ module TingYun
             @stack.last.children_time += frame.children_time
           end
         end
+      end
+
+
+      def sampler_enabled?
+        TingYun::Agent.config[:'nbs.action_tracer.enabled']
+      end
+
+
+
+      def transaction_sampler
+        TingYun::Agent.instance.transaction_sampler
       end
 
       def clear

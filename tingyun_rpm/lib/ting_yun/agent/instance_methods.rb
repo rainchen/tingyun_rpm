@@ -3,6 +3,7 @@
 require 'ting_yun/agent/instance_methods/start'
 require 'ting_yun/agent/instance_methods/connect'
 require 'ting_yun/agent/instance_methods/start_worker_thread'
+require 'ting_yun/agent/instance_methods/container_data_manager'
 
 module TingYun
   module Agent
@@ -11,6 +12,7 @@ module TingYun
       include Start
       include Connect
       include StartWorkerThread
+      include ContainerDataManager
 
 
       def reset_to_default_configuration
@@ -22,6 +24,14 @@ module TingYun
         @event_loop.stop if @event_loop
       end
 
+
+      def push_trace_execution_flag(flag =false)
+        TransactionState.tl_get.push_traced(flag)
+      end
+
+      def pop_trace_execution_flag
+
+      end
 
     end
   end

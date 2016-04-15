@@ -10,7 +10,7 @@ module TingYun
         ALL_BACKGROUND = "AllBackground".freeze
         ALL = "All".freeze
 
-        NOSQL =['MongoDB','Redis','Memcached'].freeze
+        NOSQL = %w(MongoDB Redis Memcached).freeze
 
         def self.checkNosql(product)
           NOSQL.include?(product)
@@ -18,7 +18,11 @@ module TingYun
 
         def self.metric_name(product, collection, operation)
           if checkNosql(product)
-            "#{product}/#{collection}/#{operation}"
+            if product == 'MongoDB'
+              "#{product}/#{collection}/#{operation}"
+            else
+              "#{product}/NULL/#{operation}"
+            end
           else
             "Database #{product}/#{collection}/#{operation}"
           end

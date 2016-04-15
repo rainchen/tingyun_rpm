@@ -21,7 +21,6 @@ module TingYun
 
         def initialize(metric_name, exception, timestamp = Time.now)
           @stack_trace = []
-          @thread_name = "pid-#{$$}"
           @count_error = 1
           @exception_id = exception.object_id
           @metric_name = metric_name
@@ -90,16 +89,14 @@ module TingYun
 
         def custom_params
           {
-            :threadName => thread_name,
-            :httpStatus => int(attributes.agent_attributes[:httpResponseCode]),
-
-            :referer    => string(attributes.agent_attributes[:'request.headers.referer']) || ''
-
+            :threadName => string(attributes.agent_attributes[:threadName]),
+            :httpStatus => int(attributes.agent_attributes[:httpStatus]),
+            :referer    => string(attributes.agent_attributes[:referer]) || ''
           }
         end
 
         def request_params
-          {}
+          attributes.agent_attributes[:request_params]
         end
 
       end

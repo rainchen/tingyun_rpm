@@ -5,9 +5,9 @@ require 'ting_yun/agent/class_methods'
 require 'ting_yun/agent/instance_methods'
 require 'ting_yun/ting_yun_service'
 require 'ting_yun/frameworks'
-require 'ting_yun/agent/container_data_manager'
 require 'ting_yun/agent/event/event_listener'
 require 'ting_yun/agent/dispatcher'
+require 'ting_yun/agent/collector/middle_ware_collector'
 
 
 # The Agent is a singleton that is instantiated when the plugin is
@@ -29,7 +29,7 @@ module TingYun
 
       extend ClassMethods
       include InstanceMethods
-      include ContainerDataManager
+
 
 
 

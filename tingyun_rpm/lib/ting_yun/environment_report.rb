@@ -65,9 +65,9 @@ module TingYun
     report_on('Java VM version') { ENV_JAVA['java.vm.version'] }
     report_on('Logical Processors') { ::TingYun::Support::SystemInfo.num_logical_processors }
     report_on('Physical Cores') { ::TingYun::Support::SystemInfo.num_physical_cores }
-    report_on('Arch') { ::TingYun::Support::SystemInfo.processor_arch }
-    report_on('OS version') { ::TingYun::Support::SystemInfo.os_version }
-    report_on('OS') { ::TingYun::Support::SystemInfo.ruby_os_identifier }
+    report_on('os_arch') { ::TingYun::Support::SystemInfo.processor_arch }
+    report_on('os_version') { ::TingYun::Support::SystemInfo.os_version }
+    report_on('kernel') { ::TingYun::Support::SystemInfo.ruby_os_identifier }
     report_on('Database adapter') do
       ActiveRecord::Base.configurations[::TingYun::Frameworks.framework.env]['adapter']
     end
