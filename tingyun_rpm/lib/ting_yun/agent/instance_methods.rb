@@ -3,6 +3,7 @@
 require 'ting_yun/agent/instance_methods/start'
 require 'ting_yun/agent/instance_methods/connect'
 require 'ting_yun/agent/instance_methods/start_worker_thread'
+require 'ting_yun/agent/instance_methods/container_data_manager'
 
 module TingYun
   module Agent
@@ -11,6 +12,7 @@ module TingYun
       include Start
       include Connect
       include StartWorkerThread
+      include ContainerDataManager
 
 
       def reset_to_default_configuration

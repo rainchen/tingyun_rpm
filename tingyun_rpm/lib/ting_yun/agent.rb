@@ -5,6 +5,7 @@ require 'ting_yun/logger/startup_logger'
 require 'ting_yun/frameworks'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/agent/transaction'
+require 'ting_yun/agent/collector/middle_ware_collector/middle_ware'
 
 
 module TingYun

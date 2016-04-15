@@ -37,8 +37,7 @@ module TingYun
             :general => general_array,
             :errors  => errors_array
         }
-
-        result = invoke_remote(:upload,[upload_data])
+        result = invoke_remote(:upload, [upload_data])
         fill_metric_id_cache(result)
         result
       end
@@ -64,7 +63,7 @@ module TingYun
               adpex_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('Database','View','MongoDB','Redis','Memcached','External','Nested')
+            elsif metric_spec.name.start_with?('Database','View','MongoDB','Redis','Memcached','External','Nested', 'CPU', 'Memory', 'WebFrontend')
               if metric_spec.scope.empty?
                 general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
               else
@@ -121,7 +120,7 @@ module TingYun
           :sqlTraces => sql_trace
       }
 
-      invoke_remote(:upload, [upload_data], :encoder=> json )
+      invoke_remote(:upload, [upload_data], :encoder=> json)
 
     end
   end

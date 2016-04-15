@@ -88,7 +88,11 @@ module TingYun
       data, encoding = compress_request_if_needed(data)
       size = data.size
 
-      TingYun::Agent.logger.info("the prepare data: #{data}") if TingYun::Agent.config[:'nbs.audit_mode']
+      if TingYun::Agent.config[:'nbs.audit_mode']
+        TingYun::Agent.logger.info("the prepare data: #{data}")
+      else
+        TingYun::Agent.logger.info("prepare to send data")
+      end
 
       uri = remote_method_uri(method)
       full_uri = "#{@collector}#{uri}"
@@ -97,7 +101,12 @@ module TingYun
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
-      TingYun::Agent.logger.info("the return data: #{response.body}") if TingYun::Agent.config[:'nbs.audit_mode']
+
+      if TingYun::Agent.config[:'nbs.audit_mode']
+        TingYun::Agent.logger.info("the return data: #{response.body}")
+      else
+        TingYun::Agent.logger.info("the send-process end")
+      end
       @marshaller.load(decompress_response(response))
     end
 
