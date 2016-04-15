@@ -5,6 +5,7 @@ require 'ting_yun/logger/startup_logger'
 require 'ting_yun/frameworks'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/agent/transaction'
+require 'ting_yun/agent/collector/middle_ware_collector/middle_ware'
 
 
 module TingYun
@@ -123,7 +124,6 @@ module TingYun
       nil # don't return a noticed error datastructure. it can only hurt.
     end
 
-
     # Register this method as a callback for processes that fork
     # jobs.
     #
@@ -152,6 +152,7 @@ module TingYun
     def after_fork(options={})
       agent.after_fork(options) if agent
     end
+
 
 
   end

@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   # s.email    = 'support@tingyun.com'
   # s.homepage = 'http://tingyun.com/features/ruby.html'
 
-  s.licenses    = ['TingYun', 'MIT', 'Ruby']
+  s.licenses    = ['Tingyun', 'MIT', 'Ruby']
   s.summary     = 'TingYun Ruby Agent'
   # s.description = 'TingYun Ruby Agent. (http://tingyun.com/features/ruby.html)'
 

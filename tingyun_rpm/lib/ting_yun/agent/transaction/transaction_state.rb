@@ -9,10 +9,13 @@ module TingYun
       class TransactionState
 
         # Request data
-        attr_accessor :request
+        attr_accessor :request, :transaction_sample_builder
         attr_reader   :current_transaction, :traced_method_stack
+        # Execution tracing on current thread
+        attr_accessor :untraced
         # Sql Sampler Transaction Data
         attr_accessor :sql_sampler_transaction_data
+
 
 
         def self.tl_get
@@ -35,6 +38,7 @@ module TingYun
         end
 
         def initialize
+
           @current_transaction = nil
           @traced_method_stack = TingYun::Agent::TracedMethodStack.new
         end
@@ -44,6 +48,7 @@ module TingYun
           @request = nil
           @current_transaction = transaction
           @traced_method_stack.clear
+          @transaction_sample_builder = nil
           @sql_sampler_transaction_data = nil
         end
 
@@ -57,6 +62,8 @@ module TingYun
         def is_sql_recorded?
           @record_sql != false
         end
+
+
       end
   end
 end

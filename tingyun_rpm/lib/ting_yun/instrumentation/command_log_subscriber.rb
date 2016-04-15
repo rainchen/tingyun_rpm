@@ -4,6 +4,7 @@ require 'ting_yun/agent'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/agent/datastore/metric_helper'
 require 'ting_yun/agent/datastore/mongo'
+require 'ting_yun/instrumentation/support/event_formatter'
 
 
 module TingYun
@@ -68,6 +69,27 @@ module TingYun
         TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB, TingYun::Agent::Datastore::Mongo.transform_operation(event.command_name), collection(event))
       end
 
+      def generate_statement(event)
+        TingYun::Instrumentation::Support::EventFormatter.format(
+            event.command_name,
+            event.database_name,
+            event.command
+        )
+      end
+
+      def notice_nosql_statement(state, event, metric, duration)
+        end_time = Time.now.to_f
+
+        stack  = state.traced_method_stack
+
+        # enter transaction trace node
+        frame = stack.push_frame(state, :mongo_db, end_time - duration)
+
+        TingYun::Agent.instance.transaction_sampler.notice_nosql_statement(generate_statement(event),duration)
+
+        # exit transaction trace node
+        stack.pop_frame(state, frame, metric, end_time)
+      end
     end
   end
 end

@@ -5,7 +5,7 @@ require 'ting_yun/support/helper'
 require 'ting_yun/agent/method_tracer_helpers'
 require 'ting_yun/agent/transaction/transaction_metrics'
 require 'ting_yun/agent/transaction/request_attributes'
-require 'ting_yun/agent/transaction/response_attributes'
+require 'ting_yun/agent/transaction/attributes'
 
 
 module TingYun
@@ -50,10 +50,13 @@ module TingYun
                     :metrics,
                     :http_response_code,
                     :response_content_type,
-                    :error_recorded
+                    :error_recorded,
+                    :guid,
+                    :attributes
 
 
       def initialize(category, options)
+        @guid = generate_guid
         @has_children = false
         @category = category
         @exceptions = {}
@@ -67,7 +70,7 @@ module TingYun
 
         @error_recorded = false
 
-        @response_attributes = TingYun::Agent::Transaction::ResponseAttributes.new
+        @attributes = TingYun::Agent::Transaction::Attributes.new
 
         if request = options[:request]
           @request_attributes = TingYun::Agent::Transaction::RequestAttributes.new request
@@ -109,6 +112,7 @@ module TingYun
       end
 
       def start(state)
+        transaction_sampler.on_start_transaction(state, start_time)
         sql_sampler.on_start_transaction(state, request_path)
         TingYun::Agent.instance.events.notify(:start_transaction)
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
@@ -215,6 +219,8 @@ module TingYun
       def commit!(state, end_time, outermost_node_name)
         assign_agent_attributes
 
+        transaction_sampler.on_finishing_transaction(state, self, end_time)
+
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
         record_summary_metrics(outermost_node_name, end_time)
@@ -224,13 +230,15 @@ module TingYun
       end
 
       def assign_agent_attributes
+  
+        add_agent_attribute(:threadName,  "pid-#{$$}");
 
         if http_response_code
-          add_agent_attribute(:httpResponseCode, http_response_code.to_s)
+          add_agent_attribute(:httpStatus, http_response_code.to_s)
         end
 
         if response_content_type
-          add_agent_attribute(:'response.headers.contentType', response_content_type)
+          add_agent_attribute(:contentType, response_content_type)
         end
 
 
@@ -241,7 +249,7 @@ module TingYun
       end
 
       def add_agent_attribute(key, value)
-        @response_attributes.add_agent_attribute(key, value)
+        @attributes.add_agent_attribute(key, value)
       end
 
       #collector error
@@ -260,7 +268,7 @@ module TingYun
             options[:uri]      ||= request_path if request_path
             options[:port]       = request_port if request_port
             options[:metric_name]     = best_name
-            options[:attributes] = @response_attributes
+            options[:attributes] = @attributes
 
             @error_recorded = !!::TingYun::Agent.instance.error_collector.notice_error(exception, options) || @error_recorded
           end
@@ -450,13 +458,28 @@ module TingYun
         TingYun::Agent.instance
       end
 
-      def transaction_sampler
-        agent.transaction_sampler
-      end
-
       def sql_sampler
         agent.sql_sampler
       end
+
+
+      def transaction_sampler
+        TingYun::Agent.instance.transaction_sampler
+      end
+
+      HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
+      GUID_LENGTH = 16
+
+      # generate a random 64 bit uuid
+      private
+      def generate_guid
+        guid = ''
+        GUID_LENGTH.times do
+          guid << HEX_DIGITS[rand(16)]
+        end
+        guid
+      end
+
     end
   end
 end
