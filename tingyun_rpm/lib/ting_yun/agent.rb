@@ -124,7 +124,6 @@ module TingYun
       nil # don't return a noticed error datastructure. it can only hurt.
     end
 
-
     # Register this method as a callback for processes that fork
     # jobs.
     #
@@ -153,6 +152,7 @@ module TingYun
     def after_fork(options={})
       agent.after_fork(options) if agent
     end
+
 
 
   end
