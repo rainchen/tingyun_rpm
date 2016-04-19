@@ -6,6 +6,16 @@ require 'ting_yun/support/http_clients/uri_util'
 module TingYun
   module Agent
     module CrossAppTracing
+
+      # Exception raised if there is a problem with cross app transactions.
+      class Error < RuntimeError; end
+
+      # The cross app id header for "outgoing" calls
+      NR_ID_HEADER = 'X-Tingyun-Id'
+
+      # The cross app transaction header for "outgoing" calls
+      NR_TXN_HEADER = 'X-Tingyun-Tx-Id'
+
       module_function
 
       def tl_trace_http_request(request)
@@ -22,6 +32,7 @@ module TingYun
       end
 
       def start_trace(state, t0, request)
+        inject_request_headers(state, request) if cross_app_enabled?
         stack = state.traced_method_stack
         node = stack.push_frame(state,:http_request,t0)
 
@@ -63,7 +74,11 @@ module TingYun
       def metrics_for(request, response)
         metrics = common_metrics(request)
 
-        metrics.concat metrics_for_regular_request( request )
+        if response && response_is_crossapp?( response )
+          metrics.concat metrics_for_regular_request( request )
+        else
+          metrics.concat metrics_for_regular_request( request )
+        end
 
         return metrics
       end
@@ -90,6 +105,54 @@ module TingYun
       def transaction_sampler
         ::TingYun::Agent.instance.transaction_sampler
       end
+
+      def cross_app_enabled?
+        web_action_tracer_enabled? && cross_application_tracer_enabled?
+      end
+
+      def web_action_tracer_enabled?
+        TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
+      end
+
+      def cross_application_tracer_enabled?
+        TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
+      end
+
+      # Inject the X-Process header into the outgoing +request+.
+      def inject_request_headers(state, request)
+        cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+            raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+
+        txn_guid = state.request_guid
+
+        request[NR_ID_HEADER]  = cross_app_id
+        request[NR_TXN_HEADER] = txn_guid
+
+      rescue TingYun::Agent::CrossAppTracing::Error => err
+        TingYun::Agent.logger.debug "Not injecting x-process header", err
+      end
+
+      # Returns +true+ if Cross Application Tracing is enabled, and the given +response+
+      # has the appropriate headers.
+      def response_is_crossapp?( response )
+        return false unless cross_app_enabled?
+        return true
+      end
+
+      # Return the set of metric objects appropriate for the given cross app
+      # +response+.
+      def metrics_for_crossapp_response( request, response )
+        xp_id, txn_name, _q_time, _r_time, _req_len, _ = extract_appdata( response )
+
+        check_crossapp_id( xp_id )
+        check_transaction_name( txn_name )
+
+        metrics = []
+        metrics << "ExternalTransaction/NULL/#{cross_app_id}"
+
+        return metrics
+      end
+
 
     end
   end

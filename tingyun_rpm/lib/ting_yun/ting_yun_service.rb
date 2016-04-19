@@ -24,7 +24,6 @@ module TingYun
 
 
     attr_accessor :request_timeout,
-                  :tingyunIdSecret,
                   :appSessionKey,
                   :data_version,
                   :metric_id_cache,
@@ -50,7 +49,6 @@ module TingYun
       TingYun::Agent.logger.info("initAgentApp response: #{response}") if TingYun::Agent.config[:'nbs.audit_mode']
       @applicationId = response['applicationId']
       @appSessionKey = response['appSessionKey']
-      @tingyunIdSecret  = response['appSessionKey']
       response
     end
 
@@ -61,7 +59,6 @@ module TingYun
     def force_restart
       @applicationId = nil
       @appSessionKey = nil
-      @tingyunIdSecret = nil
       @metric_id_cache = {}
       close_shared_connection
     end
@@ -89,7 +86,7 @@ module TingYun
       size = data.size
 
       if TingYun::Agent.config[:'nbs.audit_mode']
-        TingYun::Agent.logger.info("the prepare data: #{data}")
+        TingYun::Agent.logger.debug("the prepare data: #{data}")
       else
         TingYun::Agent.logger.info("prepare to send data")
       end
@@ -103,7 +100,7 @@ module TingYun
                               :collector => @collector)
 
       if TingYun::Agent.config[:'nbs.audit_mode']
-        TingYun::Agent.logger.info("the return data: #{response.body}")
+        TingYun::Agent.logger.debug("the return data: #{response.body}")
       else
         TingYun::Agent.logger.info("the send-process end")
       end

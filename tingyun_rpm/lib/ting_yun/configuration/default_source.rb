@@ -270,7 +270,7 @@ module TingYun
             :description => 'Threshold (in millisecond) above which the agent will collect explain plans. Relevant only when <code><a href="">explain_enabled</a></code> is true.'
         },
         :'nbs.transaction_tracer.enabled' => {
-            :default => false,
+            :default => true,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,
@@ -625,6 +625,13 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => false,
             :description => 'Controls whether to normalize string encodings prior to serializing data for the collector to JSON.'
+        },
+        :tingyunIdSecret => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => false,
+            :description => '跨应用追踪加密ID'
         }
     }.freeze
   end

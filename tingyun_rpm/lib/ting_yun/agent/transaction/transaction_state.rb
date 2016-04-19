@@ -77,6 +77,11 @@ module TingYun
           @record_tt != false
         end
 
+        def request_guid
+          return nil unless current_transaction
+          current_transaction.guid
+        end
+
 
       end
   end
