@@ -51,12 +51,14 @@ module TingYun
         state = TingYun::Agent::TransactionState.tl_get
         begin
           TingYun::Agent::Transaction.start(state, category, build_transaction_options(env, first_middleware))
+          events.notify(:before_call, env) if first_middleware
 
           result = target.call(env)
 
           if first_middleware
             capture_http_response_code(state, result)
             capture_response_content_type(state, result)
+            events.notify(:after_call, result)
           end
 
           result

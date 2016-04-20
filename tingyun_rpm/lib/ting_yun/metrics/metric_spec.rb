@@ -8,7 +8,7 @@
 module TingYun
   module Metrics
     class MetricSpec
-      attr_reader :name, :scope
+      attr_accessor :name, :scope, :calleeId, :calleeName
 
       # the maximum length of a metric name or metric scope
       MAX_LENGTH = 255

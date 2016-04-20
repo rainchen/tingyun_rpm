@@ -57,6 +57,7 @@ module TingYun
             log_without_tingyun_instrumentation(*args, &block)
           ensure
             elapsed_time = (Time.now - t0).to_f
+            state.sql_duration = elapsed_time * 1000
 
             TingYun::Agent.instance.transaction_sampler.notice_sql(sql, @config, elapsed_time,
                                                                     state, EXPLAINER)

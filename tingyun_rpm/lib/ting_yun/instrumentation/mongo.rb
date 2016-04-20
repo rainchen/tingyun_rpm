@@ -34,7 +34,7 @@ module TingYun
           def instrument_with_ting_yun_trace(name, payload = {}, &block)
             metrics = ting_yun_generate_metrics(name, payload)
 
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, nil, method(:record_mongo_duration)) do
               instrument_without_ting_yun_trace(name, payload, &block)
             end
           end
@@ -48,7 +48,7 @@ module TingYun
         ::Mongo::Collection.class_eval do
           def save_with_ting_yun_trace(doc, opts = {}, &block)
             metrics = ting_yun_generate_metrics(:save)
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, nil, method(:record_mongo_duration)) do
               save_without_ting_yun_trace(doc, opts, &block)
             end
           end
@@ -62,13 +62,20 @@ module TingYun
         ::Mongo::Collection.class_eval do
           def ensure_index_with_ting_yun_trace(spec, opts = {}, &block)
             metrics = ting_yun_generate_metrics(:ensureIndex)
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, nil, method(:record_mongo_duration)) do
               ensure_index_with_out_ting_yun_trace(spec, opts, &block)
             end
           end
 
           alias_method :ensure_index_with_out_ting_yun_trace, :ensure_index
           alias_method :ensure_index, :ensure_index_with_ting_yun_trace
+        end
+      end
+
+      def record_mongo_duration(duration)
+        state = TingYun::Agent::TransactionState.tl_get
+        unless state.nil?
+          state.mon_duration += duration * 1000
         end
       end
 

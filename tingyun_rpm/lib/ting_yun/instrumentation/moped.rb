@@ -3,6 +3,7 @@
 require 'ting_yun/agent'
 require 'ting_yun/agent/datastore'
 require 'ting_yun/agent/datastore/mongo'
+require 'ting_yun/agent/transaction/transaction_state'
 
 module TingYun
   module Instrumentation
@@ -31,7 +32,7 @@ module TingYun
         operation = TingYun::Agent::Datastore::Mongo.transform_operation(operation_name)
 
         res = nil
-        TingYun::Agent::Datastore.wrap(MONGODB, operation, collection) do
+        TingYun::Agent::Datastore.wrap(MONGODB, operation, collection, method(:record_mongo_duration)) do
           res = log_without_tingyun_instrumentation(operations, &blk)
         end
 
@@ -58,6 +59,13 @@ module TingYun
           collection = log_statement[/:findAndModify=>"([^"]+)/,1]
         end
         return operation_name, collection
+      end
+
+      def record_mongo_duration(_1, _2, duration)
+        state = TingYun::Agent::TransactionState.tl_get
+        unless state.nil?
+          state.mon_duration += duration * 1000
+        end
       end
 
     end

@@ -10,7 +10,7 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     ::TingYun::Agent.logger.info 'Installing Net instrumentation'
-    require 'ting_yun/agent/cross_app_tracing'
+    require 'ting_yun/agent/cross_app/cross_app_tracing'
     require 'ting_yun/http/net_http_request'
   end
 

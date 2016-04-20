@@ -12,6 +12,7 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     TingYun::Agent.logger.info 'Installing Redis Instrumentation'
+    require 'ting_yun/agent/transaction/transaction_state'
   end
 
   executes do
@@ -19,13 +20,19 @@ TingYun::Support::LibraryDetection.defer do
 
     ::Redis::Client.class_eval do
 
+      def record_redis_duration(_1, _2, duration)
+        state = TingYun::Agent::TransactionState.tl_get
+        unless state.nil?
+          state.rds_duration += duration * 1000
+        end
+      end
 
       call_method = ::Redis::Client.new.respond_to?(:call) ? :call : :raw_call_command
 
       def call_with_tingyun_trace(*args, &blk)
         operation = args[0].is_a?(Array) ? args[0][0] : args[0]
 
-        TingYun::Agent::Datastore.wrap("Redis", operation) do
+        TingYun::Agent::Datastore.wrap("Redis", operation, nil, method(:record_redis_duration)) do
           call_without_tingyun_trace(*args, &blk)
         end
       end
@@ -39,7 +46,7 @@ TingYun::Support::LibraryDetection.defer do
           pipeline = args[0]
           operation = pipeline.is_a?(::Redis::Pipeline::Multi) ? 'multi' : 'pipeline'
 
-          TingYun::Agent::Datastore.wrap("Redis", operation) do
+          TingYun::Agent::Datastore.wrap("Redis", operation, nil, method(:record_redis_duration)) do
             call_pipelined_without_tinyun_trace(*args, &block)
           end
         end
@@ -53,7 +60,7 @@ TingYun::Support::LibraryDetection.defer do
         alias_method :connect_without_tingyun, :connect
 
         def connect(*args, &block)
-          TingYun::Agent::Datastore.wrap("Redis", "connect") do
+          TingYun::Agent::Datastore.wrap("Redis", "connect", nil, method(:record_redis_duration)) do
             connect_without_tingyun(*args, &block)
           end
         end

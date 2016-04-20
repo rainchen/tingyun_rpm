@@ -8,7 +8,7 @@ module TingYun
     class Transaction
       class Trace
 
-        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished
+        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished, :tx_id
 
         attr_reader  :root_node
 
@@ -17,6 +17,7 @@ module TingYun
           @node_count = 0
           @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, 'ROOT')
           @prepared = false
+          @guid = generate_guid
         end
 
         def create_node(time_since_start, metric_name = nil)
@@ -27,6 +28,8 @@ module TingYun
         def duration
           @root_node.duration
         end
+
+
 
         include TingYun::Support::Coerce
         
@@ -46,7 +49,7 @@ module TingYun
               TingYun::Helper.correctly_encoded(metric_name),
               TingYun::Helper.correctly_encoded(uri),
               encoder.encode(trace_tree),
-              '',
+              tx_id || '',
               guid
           ]
         end
@@ -102,6 +105,19 @@ module TingYun
 
         def request_params
           attributes.agent_attributes[:request_params]
+        end
+
+        HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
+        GUID_LENGTH = 16
+
+        # generate a random 64 bit uuid
+        private
+        def generate_guid
+          guid = ''
+          GUID_LENGTH.times do
+            guid << HEX_DIGITS[rand(16)]
+          end
+          guid
         end
       end
     end

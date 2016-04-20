@@ -57,19 +57,23 @@ module TingYun
         end
       end
 
-      def  trace_execution_scoped(metric_names, options={}) #THREAD_LOCAL_ACCESS
+      def  trace_execution_scoped(metric_names, options={}, callback = nil) #THREAD_LOCAL_ACCESS
         state = TingYun::Agent::TransactionState.tl_get
 
         metric_names = Array(metric_names)
         first_name   = metric_names.shift
         return yield unless first_name
 
-        start_time = Time.now.to_f
+        start_time = Time.now
         expected_scope = trace_execution_scoped_header(state, start_time)
 
         begin
           yield
         ensure
+          elapsed_time = (Time.now - start_time).to_f
+          if callback
+            callback.call(elapsed_time)
+          end
           trace_execution_scoped_footer(state, start_time, first_name, metric_names, expected_scope, options)
         end
       end

@@ -52,11 +52,12 @@ module TingYun
                     :response_content_type,
                     :error_recorded,
                     :guid,
-                    :attributes
+                    :attributes,
+                    :duration
 
 
       def initialize(category, options)
-        @guid = generate_guid
+        @guid = options[:client_transaction_id] || generate_guid
         @has_children = false
         @category = category
         @exceptions = {}
@@ -92,7 +93,7 @@ module TingYun
       def self.start(state, category, options)
         category ||= :controller
         txn = state.current_transaction
-
+        options[:client_transaction_id] = state.client_transaction_id
         if txn && options[:transaction_name]
           txn.create_nested_frame(state, category, options)
         else
@@ -179,6 +180,8 @@ module TingYun
 
       def stop(state, end_time, outermost_frame)
 
+        state.web_duration = (end_time - @apdex_start)*1000
+
         freeze_name_and_execute
 
         if @has_children
@@ -217,6 +220,7 @@ module TingYun
       end
 
       def commit!(state, end_time, outermost_node_name)
+        state.queue_duration = queue_time * 1000
         assign_agent_attributes
 
 
@@ -455,6 +459,11 @@ module TingYun
       def best_name
         @frozen_name || @default_name || ::TingYun::Agent::UNKNOWN_METRIC
       end
+
+      def queue_time
+        @apdex_start ? @start_time - @apdex_start : 0
+      end
+
 
       def agent
         TingYun::Agent.instance

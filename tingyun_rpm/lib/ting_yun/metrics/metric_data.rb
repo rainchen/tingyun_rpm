@@ -53,11 +53,14 @@ module TingYun
       end
 
       def stats_has_parent?
-        if metric_spec.scope.empty?
-          { 'name' => metric_spec.name }
-        else
-          { 'name' => metric_spec.name, 'parent' => metric_spec.scope }
+        hash =  { 'name' => metric_spec.name }
+        hash['calleeId'] = metric_spec.calleeId unless metric_spec.calleeId.nil?
+        hash['calleeName'] = metric_spec.calleeName unless metric_spec.calleeName.nil?
+        unless metric_spec.scope.empty?
+          hash['parent'] = metric_spec.scope
         end
+
+        return hash
       end
 
       def metrics(stat_key)

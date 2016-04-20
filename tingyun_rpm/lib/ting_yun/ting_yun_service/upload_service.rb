@@ -69,6 +69,18 @@ module TingYun
               else
                 components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
               end
+            elsif metric_spec.name.start_with?('cross_app')
+              external =  metric_spec.name.split(';')
+              if metric_spec.scope.empty?
+                metric_spec.name = "ExternalTransaction/NULL/#{external[1]}"
+                general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+              else
+                metric_spec.name = "External/#{external[3]}"
+                metric_spec.calleeId = external[1]
+                metric_spec.calleeName = external[2]
+                components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+              end
+
             end
           end
         end

@@ -11,10 +11,12 @@ module TingYun
       class Error < RuntimeError; end
 
       # The cross app id header for "outgoing" calls
-      NR_ID_HEADER = 'X-Tingyun-Id'
 
-      # The cross app transaction header for "outgoing" calls
-      NR_TXN_HEADER = 'X-Tingyun-Tx-Id'
+      TY_ID_HEADER = 'X-Tingyun-Id'.freeze
+      TY_DATA_HEADER = 'X-Tingyun-Tx-Data'.freeze
+
+
+
 
       module_function
 
@@ -42,10 +44,11 @@ module TingYun
       def finish_trace(state, t0, node, request, response)
         t1 = Time.now
         duration = (t1.to_f - t0.to_f) * 1000
+        state.external_duration = duration
 
         begin
           if request
-            metrics = metrics_for(request, response)
+            metrics = metrics_for(state, request, response)
             scoped_metric = metrics[-1]
 
             stats_engine.record_scoped_and_unscoped_metrics(state, scoped_metric, metrics, duration)
@@ -69,13 +72,24 @@ module TingYun
       def add_transaction_trace_info(request, response)
         filtered_uri = TingYun::Agent::HTTPClients::URIUtil.filter_uri request.uri
         transaction_sampler.add_node_info(:uri => filtered_uri)
+        if response && response_is_cross_app?( response )
+          transaction_sampler.tl_builder.current_node[:txId] = response[TY_DATA_HEADER][:trId]
+          transaction_sampler.tl_builder.current_node[:txData] = response[TY_DATA_HEADER]
+        end
       end
 
-      def metrics_for(request, response)
+      def metrics_for(state, request, response)
         metrics = common_metrics(request)
 
-        if response && response_is_crossapp?( response )
-          metrics.concat metrics_for_regular_request( request )
+        if response && response_is_cross_app?( response )
+          begin
+            metrics.concat metrics_for_cross_app_response( request, response )
+          rescue => err
+            # Fall back to regular metrics if there's a problem with x-process metrics
+            TingYun::Agent.logger.debug "%p while fetching x-process metrics: %s" %
+                                             [ err.class, err.message ]
+            metrics.concat metrics_for_regular_request( request )
+          end
         else
           metrics.concat metrics_for_regular_request( request )
         end
@@ -106,16 +120,21 @@ module TingYun
         ::TingYun::Agent.instance.transaction_sampler
       end
 
+
       def cross_app_enabled?
-        web_action_tracer_enabled? && cross_application_tracer_enabled?
+        valid_tingyun_secret_id? && web_action_tracer_enabled? && cross_application_tracer_enabled?
       end
 
       def web_action_tracer_enabled?
-        TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
+        TingYun::Agent.config[:'nbs.action_tracer.enabled']
       end
 
       def cross_application_tracer_enabled?
         TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
+      end
+
+      def valid_tingyun_secret_id?
+        TingYun::Agent.config[:tingyunIdSecret] && TingYun::Agent.config[:tingyunIdSecret].size > 0
       end
 
       # Inject the X-Process header into the outgoing +request+.
@@ -125,8 +144,7 @@ module TingYun
 
         txn_guid = state.request_guid
 
-        request[NR_ID_HEADER]  = cross_app_id
-        request[NR_TXN_HEADER] = txn_guid
+        request[TY_ID_HEADER] = "#{cross_app_id};c=1;x=#{txn_guid}"
 
       rescue TingYun::Agent::CrossAppTracing::Error => err
         TingYun::Agent.logger.debug "Not injecting x-process header", err
@@ -134,25 +152,23 @@ module TingYun
 
       # Returns +true+ if Cross Application Tracing is enabled, and the given +response+
       # has the appropriate headers.
-      def response_is_crossapp?( response )
+      def response_is_cross_app?( response )
         return false unless cross_app_enabled?
+        unless response[TY_DATA_HEADER]
+          return false
+        end
         return true
       end
 
       # Return the set of metric objects appropriate for the given cross app
       # +response+.
-      def metrics_for_crossapp_response( request, response )
-        xp_id, txn_name, _q_time, _r_time, _req_len, _ = extract_appdata( response )
-
-        check_crossapp_id( xp_id )
-        check_transaction_name( txn_name )
-
+      def metrics_for_cross_app_response(request, response )
+        uri = "#{request.host}/#{request.type}/#{request.method}"
         metrics = []
-        metrics << "ExternalTransaction/NULL/#{cross_app_id}"
+        metrics << "cross_app;#{response[TY_DATA_HEADER][:id]};#{response[TY_DATA_HEADER][:action]};#{uri}"
 
         return metrics
       end
-
 
     end
   end

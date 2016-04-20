@@ -27,6 +27,7 @@ module TingYun
       def completed(event)
         begin
           state = TingYun::Agent::TransactionState.tl_get
+          state.mon_duration = event.duration
           started_event = operations.delete(event.operation_id)
 
           base, *other_metrics = metrics(started_event)

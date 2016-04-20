@@ -454,7 +454,7 @@ module TingYun
             :description => 'Port for the Ting Yun data collection service.'
         },
         :api_host => {
-            :default => 'dc1.networkbench.com',
+            :default => 'redirect.networkbench.com',
             :public => false,
             :type => String,
             :allowed_from_server => false,

@@ -118,6 +118,7 @@ module TingYun
         @events  = TingYun::Agent::Event::EventListener.new
         @after_fork_lock = Mutex.new
         @dispatcher = TingYun::Agent::Dispatcher.new(@events)
+        @cross_app_monitor = TingYun::Agent::CrossAppMonitor.new(@events)
 
         init_containers
       end
