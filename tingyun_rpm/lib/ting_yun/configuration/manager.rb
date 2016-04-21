@@ -116,6 +116,8 @@ module TingYun
       def replace_or_add_config(source)
         source.freeze
 
+        was_finished = finished_configuring?
+
         case source
           when YamlSource        then   @yaml_source          = source
           when DefaultSource     then   @default_source       = source
@@ -127,8 +129,18 @@ module TingYun
         end
         reset_cache
 
+        log_config(:add, source)
+
+        notify_finished_configuring if !was_finished && finished_configuring?
       end
 
+      def notify_finished_configuring
+        TingYun::Agent.instance.events.notify(:finished_configuring)
+      end
+
+      def finished_configuring?
+        !@server_source.nil?
+      end
 
 
       def source(key)

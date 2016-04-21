@@ -64,13 +64,13 @@ module TingYun
         first_name   = metric_names.shift
         return yield unless first_name
 
-        start_time = Time.now
+        start_time = Time.now.to_f
         expected_scope = trace_execution_scoped_header(state, start_time)
 
         begin
           yield
         ensure
-          elapsed_time = (Time.now - start_time).to_f
+          elapsed_time = (Time.now.to_f - start_time)
           if callback
             callback.call(elapsed_time)
           end

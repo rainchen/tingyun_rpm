@@ -21,7 +21,7 @@ module TingYun
       module_function
 
       def tl_trace_http_request(request)
-        t0 = Time.now
+        t0 = Time.now.to_f
         state = TingYun::Agent::TransactionState.tl_get
         return yield unless state.execution_traced?
         begin
@@ -42,8 +42,8 @@ module TingYun
       end
 
       def finish_trace(state, t0, node, request, response)
-        t1 = Time.now
-        duration = (t1.to_f - t0.to_f) * 1000
+        t1 = Time.now.to_f
+        duration = (t1- t0) * 1000
         state.external_duration = duration
 
         begin

@@ -25,7 +25,7 @@ module TingYun
       end
 
       # service for communicating with collector
-      attr_accessor :service
+      attr_accessor :service, :cross_app_monitor
       attr_reader :events
 
       extend ClassMethods

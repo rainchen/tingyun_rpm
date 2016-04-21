@@ -10,7 +10,7 @@ module TingYun
     class CrossAppMonitor < TingYun::Agent::InboundRequestMonitor
 
 
-      TY_ID_HEADER = 'X-Tingyun-Id'.freeze
+      TY_ID_HEADER = 'HTTP_X_TINGYUN_ID'.freeze
       TY_DATA_HEADER = 'X-Tingyun-Tx-Data'.freeze
 
 
@@ -27,14 +27,14 @@ module TingYun
         events.subscribe(:before_call) do |env| #THREAD_LOCAL_ACCESS
           if cross_app_enabled?
             state = TingYun::Agent::TransactionState.tl_get
-
-            save_referring_transaction_info(state, env)
+            save_referring_transaction_info(state, env)  unless env[TY_ID_HEADER].nil?
           end
         end
 
         events.subscribe(:after_call) do |_status_code, headers, _body| #THREAD_LOCAL_ACCESS
           state = TingYun::Agent::TransactionState.tl_get
-
+          state.queue_duration = state.current_transaction.queue_time * 1000
+          state.web_duration = (Time.now - state.current_transaction.start_time) * 1000
           insert_response_header(state, headers)
         end
 
@@ -46,7 +46,8 @@ module TingYun
       end
 
 
-      def save_referring_transaction_info(request)
+      def save_referring_transaction_info(state,request)
+
         info = request[TY_ID_HEADER].split(';')
         tingyun_id_secret = info[0]
         client_transaction_id = info.find do |e|
@@ -64,7 +65,7 @@ module TingYun
 
 
       def insert_response_header(state, response_headers)
-        if same_account?
+        if same_account?(state)
           txn = state.current_transaction
           unless txn.nil?
             set_response_headers(state, response_headers)
@@ -77,7 +78,7 @@ module TingYun
         state.client_tingyun_id_secret = nil
       end
 
-      def same_account?
+      def same_account?(state)
         server_info = TingYun::Agent.config[:tingyunIdSecret].split('|')
         client_info = (state.client_tingyun_id_secret || '').split('|')
         if server_info.size == 2 && client_info.size == 2 && server_info[0] == client_info[0]
@@ -107,11 +108,13 @@ module TingYun
                 :code => execute_duration(state)
             }
         }
-        payload[:tr] = 1 if slow_action_tracer?
+        payload[:tr] = 1 if slow_action_tracer?(state)
+
+        payload
       end
 
-      def slow_action_tracer?
-        if state.current_transaction.duration > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
+      def slow_action_tracer?(state)
+        if state.web_duration > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
           return true
         else
           return false

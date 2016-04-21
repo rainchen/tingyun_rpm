@@ -2,6 +2,7 @@
 
 require 'ting_yun/agent/transaction/trace'
 
+
 module TingYun
   module Agent
     class TransactionSampleBuilder
@@ -39,7 +40,7 @@ module TingYun
           return
         end
 
-        @trace.root_node.end_trace(time.to_f - @trace_start)
+        @trace.root_node.end_trace(time - @trace_start)
 
         @trace.threshold = transaction_trace_threshold
         @trace.finished = true

@@ -52,8 +52,7 @@ module TingYun
                     :response_content_type,
                     :error_recorded,
                     :guid,
-                    :attributes,
-                    :duration
+                    :attributes
 
 
       def initialize(category, options)
@@ -145,6 +144,7 @@ module TingYun
           TingYun::Agent.logger.error("Failed during Transaction.stop because there is no current transaction")
           return
         end
+
         nested_frame = txn.frame_stack.pop
 
         if txn.frame_stack.empty?
@@ -179,8 +179,6 @@ module TingYun
 
 
       def stop(state, end_time, outermost_frame)
-
-        state.web_duration = (end_time - @apdex_start)*1000
 
         freeze_name_and_execute
 
@@ -220,7 +218,6 @@ module TingYun
       end
 
       def commit!(state, end_time, outermost_node_name)
-        state.queue_duration = queue_time * 1000
         assign_agent_attributes
 
 
