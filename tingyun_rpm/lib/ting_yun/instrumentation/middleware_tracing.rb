@@ -75,6 +75,9 @@ module TingYun
         env[TXN_STARTED_KEY] = true unless env[TXN_STARTED_KEY]
       end
 
+      def events
+        ::TingYun::Agent.instance.events
+      end
     end
   end
 end

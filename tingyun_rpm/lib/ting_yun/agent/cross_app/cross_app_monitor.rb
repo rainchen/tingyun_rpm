@@ -2,6 +2,7 @@
 require 'ting_yun/agent/cross_app/inbound_request_monitor'
 require 'ting_yun/agent/cross_app/cross_app_tracing'
 require 'ting_yun/agent/transaction/transaction_state'
+require 'ting_yun/agent'
 
 
 module TingYun

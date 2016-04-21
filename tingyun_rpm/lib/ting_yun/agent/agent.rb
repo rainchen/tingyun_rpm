@@ -8,6 +8,7 @@ require 'ting_yun/frameworks'
 require 'ting_yun/agent/event/event_listener'
 require 'ting_yun/agent/dispatcher'
 require 'ting_yun/agent/collector/middle_ware_collector'
+require 'ting_yun/agent/cross_app/cross_app_monitor'
 
 
 # The Agent is a singleton that is instantiated when the plugin is

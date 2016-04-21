@@ -22,8 +22,8 @@ module TingYun
                       :queue_duration,
                       :rds_duration,
                       :mc_duration,
-                      :mon_duration,
-                      :cross_app?
+                      :mon_duration
+
 
 
 

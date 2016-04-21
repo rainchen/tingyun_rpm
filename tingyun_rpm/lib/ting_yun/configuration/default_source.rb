@@ -630,7 +630,7 @@ module TingYun
             :default => '',
             :public => true,
             :type => String,
-            :allowed_from_server => false,
+            :allowed_from_server => true,
             :description => '跨应用追踪加密ID'
         }
     }.freeze
