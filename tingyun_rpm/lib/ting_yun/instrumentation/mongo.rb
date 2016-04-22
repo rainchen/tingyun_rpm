@@ -26,6 +26,13 @@ module TingYun
         target_class.class_eval do
           require 'ting_yun/agent/method_tracer'
 
+          def record_mongo_duration(duration)
+            state = TingYun::Agent::TransactionState.tl_get
+            unless state.nil?
+              state.mon_duration += duration * 1000
+            end
+          end
+
           def ting_yun_generate_metrics(operation, payload = nil)
             payload ||= { :collection => self.name, :database => self.db.name }
             TingYun::Instrumentation::Support::MetricTranslator.metrics_for(operation, payload)
@@ -71,14 +78,6 @@ module TingYun
           alias_method :ensure_index, :ensure_index_with_ting_yun_trace
         end
       end
-
-      def record_mongo_duration(duration)
-        state = TingYun::Agent::TransactionState.tl_get
-        unless state.nil?
-          state.mon_duration += duration * 1000
-        end
-      end
-
     end
   end
 end
