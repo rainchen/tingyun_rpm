@@ -28,6 +28,19 @@ module TingYun
       end
 
       def app_names
+        if TingYun::Agent.config[:'nbs.auto_app_naming']
+          begin
+          ::TingYun::Frameworks.framework.root.split('/').last
+          rescue Exception => e
+            get_name
+          end
+        else
+          get_name
+        end
+
+      end
+
+      def get_name
         case TingYun::Agent.config[:app_name]
           when Array then
             TingYun::Agent.config[:app_name]
