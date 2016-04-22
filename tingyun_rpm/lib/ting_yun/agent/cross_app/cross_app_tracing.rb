@@ -2,7 +2,7 @@
 
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/support/http_clients/uri_util'
-require 'json'
+require 'ting_yun/support/serialize/json_wrapper'
 
 module TingYun
   module Agent
@@ -50,19 +50,20 @@ module TingYun
         begin
           if request
             metrics = metrics_for(state, request, response)
-            scoped_metric = metrics[-1]
+            node_name = metrics.pop
+            scoped_metric = metrics.pop
 
             stats_engine.record_scoped_and_unscoped_metrics(state, scoped_metric, metrics, duration)
 
             if node
-              node.name = scoped_metric
+              node.name = node_name
               add_transaction_trace_info(request, response)
             end
           end
         ensure
           if node
             stack = state.traced_method_stack
-            stack.pop_frame(state, node, scoped_metric, t1)
+            stack.pop_frame(state, node, node_name, t1)
           end
         end
       rescue => err
@@ -75,7 +76,7 @@ module TingYun
         transaction_sampler.add_node_info(:uri => filtered_uri)
         if response && response_is_cross_app?( response )
           my_data = TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER]
-          transaction_sampler.tl_builder.current_node[:txId] = my_data[:trId]
+          transaction_sampler.tl_builder.current_node[:txId] = my_data["trId"]
           transaction_sampler.tl_builder.current_node[:txData] = my_data
         end
       end
@@ -168,7 +169,8 @@ module TingYun
         my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER]
         uri = "#{request.host}/#{request.type}/#{request.method}"
         metrics = []
-        metrics << "cross_app;#{my_data[:id]};#{my_data[:action]};#{uri}"
+        metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
+        metrics << "#{my_data["action"]}:#{uri}"
 
         return metrics
       end
