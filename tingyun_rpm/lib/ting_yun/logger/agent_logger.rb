@@ -106,6 +106,7 @@ module TingYun
         unless File.exist? @file_path
           begin
             @log = ::Logger.new(@file_path)
+            set_log_format!
           rescue => e
             @log = ::Logger.new(STDOUT)
             warn("check_log_file:  Failed creating logger for file #{file_path}, using standard out for logging.", e)
