@@ -3,6 +3,7 @@ require 'ting_yun/agent/cross_app/inbound_request_monitor'
 require 'ting_yun/agent/cross_app/cross_app_tracing'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/agent'
+require 'ting_yun/support/serialize/json_wrapper'
 
 
 module TingYun
@@ -89,7 +90,7 @@ module TingYun
       end
 
       def set_response_headers(state, response_headers)
-        response_headers[TY_DATA_HEADER] = build_payload(state)
+        response_headers[TY_DATA_HEADER] = TingYun::Support::Serialize::JSONWrapper.dump build_payload(state)
       end
 
       def build_payload(state)
