@@ -101,7 +101,7 @@ module TingYun
           when :apdex_f then @total_exclusive_time += 1
         end
         if apdex_t
-          @min_call_time = apdex_t
+          @max_call_time = apdex_t
         else
           ::TingYun::Agent.logger.warn("Attempted to set apdex_t to #{apdex_t.inspect}, backtrace = #{caller.join("\n")}")
         end

@@ -111,6 +111,7 @@ module TingYun
       def metrics_for_regular_request( request )
         metrics = []
         metrics << "External/#{request.host}/#{request.type}/#{request.method}"
+        metrics << "External/#{request.host}/#{request.type}/#{request.method}"
 
         return metrics
       end
