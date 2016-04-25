@@ -112,6 +112,8 @@ module TingYun
       end
 
       def start(state)
+        return if !state.is_execution_traced?
+
         transaction_sampler.on_start_transaction(state, start_time)
         sql_sampler.on_start_transaction(state, request_path)
         TingYun::Agent.instance.events.notify(:start_transaction)

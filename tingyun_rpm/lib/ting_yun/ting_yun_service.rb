@@ -86,7 +86,7 @@ module TingYun
       size = data.size
 
       if TingYun::Agent.config[:'nbs.audit_mode']
-        TingYun::Agent.logger.debug("the prepare data: #{data}")
+        TingYun::Agent.logger.info("the prepare data: #{data}")
       else
         TingYun::Agent.logger.info("prepare to send data")
       end
@@ -100,7 +100,7 @@ module TingYun
                               :collector => @collector)
 
       if TingYun::Agent.config[:'nbs.audit_mode']
-        TingYun::Agent.logger.debug("the return data: #{response.body}")
+        TingYun::Agent.logger.info("the return data: #{response.body}")
       else
         TingYun::Agent.logger.info("the send-process end")
       end

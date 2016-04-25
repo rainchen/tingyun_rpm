@@ -160,6 +160,7 @@ module TingYun
         # Treatment of @started and env report is important to get right.
         def setup_and_start_agent(options={})
           @started = true
+          @dispatcher.mark_started
           generate_environment_report
           install_exit_handler
           cpu_and_memory
