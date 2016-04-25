@@ -30,7 +30,7 @@ module TingYun
       def app_names
         if TingYun::Agent.config[:'nbs.auto_app_naming']
           begin
-          ::TingYun::Frameworks.framework.root.split('/').last
+          [::TingYun::Frameworks.framework.root.split('/').last]
           rescue Exception => e
             get_name
           end
