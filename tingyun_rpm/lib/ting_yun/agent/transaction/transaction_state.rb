@@ -64,7 +64,7 @@ module TingYun
         # This starts the timer for the transaction.
         def reset(transaction=nil)
           # We purposefully don't reset @untraced, @record_tt and @record_sql
-          # since those are managed by NewRelic::Agent.disable_* calls explicitly
+          # since those are managed by TingYun::Agent.disable_* calls explicitly
           # and (more importantly) outside the scope of a transaction
           @request = nil
           @current_transaction = transaction
