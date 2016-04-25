@@ -55,7 +55,7 @@ module TingYun
               if data['status'] =="error"
                 parsed_error(data['result'])
               elsif data['result']['enabled'] == false
-                raise TingYun::Support::Exception::AgentEnableException.new("config['nbs.agent_enable']==false , should retry")
+                raise TingYun::Support::Exception::AgentEnableException.new("sorry，the application is unable to use the tingyun service now ")
               else
                 return data['result']
               end

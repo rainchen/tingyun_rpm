@@ -36,7 +36,7 @@ module TingYun
 
         # return the total duration of this node
         def duration
-          (@exit_timestamp - @entry_timestamp).to_f
+          TingYun::Helper.time_to_millis(@exit_timestamp - @entry_timestamp)
         end
 
 

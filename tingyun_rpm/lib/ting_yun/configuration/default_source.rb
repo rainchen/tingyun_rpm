@@ -606,7 +606,7 @@ module TingYun
             :description => 'millisecond'
         },
         :'transaction_tracer.limit_segments' => {
-            :default => 40,
+            :default => 2000,
             :public => true,
             :type => Fixnum,
             :allowed_from_server => true,
