@@ -52,11 +52,11 @@ module TingYun
         end
 
 
-        def on_finishing_transaction(state, txn, time=Time.now)
+        def on_finishing_transaction(state, txn, time=Time.now.to_f)
           last_builder = state.transaction_sample_builder
           return unless last_builder && enabled?
 
-          last_builder.finish_trace(time.to_f)
+          last_builder.finish_trace(time)
 
           state.transaction_sample_builder = nil
 

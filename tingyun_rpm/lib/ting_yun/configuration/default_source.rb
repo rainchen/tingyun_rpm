@@ -580,7 +580,7 @@ module TingYun
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => false,
+            :allowed_from_server => true,
             :description => 'Enable or disable to use default name '
         },
         :capture_params => {

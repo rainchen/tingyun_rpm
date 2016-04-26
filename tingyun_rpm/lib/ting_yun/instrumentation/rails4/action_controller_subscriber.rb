@@ -66,7 +66,7 @@ module TingYun
         end
 
         def metric_name
-          if TingYun::Agent.config[:'nbs.auto_app_naming']
+          if TingYun::Agent.config[:'nbs.auto_action_naming']
             @metric_name ||= "WebAction/Rails/#{metric_path}/#{metric_action}"
           else
             path

@@ -35,7 +35,7 @@ module TingYun
         
         def trace_tree
           [
-              TingYun::Helper.time_to_millis(duration),
+              duration,
               request_params,
               custom_params,
               @root_node.to_array
@@ -45,7 +45,7 @@ module TingYun
         def to_collector_array(encoder)
           [
               @start_time.round,
-              TingYun::Helper.time_to_millis(duration),
+              duration,
               TingYun::Helper.correctly_encoded(metric_name),
               TingYun::Helper.correctly_encoded(uri),
               encoder.encode(trace_tree),
