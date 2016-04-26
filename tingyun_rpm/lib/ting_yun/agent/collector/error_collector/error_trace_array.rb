@@ -13,7 +13,7 @@ module TingYun
         end
 
         def enabled?
-          ::TingYun::Agent.config[:'error_collector.enabled']
+          ::TingYun::Agent.config[:'nbs.error_collector.enabled']
         end
 
         def merge!(errors)

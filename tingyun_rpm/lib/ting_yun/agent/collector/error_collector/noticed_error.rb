@@ -70,7 +70,7 @@ module TingYun
 
            [timestamp.to_i,
             string(metric_name),
-            int(attributes.agent_attributes[:httpResponseCode]),
+            int(attributes.agent_attributes[:httpStatus]),
             string(exception_class_name),
             string(message),
             count_error,
