@@ -57,12 +57,11 @@ module TingYun
               elsif data['result']['enabled'] == false
                 raise TingYun::Support::Exception::AgentEnableException.new("sorry，the application is unable to use the tingyun service now ")
               else
-                return data
+                return data['result'] if data.has_key?('result')
               end
             end
           end
-          ::TingYun::Agent.logger.debug("Unexpected response from collector: #{data}")
-          nil
+          data
         end
       end
     end
