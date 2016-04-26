@@ -5,6 +5,8 @@
 
 require 'ting_yun/support/exception'
 require 'ting_yun/support/coerce'
+require 'ting_yun/support/serialize/json_wrapper'
+
 
 module TingYun
   module Agent
@@ -68,15 +70,15 @@ module TingYun
 
         def to_collector_array(encoder=nil)
 
-           [timestamp.to_i,
-            string(metric_name),
-            int(attributes.agent_attributes[:httpStatus]),
-            string(exception_class_name),
-            string(message),
-            count_error,
-            string(request_uri),
-            error_params.to_s
-           ]
+          [timestamp.to_i,
+           string(metric_name),
+           int(attributes.agent_attributes[:httpStatus]),
+           string(exception_class_name),
+           string(message),
+           count_error,
+           string(request_uri),
+           TingYun::Support::Serialize::JSONWrapper.dump(error_params)
+          ]
         end
 
         def error_params
@@ -89,9 +91,9 @@ module TingYun
 
         def custom_params
           {
-            :threadName => string(attributes.agent_attributes[:threadName]),
-            :httpStatus => int(attributes.agent_attributes[:httpStatus]),
-            :referer    => string(attributes.agent_attributes[:referer]) || ''
+              :threadName => string(attributes.agent_attributes[:threadName]),
+              :httpStatus => int(attributes.agent_attributes[:httpStatus]),
+              :referer    => string(attributes.agent_attributes[:referer]) || ''
           }
         end
 
