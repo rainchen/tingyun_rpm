@@ -51,13 +51,13 @@ module TingYun
 
         def return_value(data)
           if data.respond_to?(:has_key?)
-            if data.has_key?('status') && data.has_key?('result')
-              if data['status'] =="error"
+            if data.has_key?('status')
+              if data['status'] == "error"
                 parsed_error(data['result'])
               elsif data['result']['enabled'] == false
                 raise TingYun::Support::Exception::AgentEnableException.new("sorry，the application is unable to use the tingyun service now ")
               else
-                return data['result']
+                return data
               end
             end
           end

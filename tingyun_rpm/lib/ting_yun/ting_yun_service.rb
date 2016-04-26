@@ -73,23 +73,23 @@ module TingYun
 
     def invoke_remote(method, payload=[], options = {})
 
-      data, size, serialize_finish_time = nil
+      data = nil
       payload = payload[0]  if method == :initAgentApp
       begin
         data = @marshaller.dump(payload, options)
       rescue StandardError, SystemStackError => e
         handle_serialization_error(method, e)
       end
-      serialize_finish_time = Time.now
-
-      data, encoding = compress_request_if_needed(data)
-      size = data.size
+      # serialize_finish_time = Time.now
 
       if TingYun::Agent.config[:'nbs.audit_mode']
         TingYun::Agent.logger.info("the prepare data: #{data}")
       else
         TingYun::Agent.logger.info("prepare to send data")
       end
+
+      data, encoding = compress_request_if_needed(data)
+      # size = data.size
 
       uri = remote_method_uri(method)
       full_uri = "#{@collector}#{uri}"
