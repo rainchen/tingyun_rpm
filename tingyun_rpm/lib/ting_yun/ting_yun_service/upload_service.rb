@@ -115,7 +115,7 @@ module TingYun
           :type => 'errorTraceData',
           :errors => unsent_errors
       }
-      invoke_remote(:upload, [upload_data])
+      invoke_remote(:upload, [upload_data], :encoder=> json)
     end
 
 

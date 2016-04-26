@@ -5,7 +5,6 @@
 
 require 'ting_yun/support/exception'
 require 'ting_yun/support/coerce'
-require 'ting_yun/support/serialize/json_wrapper'
 
 
 module TingYun
@@ -68,7 +67,7 @@ module TingYun
 
         include TingYun::Support::Coerce
 
-        def to_collector_array(encoder=nil)
+        def to_collector_array(encoder)
 
           [timestamp.to_i,
            string(metric_name),
@@ -77,7 +76,7 @@ module TingYun
            string(message),
            count_error,
            string(request_uri),
-           TingYun::Support::Serialize::JSONWrapper.dump(error_params)
+           encoder.encode(error_params)
           ]
         end
 
