@@ -75,7 +75,7 @@ module TingYun
         filtered_uri = TingYun::Agent::HTTPClients::URIUtil.filter_uri request.uri
         transaction_sampler.add_node_info(:uri => filtered_uri)
         if response && response_is_cross_app?( response )
-          my_data = TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER]
+          my_data = TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
           transaction_sampler.tl_builder.current_node[:txId] = my_data["trId"]
           transaction_sampler.tl_builder.current_node[:txData] = my_data
         end
@@ -167,7 +167,7 @@ module TingYun
       # Return the set of metric objects appropriate for the given cross app
       # +response+.
       def metrics_for_cross_app_response(request, response )
-        my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER]
+        my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
         uri = "#{request.host}/#{request.type}/#{request.method}"
         metrics = []
         metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"

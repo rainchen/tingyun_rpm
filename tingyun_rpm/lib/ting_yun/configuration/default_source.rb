@@ -171,7 +171,7 @@ module TingYun
             :description => 'Semicolon-delimited list of Naming your application.'
         },
         :'nbs.auto_app_naming' => {
-            :default => true,
+            :default => false,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,
