@@ -576,7 +576,7 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Enable or disable Specifies url'
         },
-        :auto_action_naming => {
+        :'nbs.auto_action_naming' => {
             :default => true,
             :public => true,
             :type => Boolean,
