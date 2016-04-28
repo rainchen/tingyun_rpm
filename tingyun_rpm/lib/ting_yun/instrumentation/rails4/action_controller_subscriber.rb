@@ -14,9 +14,9 @@ module TingYun
           request = state.request
           event = ControllerEvent.new(name, Time.now, nil, id, payload, request)
           push_event(event)
-          if state.execution_traced?
+          # if state.execution_traced?
             start_transaction(state, event)
-          end
+          # end
         rescue => e
           log_notification_error(e, name, 'start')
         end

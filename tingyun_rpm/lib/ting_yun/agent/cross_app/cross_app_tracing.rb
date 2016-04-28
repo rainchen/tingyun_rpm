@@ -171,7 +171,7 @@ module TingYun
         uri = "#{request.host}/#{request.type}/#{request.method}"
         metrics = []
         metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
-        metrics << "#{my_data["action"]}:#{uri}"
+        metrics << "External/#{my_data["action"]}:#{uri}"
 
         return metrics
       end
