@@ -111,7 +111,7 @@ module TingYun
             }
         }
         payload[:tr] = 1 if slow_action_tracer?(state)
-
+        payload[:r] = state.client_req_id unless state.client_req_id.nil?
         payload
       end
 
