@@ -82,7 +82,7 @@ module TingYun
       def same_account?(state)
         server_info = TingYun::Agent.config[:tingyunIdSecret].split('|')
         client_info = (state.client_tingyun_id_secret || '').split('|')
-        if server_info[0] == client_info[0] && !server_info[0].empty?
+        if !server_info[0].nil? && server_info[0] == client_info[0] && !server_info[0].empty?
           return true
         else
           return false
