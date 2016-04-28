@@ -82,7 +82,7 @@ module TingYun
       def same_account?(state)
         server_info = TingYun::Agent.config[:tingyunIdSecret].split('|')
         client_info = (state.client_tingyun_id_secret || '').split('|')
-        if server_info.size == 2 && client_info.size == 2 && server_info[0] == client_info[0]
+        if server_info[0] == client_info[0] && !server_info[0].empty?
           return true
         else
           return false
@@ -91,6 +91,7 @@ module TingYun
 
       def set_response_headers(state, response_headers)
         response_headers[TY_DATA_HEADER] = TingYun::Support::Serialize::JSONWrapper.dump build_payload(state)
+        TingYun::Agent.logger.debug("now,cross app will send response_headers  #{response_headers[TY_DATA_HEADER]}")
       end
 
       def build_payload(state)
