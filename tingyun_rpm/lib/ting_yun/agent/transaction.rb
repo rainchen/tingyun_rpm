@@ -208,7 +208,7 @@ module TingYun
             trace_options,
             end_time.to_f)
 
-        commit!(state, end_time, name)
+        commit!(state, end_time, name) unless ignore(best_name)
       end
 
       def self.nested_transaction_name(name)
@@ -454,6 +454,8 @@ module TingYun
       def needs_middleware_summary_metrics?(name)
         name.start_with?(MIDDLEWARE_PREFIX)
       end
+
+      alias_method :ignore, :needs_middleware_summary_metrics?
 
       def best_name
         @frozen_name || @default_name || ::TingYun::Agent::UNKNOWN_METRIC
