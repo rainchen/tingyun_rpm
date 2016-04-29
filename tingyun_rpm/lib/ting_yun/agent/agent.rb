@@ -25,6 +25,7 @@ module TingYun
 
       # service for communicating with collector
       attr_accessor :service
+      attr_reader :events
 
       extend ClassMethods
       include InstanceMethods
