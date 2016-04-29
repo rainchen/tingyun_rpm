@@ -44,6 +44,10 @@ module TingYun
           TingYun::Support::SystemInfo.ruby_os_identifier.downcase
         end
 
+        def self.platform
+          TingYun::Support::SystemInfo.ruby_os_identifier.downcase
+        end
+
         def poll
           sample = @sampler.get_sample
           if sample

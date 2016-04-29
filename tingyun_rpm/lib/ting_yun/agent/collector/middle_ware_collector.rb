@@ -62,17 +62,16 @@ module TingYun
         rescue => e
           ::TingYun::Agent.logger.error("Error registering sampler:", e)
         end
-      end
 
 
-      # adds samplers to the sampler collection so that they run every
-      # minute. This is dynamically recognized by any class that
-      def load_samplers
-        TingYun::Agent::Collector::Sampler.sampler_classes.each do |subclass|
-          register_sampler(subclass)
+        # adds samplers to the sampler collection so that they run every
+        # minute. This is dynamically recognized by any class that
+        def load_samplers
+          TingYun::Agent::Collector::Sampler.sampler_classes.each do |subclass|
+            register_sampler(subclass)
+          end
         end
       end
-
     end
   end
 end
