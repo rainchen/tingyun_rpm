@@ -8,7 +8,7 @@ module TingYun
       class RequestAttributes
 
         attr_reader :request_path, :referer, :accept, :content_length, :host,
-                    :port, :user_agent, :request_method
+                    :port, :user_agent, :request_method, :query_string
 
         HTTP_ACCEPT_HEADER_KEY = "HTTP_ACCEPT".freeze
 
@@ -21,6 +21,7 @@ module TingYun
           @port = port_from_request request
           @user_agent = attribute_from_request request, :user_agent
           @request_method = attribute_from_request request, :request_method
+          @query_string = attribute_from_request request, :query_string
         end
 
         def assign_agent_attributes(txn)
@@ -56,6 +57,10 @@ module TingYun
           if request_method
             txn.add_agent_attribute :method, request_method
           end
+
+          if query_string
+            txn.add_agent_attribute :request_params, request_params
+          end
         end
 
 
@@ -63,6 +68,18 @@ module TingYun
 
         # Make a safe attempt to get the referer from a request object, generally successful when
         # it's a Rack request.
+
+        def request_params
+          hash = {}
+          return hash if query_string.empty?
+
+          query_string.split("&").each do |param|
+            _k,_v = param.strip.split("=")
+            hash[-k] = _v unless _v.nil?
+          end
+
+          return hash
+        end
 
         def referer_from_request request
           if referer = attribute_from_request(request, :referer)

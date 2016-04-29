@@ -256,7 +256,7 @@ module TingYun
       end
 
       def add_agent_attribute(key, value)
-        @attributes.add_agent_attribute(key, value)
+        @attributes.add_a_attribute(key, value)
       end
 
       #collector error
