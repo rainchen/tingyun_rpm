@@ -81,7 +81,7 @@ module TingYun
           sanitize_environment_report
           settings = {
               :pid => $$,
-              :port => ::TingYun::Agent.config[:agent_port],
+              :port => ::TingYun::Agent.config[:port],
               :host => local_host,
               :appName => ::TingYun::Agent.config.app_names,
               :language => 'Ruby',
