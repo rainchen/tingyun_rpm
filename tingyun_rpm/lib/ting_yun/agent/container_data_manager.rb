@@ -96,6 +96,8 @@ module TingYun
           @service.send(endpoint, items)
         rescue => e
           TingYun::Agent.logger.info("Unable to send #{endpoint} data, will try again later. Error: ", e)
+          container.merge!(payload)
+          raise
         end
 
       end
