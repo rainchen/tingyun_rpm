@@ -4,6 +4,8 @@
 #
 
 require 'ting_yun/support/exception'
+require 'ting_yun/support/coerce'
+
 
 module TingYun
   module Agent
@@ -12,7 +14,7 @@ module TingYun
 
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :request_uri, :request_port, :file_name, :line_number,
-                      :stack_trace, :attributes_from_notice_error, :response_attributes,
+                      :stack_trace, :attributes_from_notice_error, :attributes,
                       :count_error, :thread_name
 
         attr_reader :exception_id, :is_internal
@@ -20,7 +22,6 @@ module TingYun
 
         def initialize(metric_name, exception, timestamp = Time.now)
           @stack_trace = []
-          @thread_name = "pid-#{$$}"
           @count_error = 1
           @exception_id = exception.object_id
           @metric_name = metric_name
@@ -66,16 +67,17 @@ module TingYun
 
         include TingYun::Support::Coerce
 
-        def to_collector_array(encoder=nil)
-           [timestamp.to_i,
-            string(metric_name),
-            int(response_attributes.agent_attributes[:httpResponseCode]),
-            string(exception_class_name),
-            string(message),
-            count_error,
-            string(request_uri),
-            error_params.to_s
-           ]
+        def to_collector_array(encoder)
+
+          [timestamp.to_i,
+           string(metric_name),
+           int(attributes.agent_attributes[:httpStatus]),
+           string(exception_class_name),
+           string(message),
+           count_error,
+           string(request_uri),
+           encoder.encode(error_params)
+          ]
         end
 
         def error_params
@@ -88,14 +90,14 @@ module TingYun
 
         def custom_params
           {
-            :threadName => thread_name,
-            :httpStatus => int(response_attributes.agent_attributes[:httpResponseCode]),
-            :referer    => string(response_attributes.agent_attributes[:'request.headers.referer']) || ''
+              :threadName => string(attributes.agent_attributes[:threadName]),
+              :httpStatus => int(attributes.agent_attributes[:httpStatus]),
+              :referer    => string(attributes.agent_attributes[:referer]) || ''
           }
         end
 
         def request_params
-          {}
+          attributes.agent_attributes[:request_params]
         end
 
       end
