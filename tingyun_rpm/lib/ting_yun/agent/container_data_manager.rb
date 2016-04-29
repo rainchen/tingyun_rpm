@@ -7,7 +7,7 @@ module TingYun
   module Agent
     module ContainerDataManager
 
-      attr_reader :stats_engine, :error_collector
+      attr_reader :stats_engine, :error_collector, :transaction_sampler
 
       def drop_buffered_data
         @stats_engine.reset!
