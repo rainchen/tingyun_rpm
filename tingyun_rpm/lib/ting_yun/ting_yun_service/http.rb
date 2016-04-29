@@ -18,7 +18,7 @@ module TingYun
 
       def remote_method_uri(method)
         params = {'licenseKey'=> @license_key,'version' => @data_version}
-        params[:appSessionKey] = @appSessionKey unless method == :initAgentApp
+        params[:appSessionKey] = @appSessionKey if @appSessionKey
         uri = "/" + method.to_s
         uri << '?' + params.map do |k,v|
           next unless v
