@@ -22,7 +22,7 @@
 #
 
 require 'ting_yun/frameworks'
-require 'pry'
+
 
 if defined?(Rails::VERSION)
   if Rails::VERSION::MAJOR.to_i >= 3
