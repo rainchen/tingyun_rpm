@@ -13,6 +13,7 @@ module TingYun
             'UPDATE',
             'DELETE',
             'INSERT',
+            'SHOW',
             'CALL'
         ]
 
