@@ -120,7 +120,7 @@ module TingYun
         processor_count = get_processor_info[:num_logical_processors]
 
         if processor_count.nil?
-          OneApm::Manager.logger.warn("Failed to determine processor count, assuming 1")
+          TingYun::Agent.logger.warn("Failed to determine processor count, assuming 1")
           processor_count = 1
         end
 
@@ -159,7 +159,7 @@ module TingYun
           when '/'                                            then nil
           # in a cgroup, but we don't recognize its format
           else
-            OneApm::Manager.logger.debug("Ignoring unrecognized cgroup ID format: '#{cpu_cgroup}'")
+            TingYun::Agent.logger.debug("Ignoring unrecognized cgroup ID format: '#{cpu_cgroup}'")
             nil
         end
       end
