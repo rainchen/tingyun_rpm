@@ -63,7 +63,9 @@ module TingYun
       #
       def harvest_and_send_from_container(container,endpoint)
         items = harvest_from_container(container, endpoint)
-        send_data_to_endpoint(endpoint, items, container) unless items.empty?
+        if !items.empty? && TingYun::Agent.config[:'nbs.agent_enabled']
+          send_data_to_endpoint(endpoint, items, container)
+        end
       end
 
       def harvest_from_container(container, endpoint)
