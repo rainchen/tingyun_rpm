@@ -24,11 +24,13 @@ module TingYun
         # the agent
         def deferred_work!(connection_options)
           catch_errors do
-            connect!(connection_options)
-            if connected?
-              create_and_run_event_loop
-            else
-              TingYun::Agent.logger.debug "No connection.  Worker thread ending."
+            TingYun::Agent.disable_all_tracing do
+              connect!(connection_options)
+              if connected?
+                create_and_run_event_loop
+              else
+                TingYun::Agent.logger.debug "No connection.  Worker thread ending."
+              end
             end
           end
         end

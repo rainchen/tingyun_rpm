@@ -235,10 +235,6 @@ module TingYun
       end
 
       def assign_agent_attributes
-  
-        add_agent_attribute(:threadName,  "pid-#{$$}");
-
-        add_agent_attribute(:threadName,  "pid-#{$$}");
 
         add_agent_attribute(:threadName,  "pid-#{$$}");
 
@@ -258,7 +254,7 @@ module TingYun
       end
 
       def add_agent_attribute(key, value)
-        @attributes.add_a_attribute(key, value)
+        @attributes.add_agent_attribute(key, value)
       end
 
       #collector error

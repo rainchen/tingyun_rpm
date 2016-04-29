@@ -6,11 +6,11 @@ require 'ting_yun/agent/method_tracer'
 module TingYun
   module Instrumentation
     module Mongo2
-      def self.install_mongo_command_subscriber
-        require 'ting_yun/instrumentation/command_log_subscriber'
+      def self.install_mongo_command_log_subscriber
+        require 'ting_yun/instrumentation/mongo_command_log_subscriber'
         ::Mongo::Monitoring::Global.subscribe(
             ::Mongo::Monitoring::COMMAND,
-            TingYun::Instrumentation::CommandLogSubscriber.new
+            TingYun::Instrumentation::MongoCommandLogSubscriber.new
         )
       end
     end
@@ -32,6 +32,6 @@ TingYun::Support::LibraryDetection.defer do
   end
 
   executes do
-    TingYun::Instrumentation::Mongo2.install_mongo_command_subscriber
+    TingYun::Instrumentation::Mongo2.install_mongo_command_log_subscriber
   end
 end

@@ -24,7 +24,6 @@ module TingYun
 
 
     attr_accessor :request_timeout,
-                  :tingyunIdSecret,
                   :appSessionKey,
                   :data_version,
                   :metric_id_cache,
@@ -44,13 +43,12 @@ module TingYun
 
     def connect(settings={})
       if host = get_redirect_host
-         @collector = TingYun::Support.collector_from_host(host)
+        @collector = TingYun::Support.collector_from_host(host)
       end
       response = invoke_remote(:initAgentApp, [settings])
       TingYun::Agent.logger.info("initAgentApp response: #{response}") if TingYun::Agent.config[:'nbs.audit_mode']
       @applicationId = response['applicationId']
       @appSessionKey = response['appSessionKey']
-      @tingyunIdSecret  = response['appSessionKey']
       response
     end
 
@@ -61,7 +59,6 @@ module TingYun
     def force_restart
       @applicationId = nil
       @appSessionKey = nil
-      @tingyunIdSecret = nil
       @metric_id_cache = {}
       close_shared_connection
     end
@@ -85,7 +82,11 @@ module TingYun
       end
       # serialize_finish_time = Time.now
 
-      TingYun::Agent.logger.info("the prepare data: #{data}") if TingYun::Agent.config[:'nbs.audit_mode']
+      if TingYun::Agent.config[:'nbs.audit_mode']
+        TingYun::Agent.logger.info("the prepare data: #{data}")
+      else
+        TingYun::Agent.logger.info("prepare to send data")
+      end
 
       data, encoding = compress_request_if_needed(data)
       # size = data.size
@@ -97,7 +98,12 @@ module TingYun
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
-      TingYun::Agent.logger.info("the return data: #{response.body}") if TingYun::Agent.config[:'nbs.audit_mode']
+
+      if TingYun::Agent.config[:'nbs.audit_mode']
+        TingYun::Agent.logger.info("the return data: #{response.body}")
+      else
+        TingYun::Agent.logger.info("the send-process end")
+      end
       @marshaller.load(decompress_response(response))
     end
 

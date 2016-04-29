@@ -10,7 +10,7 @@ module TingYun
         attr_reader :request_path, :referer, :accept, :content_length, :host,
                     :port, :user_agent, :request_method, :query_string
 
-        HTTP_ACCEPT_HEADER_KEY = "HTTP_ACCEPT".freeze
+        HTTP_ACCEPT_HEADER_KEY = 'HTTP_ACCEPT'.freeze
 
         def initialize request
           @request_path = path_from_request request
@@ -63,41 +63,6 @@ module TingYun
           end
         end
 
-        def assign_agent_attributes(txn)
-
-          if request_path
-            txn.add_agent_attribute :request_path, request_path
-          end
-
-          if referer
-            txn.add_agent_attribute :referer, referer
-          end
-
-          if accept
-            txn.add_agent_attribute :accept, accept
-          end
-
-          if content_length
-            txn.add_agent_attribute :contentLength, content_length
-          end
-
-          if host
-            txn.add_agent_attribute :host, host
-          end
-
-          if port
-            txn.add_agent_attribute :port, port
-          end
-
-          if user_agent
-            txn.add_agent_attribute :userAgent, user_agent
-          end
-
-          if request_method
-            txn.add_agent_attribute :method, request_method
-          end
-        end
-
 
         private
 
@@ -106,14 +71,13 @@ module TingYun
 
         def request_params
           hash = {}
-          return hash if query_string.empty?
-
-          query_string.split("&").each do |param|
-            _k,_v = param.strip.split("=")
-            hash[-k] = _v unless _v.nil?
+          return hash if @query_string.empty?
+          query_string.split('&').each do |param|
+            _k,_v = param.strip.split('=')
+            hash[_k] = _v unless _v.nil?
           end
 
-          return hash
+          hash
         end
 
         def referer_from_request request

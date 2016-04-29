@@ -14,7 +14,9 @@ module TingYun
           request = state.request
           event = ControllerEvent.new(name, Time.now, nil, id, payload, request)
           push_event(event)
-          start_transaction(state, event)
+          # if state.execution_traced?
+            start_transaction(state, event)
+          # end
         rescue => e
           log_notification_error(e, name, 'start')
         end
@@ -27,7 +29,7 @@ module TingYun
           state = TingYun::Agent::TransactionState.tl_get
 
 
-          stop_transaction(state, event)
+          stop_transaction(state)
         rescue => e
           log_notification_error(e, name, 'finish')
         end
@@ -40,8 +42,8 @@ module TingYun
                                             :transaction_name => event.metric_name)
         end
 
-        def stop_transaction(state, event)
-          txn = state.current_transaction
+        def stop_transaction(state)
+          # txn = state.current_transaction
           TingYun::Agent::Transaction.stop(state)
         end
 
@@ -66,10 +68,10 @@ module TingYun
         end
 
         def metric_name
-          unless TingYun::Agent.config[:'nbs.auto_app_naming']
-            @metric_name = "WebAction/#{payload[:path]}"
-          else
+          if TingYun::Agent.config[:'nbs.auto_action_naming']
             @metric_name ||= "WebAction/Rails/#{metric_path}/#{metric_action}"
+          else
+            path
           end
         end
 
@@ -77,12 +79,16 @@ module TingYun
           @controller_class.controller_path
         end
 
+        def metric_class
+          payload[:controller]
+        end
+
         def metric_action
           payload[:action]
         end
 
         def path
-          path = payload[:path]
+          payload[:path]
         end
 
         def to_s

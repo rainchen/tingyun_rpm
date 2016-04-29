@@ -10,7 +10,7 @@ module TingYun
 
         def tingyun_metric_path(action_name_override = nil)
 
-          return self.env["PATH_INFO"] unless TingYun::Agent.config[:'nbs.auto_app_naming']
+          return  self.env["PATH_INFO"] unless TingYun::Agent.config[:'nbs.auto_action_naming']
 
           action = action_name_override || action_name
           if action_name_override || self.class.action_methods.include?(action)

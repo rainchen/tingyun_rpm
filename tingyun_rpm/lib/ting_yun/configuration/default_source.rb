@@ -157,7 +157,7 @@ module TingYun
             :description => 'Enable or disable the agent.'
         },
         :'nbs.agent_enabled' => {
-            :default => true,
+            :default => DefaultSource.agent_enabled,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,
@@ -171,7 +171,7 @@ module TingYun
             :description => 'Semicolon-delimited list of Naming your application.'
         },
         :'nbs.auto_app_naming' => {
-            :default => true,
+            :default => false,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,
@@ -270,7 +270,7 @@ module TingYun
             :description => 'Threshold (in millisecond) above which the agent will collect explain plans. Relevant only when <code><a href="">explain_enabled</a></code> is true.'
         },
         :'nbs.transaction_tracer.enabled' => {
-            :default => false,
+            :default => true,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,
@@ -454,7 +454,7 @@ module TingYun
             :description => 'Port for the Ting Yun data collection service.'
         },
         :api_host => {
-            :default => 'dc1.networkbench.com',
+            :default => 'redirect.networkbench.com',
             :public => false,
             :type => String,
             :allowed_from_server => false,
@@ -527,7 +527,7 @@ module TingYun
             :description => "Manual override for the path to your local CA bundle. This CA bundle will be used to validate the SSL certificate presented by Ting Yun's data collection service."
         },
         :ssl => {
-            :default => false,
+            :default => true,
             :allow_nil => true,
             :public => true,
             :type => Boolean,
@@ -576,11 +576,11 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Enable or disable Specifies url'
         },
-        :auto_action_naming => {
+        :'nbs.auto_action_naming' => {
             :default => true,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => false,
+            :allowed_from_server => true,
             :description => 'Enable or disable to use default name '
         },
         :capture_params => {
@@ -606,7 +606,7 @@ module TingYun
             :description => 'millisecond'
         },
         :'transaction_tracer.limit_segments' => {
-            :default => 40,
+            :default => 2000,
             :public => true,
             :type => Fixnum,
             :allowed_from_server => true,
@@ -625,6 +625,13 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => false,
             :description => 'Controls whether to normalize string encodings prior to serializing data for the collector to JSON.'
+        },
+        :tingyunIdSecret => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => '跨应用追踪加密ID'
         }
     }.freeze
   end

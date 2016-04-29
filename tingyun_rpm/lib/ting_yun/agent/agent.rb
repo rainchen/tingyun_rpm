@@ -8,6 +8,7 @@ require 'ting_yun/frameworks'
 require 'ting_yun/agent/event/event_listener'
 require 'ting_yun/agent/dispatcher'
 require 'ting_yun/agent/collector/middle_ware_collector'
+require 'ting_yun/agent/cross_app/cross_app_monitor'
 
 
 # The Agent is a singleton that is instantiated when the plugin is
@@ -24,14 +25,26 @@ module TingYun
       end
 
       # service for communicating with collector
-      attr_accessor :service
+      attr_accessor :service, :cross_app_monitor
       attr_reader :events
 
       extend ClassMethods
       include InstanceMethods
 
 
+      def initialize
+        @started = false
+        @environment_report = nil
+        @service = TingYunService.new
+        @connect_state = :pending #[:pending, :connected, :disconnected]
+        @connect_attempts = 0
+        @events  = TingYun::Agent::Event::EventListener.new
+        @after_fork_lock = Mutex.new
+        @dispatcher = TingYun::Agent::Dispatcher.new(@events)
+        @cross_app_monitor = TingYun::Agent::CrossAppMonitor.new(@events)
 
+        init_containers
+      end
 
       def start
         # should hava the vaild app_name, unstart-state and able to start
@@ -88,7 +101,7 @@ module TingYun
         end
       rescue Exception => e
         ::TingYun::Agent.logger.error "Exception of unexpected type during Agent#connect():", e
-       raise
+        raise
       end
 
 
@@ -109,18 +122,7 @@ module TingYun
         defined?(RUBY_ENGINE) && RUBY_ENGINE == "ruby" && RUBY_VERSION.match(/^1\.9/)
       end
 
-      def initialize
-        @started = false
-        @environment_report = nil
-        @service = TingYunService.new
-        @connect_state = :pending #[:pending, :connected, :disconnected]
-        @connect_attempts = 0
-        @events  = TingYun::Agent::Event::EventListener.new
-        @after_fork_lock = Mutex.new
-        @dispatcher = TingYun::Agent::Dispatcher.new(@events)
 
-        init_containers
-      end
     end
   end
 end

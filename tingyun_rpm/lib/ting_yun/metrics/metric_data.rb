@@ -53,11 +53,14 @@ module TingYun
       end
 
       def stats_has_parent?
-        if metric_spec.scope.empty?
-          { 'name' => metric_spec.name }
-        else
-          { 'name' => metric_spec.name, 'parent' => metric_spec.scope }
+        hash =  { 'name' => metric_spec.name }
+        hash['calleeId'] = metric_spec.calleeId unless metric_spec.calleeId.nil?
+        hash['calleeName'] = metric_spec.calleeName unless metric_spec.calleeName.nil?
+        unless metric_spec.scope.empty?
+          hash['parent'] = metric_spec.scope
         end
+
+        return hash
       end
 
       def metrics(stat_key)
@@ -65,14 +68,14 @@ module TingYun
         metrics = []
 
         metrics << int(stats.call_count, stat_key)
-        if stats.min_call_time != 0.0 #apedx
+        if stats.max_call_time != 0.0 #apedx
           metrics << float(stats.total_call_time, stat_key)
           metrics << float(stats.total_exclusive_time, stat_key)
-          metrics << float(stats.min_call_time, stat_key)
+          metrics << float(stats.max_call_time, stat_key)
         end
 
-        if stats.max_call_time !=0.0 #
-          metrics << float(stats.max_call_time, stat_key)
+        if stats.min_call_time !=0.0 #
+          metrics << float(stats.min_call_time, stat_key)
           metrics << float(stats.sum_of_squares, stat_key)
         end
 

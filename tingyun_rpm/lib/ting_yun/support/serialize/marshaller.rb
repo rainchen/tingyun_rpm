@@ -51,18 +51,17 @@ module TingYun
 
         def return_value(data)
           if data.respond_to?(:has_key?)
-            if data.has_key?('status')
-              if data['status'] == "error"
+            if data.has_key?('status') && data.has_key?('result')
+              if data['status'] =="error"
                 parsed_error(data['result'])
               elsif data['result']['enabled'] == false
-                raise TingYun::Support::Exception::AgentEnableException.new("config['nbs.agent_enable']==false , should retry")
+                raise TingYun::Support::Exception::AgentEnableException.new("sorry，the application is unable to use the tingyun service now ")
               else
-                return data
+                return data['result']
               end
             end
           end
-          ::TingYun::Agent.logger.debug("Unexpected response from collector: #{data}")
-          nil
+          data
         end
       end
     end

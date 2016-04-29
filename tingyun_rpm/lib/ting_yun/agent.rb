@@ -124,6 +124,54 @@ module TingYun
       nil # don't return a noticed error datastructure. it can only hurt.
     end
 
+    # Register this method as a callback for processes that fork
+    # jobs.
+    #
+    # If the master/parent connects to the agent prior to forking the
+    # agent in the forked process will use that agent_run.  Otherwise
+    # the forked process will establish a new connection with the
+    # server.
+    #
+    # Use this especially when you fork the process to run background
+    # jobs or other work.  If you are doing this with a web dispatcher
+    # that forks worker processes then you will need to force the
+    # agent to reconnect, which it won't do by default.  Passenger and
+    # Rainbows and Unicorn are already handled, nothing special needed for them.
+    #
+    # Options:
+    # * <tt>:force_reconnect => true</tt> to force the spawned process to
+    #   establish a new connection, such as when forking a long running process.
+    #   The default is false--it will only connect to the server if the parent
+    #   had not connected.
+    # * <tt>:keep_retrying => false</tt> if we try to initiate a new
+    #   connection, this tells me to only try it once so this method returns
+    #   quickly if there is some kind of latency with the server.
+    #
+    # @api public
+    #
+    def after_fork(options={})
+      agent.after_fork(options) if agent
+    end
+
+
+    # Yield to the block without collecting any metrics or traces in
+    # any of the subsequent calls.  If executed recursively, will keep
+    # track of the first entry point and turn on tracing again after
+    # leaving that block.  This uses the thread local TransactionState.
+    #
+    # @api public
+    #
+    def disable_all_tracing
+      return yield unless agent
+      begin
+        agent.push_trace_execution_flag(false)
+        yield
+      ensure
+        agent.pop_trace_execution_flag
+      end
+    end
+
+
 
     # Register this method as a callback for processes that fork
     # jobs.

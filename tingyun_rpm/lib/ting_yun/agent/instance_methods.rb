@@ -11,8 +11,9 @@ module TingYun
 
       include Start
       include Connect
-      include StartWorkerThread
       include ContainerDataManager
+      include StartWorkerThread
+
 
 
       def reset_to_default_configuration
@@ -24,6 +25,14 @@ module TingYun
         @event_loop.stop if @event_loop
       end
 
+
+      def push_trace_execution_flag(flag =false)
+        TransactionState.tl_get.push_traced(flag)
+      end
+
+      def pop_trace_execution_flag
+        TransactionState.tl_get.pop_traced
+      end
 
     end
   end
