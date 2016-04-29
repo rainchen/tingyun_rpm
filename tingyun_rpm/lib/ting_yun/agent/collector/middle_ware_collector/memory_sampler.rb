@@ -47,7 +47,7 @@ module TingYun
         def poll
           sample = @sampler.get_sample
           if sample
-            TingYun::Agent.record_metric("Memory/Physical", sample)
+            TingYun::Agent.record_metric("Memory/NULL/PhysicalUsed", sample)
           end
         end
 

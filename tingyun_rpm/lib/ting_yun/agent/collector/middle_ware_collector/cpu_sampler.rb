@@ -23,7 +23,7 @@ module TingYun
         end
 
         def record_user_util(value)
-          TingYun::Agent.record_metric("CPU/User/Utilization", value)
+          TingYun::Agent.record_metric("CPU/NULL/UserUtilization", value)
         end
 
         def record_system_util(value)
@@ -31,7 +31,7 @@ module TingYun
         end
 
         def record_usertime(value)
-          TingYun::Agent.record_metric("CPU/User Time", value)
+          TingYun::Agent.record_metric("CPU/NULL/UserTime", value)
         end
 
         def record_systemtime(value)
@@ -46,16 +46,16 @@ module TingYun
             return if elapsed < 1 # Causing some kind of math underflow
 
             usertime = t.utime - @last_utime
-            systemtime = t.stime - @last_stime
+            # systemtime = t.stime - @last_stime
 
-            record_systemtime(systemtime) if systemtime >= 0
+            # record_systemtime(systemtime) if systemtime >= 0
             record_usertime(usertime) if usertime >= 0
 
             # Calculate the true utilization by taking cpu times and dividing by
             # elapsed time X processor_count.
 
             record_user_util(usertime / (elapsed * @processor_count))
-            record_system_util(systemtime / (elapsed * @processor_count))
+            # record_system_util(systemtime / (elapsed * @processor_count))
           end
           @last_utime = t.utime
           @last_stime = t.stime
