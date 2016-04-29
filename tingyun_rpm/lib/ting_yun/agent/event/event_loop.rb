@@ -146,6 +146,8 @@ module TingYun
           @subscriptions[event].each do |s|
             begin
               s.call(*args)
+            rescue TingYun::Support::Exception::ExpiredConfigurationException, TingYun::Support::Exception::InvalidDataTokenException, TingYun::Support::Exception::InvalidDataException
+              raise
             rescue => e
               errors << e
             end
