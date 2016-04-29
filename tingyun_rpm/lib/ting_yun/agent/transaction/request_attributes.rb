@@ -63,6 +63,41 @@ module TingYun
           end
         end
 
+        def assign_agent_attributes(txn)
+
+          if request_path
+            txn.add_agent_attribute :'request.headers.request_path', request_path
+          end
+
+          if referer
+            txn.add_agent_attribute :'request.headers.referer', referer
+          end
+
+          if accept
+            txn.add_agent_attribute :'request.headers.accept', accept
+          end
+
+          if content_length
+            txn.add_agent_attribute :'request.headers.contentLength', content_length
+          end
+
+          if host
+            txn.add_agent_attribute :'request.headers.host', host
+          end
+
+          if port
+            txn.add_agent_attribute :'request.headers.port', port
+          end
+
+          if user_agent
+            txn.add_agent_attribute :'request.headers.userAgent', user_agent
+          end
+
+          if request_method
+            txn.add_agent_attribute :'request.headers.method', request_method
+          end
+        end
+
 
         private
 
@@ -118,41 +153,6 @@ module TingYun
         def attribute_from_env request, key
           if env = attribute_from_request(request, :env)
             env[key]
-          end
-        end
-
-        def assign_agent_attributes(txn)
-
-          if request_path
-            txn.add_agent_attribute :'request.headers.request_path', request_path
-          end
-
-          if referer
-            txn.add_agent_attribute :'request.headers.referer', referer
-          end
-
-          if accept
-            txn.add_agent_attribute :'request.headers.accept', accept
-          end
-
-          if content_length
-            txn.add_agent_attribute :'request.headers.contentLength', content_length
-          end
-
-          if host
-            txn.add_agent_attribute :'request.headers.host', host
-          end
-
-          if port
-            txn.add_agent_attribute :'request.headers.port', port
-          end
-
-          if user_agent
-            txn.add_agent_attribute :'request.headers.userAgent', user_agent
-          end
-
-          if request_method
-            txn.add_agent_attribute :'request.headers.method', request_method
           end
         end
 
