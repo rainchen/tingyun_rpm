@@ -235,6 +235,8 @@ module TingYun
       end
 
       def assign_agent_attributes
+  
+        add_agent_attribute(:threadName,  "pid-#{$$}");
 
         add_agent_attribute(:threadName,  "pid-#{$$}");
 
