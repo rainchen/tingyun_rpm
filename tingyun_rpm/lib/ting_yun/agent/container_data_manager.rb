@@ -79,7 +79,12 @@ module TingYun
 
       def send_data_to_endpoint(endpoint, items, container)
         TingYun::Agent.logger.debug("Sending #{items.size} items to #{endpoint}")
-        @service.send(endpoint, items)
+        begin
+          @service.send(endpoint, items)
+        rescue => e
+          TingYun::Agent.logger.info("Unable to send #{endpoint} data, will try again later. Error: ", e)
+        end
+
       end
 
     end
