@@ -12,9 +12,15 @@ module TingYun
 
       def drop_buffered_data
         @stats_engine.reset!
+        @sql_sampler.reset!
+        @error_collector.drop_buffered_data
       end
 
-      # private
+      def reset_objects_with_locks
+        init_containers
+      end
+
+
 
       def init_containers
         @stats_engine = TingYun::Agent::Collector::StatsEngine.new

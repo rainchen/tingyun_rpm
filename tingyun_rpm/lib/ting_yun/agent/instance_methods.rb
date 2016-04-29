@@ -22,6 +22,7 @@ module TingYun
         @event_loop.stop if @event_loop
       end
 
+
     end
   end
 end
