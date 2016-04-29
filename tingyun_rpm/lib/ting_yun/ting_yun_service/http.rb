@@ -17,7 +17,8 @@ module TingYun
       include Connection
 
       def remote_method_uri(method)
-        params = {'licenseKey'=> @license_key,'version' => @data_version,'appSessionKey' => @appSessionKey}
+        params = {'licenseKey'=> @license_key,'version' => @data_version}
+        params[:appSessionKey] = @appSessionKey unless method == :initAgentApp
         uri = "/" + method.to_s
         uri << '?' + params.map do |k,v|
           next unless v
