@@ -35,7 +35,7 @@ module TingYun
         begin
           node = start_trace(state, t0, request)
           response = yield
-          capture_exception(response,state)
+          capture_exception(response,state,'net%2Fhttp')
         ensure
           finish_trace(state, t0, node, request, response)
         end

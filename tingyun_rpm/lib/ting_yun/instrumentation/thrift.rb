@@ -44,9 +44,9 @@ module TingYun
       def metrics operate
         state = TingYun::Agent::TransactionState.tl_get
         metrics = if tingyun_host.nil?
-                    ["External/thrift:%2F%2F#{operate}/#{state.current_transaction.remote_name}"]
+                    ["External/thrift:%2F%2F#{operate}/#{operate}"]
                   else
-                    ["External/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{state.current_transaction.remote_name}"]
+                    ["External/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{operate}"]
                   end
         metrics << "External/NULL/ALL"
 
@@ -61,7 +61,7 @@ module TingYun
 
 
         if my_data
-          uri = "thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{state.current_transaction.remote_name}"
+          uri = "thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{operate}"
           metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
         end
         return metrics
@@ -298,7 +298,8 @@ TingYun::Support::LibraryDetection.defer do
           e = ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, "#{operate} failed: unknown result")
           e.instance_variable_set(:@klass, metrics(operate)[0])
           e.instance_variable_set(:@external, true)
-          raise e
+          e.instance_variable_set(:@code, 1000)
+          TingYun::Agent.notice_error(e)
         end
 
         t1 = Time.now.to_f

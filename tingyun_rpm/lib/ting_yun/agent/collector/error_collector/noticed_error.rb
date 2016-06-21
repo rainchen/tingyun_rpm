@@ -15,7 +15,7 @@ module TingYun
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :request_uri, :request_port, :file_name, :line_number,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :thread_name, :is_external_error, :external_metric_name
+                      :count_error, :thread_name, :is_external_error, :external_metric_name,:code
 
 
         attr_reader :exception_id, :is_internal
@@ -30,6 +30,7 @@ module TingYun
           @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
           @external_metric_name = exception.instance_variable_get :@klass
           @is_external_error = exception.instance_variable_get :@external
+          @code = exception.instance_variable_get :@code
           # It's critical that we not hold onto the exception class constant in this
           # class. These objects get serialized for Resque to a process that might
           # not have the original exception class loaded, so do all processing now
@@ -73,7 +74,7 @@ module TingYun
           if  is_external_error
             [timestamp.to_i,
              string(external_metric_name),
-             int(attributes.agent_attributes[:httpStatus]),
+             int(code),
              string(exception_class_name),
              count_error,
              string(metric_name),
