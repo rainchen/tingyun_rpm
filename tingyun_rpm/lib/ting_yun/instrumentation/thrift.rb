@@ -296,7 +296,7 @@ TingYun::Support::LibraryDetection.defer do
         duration = TingYun::Helper.time_to_millis(t1 - t0)
 
         TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
-            other_metrics, other_metrics, duration
+            other_metrics.pop, other_metrics, duration
         )
         if node
           node.name = node_name
