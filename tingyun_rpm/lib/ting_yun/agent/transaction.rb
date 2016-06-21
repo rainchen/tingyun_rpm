@@ -507,14 +507,6 @@ module TingYun
       HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
       GUID_LENGTH = 16
 
-      def remote_name
-        if @default_name && @default_name.start_with?("WebAction")
-         array =  @default_name.split('/')
-          "#{array[2]}.#{array[3]}"
-        else
-          ""
-        end
-      end
       # generate a random 64 bit uuid
       private
       def generate_guid

@@ -21,7 +21,7 @@ module TingYun
       TY_ID_HEADER = 'X-Tingyun-Id'.freeze
       TY_DATA_HEADER = 'X-Tingyun-Tx-Data'.freeze
 
-
+      TYPE = 'net%2Fhttp'.freeze
 
 
       module_function
@@ -35,7 +35,7 @@ module TingYun
         begin
           node = start_trace(state, t0, request)
           response = yield
-          capture_exception(request, response,state,'net%2Fhttp')
+          capture_exception(response,request,state,TYPE)
         ensure
           finish_trace(state, t0, node, request, response)
         end
@@ -126,8 +126,8 @@ module TingYun
       def metrics_for_regular_request( request )
         state = TingYun::Agent::TransactionState.tl_get
         metrics = []
-        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
-        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
+        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{TYPE}"
+        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{TYPE}"
 
         return metrics
       end
@@ -185,7 +185,7 @@ module TingYun
       def metrics_for_cross_app_response(request, response )
         state = TingYun::Agent::TransactionState.tl_get
         my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
-        uri = "#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
+        uri = "#{request.uri.to_s.gsub('/','%2F')}/#{TYPE}"
         metrics = []
         metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
         metrics << "External/#{my_data["action"]}:#{uri}"
