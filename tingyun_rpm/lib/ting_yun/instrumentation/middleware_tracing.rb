@@ -5,7 +5,7 @@ require 'rack/request'
 require 'ting_yun/instrumentation/support/queue_time'
 require 'ting_yun/agent/transaction'
 require 'ting_yun/agent'
-require 'ting_yun/instrumentation/support/queue_time'
+require 'ting_yun/instrumentation/support/external_error'
 
 module TingYun
   module Instrumentation
@@ -63,6 +63,7 @@ module TingYun
 
           result
         rescue Exception => e
+
           TingYun::Agent.notice_error(e)
           raise e
         ensure
