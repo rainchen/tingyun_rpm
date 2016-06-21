@@ -27,7 +27,7 @@ module TingYun
             begin
               yield
             rescue => e
-              ::TingYun::Agent.notice_error(e, handle_thrift_error(e))
+              ::TingYun::Agent.notice_error(e)
               raise
             end
           ensure
@@ -46,15 +46,6 @@ module TingYun
           txn_options[:apdex_start_time] = Time.now
 
           txn_options
-        end
-
-        def handle_thrift_error(e)
-          options = {}
-          if defined? ::Thrift::ApplicationException && e.is_a?::Thrift::ApplicationException
-            options[:is_external_error] = true
-            options[:external_metric_name] = TingYun::Agent::TransactionState.tl_get.external_metric_name
-          end
-          options
         end
       end
     end
