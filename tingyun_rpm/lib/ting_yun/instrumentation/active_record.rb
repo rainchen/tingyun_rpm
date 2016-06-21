@@ -46,9 +46,9 @@ module TingYun
         state = TingYun::Agent::TransactionState.tl_get
         sql, name, _ = args
         metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(
-                                                                    TingYun::Helper.correctly_encoded(name),
-                                                                    TingYun::Helper.correctly_encoded(sql),
-                                                                    @config && @config[:adapter])
+            TingYun::Helper.correctly_encoded(name),
+            TingYun::Helper.correctly_encoded(sql),
+            @config && @config[:adapter])
 
         scoped_metric = metrics.first
 
@@ -61,10 +61,10 @@ module TingYun
             state.sql_duration = elapsed_time * 1000
 
             TingYun::Agent.instance.transaction_sampler.notice_sql(sql, @config, elapsed_time,
-                                                                    state, EXPLAINER)
+                                                                   state, EXPLAINER)
             TingYun::Agent.instance.sql_sampler.notice_sql(sql, scoped_metric,
-                                                            @config, elapsed_time,
-                                                            state, EXPLAINER)
+                                                           @config, elapsed_time,
+                                                           state, EXPLAINER)
           end
 
         end
@@ -79,9 +79,7 @@ TingYun::Support::LibraryDetection.defer do
   named :active_record
 
   depends_on do
-    defined?(::ActiveRecord) && defined?(::ActiveRecord::Base) &&
-        (!defined?(::ActiveRecord::VERSION) ||
-            ::ActiveRecord::VERSION::MAJOR.to_i <= 3)
+    defined?(::ActiveRecord) && defined?(::ActiveRecord::Base)
   end
 
   executes do
@@ -91,7 +89,7 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     require 'ting_yun/instrumentation/support/active_record_helper'
 
-    if defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 3
+    if defined?(::Rails)
       ActiveSupport.on_load(:active_record) do
         ::TingYun::Instrumentation::ActiveRecord.instrument
       end

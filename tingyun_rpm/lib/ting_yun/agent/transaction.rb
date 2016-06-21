@@ -88,22 +88,6 @@ module TingYun
         @request_attributes && @request_attributes.port
       end
 
-
-      def self.start(state, category, options)
-        category ||= :controller
-        txn = state.current_transaction
-        options[:client_transaction_id] = state.client_transaction_id
-        if txn && options[:transaction_name]
-          txn.create_nested_frame(state, category, options)
-        else
-          txn = start_new_transaction(state, category, options)
-        end
-
-        txn
-      rescue => e
-        TingYun::Agent.logger.error("Exception during Transaction.start", e)
-      end
-
       def self.wrap(state, name, category, options = {})
         Transaction.start(state, category, options.merge(:transaction_name => name))
 
@@ -119,6 +103,21 @@ module TingYun
         end
       end
 
+
+      def self.start(state, category, options)
+        category ||= :controller
+        txn = state.current_transaction
+        options[:client_transaction_id] = state.client_transaction_id
+        if txn && options[:transaction_name]
+          txn.create_nested_frame(state, category, options)
+        else
+          txn = start_new_transaction(state, category, options)
+        end
+
+        txn
+      rescue => e
+        TingYun::Agent.logger.error("Exception during Transaction.start", e)
+      end
 
       def self.start_new_transaction(state, category, options)
         txn = Transaction.new(category, options)

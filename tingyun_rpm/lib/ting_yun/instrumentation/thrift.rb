@@ -52,7 +52,10 @@ module TingYun
           metrics << "External/NULL/AllBackground"
         end
         state = TingYun::Agent::TransactionState.tl_get
+
         my_data = state.thrift_return_data
+
+
         if my_data
           uri = "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}"
           metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
@@ -81,23 +84,148 @@ TingYun::Support::LibraryDetection.defer do
   end
 
   executes do
+    ::Thrift::Processor.module_eval do
 
 
-    ::Thrift::BaseProtocol.class_eval do
-      def skip_with_tingyun(type)
-        data = skip_without_tingyun(type)
-        if data.is_a? ::String && data.include?("TingyunTxData")
 
-          state = TingYun::Agent::TransactionState.tl_get
-          my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
-
-          state.thrift_return_data = my_data["TingyunTxData"]
-
-          transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
-          transaction_sampler.tl_builder.current_node[:txId] = my_data["TingyunTxData"]["trId"]
-          transaction_sampler.tl_builder.current_node[:txData] = my_data["TingyunTxData"]
+      def same_account?(state)
+        server_info = TingYun::Agent.config[:tingyunIdSecret].split('|')
+        client_info = (state.client_tingyun_id_secret || '').split('|')
+        if !server_info[0].nil? && server_info[0] == client_info[0] && !server_info[0].empty?
+          return true
+        else
+          return false
         end
       end
+      def write_result_with_tingyun(result, oprot, name, seqid)
+        state = TingYun::Agent::TransactionState.tl_get
+        oprot.write_message_begin(name, ::Thrift::MessageTypes::REPLY, seqid)
+
+        if state.execution_traced? && same_account?(state)
+
+          class_name = "WebAction/thrift/#{self.class.to_s.split('::').first.downcase}.#{name}"
+          ::TingYun::Agent::Transaction.wrap(state, class_name, :thrift) do
+            data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunTxData" => build_payload(state))
+            oprot.write_field_begin("TingyunField", 11, 6)
+            oprot.write_string(data)
+            oprot.write_field_end
+            write_result_without_tingyun(result, oprot, name, seqid)
+            state.current_transaction.add_agent_attribute(:httpStatus, 200)
+          end
+        else
+          write_result_without_tingyun(result, oprot, name, seqid)
+        end
+      end
+
+      def write_error_with_tingyun(err, oprot, name, seqid)
+        p 'write_error'
+        state = TingYun::Agent::TransactionState.tl_get
+        oprot.write_message_begin(name, ::Thrift::MessageTypes::EXCEPTION, seqid)
+
+        if state.execution_traced? && same_account?(state)
+
+          class_name = "WebAction/thrift/#{self.class.to_s.split('::').first.downcase}.#{name}"
+          ::TingYun::Agent::Transaction.wrap(state, class_name, :thrift) do
+            data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunTxData" => build_payload(state))
+            oprot.write_field_begin("TingyunField", 11, 6)
+            oprot.write_string(data)
+            oprot.write_field_end
+            write_result_without_tingyun(err, oprot, name, seqid)
+            p 'write_error end'
+            state.current_transaction.add_agent_attribute(:httpStatus, 500)
+          end
+        else
+          write_result_without_tingyun(error, oprot, name, seqid)
+        end
+      end
+
+
+      def build_payload(state)
+        state.web_duration = TingYun::Helper.time_to_millis(Time.now - state.thrift_start_time)
+        payload = {
+            :id => TingYun::Agent.config[:tingyunIdSecret].split('|')[1],
+            :action => state.current_transaction.best_name,
+            :trId => state.request_guid,
+            :time => {
+                :duration => state.web_duration,
+                :qu => state.queue_duration,
+                :db => state.sql_duration,
+                :ex => state.external_duration,
+                :rds => state.rds_duration,
+                :mc => state.mc_duration,
+                :mon => state.mon_duration,
+                :code => execute_duration(state)
+            }
+        }
+        payload[:tr] = 1 if slow_action_tracer?(state)
+        payload[:r] = state.client_req_id unless state.client_req_id.nil?
+        payload
+      end
+
+      def slow_action_tracer?(state)
+        if state.web_duration > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
+          return true
+        else
+          return false
+        end
+      end
+
+      def write_result_without_tingyun(result, oprot, name, seqid)
+        result.write(oprot)
+        oprot.write_message_end
+        oprot.trans.flush
+      end
+
+      def execute_duration(state)
+        state.web_duration - state.queue_duration - state.sql_duration - state.external_duration - state.rds_duration - state.mc_duration - state.mon_duration
+      end
+
+      alias :write_result  :write_result_with_tingyun
+      alias :write_error  :write_error_with_tingyun
+      # alias :write_result_without_tingyun  :write_result
+    end
+
+    ::Thrift::BaseProtocol.class_eval do
+
+      def skip_with_tingyun(type)
+
+        data = skip_without_tingyun(type)
+        state = TingYun::Agent::TransactionState.tl_get
+        if data.is_a? ::String
+          if data.include?("TingyunTxData")
+
+            my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
+
+            state.thrift_return_data = my_data["TingyunTxData"]
+
+            transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
+            transaction_sampler.tl_builder.current_node[:txId] = my_data["TingyunTxData"]["trId"]
+            transaction_sampler.tl_builder.current_node[:txData] = my_data["TingyunTxData"]
+          elsif data.include?("TingyunID")
+            state.thrift_start_time = Time.now
+            my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
+            save_referring_transaction_info(state, my_data)
+          end
+        end
+      end
+
+      def save_referring_transaction_info(state,data)
+
+        info = data["TingyunID"].split(';')
+        tingyun_id_secret = info[0]
+        client_transaction_id = info.find do |e|
+          e.split('=')[1] if e.match(/x=/)
+        end
+        client_req_id = info.find do |e|
+          e.split('=')[1] if e.match(/r=/)
+        end
+
+        state.client_tingyun_id_secret = tingyun_id_secret
+        state.client_transaction_id = client_transaction_id
+        state.client_req_id = client_req_id
+
+      end
+
       alias :skip_without_tingyun :skip
       alias :skip  :skip_with_tingyun
     end
@@ -126,6 +254,7 @@ TingYun::Support::LibraryDetection.defer do
       alias :send_message_args  :send_message_args_with_tingyun
 
       def send_message_with_tingyun(name, args_class, args = {})
+
         tag = "#{args_class.to_s.split('::').first.downcase}.#{name}"
         t0 = Time.now.to_f
         operations[tag] = {:started_time => t0}
