@@ -21,7 +21,7 @@ module TingYun
       TY_ID_HEADER = 'X-Tingyun-Id'.freeze
       TY_DATA_HEADER = 'X-Tingyun-Tx-Data'.freeze
 
-      TYPE = 'net%2Fhttp'.freeze
+
 
 
       module_function
@@ -32,10 +32,14 @@ module TingYun
         t0 = Time.now.to_f
         state = TingYun::Agent::TransactionState.tl_get
         return yield unless state.execution_traced?
+
         begin
           node = start_trace(state, t0, request)
           response = yield
-          capture_exception(response,request,state,TYPE)
+          capture_exception(response,state,'net%2Fhttp')
+        rescue => e
+          klass = "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
+          handle_error(e,klass)
         ensure
           finish_trace(state, t0, node, request, response)
         end
@@ -43,7 +47,7 @@ module TingYun
       end
 
       def start_trace(state, t0, request)
-        inject_request_headers(state, request) if cross_app_enabled?
+        # inject_request_headers(state, request) if cross_app_enabled?
         stack = state.traced_method_stack
         node = stack.push_frame(state,:http_request,t0)
 
@@ -101,7 +105,7 @@ module TingYun
           rescue => err
             # Fall back to regular metrics if there's a problem with x-process metrics
             TingYun::Agent.logger.debug "%p while fetching x-process metrics: %s" %
-                                             [ err.class, err.message ]
+                                            [ err.class, err.message ]
             metrics.concat metrics_for_regular_request( request )
           end
         else
@@ -126,8 +130,8 @@ module TingYun
       def metrics_for_regular_request( request )
         state = TingYun::Agent::TransactionState.tl_get
         metrics = []
-        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{TYPE}"
-        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{TYPE}"
+        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
+        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
 
         return metrics
       end
@@ -185,7 +189,7 @@ module TingYun
       def metrics_for_cross_app_response(request, response )
         state = TingYun::Agent::TransactionState.tl_get
         my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
-        uri = "#{request.uri.to_s.gsub('/','%2F')}/#{TYPE}"
+        uri = "#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
         metrics = []
         metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
         metrics << "External/#{my_data["action"]}:#{uri}"

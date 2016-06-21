@@ -12,6 +12,7 @@ TingYun::Support::LibraryDetection.defer do
     ::TingYun::Agent.logger.info 'Installing Net instrumentation'
     require 'ting_yun/agent/cross_app/cross_app_tracing'
     require 'ting_yun/http/net_http_request'
+    require 'ting_yun/instrumentation/support/external_error'
   end
 
   executes do
@@ -35,22 +36,23 @@ TingYun::Support::LibraryDetection.defer do
           begin
             get_response_without_tingyun(uri_or_host, path = nil, port = nil, &block)
           rescue => e
-            info = ::TingYun::Instrumentation::Support::ExternalError::ERROR_CODE.find {|k,v| e.class.to_s.include? k.to_s }
             klass = "External/#{uri_or_host.to_s.gsub('/','%2F')}/net%2Fhttp"
-            e.instance_variable_set(:@tingyun_klass, klass)
-            e.instance_variable_set(:@tingyun_external, true)
-            e.instance_variable_set(:@tingyun_trace, caller.reject! { |t| t.include?('tingyun_rpm') })
-            if info.nil?
-              e.instance_variable_set(:@tingyun_code, 1000)
-            else
-              e.instance_variable_set(:@tingyun_code, info[1])
-            end
-            TingYun::Agent.notice_error(e)
-            raise e
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,klass)
           end
         end
         alias get_response_without_tingyun get_response
         alias get_response get_response_with_tingyun
+
+        def start_with_tingyun(address, *arg, &block)
+          begin
+            start_without_tingyun(address, *arg, &block)
+          rescue => e
+            klass = "External/#{address.to_s.gsub('/','%2F')}/net%2Fhttp"
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,klass)
+          end
+        end
+        alias :start_without_tingyun :start
+        alias :start :start_with_tingyun
       end
     end
   end
