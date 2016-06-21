@@ -227,7 +227,7 @@ module TingYun
         end
 
         def send_data_to_endpoint(endpoint, items, container)
-          TingYun::Agent.logger.debug("Sending #{items.size} items to #{endpoint}")
+          TingYun::Agent.logger.info("Sending #{items.size} items to #{endpoint}")
           begin
             @service.send(endpoint, items)
           rescue => e

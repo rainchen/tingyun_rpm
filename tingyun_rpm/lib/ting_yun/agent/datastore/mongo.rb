@@ -23,17 +23,20 @@ module TingYun
           defined?(::Mongo) && (defined?(::Mongo::MongoClient) || monitoring_enabled?)
         end
 
+        # def self.transform_operation(operation)
+        #   t_operation = case operation.to_s.upcase
+        #                 when 'DELETE', 'FIND_AND_REMOVE', 'DELETEINDEXS', 'REMOVE'                       then 'destroy'
+        #                 when 'INSERT'                                                                    then 'INSERT'
+        #                 when 'UPDATE', 'RENAMECOLLECTION', 'REINDEX'                                     then 'UPDATE'
+        #                 when 'CREATE', 'FIND_AND_MODIFY', 'CREATEINDEXS', 'CREATEINDEX', 'REPINDEX'      then 'SAVE'
+        #                 when 'QUERY', 'COUNT', 'GET_MORE', 'AGGREGATE', 'FIND', 'FINDONE', 'GROUP'       then 'SECECT'
+        #                 else
+        #                   nil
+        #                 end
+        #   t_operation
+        # end
         def self.transform_operation(operation)
-          t_operation = case operation.to_s.upcase
-                        when 'DELETE', 'FIND_AND_REMOVE', 'DELETEINDEXS', 'REMOVE'                       then 'destroy'
-                        when 'INSERT'                                                                    then 'INSERT'
-                        when 'UPDATE', 'RENAMECOLLECTION', 'REINDEX'                                     then 'UPDATE'
-                        when 'CREATE', 'FIND_AND_MODIFY', 'CREATEINDEXS', 'CREATEINDEX', 'REPINDEX'      then 'SAVE'
-                        when 'QUERY', 'COUNT', 'GET_MORE', 'AGGREGATE', 'FIND', 'FINDONE', 'GROUP'       then 'SECECT'
-                        else
-                          nil
-                        end
-          t_operation
+          operation.to_s.upcase
         end
       end
     end
