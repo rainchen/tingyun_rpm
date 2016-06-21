@@ -82,7 +82,7 @@ module TingYun
         filtered_uri = TingYun::Agent::HTTPClients::URIUtil.filter_uri request.uri
         transaction_sampler.add_node_info(:uri => filtered_uri)
         if response && response_is_cross_app?( response )
-          transaction_sampler.tl_builder.current_node[:txId] = state.request_guid
+          transaction_sampler.tl_builder.current_node[:txId] = state.client_transaction_id || state.request_guid
           my_data = TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
           transaction_sampler.tl_builder.current_node[:txData] = my_data
         end
