@@ -83,7 +83,7 @@ module TingYun
         options = {}
         if defined? ::Thrift::ApplicationException && e.is_a?::Thrift::ApplicationException
           options[:is_external_error] = true
-          options[:external_metric_name] = state.external_metric_name
+          options[:external_metric_name] = TingYun::Agent::TransactionState.tl_get.external_metric_name
         end
         options
       end
