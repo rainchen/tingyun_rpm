@@ -451,6 +451,15 @@ module TingYun
         web_category?(@category)
       end
 
+      def self.recording_web_transaction? #THREAD_LOCAL_ACCESS
+        txn = tl_current
+        txn && txn.recording_web_transaction?
+      end
+
+      def self.tl_current
+        TingYun::Agent::TransactionState.tl_get.current_transaction
+      end
+
       def needs_middleware_summary_metrics?(name)
         name.start_with?(MIDDLEWARE_PREFIX)
       end

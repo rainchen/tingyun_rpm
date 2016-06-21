@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'ting_yun/agent/transaction/transaction_state'
+require 'ting_yun/agent/transaction'
 require 'ting_yun/support/http_clients/uri_util'
 require 'ting_yun/support/serialize/json_wrapper'
 
@@ -103,7 +104,11 @@ module TingYun
       def common_metrics(request)
         metrics = [ "External/NULL/ALL" ]
 
-        metrics << "External/NULL/AllWeb"
+        if TingYun::Agent::Transaction.recording_web_transaction?
+          metrics << "External/NULL/AllWeb"
+        else
+          metrics << "External/NULL/AllBackground"
+        end
 
         return metrics
       end
