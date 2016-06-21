@@ -47,7 +47,7 @@ TingYun::Support::LibraryDetection.defer do
           operation = pipeline.is_a?(::Redis::Pipeline::Multi) ? 'multi' : 'pipeline'
 
           TingYun::Agent::Datastore.wrap("Redis", operation, nil, method(:record_redis_duration)) do
-            call_pipelined_without_tinyun_trace(*args, &block)
+            call_pipelined_without_tingyun_trace(*args, &block)
           end
         end
 
