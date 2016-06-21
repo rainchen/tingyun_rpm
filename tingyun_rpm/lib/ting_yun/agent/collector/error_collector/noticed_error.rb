@@ -99,9 +99,9 @@ module TingYun
               :params => custom_params
           }
          if is_external_error
-           hash[:stacktrace] = stack_trace
-         else
            hash[:stacktrace] = trace
+         else
+           hash[:stacktrace] = stack_trace
            hash[:requestParams] = request_params
          end
          hash
