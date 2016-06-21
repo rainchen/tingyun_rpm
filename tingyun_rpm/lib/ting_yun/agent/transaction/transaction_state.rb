@@ -73,17 +73,7 @@ module TingYun
         @traced_method_stack.clear
         @transaction_sample_builder = nil
         @sql_sampler_transaction_data = nil
-        @client_tingyun_id_secret = nil
-        @client_transaction_id = nil
         @cross_tx_data = nil
-        @client_req_id = nil
-        @sql_duration = 0
-        @external_duration = 0
-        @web_duration = 0
-        @queue_duration = 0
-        @rds_duration = 0
-        @mc_duration = 0
-        @mon_duration = 0
         @thrift_return_data = nil
       end
 

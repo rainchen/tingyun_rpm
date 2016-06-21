@@ -98,6 +98,7 @@ TingYun::Support::LibraryDetection.defer do
         end
       end
       def write_result_with_tingyun(result, oprot, name, seqid)
+
         state = TingYun::Agent::TransactionState.tl_get
         oprot.write_message_begin(name, ::Thrift::MessageTypes::REPLY, seqid)
 
@@ -223,7 +224,6 @@ TingYun::Support::LibraryDetection.defer do
         state.client_tingyun_id_secret = tingyun_id_secret
         state.client_transaction_id = client_transaction_id
         state.client_req_id = client_req_id
-
       end
 
       alias :skip_without_tingyun :skip
@@ -273,24 +273,20 @@ TingYun::Support::LibraryDetection.defer do
 
 
       def receive_message_with_tingyun(result_klass)
-
         state = TingYun::Agent::TransactionState.tl_get
-
-        t1 = Time.now.to_f
 
         operate = operator(result_klass)
         t0, node =  started_time_and_node(operate)
 
-
         result = receive_message_without_tingyun(result_klass)
 
-        node_name, base, *other_metrics = metrics(operate)
+        t1 = Time.now.to_f
+        node_name, *other_metrics = metrics(operate)
         duration = TingYun::Helper.time_to_millis(t1 - t0)
 
-        TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state,
-                                                                                base, other_metrics, duration
+        TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
+            other_metrics.pop, other_metrics, duration
         )
-
         if node
           node.name = node_name
           transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
