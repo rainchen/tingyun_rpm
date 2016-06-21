@@ -28,7 +28,7 @@ module TingYun
           e.instance_variable_set(:@tingyun_external, true)
           e.instance_variable_set(:@tingyun_trace, caller.reject! { |t| t.include?('tingyun_rpm') })
 
-          case e.class
+          case e
             when Errno::ECONNREFUSED
               e.instance_variable_set(:@tingyun_code, 902)
             when SocketError
