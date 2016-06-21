@@ -161,7 +161,7 @@ module TingYun
             raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
 
         txn_guid = state.request_guid
-
+        state.transaction_sample_builder.trace.tx_id = txn_guid
         request[TY_ID_HEADER] = "#{cross_app_id};c=1;x=#{txn_guid}"
 
       rescue TingYun::Agent::CrossAppTracing::Error => err

@@ -64,7 +64,6 @@ module TingYun
           final_trace = last_builder.trace
           final_trace.metric_name = txn.best_name
           final_trace.uri = txn.request_path
-          final_trace.tx_id = state.client_transaction_id
           final_trace.attributes = txn.attributes
 
 

@@ -60,6 +60,7 @@ module TingYun
 
         state.client_tingyun_id_secret = tingyun_id_secret
         state.client_transaction_id = client_transaction_id
+        state.transaction_sample_builder.trace.tx_id = client_transaction_id
         state.client_req_id = client_req_id
       end
 
