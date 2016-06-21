@@ -137,5 +137,13 @@ module TingYun
       invoke_remote(:upload, [upload_data], :encoder=> json)
 
     end
+
+    def external_error_data(traces)
+      upload_data = {
+          :type => 'externalErrorTraceData',
+          :errors => traces
+      }
+      invoke_remote(:upload, [upload_data], :encoder=> json)
+    end
   end
 end

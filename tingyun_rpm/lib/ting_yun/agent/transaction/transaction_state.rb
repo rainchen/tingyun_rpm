@@ -23,8 +23,7 @@ module TingYun
                     :rds_duration,
                     :mc_duration,
                     :mon_duration,
-                    :thrift_return_data,
-                    :external_metric_name
+                    :thrift_return_data
 
 
 

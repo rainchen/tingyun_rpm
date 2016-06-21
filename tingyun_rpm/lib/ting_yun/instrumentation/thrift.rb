@@ -10,7 +10,10 @@ module TingYun
         operator_name = namespaces[0].downcase
         if namespaces.last =~ /_result/
           operator_name = "#{operator_name}.#{namespaces.last.sub('_result', '').downcase}"
+        elsif namespaces.last =~ /_args/
+          operator_name = "#{operator_name}.#{namespaces.last.sub('_args', '').downcase}"
         end
+
         operator_name
       end
 
@@ -238,7 +241,6 @@ TingYun::Support::LibraryDetection.defer do
       def send_message_args_with_tingyun(args_class, args = {})
         state = TingYun::Agent::TransactionState.tl_get
         return  unless state.execution_traced?
-
         cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
             raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
         txn_guid = state.request_guid
@@ -287,10 +289,16 @@ TingYun::Support::LibraryDetection.defer do
         state = TingYun::Agent::TransactionState.tl_get
 
         operate = operator(result_klass)
-        state.external_metric_name = operate
+
         t0, node =  started_time_and_node(operate)
 
-        result = receive_message_without_tingyun(result_klass)
+        begin
+          result = receive_message_without_tingyun(result_klass)
+        rescue Exception => e
+          e.instance_variable_set(:@klass, metrics(operate)[0])
+          e.instance_variable_set(:@external, true)
+          raise e
+        end
 
         t1 = Time.now.to_f
         node_name, *other_metrics = metrics(operate)

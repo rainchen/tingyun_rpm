@@ -76,7 +76,7 @@ module TingYun
           state = ::TingYun::Agent::TransactionState.tl_get
           increment_error_count!(state, exception, options)
           noticed_error = create_noticed_error(exception, options)
-          external_error_array.add_to_error_queue(noticed_error) if noticed_error.external_error?
+          external_error_array.add_to_error_queue(noticed_error) if noticed_error.is_external_error
           error_trace_array.add_to_error_queue(noticed_error)
         rescue => e
           ::TingYun::Agent.logger.warn("Failure when capturing error '#{exception}':", e)
@@ -107,8 +107,6 @@ module TingYun
           noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING
           noticed_error.request_port = options.delete(:port)
           noticed_error.attributes  = options.delete(:attributes)
-          noticed_error.is_external_error = options.delete(:is_external_error)
-          noticed_error.external_metric_name = options.delete(:external_metric_name)
 
           noticed_error.file_name   = sense_method(exception, :file_name)
           noticed_error.line_number = sense_method(exception, :line_number)

@@ -71,6 +71,9 @@ module TingYun
           super("Ruby agent internal error. Please contact support referencing this error.\n #{msg}")
         end
       end
+
+      class InternalServerError < StandardError
+      end
     end
   end
 end

@@ -28,7 +28,8 @@ module TingYun
           @metric_name = metric_name
           @timestamp = timestamp
           @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
-
+          @external_metric_name = exception.instance_variable_get :@klass
+          @is_external_error = exception.instance_variable_get :@external
           # It's critical that we not hold onto the exception class constant in this
           # class. These objects get serialized for Resque to a process that might
           # not have the original exception class loaded, so do all processing now
