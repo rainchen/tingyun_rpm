@@ -104,13 +104,13 @@ TingYun::Support::LibraryDetection.defer do
 
         if state.execution_traced? && same_account?(state)
           class_name = "WebAction/thrift/#{self.class.to_s.split('::').first.downcase}.#{name}"
+          state.current_transaction.default_name = class_name
           data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunTxData" => build_payload(state))
           oprot.write_field_begin("TingyunField", 11, 6)
           oprot.write_string(data)
           oprot.write_field_end
           write_result_without_tingyun(result, oprot, name, seqid)
           state.current_transaction.add_agent_attribute(:httpStatus, 200)
-          state.current_transaction.default_name = class_name
           TingYun::Agent::Transaction.stop(state)
         else
           write_result_without_tingyun(result, oprot, name, seqid)
@@ -129,7 +129,7 @@ TingYun::Support::LibraryDetection.defer do
         if state.execution_traced? && same_account?(state)
 
           class_name = "WebAction/thrift/#{self.class.to_s.split('::').first.downcase}.#{name}"
-
+          state.current_transaction.default_name = class_name
           data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunTxData" => build_payload(state))
           oprot.write_field_begin("TingyunField", 11, 6)
           oprot.write_string(data)
@@ -137,7 +137,7 @@ TingYun::Support::LibraryDetection.defer do
           write_result_without_tingyun(err, oprot, name, seqid)
           p 'write_error end'
           state.current_transaction.add_agent_attribute(:httpStatus, 500)
-          state.current_transaction.default_name = class_name
+
           TingYun::Agent::Transaction.stop(state)
         else
           write_result_without_tingyun(err, oprot, name, seqid)
