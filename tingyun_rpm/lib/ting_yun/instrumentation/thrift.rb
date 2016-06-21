@@ -145,7 +145,7 @@ TingYun::Support::LibraryDetection.defer do
         payload = {
             :id => TingYun::Agent.config[:tingyunIdSecret].split('|')[1],
             :action => state.current_transaction.best_name,
-            :trId => state.request_guid,
+            :trId => state.transaction_sample_builder.trace.guid,
             :time => {
                 :duration => state.web_duration,
                 :qu => state.queue_duration,
@@ -199,7 +199,7 @@ TingYun::Support::LibraryDetection.defer do
             state.thrift_return_data = my_data["TingyunTxData"]
 
             transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
-            transaction_sampler.tl_builder.current_node[:txId] = my_data["TingyunTxData"]["trId"]
+            transaction_sampler.tl_builder.current_node[:txId] = state.request_guid
             transaction_sampler.tl_builder.current_node[:txData] = my_data["TingyunTxData"]
           elsif data.include?("TingyunID")
             state.thrift_start_time = Time.now
