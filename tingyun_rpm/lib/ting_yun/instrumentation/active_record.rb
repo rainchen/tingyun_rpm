@@ -79,7 +79,9 @@ TingYun::Support::LibraryDetection.defer do
   named :active_record
 
   depends_on do
-    defined?(::ActiveRecord) && defined?(::ActiveRecord::Base)
+    defined?(::ActiveRecord) && defined?(::ActiveRecord::Base) &&
+        (!defined?(::ActiveRecord::VERSION) ||
+            ::ActiveRecord::VERSION::MAJOR.to_i <= 3)
   end
 
   executes do
@@ -89,7 +91,7 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     require 'ting_yun/instrumentation/support/active_record_helper'
 
-    if defined?(::Rails)
+    if defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 3
       ActiveSupport.on_load(:active_record) do
         ::TingYun::Instrumentation::ActiveRecord.instrument
       end
@@ -99,4 +101,3 @@ TingYun::Support::LibraryDetection.defer do
   end
 
 end
-
