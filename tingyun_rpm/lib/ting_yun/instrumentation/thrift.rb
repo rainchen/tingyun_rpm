@@ -214,11 +214,11 @@ TingYun::Support::LibraryDetection.defer do
         info = data["TingyunID"].split(';')
         tingyun_id_secret = info[0]
         client_transaction_id = info.find do |e|
-          e.split('=')[1] if e.match(/x=/)
-        end
+          e.match(/x=/)
+        end.split('=')[1] rescue nil
         client_req_id = info.find do |e|
-          e.split('=')[1] if e.match(/r=/)
-        end
+          e.match(/r=/)
+        end.split('=')[1] rescue nil
 
         state.client_tingyun_id_secret = tingyun_id_secret
         state.client_transaction_id = client_transaction_id
