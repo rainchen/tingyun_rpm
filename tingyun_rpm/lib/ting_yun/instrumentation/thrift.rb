@@ -74,8 +74,19 @@ TingYun::Support::LibraryDetection.defer do
       include TingYun::Instrumentation::ThriftHelper
 
       def send_message_with_tingyun(name, args_class, args = {})
+        state = TingYun::Agent::TransactionState.tl_get
+        return yield unless state.execution_traced?
+        cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+            raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+        txn_guid = state.request_guid
+        tingyun_id = "#{cross_app_id};c=1;x=#{txn_guid}"
+
+
         operations[name] = {:started_time => Time.now.to_f}
-        send_message_without_tingyun(name, args_class, args = {})
+        @oprot.write_message_begin("TingyunID", MessageTypes::CALL, -1)
+        @oprot.write_string(tingyun_id)
+        @oprot.write_field_stop
+        send_message_without_tingyun(name, args_class, args)
       end
       alias :send_message_without_tingyun :send_message
       alias :send_message  :send_message_with_tingyun
