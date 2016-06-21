@@ -275,10 +275,11 @@ TingYun::Support::LibraryDetection.defer do
       alias :send_message  :send_message_with_tingyun
 
       def send_oneway_message_with_tingyun(name, args_class, args = {})
+        tag = "#{args_class.to_s.split('::').first.downcase}.#{name}"
         op_started = Time.now.to_f
-        base, *other_metrics = metrics(name)
+        base, *other_metrics = metrics(tag)
         result = send_oneway_message_without_tingyun(name, args_class, args)
-        duration = Time.now.to_f - op_started
+        duration = (Time.now.to_f - op_started) * 1000
         TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, duration)
         result
       end
