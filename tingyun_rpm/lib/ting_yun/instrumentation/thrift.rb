@@ -214,15 +214,16 @@ TingYun::Support::LibraryDetection.defer do
         info = data["TingyunID"].split(';')
         tingyun_id_secret = info[0]
         client_transaction_id = info.find do |e|
-          e.match(/x=/)
-        end.split('=')[1] rescue nil
+          e.split('=')[1] if e.match(/x=/)
+        end
         client_req_id = info.find do |e|
-          e.match(/r=/)
-        end.split('=')[1] rescue nil
+          e.split('=')[1] if e.match(/r=/)
+        end
 
         state.client_tingyun_id_secret = tingyun_id_secret
         state.client_transaction_id = client_transaction_id
         state.client_req_id = client_req_id
+
       end
 
       alias :skip_without_tingyun :skip
@@ -272,6 +273,7 @@ TingYun::Support::LibraryDetection.defer do
 
 
       def receive_message_with_tingyun(result_klass)
+
         state = TingYun::Agent::TransactionState.tl_get
 
         t1 = Time.now.to_f
@@ -282,20 +284,21 @@ TingYun::Support::LibraryDetection.defer do
 
         result = receive_message_without_tingyun(result_klass)
 
-        base, *other_metrics = metrics(operate)
+        node_name, base, *other_metrics = metrics(operate)
         duration = TingYun::Helper.time_to_millis(t1 - t0)
 
+        TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state,
+                                                                                base, other_metrics, duration
+        )
+
         if node
-          node.name = base
+          node.name = node_name
           transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
           transaction_sampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
           stack = state.traced_method_stack
-          stack.pop_frame(state, node, "External/#{operate}", t1)
+          stack.pop_frame(state, node, node_name, t1)
         end
 
-        TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
-            base, other_metrics, duration
-        )
         result
       end
 
