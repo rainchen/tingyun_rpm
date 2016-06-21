@@ -27,13 +27,13 @@ module TingYun
       def completed(event)
         begin
           state = TingYun::Agent::TransactionState.tl_get
-          state.mon_duration = event.duration
+          state.mon_duration = event.duration*1000
           started_event = operations.delete(event.operation_id)
 
           base, *other_metrics = metrics(started_event)
 
           TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
-              base, other_metrics, event.duration
+              base, other_metrics, event.duration*1000
           )
           notice_nosql_statement(state, started_event, base, event.duration)
         rescue Exception => e
