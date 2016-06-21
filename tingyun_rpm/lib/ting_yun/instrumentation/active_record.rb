@@ -42,6 +42,7 @@ module TingYun
       end
 
       def log_with_tingyun_instrumentation(*args, &block)
+
         state = TingYun::Agent::TransactionState.tl_get
         sql, name, _ = args
         metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(

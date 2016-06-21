@@ -19,6 +19,7 @@ module TingYun
         end
 
         def start(name, id, payload) #THREAD_LOCAL_ACCESS
+
           return if payload[:name] == CACHED_QUERY_NAME
           super
         rescue => e

@@ -52,7 +52,7 @@ module TingYun
           metrics << "External/NULL/AllBackground"
         end
         state = TingYun::Agent::TransactionState.tl_get
-        my_data = state.thrift_return_data["TingyunTxData"]
+        my_data = state.thrift_return_data
         if my_data
           uri = "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}"
           metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
@@ -86,16 +86,16 @@ TingYun::Support::LibraryDetection.defer do
     ::Thrift::BaseProtocol.class_eval do
       def skip_with_tingyun(type)
         data = skip_without_tingyun(type)
-        if data.include?("TingyunTxData")
+        if data.is_a? ::String && data.include?("TingyunTxData")
 
           state = TingYun::Agent::TransactionState.tl_get
           my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
 
-          state.thrift_return_data = my_data
+          state.thrift_return_data = my_data["TingyunTxData"]
 
           transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
-          transaction_sampler.tl_builder.current_node[:txId] = my_data["trId"]
-          transaction_sampler.tl_builder.current_node[:txData] = my_data
+          transaction_sampler.tl_builder.current_node[:txId] = my_data["TingyunTxData"]["trId"]
+          transaction_sampler.tl_builder.current_node[:txData] = my_data["TingyunTxData"]
         end
       end
       alias :skip_without_tingyun :skip
@@ -150,22 +150,24 @@ TingYun::Support::LibraryDetection.defer do
 
         operate = operator(result_klass)
         t0, node =  started_time_and_node(operate)
-        if node
-          node.name = operate
-          stack = state.traced_method_stack
-          stack.pop_frame(state, node, operate, t1)
-        end
 
 
         result = receive_message_without_tingyun(result_klass)
 
         base, *other_metrics = metrics(operate)
         duration = TingYun::Helper.time_to_millis(t1 - t0)
+
+        if node
+          node.name = base
+          transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
+          transaction_sampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
+          stack = state.traced_method_stack
+          stack.pop_frame(state, node, "External/#{operate}", t1)
+        end
+
         TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
             base, other_metrics, duration
         )
-        transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
-        transaction_sampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
         result
       end
 

@@ -22,7 +22,7 @@ module TingYun
       MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
       GRAPE_PREFIX = 'Grape/'.freeze
       RAKE_PREFIX = 'OtherTransaction/Rake/'.freeze
-      WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware].freeze
+      WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware, :thrift].freeze
       EMPTY_SUMMARY_METRICS = [].freeze
       MIDDLEWARE_SUMMARY_METRICS = ['Middleware/all'.freeze].freeze
 
@@ -103,6 +103,22 @@ module TingYun
       rescue => e
         TingYun::Agent.logger.error("Exception during Transaction.start", e)
       end
+
+      def self.wrap(state, name, category, options = {})
+        Transaction.start(state, category, options.merge(:transaction_name => name))
+
+        begin
+          # We shouldn't raise from Transaction.start, but only wrap the yield
+          # to be absolutely sure we don't report agent problems as app errors
+          yield
+        rescue => e
+          Transaction.notice_error(e)
+          raise e
+        ensure
+          Transaction.stop(state)
+        end
+      end
+
 
       def self.start_new_transaction(state, category, options)
         txn = Transaction.new(category, options)
