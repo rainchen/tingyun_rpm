@@ -107,7 +107,7 @@ module TingYun
           noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING
           noticed_error.request_port = options.delete(:port)
           noticed_error.attributes  = options.delete(:attributes)
-          noticed_error.external_error? = options.delete(:external_error?)
+          noticed_error.is_external_error = options.delete(:is_external_error)
           noticed_error.external_metric_name = options.delete(:external_metric_name)
 
           noticed_error.file_name   = sense_method(exception, :file_name)

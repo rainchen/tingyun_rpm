@@ -82,7 +82,7 @@ module TingYun
       def handle_thrift_error(e)
         options = {}
         if defined? ::Thrift::ApplicationException && e.is_a?::Thrift::ApplicationException
-          options[:external_error?] = true
+          options[:is_external_error] = true
           options[:external_metric_name] = state.external_metric_name
         end
         options
