@@ -42,6 +42,8 @@ module TingYun
           end
 
           TingYun::Agent.notice_error(e)
+
+          raise e
         end
 
       end

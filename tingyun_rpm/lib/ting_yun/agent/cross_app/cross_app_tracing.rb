@@ -36,7 +36,7 @@ module TingYun
         begin
           node = start_trace(state, t0, request)
           response = yield
-          capture_exception(response,state,'net%2Fhttp')
+          capture_exception(response,request,'net%2Fhttp')
         rescue => e
           klass = "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
           handle_error(e,klass)
