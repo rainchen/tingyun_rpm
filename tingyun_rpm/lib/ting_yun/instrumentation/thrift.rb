@@ -296,9 +296,10 @@ TingYun::Support::LibraryDetection.defer do
         result = receive_message_without_tingyun(result_klass)
         if result.nil? || result.success.nil?
           e = ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, "#{operate} failed: unknown result")
-          e.instance_variable_set(:@klass, metrics(operate)[0])
-          e.instance_variable_set(:@external, true)
-          e.instance_variable_set(:@code, 1000)
+          e.instance_variable_set(:@tingyun_klass, metrics(operate)[0])
+          e.instance_variable_set(:@tingyun_external, true)
+          e.instance_variable_set(:@tingyun_code, 1000)
+          e.instance_variable_set(:@tingyun_trace, caller.reject! { |t| t.include?('tingyun_rpm') })
           TingYun::Agent.notice_error(e)
         end
 

@@ -15,7 +15,7 @@ module TingYun
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :request_uri, :request_port, :file_name, :line_number,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :thread_name, :is_external_error, :external_metric_name,:code
+                      :count_error, :thread_name, :is_external_error, :external_metric_name, :code, :trace
 
 
         attr_reader :exception_id, :is_internal
@@ -28,9 +28,10 @@ module TingYun
           @metric_name = metric_name
           @timestamp = timestamp
           @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
-          @external_metric_name = exception.instance_variable_get :@klass
-          @is_external_error = exception.instance_variable_get :@external
-          @code = exception.instance_variable_get :@code
+          @external_metric_name = exception.instance_variable_get :@tingyun_klass
+          @is_external_error = exception.instance_variable_get :@tingyun_external
+          @code = exception.instance_variable_get :@tingyun_code
+          @trace = exception.instance_variable_get :@tingyun_trace
           # It's critical that we not hold onto the exception class constant in this
           # class. These objects get serialized for Resque to a process that might
           # not have the original exception class loaded, so do all processing now
@@ -94,19 +95,27 @@ module TingYun
         end
 
         def error_params
-          {
-              :params => custom_params,
-              :requestParams => request_params,
-              :stacktrace => stack_trace
+         hash = {
+              :params => custom_params
           }
+         if is_external_error
+           hash[:stacktrace] = stack_trace
+         else
+           hash[:stacktrace] = trace
+           hash[:requestParams] = request_params
+         end
+         hash
         end
 
         def custom_params
-          {
-              :threadName => string(attributes.agent_attributes[:threadName]),
-              :httpStatus => int(attributes.agent_attributes[:httpStatus]),
-              :referer    => string(attributes.agent_attributes[:referer]) || ''
-          }
+          hash = {:threadName => string(attributes.agent_attributes[:threadName])}
+          if is_external_error
+            hash[:httpStatus] = int(code)
+          else
+            hash[:httpStatus] = int(attributes.agent_attributes[:httpStatus])
+            hash[:referer] = string(attributes.agent_attributes[:referer]) || ''
+          end
+          hash
         end
 
         def request_params
