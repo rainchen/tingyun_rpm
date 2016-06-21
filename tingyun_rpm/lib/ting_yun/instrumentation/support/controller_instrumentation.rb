@@ -5,6 +5,7 @@ require 'ting_yun/instrumentation/support/transaction_namer'
 require 'ting_yun/agent/transaction'
 require 'ting_yun/agent'
 
+
 module TingYun
   module Instrumentation
     module Support
@@ -26,7 +27,7 @@ module TingYun
             begin
               yield
             rescue => e
-              ::TingYun::Agent.notice_error(e)
+              ::TingYun::Agent.notice_error(e, handle_thrift_error(e))
               raise
             end
           ensure
@@ -45,6 +46,15 @@ module TingYun
           txn_options[:apdex_start_time] = Time.now
 
           txn_options
+        end
+
+        def handle_thrift_error(e)
+          options = {}
+          if defined? ::Thrift::ApplicationException && e.is_a?::Thrift::ApplicationException
+            options[:external_error?] = true
+            options[:external_metric_name] = state.external_metric_name
+          end
+          options
         end
       end
     end

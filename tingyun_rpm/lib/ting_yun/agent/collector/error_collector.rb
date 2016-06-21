@@ -58,7 +58,7 @@ module TingYun
         end
         include Metric
 
-        attr_reader :error_trace_array
+        attr_reader :error_trace_array, :external_error_array
 
         def initialize
           # lookup of exception class names to ignore.  Hash for fast access
@@ -67,6 +67,7 @@ module TingYun
           @lock = Mutex.new
 
           @error_trace_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
+          @external_error_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
         end
 
         # See TingYun::Agent.notice_error for options and commentary
@@ -75,6 +76,7 @@ module TingYun
           state = ::TingYun::Agent::TransactionState.tl_get
           increment_error_count!(state, exception, options)
           noticed_error = create_noticed_error(exception, options)
+          external_error_array.add_to_error_queue(noticed_error) if noticed_error.external_error?
           error_trace_array.add_to_error_queue(noticed_error)
         rescue => e
           ::TingYun::Agent.logger.warn("Failure when capturing error '#{exception}':", e)
@@ -105,6 +107,8 @@ module TingYun
           noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING
           noticed_error.request_port = options.delete(:port)
           noticed_error.attributes  = options.delete(:attributes)
+          noticed_error.external_error? = options.delete(:external_error?)
+          noticed_error.external_metric_name = options.delete(:external_metric_name)
 
           noticed_error.file_name   = sense_method(exception, :file_name)
           noticed_error.line_number = sense_method(exception, :line_number)
@@ -138,7 +142,7 @@ module TingYun
 
         # *Use sparingly for difficult to track bugs.*
         #
-        # Track internal agent errors for communication back to New Relic.
+        # Track internal agent errors for communication back to TingYun
         # To use, make a specific subclass of  TingYun::Support::Exception::InternalAgentError,
         # then pass an instance of it to this method when your problem occurs.
         #
@@ -151,6 +155,7 @@ module TingYun
 
         def reset!
           @error_trace_array.reset!
+          @external_error_array.reset!
           nil
         end
       end

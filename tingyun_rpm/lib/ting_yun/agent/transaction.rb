@@ -341,7 +341,8 @@ module TingYun
         txn = state.current_transaction
         if txn
           txn.notice_error(e, options)
-        elsif TingYun::Agent.instance.error_collector.notice_error(e, options)
+        elsif TingYun::Agent.instance
+          TingYun::Agent.instance.error_collector.notice_error(e, options)
         end
       end
 

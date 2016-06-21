@@ -287,6 +287,7 @@ TingYun::Support::LibraryDetection.defer do
         state = TingYun::Agent::TransactionState.tl_get
 
         operate = operator(result_klass)
+        state.external_metric_name = operate
         t0, node =  started_time_and_node(operate)
 
         result = receive_message_without_tingyun(result_klass)

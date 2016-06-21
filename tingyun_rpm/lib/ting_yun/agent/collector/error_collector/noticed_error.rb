@@ -15,7 +15,8 @@ module TingYun
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :request_uri, :request_port, :file_name, :line_number,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :thread_name
+                      :count_error, :thread_name, :external_error?, :external_metric_name
+
 
         attr_reader :exception_id, :is_internal
 
@@ -68,16 +69,26 @@ module TingYun
         include TingYun::Support::Coerce
 
         def to_collector_array(encoder)
-
-          [timestamp.to_i,
-           string(metric_name),
-           int(attributes.agent_attributes[:httpStatus]),
-           string(exception_class_name),
-           string(message),
-           count_error,
-           string(request_uri),
-           encoder.encode(error_params)
-          ]
+          if  external_error?
+            [timestamp.to_i,
+             string(external_metric_name),
+             int(attributes.agent_attributes[:httpStatus]),
+             string(exception_class_name),
+             count_error,
+             string(metric_name),
+             encoder.encode(error_params)
+            ]
+          else
+            [timestamp.to_i,
+             string(metric_name),
+             int(attributes.agent_attributes[:httpStatus]),
+             string(exception_class_name),
+             string(message),
+             count_error,
+             string(request_uri),
+             encoder.encode(error_params)
+            ]
+          end
         end
 
         def error_params
