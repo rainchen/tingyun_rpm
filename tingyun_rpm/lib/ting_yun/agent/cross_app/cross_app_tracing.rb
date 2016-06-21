@@ -115,9 +115,10 @@ module TingYun
       end
 
       def metrics_for_regular_request( request )
+        state = TingYun::Agent::TransactionState.tl_get
         metrics = []
-        metrics << "External/#{request.host}/#{request.type}/#{request.method}"
-        metrics << "External/#{request.host}/#{request.type}/#{request.method}"
+        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
+        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
 
         return metrics
       end
@@ -173,8 +174,9 @@ module TingYun
       # Return the set of metric objects appropriate for the given cross app
       # +response+.
       def metrics_for_cross_app_response(request, response )
+        state = TingYun::Agent::TransactionState.tl_get
         my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
-        uri = "#{request.host}/#{request.type}/#{request.method}"
+        uri = "#{request.uri.to_s.gsub('/','%2F')}/#{state.current_transaction.remote_name}"
         metrics = []
         metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
         metrics << "External/#{my_data["action"]}:#{uri}"

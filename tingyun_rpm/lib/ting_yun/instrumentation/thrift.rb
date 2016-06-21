@@ -39,10 +39,11 @@ module TingYun
       end
 
       def metrics operate
+        state = TingYun::Agent::TransactionState.tl_get
         metrics = if tingyun_host.nil?
-                    ["External/thrift/#{operate}"]
+                    ["External/thrift:%2F%2F#{operate}/#{state.current_transaction.remote_name}"]
                   else
-                    ["External/thrift:#{tingyun_host}:#{tingyun_port}/#{operate}"]
+                    ["External/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{state.current_transaction.remote_name}"]
                   end
         metrics << "External/NULL/ALL"
 
@@ -51,13 +52,13 @@ module TingYun
         else
           metrics << "External/NULL/AllBackground"
         end
-        state = TingYun::Agent::TransactionState.tl_get
+
 
         my_data = state.thrift_return_data
 
 
         if my_data
-          uri = "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}"
+          uri = "thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{state.current_transaction.remote_name}"
           metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
         end
         return metrics
@@ -275,7 +276,7 @@ TingYun::Support::LibraryDetection.defer do
         op_started = Time.now.to_f
         base, *other_metrics = metrics(tag)
         result = send_oneway_message_without_tingyun(name, args_class, args)
-        duration = (Time.now.to_f - op_started) * 1000
+        duration = (Time.now.to_f - op_started)*1000
         TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, duration)
         result
       end
@@ -295,7 +296,7 @@ TingYun::Support::LibraryDetection.defer do
         duration = TingYun::Helper.time_to_millis(t1 - t0)
 
         TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
-            other_metrics.pop, other_metrics, duration
+            other_metrics, other_metrics, duration
         )
         if node
           node.name = node_name
