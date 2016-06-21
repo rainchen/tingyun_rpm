@@ -292,9 +292,10 @@ TingYun::Support::LibraryDetection.defer do
 
         t0, node =  started_time_and_node(operate)
 
-        begin
-          result = receive_message_without_tingyun(result_klass)
-        rescue Exception => e
+
+        result = receive_message_without_tingyun(result_klass)
+        if result.nil? || result.success.nil?
+          e = ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, "#{operate} failed: unknown result")
           e.instance_variable_set(:@klass, metrics(operate)[0])
           e.instance_variable_set(:@external, true)
           raise e
