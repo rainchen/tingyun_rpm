@@ -4,11 +4,13 @@ require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/agent/transaction'
 require 'ting_yun/support/http_clients/uri_util'
 require 'ting_yun/support/serialize/json_wrapper'
+require 'ting_yun/instrumentation/support/external_error'
 
 module TingYun
   module Agent
     module CrossAppTracing
 
+      include TingYun::Instrumentation::Support::ExternalError
       # Exception raised if there is a problem with cross app transactions.
       class Error < RuntimeError; end
 
@@ -66,18 +68,14 @@ module TingYun
             stack = state.traced_method_stack
             stack.pop_frame(state, node, node_name, t1)
           end
-          capture_server_exception(response,state)
+          capture_exception(response,state)
         end
       rescue => err
         TingYun::Agent.logger.error "Uncaught exception while finishing an HTTP request trace", err
 
       end
 
-      def capture_server_exception(response,state)
-        if response.code =~ /^[4,5][0-9][0-9]$/ && response.code!='401'
 
-        end
-      end
 
       def add_transaction_trace_info(request, response)
         state = TingYun::Agent::TransactionState.tl_get
