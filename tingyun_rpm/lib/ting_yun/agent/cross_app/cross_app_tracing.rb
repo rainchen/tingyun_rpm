@@ -47,7 +47,7 @@ module TingYun
       end
 
       def start_trace(state, t0, request)
-        # inject_request_headers(state, request) if cross_app_enabled?
+        inject_request_headers(state, request) if cross_app_enabled?
         stack = state.traced_method_stack
         node = stack.push_frame(state,:http_request,t0)
 
