@@ -26,7 +26,9 @@ module TingYun
 
           e.instance_variable_set(:@tingyun_klass, klass)
           e.instance_variable_set(:@tingyun_external, true)
-          e.instance_variable_set(:@tingyun_trace, caller.reject! { |t| t.include?('tingyun_rpm') })
+          trace = caller.reject! { |t| t.include?('tingyun_rpm') }
+          trace = trace.first(40) if trace.length > 40
+          e.instance_variable_set(:@tingyun_trace, trace)
 
           case e
             when Errno::ECONNREFUSED
@@ -42,8 +44,6 @@ module TingYun
           end
 
           TingYun::Agent.notice_error(e)
-
-          raise e
         end
 
       end

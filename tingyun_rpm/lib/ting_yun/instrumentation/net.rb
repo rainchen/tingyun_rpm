@@ -38,6 +38,7 @@ TingYun::Support::LibraryDetection.defer do
           rescue => e
             klass = "External/#{uri_or_host.to_s.gsub('/','%2F')}/net%2Fhttp"
             ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,klass)
+            raise e
           end
         end
         alias get_response_without_tingyun get_response
@@ -49,6 +50,7 @@ TingYun::Support::LibraryDetection.defer do
           rescue => e
             klass = "External/#{address.to_s.gsub('/','%2F')}/net%2Fhttp"
             ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,klass)
+            raise e
           end
         end
         alias :start_without_tingyun :start

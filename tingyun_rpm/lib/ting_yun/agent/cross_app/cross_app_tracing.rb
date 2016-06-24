@@ -40,6 +40,7 @@ module TingYun
         rescue => e
           klass = "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
           handle_error(e,klass)
+          raise e
         ensure
           finish_trace(state, t0, node, request, response)
         end
