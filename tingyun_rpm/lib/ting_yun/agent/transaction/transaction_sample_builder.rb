@@ -11,10 +11,15 @@ module TingYun
       def initialize(time=Time.now)
         @trace = TingYun::Agent::Transaction::Trace.new(time.to_f)
         @trace_start = time.to_f
-        @current_node = @trace.root_node
       end
 
       def trace_entry(time)
+        if @trace.node_count == 0
+          node = @trace.create_node(time.to_f - @trace_start)
+          @trace.root_node = node
+          @current_node = node
+          return @current_node
+        end
         if @trace.node_count < node_limit
           node = @trace.create_node(time.to_f - @trace_start)
           @current_node.add_called_node(node)

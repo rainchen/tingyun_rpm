@@ -8,14 +8,11 @@ module TingYun
     class Transaction
       class Trace
 
-        attr_accessor :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished, :tx_id
-
-        attr_reader  :root_node
+        attr_accessor :root_node, :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished, :tx_id
 
         def initialize(start_time)
           @start_time = start_time
           @node_count = 0
-          @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, 'ROOT')
           @prepared = false
           @guid = generate_guid
         end
@@ -26,7 +23,7 @@ module TingYun
         end
 
         def duration
-          @root_node.duration
+          root_node.duration
         end
 
 
@@ -38,7 +35,7 @@ module TingYun
               duration,
               request_params,
               custom_params,
-              @root_node.to_array
+              root_node.to_array
           ]
         end
 
@@ -61,7 +58,7 @@ module TingYun
             collect_explain_plans!
             prepare_sql_for_transmission!
           else
-            @root_node.each_call do |node|
+            root_node.each_call do |node|
               node.params.delete(:sql)
             end
           end
@@ -72,7 +69,7 @@ module TingYun
         def collect_explain_plans!
           return unless TingYun::Agent::Database.should_action_collect_explain_plans?
           threshold = TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
-          @root_node.each_call do |node|
+          root_node.each_call do |node|
             if node[:sql] && node.duration > threshold
               node[:explainPlan] = node.explain_sql
             end
@@ -81,7 +78,7 @@ module TingYun
 
         def prepare_sql_for_transmission!(&block)
           strategy = TingYun::Agent::Database.record_sql_method('nbs.action_tracer.record_sql')
-          @root_node.each_call do |node|
+          root_node.each_call do |node|
             next unless node[:sql]
 
             case strategy
