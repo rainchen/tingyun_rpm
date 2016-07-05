@@ -1,0 +1,48 @@
+common: &default_settings
+
+# License Key
+# 该选项为必填项，与您的听云账号关联。
+# 探针采集到得数据，会上传到该 license key绑定的账号下。
+  license_key: 'license_key'
+
+# 缺省应用名称
+  app_name:  'Application name'
+  
+# 应用自动命名
+# 开启该选项，探针会根据
+# nbs.auto_app_naming: false
+
+# 数据审计模式
+# 该选项确定是否启用数据审计模式。启用数据审计模式后，所有从数据采集服务接收到和提交到数据采集服务的原始数据都会被记录到探针本地日志文件中
+# nbs.audit_mode: false
+
+# 探针日志文件详细程度
+# 指定输出到探针日志文件中日志信息的详细程度
+# 可设置的值包括： critical, error, warning, info, debug
+# agent_log_level: info
+ 
+
+#
+# 环境相关配置
+#
+
+production:
+  <<: *default_settings
+
+
+development:
+  <<: *default_settings
+  # development模式下，探针开启并上传性能数据
+
+
+test:
+  <<: *default_settings
+ 
+
+staging:
+  <<: *default_settings
+  
+ 
+  
+
+
