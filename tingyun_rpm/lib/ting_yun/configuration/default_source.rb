@@ -638,9 +638,9 @@ module TingYun
             :description => 'trace ID of crossing apps'
         },
         :'nbs.naming.rules' => {
-            :default => nil,
+            :default => [],
             :public => true,
-            :type => Array,
+            :type => ::Array,
             :allowed_from_server => true,
             :description => 'defined nme rule '
         }
