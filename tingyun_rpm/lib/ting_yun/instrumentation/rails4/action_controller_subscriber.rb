@@ -84,7 +84,7 @@ module TingYun
         end
 
         def method
-          payload[:method]
+          payload[:params]['_method'].upcase ||  payload[:method]
         end
 
         def params

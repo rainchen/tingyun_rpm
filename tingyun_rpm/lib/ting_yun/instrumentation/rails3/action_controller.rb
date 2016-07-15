@@ -14,7 +14,7 @@ module TingYun
 
 
         def tingyun_metric_path(action_name_override = nil)
-          if find_rule(request.method, request.path, request.env, request.filtered_parameters)
+          if find_rule(request.method.upcase, request.path, request.env, request.filtered_parameters)
             return "Rails3/#{namespace}/#{name(request.path.slice(1..-1), request.env, request.filtered_parameters, request.cookie)}"
           else
             return  self.env["PATH_INFO"] unless TingYun::Agent.config[:'nbs.auto_action_naming']
