@@ -9,7 +9,7 @@ module TingYun
           'PUT' => 3,
           'DELETE' => 4,
           'HEAD' => 5,
-          'PATCH' => 2
+          'PATCH' => 3
         }
 
         RULE = {
