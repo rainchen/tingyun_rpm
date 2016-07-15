@@ -1,59 +1,23 @@
-Thomas’s Cat  13:42:38
-def self.empty_array
-  Proc.new { [] }
-end
-Thomas’s Cat  13:42:47
-DefaultSource.empty_array
-Thomas’s Cat  14:47:27
-method: (:get|:post|:patch|:put|:delete)
-张建明  15:05:34
-payload[:params]['_method'].upcase
-Thomas’s Cat  15:10:24
-[文件: tingyun_rpm-1.1.1.gem]
-Thomas’s Cat  16:57:28
-[文件: tingyun_rpm-1.1.1.gem]
-Thomas’s Cat  17:01:35
-require 'ting_yun/support/serialize/json_wrapper'
-Thomas’s Cat  17:01:53
-TingYun::Support::Serialize::JSONWrapper.dump
-Thomas’s Cat  17:03:05
-TingYun::Support::Serialize::JSONWrapper.load
-张建明  17:04:20
-TingYun::Support::Serialize::JSONWrapper.load ("[]")
-Thomas’s Cat  17:07:10
-[文件: tingyun_rpm-1.1.1.gem]
-Thomas’s Cat  17:15:39
-[文件: tingyun_rpm-1.1.1.gem]
-Thomas’s Cat  17:25:16
-[文件: tingyun_rpm-1.1.1.gem]
-Thomas’s Cat  18:03:44
-[文件: tingyun_rpm-1.1.1.gem]
-Thomas’s Cat  18:00:24
-[文件: tingyun_rpm-1.1.0.gem]
-Thomas’s Cat  10:33:01
-[文件: tingyun_rpm-1.1.1.gem]
-The offline file "tingyun_rpm-1.1.1.gem" has been received
-Thomas’s Cat  11:32:16
 module TingYun
   module Instrumentation
     module Support
       module SplitController
         attr_accessor :rule, :tingyun_http_verb
         HTTP = {
-            'GET' => 1,
-            'POST' => 2,
-            'PUT' => 3,
-            'DELETE' => 4,
-            'HEAD' => 5,
-            'PATCH' => 3
+          'GET' => 1,
+          'POST' => 2,
+          'PUT' => 3,
+          'DELETE' => 4,
+          'HEAD' => 5,
+          'PATCH' => 3
         }
 
         RULE = {
-            1=> :eql?,
-            2=> :start_with?,
-            3=> :end_with?,
-            4=> :include?,
-            5=> :match
+          1=> :eql?,
+          2=> :start_with?,
+          3=> :end_with?,
+          4=> :include?,
+          5=> :match
         }
 
         def find_rule(method, path, header, params)
@@ -138,11 +102,11 @@ module TingYun
         end
 
         def split_method
-          if @rule["split"]["method"]
-            "(#{tingyun_http_verb})"
-          else
-            ''
-          end
+           if @rule["split"]["method"]
+             "(#{tingyun_http_verb})"
+           else
+             ''
+           end
         end
 
         def split_params(_r, params)
