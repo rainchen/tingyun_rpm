@@ -18,7 +18,13 @@ module TingYun
       end
 
       def collector_from_host(hostname=nil)
-        Collector.new(hostname || TingYun::Agent.config[:host], TingYun::Agent.config[:port])
+        if hostname.nil?
+          Collector.new(TingYun::Agent.config[:host], TingYun::Agent.config[:port])
+        else
+          args = hostname.split(':')
+          Collector.new(args[0], args[1]||TingYun::Agent.config[:port])
+        end
+
       end
 
     end

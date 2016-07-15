@@ -10,6 +10,9 @@ module TingYun
     module Collector
       class ErrorCollector
         ERRORS_ACTION = "Errors/Count/".freeze
+
+
+
         ERRORS_ALL = "Errors/Count/All".freeze
         ERRORS_ALL_WEB = "Errors/Count/AllWeb".freeze
         ERRORS_ALL_BACK_GROUND = "Errors/Count/AllBackground".freeze
@@ -61,11 +64,6 @@ module TingYun
         attr_reader :error_trace_array, :external_error_array
 
         def initialize
-          # lookup of exception class names to ignore.  Hash for fast access
-          @ignore = {}
-
-          @lock = Mutex.new
-
           @error_trace_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
           @external_error_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
         end

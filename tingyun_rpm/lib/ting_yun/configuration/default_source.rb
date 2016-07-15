@@ -631,7 +631,14 @@ module TingYun
             :public => true,
             :type => String,
             :allowed_from_server => true,
-            :description => '跨应用追踪加密ID'
+            :description => 'trace ID of crossing apps'
+        },
+        :'nbs.naming.rules' => {
+            :default => '',
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => 'the rule of name the webaction name  containing match & split ways'
         }
     }.freeze
   end
