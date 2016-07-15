@@ -34,7 +34,7 @@ module TingYun
         end
 
         def rules
-          TingYun::Agent.config[:'nbs.naming.rules'] 
+          TingYun::Agent.config[:'nbs.naming.rules']
         end
 
         def method_match?(method, _r)
