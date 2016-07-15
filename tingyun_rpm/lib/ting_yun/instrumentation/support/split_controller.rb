@@ -43,7 +43,7 @@ module TingYun
         end
 
         def url_match?(url, _r, value)
-          (!value.nil?) and (!value.strip.empty? rescue true) and url.send(RULE[_r], value)
+          (!value.nil?) and (!value.strip.empty? rescue true) and url.send(RULE[_r], value.downcase)
         end
 
         def params_match?(header, params, _rs)
@@ -54,7 +54,7 @@ module TingYun
               if _r["type"] == 2
                 raise_error(header["HTTP_#{_r["name"].upcase}"], RULE[_r["match"]], _r["value"], _r["type"])
               else
-                raise_error(params[_r["name"]], RULE[_r["match"]], _r["value"],  _r["type"])
+                raise_error(params[_r["name"].downcase], RULE[_r["match"]], _r["value"],  _r["type"])
               end
             end
           rescue
