@@ -34,7 +34,8 @@ module TingYun
         end
 
         def rules
-          TingYun::Agent.config[:'nbs.naming.rules']
+          require 'ting_yun/support/serialize/json_wrapper'
+          TingYun::Support::Serialize::JSONWrapper.load(TingYun::Agent.config[:'nbs.naming.rules'])
         end
 
         def method_match?(method, _r)
