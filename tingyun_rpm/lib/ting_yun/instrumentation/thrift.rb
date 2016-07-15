@@ -239,23 +239,25 @@ TingYun::Support::LibraryDetection.defer do
 
       include TingYun::Instrumentation::ThriftHelper
 
-      def send_message_args_with_tingyun(args_class, args = {})
-        state = TingYun::Agent::TransactionState.tl_get
-        return  unless state.execution_traced?
-        cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
-            raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
-        txn_guid = state.request_guid
-        tingyun_id = "#{cross_app_id};c=1;x=#{txn_guid}"
 
-        data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
-        @oprot.write_field_begin("TingyunField", 11, 6)
-        @oprot.write_string(data)
-        @oprot.write_field_end
-        send_message_args_without_tingyun(args_class, args)
-      end
+        def send_message_args_with_tingyun(args_class, args = {})
+          state = TingYun::Agent::TransactionState.tl_get
+          return  unless state.execution_traced?
+          cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+              raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+          txn_guid = state.request_guid
+          tingyun_id = "#{cross_app_id};c=1;x=#{txn_guid}"
 
-      alias :send_message_args_without_tingyun :send_message_args
-      alias :send_message_args  :send_message_args_with_tingyun
+          data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
+          @oprot.write_field_begin("TingyunField", 11, 6)
+          @oprot.write_string(data)
+          @oprot.write_field_end
+          send_message_args_without_tingyun(args_class, args)
+        end
+
+        alias :send_message_args_without_tingyun :send_message_args
+        alias :send_message_args  :send_message_args_with_tingyun
+
 
       def send_message_with_tingyun(name, args_class, args = {})
 

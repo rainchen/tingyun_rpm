@@ -67,7 +67,7 @@ module TingYun
               if metric_spec.scope.empty?
                 general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
               else
-                components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+                components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id) unless metric_spec.name.start_with?('External/NULL')
               end
             elsif metric_spec.name.start_with?('cross_app')
               external =  metric_spec.name.split(';')
