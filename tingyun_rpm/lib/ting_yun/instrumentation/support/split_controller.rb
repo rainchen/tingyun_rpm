@@ -23,14 +23,14 @@ module TingYun
         def find_rule(method, path, header, params)
           @tingyun_http_verb = method
           @rule = rules.detect do |_r|
-            method_match?(method, _r[:match][:method]) and
-                url_match?(path, _r[:match][:match], _r[:match][:value]) and
-                params_match?(header, dot_flattened(params), _r[:match][:params])
+            method_match?(method, _r["match"]["method"]) and
+                url_match?(path, _r["match"]["match"], _r["match"]["value"]) and
+                params_match?(header, dot_flattened(params), _r["match"]["params"])
           end
         end
 
         def namespace
-          @rule[:name]
+          @rule["name"]
         end
 
         def rules
@@ -50,11 +50,11 @@ module TingYun
           return true if _rs.empty?
           begin
             _rs.each do |_r|
-              next if _r[:name].nil? || _r[:name].strip.empty?
-              if _r[:type] == 2
-                raise_error(header["HTTP_#{_r[:name].upcase}"], RULE[_r[:match]], _r[:value], _r[:type])
+              next if _r["name"].nil? || _r["name"].strip.empty?
+              if _r["type"] == 2
+                raise_error(header["HTTP_#{_r["name"].upcase}"], RULE[_r["match"]], _r["value"], _r["type"])
               else
-                raise_error(params[_r[:name]], RULE[_r[:match]], _r[:value],  _r[:type])
+                raise_error(params[_r["name"]], RULE[_r["match"]], _r["value"],  _r["type"])
               end
             end
           rescue
@@ -77,10 +77,10 @@ module TingYun
           name = ""
           name << split_url(path.split('/'))
           name << "?"
-          name << split_params(@rule[:split][:urlParams], params)
-          name << split_params(@rule[:split][:bodyParams], params)
-          name << split_params(@rule[:split][:cookieParams], cookie)
-          name << split_header(@rule[:split][:headerParams], header)
+          name << split_params(@rule["split"]["urlParams"], params)
+          name << split_params(@rule["split"]["bodyParams"], params)
+          name << split_params(@rule["split"]["cookieParams"], cookie)
+          name << split_header(@rule["split"]["headerParams"], header)
           name = name[0..-2] << split_method
           name.strip
         end
@@ -103,7 +103,7 @@ module TingYun
         end
 
         def split_method
-           if @rule[:split][:method]
+           if @rule["split"]["method"]
              "(#{tingyun_http_verb})"
            else
              ''
