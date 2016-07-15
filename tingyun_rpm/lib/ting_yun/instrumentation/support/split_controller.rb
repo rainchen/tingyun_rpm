@@ -140,7 +140,7 @@ module TingYun
               if _r[:type] == 2
                 raise_error(header["HTTP_#{_r[:name].upcase}"], RULE[_r[:rule]], _r[:value], _r[:type])
               else
-                raise_error(params[_r[:name]], RULE[_r[:rule]], _r[:value],  _r[:type])
+                raise_error(params[_r[:name]], RULE[_r[:match]], _r[:value],  _r[:type])
               end
             end
           rescue => err
