@@ -33,95 +33,7 @@ module TingYun
         end
 
         def rules
-          TingYun::Agent.config[:'nbs.naming.rules']
-          # [
-          #     {
-          #         "match": {
-          #             "method": 0,
-          #             "match": 1,
-          #             "value": "hello",
-          #             "params": [
-          #                 {
-          #                     "type": 1,
-          #                     "name": "a",
-          #                     "rule": 1,
-          #                     "value": "hello"
-          #                 },
-          #                 {
-          #                     "type": 1,
-          #                     "name": "a",
-          #                     "rule": 1,
-          #                     "value": "hello"
-          #                 }
-          #             ]
-          #         },
-          #         "split":[
-          #             {
-          #                 "uri": nil,
-          #                 "method": true,
-          #                 "urlParams": nil,
-          #                 "headerParams": nil,
-          #                 "bodyParams": nil,
-          #                 "cookieParams": nil
-          #
-          #             },
-          #             {
-          #                 "uri": nil,
-          #                 "method": true,
-          #                 "urlParams": nil,
-          #                 "headerParams": nil,
-          #                 "bodyParams": nil,
-          #                 "cookieParams": nil
-          #
-          #             }
-          #         ]
-          #
-          #     },
-          #     {
-          #         "match": {
-          #             "method": 0,
-          #             "match": 1,
-          #             "value": "hello",
-          #             "params": [
-          #                 {
-          #                     "type": 1,
-          #                     "name": "a",
-          #                     "rule": 1,
-          #                     "value": "hello"
-          #                 },
-          #                 {
-          #                     "type": 1,
-          #                     "name": "a",
-          #                     "rule": 1,
-          #                     "value": "hello"
-          #                 }
-          #             ]
-          #         },
-          #         "split":[
-          #             {
-          #                 "uri": nil,
-          #                 "method": true,
-          #                 "urlParams": nil,
-          #                 "headerParams": nil,
-          #                 "bodyParams": nil,
-          #                 "cookieParams": nil
-          #
-          #             },
-          #             {
-          #                 "uri": nil,
-          #                 "method": true,
-          #                 "urlParams": nil,
-          #                 "headerParams": nil,
-          #                 "bodyParams": nil,
-          #                 "cookieParams": nil
-          #
-          #             }
-          #         ]
-          #
-          #     }
-          #
-          # ]
-
+          TingYun::Agent.config[:'nbs.naming.rules'] || []
         end
 
         def method_match?(method, _r)
@@ -129,7 +41,7 @@ module TingYun
         end
 
         def url_match?(url, _r, value)
-          (!value.nil?) and (!value.strip.empty? rescue true) and (url.send(RULE[_r], value) or url.send(RULE[_r], value[1..-1]))
+          (!value.nil?) and (!value.strip.empty? rescue true) and url.send(RULE[_r], value)
         end
 
         def params_match?(header, params, _rs)

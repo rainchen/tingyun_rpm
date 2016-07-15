@@ -67,6 +67,10 @@ module TingYun
         }
       end
 
+      def self.empty_array
+        Proc.new { [] }
+      end
+
 
       def default_values
         result = {}
@@ -632,14 +636,6 @@ module TingYun
             :type => String,
             :allowed_from_server => true,
             :description => 'trace ID of crossing apps'
-        },
-        :'nbs.naming.rules' => {
-            :default     => [],
-            :allow_nil   => false,
-            :public      => true,
-            :type        => Array,
-            :allowed_from_server => true,
-            :description => 'the rules of split URL'
         }
     }.freeze
   end

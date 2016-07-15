@@ -105,7 +105,7 @@ module TingYun
 
         #expect the params
         def uri
-          path.slice(1..-1).split('?').first
+          path.split('?').first
         end
         #contain the params
 
