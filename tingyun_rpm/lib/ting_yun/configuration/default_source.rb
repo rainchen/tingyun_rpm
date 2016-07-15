@@ -634,11 +634,12 @@ module TingYun
             :description => 'trace ID of crossing apps'
         },
         :'nbs.naming.rules' => {
-            :default => '',
-            :public => true,
-            :type => String,
+            :default     => [],
+            :allow_nil   => false,
+            :public      => true,
+            :type        => Array,
             :allowed_from_server => true,
-            :description => 'the rule of name the webaction name  containing match & split ways'
+            :description => 'the rules of split URL'
         }
     }.freeze
   end
