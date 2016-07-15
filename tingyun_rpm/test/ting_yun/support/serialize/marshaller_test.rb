@@ -41,17 +41,6 @@ module TingYun::Support::Serialize
 
 
 
-    def test_return_value_data_no_has_key?
-      expects_logging(:debug, includes("Unexpected response"), any_parameters)
-      assert_nil @marshaller.return_value_for_testing("string"),'should be nil if respond_to?(:has_key?)==false'
-    end
-
-    def test_return_value_data_no_exception_return_value
-      expects_logging(:debug, includes("Unexpected response"), any_parameters)
-      assert_nil @marshaller.return_value_for_testing({:str => "has_key?"}),'should be nil if have no "return_value and exception" '
-    end
-
-
     def test_return_value_data_and_return_value
       assert 'return_value', @marshaller.return_value_for_testing({'return_value' => 'return_value'})
     end

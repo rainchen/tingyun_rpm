@@ -69,9 +69,9 @@ module TingYun
                                         })
       report = ::TingYun::EnvironmentReport.new
       assert_equal(8, report['Logical Processors'])
-      assert_equal('x86_64', report['Arch'])
-      assert_equal('WiggleOS 1.1.1', report['OS version'])
-      assert_equal('wiggleos', report['OS'])
+      assert_equal('x86_64', report['os_arch'])
+      assert_equal('WiggleOS 1.1.1', report['os_version'])
+      assert_equal('wiggleos', report['kernel'])
     end
 
     def test_has_logic_for_keys
@@ -90,9 +90,9 @@ module TingYun
           'Framework',
           'Dispatcher',
           'Environment',
-          'Arch',
-          'OS version',
-          'OS',
+          'os_arch',
+          'os_version',
+          'kernel',
           'Rails Env',
           'Rails version',
           'Rails threadsafe',

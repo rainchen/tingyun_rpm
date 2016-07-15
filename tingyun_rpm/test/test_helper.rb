@@ -14,6 +14,8 @@ $LOAD_PATH.uniq!
 
 require 'rubygems'
 require 'rake'
+require 'pry'
+
 
 require 'minitest/autorun'
 require 'mocha/setup'

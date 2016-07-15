@@ -214,7 +214,7 @@ module TingYun
             :public => true,
             :type => String,
             :allowed_from_server => true,
-            :description => ''
+            :description => 'Specify a comma-delimited list of error classes that the agent should ignore'
         },
         :"nbs.error_collector.record_db_errors" => {
             :default => true,
@@ -315,22 +315,7 @@ module TingYun
             :public => false,
             :type => String,
             :allowed_from_server => true,
-            :description => ''
-        },
-        :'nbs.action_tracer.action_name_functions' => {
-            :default => '',
-            :allow_nil => true,
-            :public => false,
-            :type => String,
-            :allowed_from_server => true,
-            :description => ''
-        },
-        :'nbs.action_tracer.remove_trailing_path' => {
-            :default => false,
-            :public => false,
-            :type => Boolean,
-            :allowed_from_server => true,
-            :description => ''
+            :description => 'obfuscate the special sql fields'
         },
         :'nbs.action_tracer.stack_trace_threshold' => {
             :default => 500,
@@ -345,13 +330,6 @@ module TingYun
             :type => String,
             :allowed_from_server => true,
             :description => 'Enable or disable Specifies External  request parameters  '
-        },
-        :'nbs.web_action_uri_params_captured' => {
-            :default => '',
-            :public => true,
-            :type => String,
-            :allowed_from_server => true,
-            :description => 'Enable or disable Specifies WebAction request parameters  '
         },
         :agent_log_file_path => {
             :default => 'log/',

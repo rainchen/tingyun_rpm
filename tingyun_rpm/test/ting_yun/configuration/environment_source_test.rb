@@ -99,7 +99,7 @@ module TingYun::Configuration
     end
 
     def test_convert_environment_key_to_config_key_allows_underscores_as_dots
-      assert_applied_string('TING_YUN_RUM_SCRIPT', :'rum.script')
+      assert_applied_string('TING_YUN_RUM.SCRIPT', :'rum.script')
     end
 
 

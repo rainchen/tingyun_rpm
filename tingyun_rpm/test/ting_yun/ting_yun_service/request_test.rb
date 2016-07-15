@@ -36,21 +36,7 @@ class TingYun::TingYunService
       assert_equal 'deflate',  compress_request_if_needed(data)[1]
     end
 
-    def test_twice_send_request
-      data = {:uri => "uri", :encoding => "encoding", :collector => Object, :data => "data"}
-      server = Net::HTTP.new("test", 303030)
 
-
-      self.stubs(:close_shared_connection).returns(nil)
-      self.stubs(:http_connection).returns(server)
-
-      expects_logging(:debug, includes('Retrying'), any_parameters)
-
-      assert_raises TingYun::Support::Exception::ServerConnectionException do
-        send_request(data)
-      end
-
-    end
 
 
 
