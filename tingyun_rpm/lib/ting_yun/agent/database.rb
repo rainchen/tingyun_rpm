@@ -129,7 +129,7 @@ module TingYun
           query_plan_string = lines.join("\n")
         end
 
-        unless record_sql_method == :raw
+        unless record_sql_method(:"nbs.action_tracer.record_sql") == :raw
           query_plan_string = Obfuscator.instance.obfuscate_postgres_explain(query_plan_string)
         end
         values = query_plan_string.split("\n").map { |line| [line] }
