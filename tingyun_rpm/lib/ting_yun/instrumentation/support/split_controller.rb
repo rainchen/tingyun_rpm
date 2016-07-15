@@ -8,7 +8,8 @@ module TingYun
           'POST' => 2,
           'PUT' => 3,
           'DELETE' => 4,
-          'HEAD' => 5
+          'HEAD' => 5,
+          'PATCH' => 2
         }
 
         RULE = {
