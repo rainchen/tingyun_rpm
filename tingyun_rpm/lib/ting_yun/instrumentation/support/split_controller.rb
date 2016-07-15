@@ -86,7 +86,7 @@ module TingYun
         end
 
         def split_url(url)
-          uri = @rule[:split][:uri]
+          uri = @rule["split"]["uri"]
           return '' if uri.nil? or uri.strip.empty?
           if uri.include? ','
             _i = uri.split(',').map{|n|n.to_i}
