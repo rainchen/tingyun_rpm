@@ -9,7 +9,7 @@ module TingYun
     class TransactionState
 
       # Request data
-      attr_accessor :request, :transaction_sample_builder
+      attr_accessor :transaction_sample_builder
       attr_reader   :current_transaction, :traced_method_stack
       # Sql Sampler Transaction Data
       attr_accessor :sql_sampler_transaction_data,
@@ -68,7 +68,6 @@ module TingYun
         # We purposefully don't reset @untraced, @record_tt and @record_sql
         # since those are managed by TingYun::Agent.disable_* calls explicitly
         # and (more importantly) outside the scope of a transaction
-        @request = nil
         @current_transaction = transaction
         @traced_method_stack.clear
         @transaction_sample_builder = nil

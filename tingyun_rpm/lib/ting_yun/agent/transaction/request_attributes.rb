@@ -8,11 +8,12 @@ module TingYun
       class RequestAttributes
 
         attr_reader :request_path, :referer, :accept, :content_length, :host,
-                    :port, :user_agent, :request_method, :query_string
+                    :port, :user_agent, :request_method, :query_string, :header, :cookie
 
         HTTP_ACCEPT_HEADER_KEY = 'HTTP_ACCEPT'.freeze
 
         def initialize request
+          @header = request.env
           @request_path = path_from_request request
           @referer = referer_from_request request
           @accept = attribute_from_env request, HTTP_ACCEPT_HEADER_KEY
@@ -22,6 +23,7 @@ module TingYun
           @user_agent = attribute_from_request request, :user_agent
           @request_method = attribute_from_request request, :request_method
           @query_string = attribute_from_request request, :query_string
+          @cookie = set_cookie(request)
         end
 
         def assign_agent_attributes(txn)
@@ -118,6 +120,15 @@ module TingYun
           if env = attribute_from_request(request, :env)
             env[key]
           end
+        end
+
+        def set_cookie(request)
+          cookie = {}
+          attribute_from_env(request, 'HTTP_COOKIE').split(';').each do |i|
+            _k, _v = i.split('=')
+            cookie[_k.strip] = _v.strip
+          end
+          cookie
         end
 
       end

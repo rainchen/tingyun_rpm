@@ -45,10 +45,19 @@ module TingYun
         end
       end
 
+      def capture_request(state, env)
+        if env.is_a? Hash
+
+        end
+      end
+
       def call(env)
         first_middleware = note_transaction_started(env)
 
         state = TingYun::Agent::TransactionState.tl_get
+        if first_middleware
+          capture_request(state, env)
+        end
         begin
           TingYun::Agent::Transaction.start(state, category, build_transaction_options(env, first_middleware))
           events.notify(:before_call, env) if first_middleware

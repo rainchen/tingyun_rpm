@@ -4,6 +4,7 @@ require 'ting_yun/instrumentation/support/queue_time'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/evented_subscriber'
 require 'ting_yun/agent/transaction'
+require 'ting_yun/instrumentation/support/split_controller'
 
 module TingYun
   module Instrumentation
@@ -11,7 +12,7 @@ module TingYun
       class ActionControllerSubscriber < TingYun::Instrumentation::Support::EventedSubscriber
         def start(name, id, payload) #THREAD_LOCAL_ACCES
           state = TingYun::Agent::TransactionState.tl_get
-          request = state.request
+          request = state.current_transaction.request_attributes rescue nil
           event = ControllerEvent.new(name, Time.now, nil, id, payload, request)
           push_event(event)
           # if state.execution_traced?
@@ -51,11 +52,14 @@ module TingYun
       end
 
       class ControllerEvent < TingYun::Instrumentation::Support::Event
+
+        include TingYun::Instrumentation::Support::SplitController
+
         attr_accessor :parent
         attr_reader :queue_start, :request
 
         def initialize(name, start, ending, transaction_id, payload, request)
-          # We have a different initialize parameter list, so be explicit
+          # We have a different initialize parameter[[j]] list, so be explicit
           super(name, start, ending, transaction_id, payload, nil)
 
           @request = request
@@ -68,11 +72,23 @@ module TingYun
         end
 
         def metric_name
-          if TingYun::Agent.config[:'nbs.auto_action_naming']
-            @metric_name ||= "WebAction/Rails/#{metric_path}%2F#{metric_action}"
+          if find_rule(method, uri, request.header, params)
+            @metric_name =  "WebAction/Rails/#{namespace}/#{name(uri, request.header, params, request.cookie)}"
           else
-            path
+            if TingYun::Agent.config[:'nbs.auto_action_naming']
+              @metric_name ||= "WebAction/Rails/#{metric_path}%2F#{metric_action}"
+            else
+              path
+            end
           end
+        end
+
+        def method
+          payload[:method]
+        end
+
+        def params
+           payload[:params]
         end
 
         def metric_path
@@ -86,6 +102,12 @@ module TingYun
         def metric_action
           payload[:action]
         end
+
+        #expect the params
+        def uri
+          path.slice(1..-1).split('?').first
+        end
+        #contain the params
 
         def path
           payload[:path]

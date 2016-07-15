@@ -2,24 +2,31 @@
 require 'ting_yun/agent'
 require 'ting_yun/instrumentation/support/controller_instrumentation'
 require 'ting_yun/instrumentation/support/parameter_filtering'
+require 'ting_yun/instrumentation/support/split_controller'
 
 module TingYun
   module Instrumentation
     module Rails3
       module ActionController
 
+        include TingYun::Instrumentation::Support::SplitController
+
+
+
         def tingyun_metric_path(action_name_override = nil)
-
-          return  self.env["PATH_INFO"] unless TingYun::Agent.config[:'nbs.auto_action_naming']
-
-          action = action_name_override || action_name
-          if action_name_override || self.class.action_methods.include?(action)
-            "Rails3/#{self.class.controller_path}%2F#{action}"
+          if find_rule(request.method, request.path, request.env, request.filtered_parameters)
+            return "Rails3/#{namespace}/#{name(request.path.slice(1..-1), request.env, request.filtered_parameters, request.cookie)}"
           else
-            "Rails3/#{self.class.controller_path}%2F(other)"
+            return  self.env["PATH_INFO"] unless TingYun::Agent.config[:'nbs.auto_action_naming']
+
+            action = action_name_override || action_name
+            if action_name_override || self.class.action_methods.include?(action)
+              "Rails3/#{self.class.controller_path}%2F#{action}"
+            else
+              "Rails3/#{self.class.controller_path}%2F(other)"
+            end
           end
         end
-
 
 
         def process_action(*args)
