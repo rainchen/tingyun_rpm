@@ -106,7 +106,9 @@ module TingYun
       end
       @marshaller.load(decompress_response(response))
     ensure
-      data = nil # take the initiative to GC
+      # take the initiative to GC
+      payload = nil
+      data = nil
     end
 
     def handle_serialization_error(method, e)
