@@ -24,7 +24,7 @@ module TingYun
 
       def started_time_and_node(operate)
         _op_ = operations.delete(operate)
-        time = (_op_ && _op_[:started_time]) or Time.now.to_f
+        time = (_op_ && _op_[:started_time]) || Time.now.to_f
         node = _op_ && _op_[:node]
         [time, node]
       end
@@ -261,7 +261,7 @@ TingYun::Support::LibraryDetection.defer do
 
       def send_message_with_tingyun(name, args_class, args = {})
 
-        tag = "#{args_class.to_s.split('::').first.downcase}.#{name}"
+        tag = "#{args_class.to_s.split('::').first}.#{name}".downcase
         t0 = Time.now.to_f
         operations[tag] = {:started_time => t0}
         state = TingYun::Agent::TransactionState.tl_get
@@ -277,7 +277,7 @@ TingYun::Support::LibraryDetection.defer do
       alias :send_message  :send_message_with_tingyun
 
       def send_oneway_message_with_tingyun(name, args_class, args = {})
-        tag = "#{args_class.to_s.split('::').first.downcase}.#{name}"
+        tag = "#{args_class.to_s.split('::').first}.#{name}".downcase
         op_started = Time.now.to_f
         base, *other_metrics = metrics(tag)
         result = send_oneway_message_without_tingyun(name, args_class, args)
