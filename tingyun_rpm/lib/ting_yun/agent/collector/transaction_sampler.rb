@@ -35,26 +35,18 @@ module TingYun
           builder.trace_exit(frame, time.to_f)
         end
 
-        def enabled?
-          TingYun::Agent.config[:'nbs.action_tracer.enabled']
-        end
 
-        def on_start_transaction(state, time)
-          start_builder(state, time)
-        end
-
-        def start_builder(state, time=nil)
-          if enabled?
+        def self.on_start_transaction(state, time)
+          if TingYun::Agent.config[:'nbs.action_tracer.enabled']
             state.transaction_sample_builder ||= TingYun::Agent::TransactionSampleBuilder.new(time)
           else
             state.transaction_sample_builder = nil
           end
         end
 
-
         def on_finishing_transaction(state, txn, time=Time.now.to_f)
           last_builder = state.transaction_sample_builder
-          return unless last_builder && enabled?
+          return unless last_builder && TingYun::Agent.config[:'nbs.action_tracer.enabled']
 
           last_builder.finish_trace(time)
 
@@ -165,7 +157,7 @@ module TingYun
         end
 
         def harvest!
-          return [] unless enabled?
+          return [] unless TingYun::Agent.config[:'nbs.action_tracer.enabled']
 
           samples = @lock.synchronize do
             @last_sample = nil
@@ -196,8 +188,7 @@ module TingYun
           end
         end
 
-        def merge!
-
+        def merge!(previous)
           @lock.synchronize do
             @sample_buffers.each do |buffer|
               buffer.store_previous(previous)

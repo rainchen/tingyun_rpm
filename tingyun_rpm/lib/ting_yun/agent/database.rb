@@ -9,11 +9,15 @@ module TingYun
 
       extend self
 
-
       def obfuscate_sql(sql)
         Obfuscator.instance.obfuscator.call(sql)
       end
 
+      def sql_sampler_enabled?
+        Agent.config[:'nbs.action_tracer.enabled'] &&
+            Agent.config[:'nbs.action_tracer.slow_sql'] &&
+            should_record_sql?('nbs.action_tracer.record_sql')
+      end
 
       def capture_query(query)
         TingYun::Helper.correctly_encoded(truncate_query(query))

@@ -22,6 +22,7 @@ module TingYun
       # query was seen, the min, max, and total time spent executing those
       # queries, and an example backtrace from one of the aggregated queries.
       #
+
       class SqlSampler
 
         MAX_SAMPLES = 10
@@ -33,18 +34,12 @@ module TingYun
           @samples_lock = Mutex.new
         end
 
-        def enabled?
-          Agent.config[:'nbs.action_tracer.enabled'] &&
-              Agent.config[:'nbs.action_tracer.slow_sql'] &&
-                  TingYun::Agent::Database.should_record_sql?('nbs.action_tracer.record_sql')
-        end
+        def self.on_start_transaction(state, uri=nil)
+          return unless TingYun::Agent::Database.sql_sampler_enabled?
 
-        def on_start_transaction(state, uri=nil)
-          return unless enabled?
+          state.sql_sampler_transaction_data = ::TingYun::Agent::Collector::TransactionSqlData.new
 
-          state.sql_sampler_transaction_data = TransactionSqlData.new
-
-          if Agent.config[:'nbs.action_tracer.slow_sql'] && state.sql_sampler_transaction_data
+          if Agent.config[:'nbs.action_tracer.slow_sql']
             state.sql_sampler_transaction_data.set_transaction_info(uri)
           end
         end
@@ -56,24 +51,21 @@ module TingYun
           data = state.sql_sampler_transaction_data
           return unless data
 
-          if state.sql_recorded? && !metric_name.nil?
-            if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold']
-              if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.stack_trace_threshold']
-                backtrace = (caller.reject! { |t| t.include?('tingyun_rpm') })
-                backtrace = backtrace.first(40) if backtrace.length > 40
-                backtrace = backtrace.join("\n")
-              else
-                backtrace = ''
-              end
-              statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
-              data.sql_data << SlowSql.new(statement, metric_name, duration, start_time, backtrace)
+          if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold'] && state.sql_recorded? && metric_name
+            if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.stack_trace_threshold']
+              backtrace = (caller.reject! { |t| t.include?('tingyun_rpm') })
+              backtrace = backtrace.first(40) if backtrace.length > 40
+              backtrace = backtrace.join("\n")
+            else
+              backtrace = ''
             end
+            statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
+            data.sql_data << SlowSql.new(statement, metric_name, duration, start_time, backtrace)
           end
         end
 
-
         def on_finishing_transaction(state, name)
-          return unless enabled?
+          return unless TingYun::Agent::Database.sql_sampler_enabled?
 
           transaction_sql_data = state.sql_sampler_transaction_data
           return unless transaction_sql_data
@@ -137,7 +129,7 @@ module TingYun
 
 
         def harvest!
-          return [] unless enabled?
+          return [] unless TingYun::Agent::Database.sql_sampler_enabled?
 
           slowest = []
           @samples_lock.synchronize do
@@ -154,7 +146,7 @@ module TingYun
           end
         end
 
-        def merge!
+        def merge!(sql_traces)
           @samples_lock.synchronize do
             sql_traces.each do |trace|
               existing_trace = @sql_traces[trace.sql]
@@ -196,8 +188,8 @@ module TingYun
         attr_reader :start_time
 
 
-        def initialize(statement, metric_name, duration, t,  backtrace=nil)
-          @start_time = t
+        def initialize(statement, metric_name, duration, time,  backtrace=nil)
+          @start_time = time
           @statement = statement
           @metric_name = metric_name
           @duration = duration
@@ -218,9 +210,7 @@ module TingYun
         end
 
         def explain
-          if statement.config && statement.explainer
-            TingYun::Agent::Database.explain_sql(statement.sql, statement.config, statement.explainer)
-          end
+          TingYun::Agent::Database.explain_sql(statement.sql, statement.config, statement.explainer)
         end
 
         # We can't serialize the explainer, so clear it before we transmit
