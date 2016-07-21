@@ -23,7 +23,7 @@ module TingYun
 
       # Runs through all the objects in ObjectSpace to find the first one that
       # match the provided class
-      def find_class_in_object_space(klass)
+      def self.find_class_in_object_space(klass)
         if TingYun::Support::LanguageSupport.object_space_usable?
           ObjectSpace.each_object(klass) do |x|
             return x
@@ -53,7 +53,7 @@ module TingYun
         rainbows
         unicorn
       ]
-        while dispatchers.any? && @discovered_dispatcher.nil?
+        while dispatchers.any? && !@discovered_dispatcher
           send 'check_for_'+(dispatchers.shift)
         end
       end
@@ -100,15 +100,15 @@ module TingYun
 
       def check_for_unicorn
         if (defined?(::Unicorn) && defined?(::Unicorn::HttpServer)) && TingYun::Support::LanguageSupport.object_space_usable?
-          v = find_class_in_object_space(::Unicorn::HttpServer)
-          @discovered_dispatcher = :unicorn if v
+          _v = TingYun::Support::LocalEnvironment.find_class_in_object_space(::Unicorn::HttpServer)
+          @discovered_dispatcher = :unicorn if _v
         end
       end
 
       def check_for_rainbows
         if (defined?(::Rainbows) && defined?(::Rainbows::HttpServer)) && TingYun::Support::LanguageSupport.object_space_usable?
-          v = find_class_in_object_space(::Rainbows::HttpServer)
-          @discovered_dispatcher = :rainbows if v
+          _v = TingYun::Support::LocalEnvironment.find_class_in_object_space(::Rainbows::HttpServer)
+          @discovered_dispatcher = :rainbows if _v
         end
       end
 

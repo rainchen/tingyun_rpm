@@ -159,7 +159,7 @@ module TingYun
             sql_traces.each do |trace|
               existing_trace = @sql_traces[trace.sql]
               if existing_trace
-                existing_trace.aggregate_trace(trace)
+                existing_trace.aggregate(trace.slow_sql, trace.path, trace.url)
               else
                 @sql_traces[trace.sql] = trace
               end
@@ -196,8 +196,8 @@ module TingYun
         attr_reader :start_time
 
 
-        def initialize(statement, metric_name, duration, t0,  backtrace=nil)
-          @start_time = t0
+        def initialize(statement, metric_name, duration, t,  backtrace=nil)
+          @start_time = t
           @statement = statement
           @metric_name = metric_name
           @duration = duration
@@ -252,27 +252,22 @@ module TingYun
         end
 
         def aggregate(slow_sql, action_name, uri)
-          if slow_sql.duration > max_call_time
+          duration = slow_sql.duration
+          if duration > max_call_time
             @action_metric_name = action_name
             @slow_sql = slow_sql
             @uri = uri
             @params[:stacktrace] = slow_sql.backtrace
           end
-          record_data_point(float(slow_sql.duration))
+          record_data_point(float(duration))
         end
 
-        def aggregate_trace(trace)
-          aggregate(trace.slow_sql, trace.path, trace.url)
-        end
 
         def prepare_to_send
-          @sql = @slow_sql.sql unless need_to_obfuscate?
+          @sql = @slow_sql.sql unless Agent.config[:'nbs.action_tracer.record_sql'].to_s == 'obfuscated'
           @params[:explainPlan] = @slow_sql.explain if need_to_explain?
         end
 
-        def need_to_obfuscate?
-          Agent.config[:'nbs.action_tracer.record_sql'].to_s == 'obfuscated'
-        end
 
         def need_to_explain?
           Agent.config[:'nbs.action_tracer.explain_enabled'] &&  @slow_sql.duration * 1000 > TingYun::Agent.config[:'nbs.action_tracer.explain_threshold']

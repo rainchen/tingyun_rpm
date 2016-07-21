@@ -158,7 +158,7 @@ module TingYun
 
         txn = state.current_transaction
 
-        if txn.nil?
+        unless txn
           TingYun::Agent.logger.error("Failed during Transaction.stop because there is no current transaction")
           return
         end
