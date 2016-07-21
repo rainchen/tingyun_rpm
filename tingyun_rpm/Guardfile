@@ -23,3 +23,8 @@ guard :minitest, :test_folders => ['test/ting_yun'], :all_after_pass => false do
   watch('test/agent_helper.rb') { "test/tingyun" }
 
 end
+
+guard "rubycritic" do
+  watch(%r{^app/(.+)\.rb$})
+  watch(%r{^lib/(.+)\.rb$})
+end

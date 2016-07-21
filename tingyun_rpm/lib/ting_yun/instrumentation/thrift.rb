@@ -5,17 +5,11 @@ require 'ting_yun/instrumentation/support/external_error'
 
 module TingYun
   module Instrumentation
+    # some methods support the thrift client
     module ThriftHelper
       def operator result_klass
         namespaces = result_klass.to_s.split('::')
-        operator_name = namespaces[0].downcase
-        if namespaces.last =~ /_result/
-          operator_name = "#{operator_name}.#{namespaces.last.sub('_result', '').downcase}"
-        elsif namespaces.last =~ /_args/
-          operator_name = "#{operator_name}.#{namespaces.last.sub('_args', '').downcase}"
-        end
-
-        operator_name
+        "#{namespaces[0].downcase}.#{namespaces.last.sub('_args', '').sub('_result', '').downcase}"
       end
 
       def operations
@@ -44,7 +38,7 @@ module TingYun
 
       def metrics operate
         state = TingYun::Agent::TransactionState.tl_get
-        metrics = if tingyun_host.nil?
+        metrics = unless tingyun_host
                     ["External/thrift:%2F%2F#{operate}/#{operate}"]
                   else
                     ["External/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{operate}"]

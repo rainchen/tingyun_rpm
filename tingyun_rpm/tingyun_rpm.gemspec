@@ -36,6 +36,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry', '~> 0.9.12'
   s.add_development_dependency 'hometown', '~> 0.2.5'
   s.add_development_dependency 'yard'
+  s.add_development_dependency 'rubycritic'
+  s.add_development_dependency 'guard-rubycritic'
 
   if RUBY_VERSION >= '1.9.3'
     s.add_development_dependency 'guard', '= 2.12.5'
