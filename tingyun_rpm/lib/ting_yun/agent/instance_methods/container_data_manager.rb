@@ -124,7 +124,7 @@ module TingYun
             @service.send(endpoint, items)
           rescue => e
             TingYun::Agent.logger.info("Unable to send #{endpoint} data, will try again later. Error: ", e)
-            container.merge!(items)
+            # container.merge!(items)
           ensure
             items = nil # take the initiative to GC
           end
