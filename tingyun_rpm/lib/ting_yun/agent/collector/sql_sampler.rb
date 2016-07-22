@@ -95,16 +95,14 @@ module TingYun
               sql_trace.aggregate(sql_item, action_metric_name, uri)
             else
               if has_room?
-                sql_trace = SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)
-              elsif should_add_trace?(sql_item)
-                remove_shortest_trace
-                sql_trace = SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)
+                @sql_traces[normalized_sql] = SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)
+              else
+                min, max = @sql_traces.minmax_by { |(_, trace)| trace.max_call_time }
+                if max.last.max_call_time < sql_item.duration
+                  @sql_traces.delete(min.first)
+                  @sql_traces[normalized_sql] = SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)
+                end
               end
-
-              if sql_trace
-                @sql_traces[normalized_sql] = sql_trace
-              end
-
             end
           end
         end
@@ -112,19 +110,6 @@ module TingYun
         # this should always be called under the @samples_lock
         def has_room?
           @sql_traces.size < MAX_SAMPLES
-        end
-
-        # this should always be called under the @samples_lock
-        def should_add_trace?(sql_item)
-          @sql_traces.any? do |(_, existing_trace)|
-            existing_trace.max_call_time < sql_item.duration
-          end
-        end
-
-        # this should always be called under the @samples_lock
-        def remove_shortest_trace
-          shortest_key, _ = @sql_traces.min_by { |(_, trace)| trace.max_call_time }
-          @sql_traces.delete(shortest_key)
         end
 
 
