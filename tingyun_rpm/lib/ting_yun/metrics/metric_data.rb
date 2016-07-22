@@ -69,14 +69,14 @@ module TingYun
 
         metrics << int(stats.call_count, stat_key)
         if stats.max_call_time != 0.0 #apedx
-          metrics << float(stats.total_call_time.round, stat_key)
-          metrics << float(stats.total_exclusive_time.round, stat_key)
-          metrics << float(stats.max_call_time.round, stat_key)
+          metrics << float(stats.total_call_time, stat_key)
+          metrics << float(stats.total_exclusive_time, stat_key)
+          metrics << float(stats.max_call_time, stat_key)
         end
 
         if stats.min_call_time !=0.0 #
-          metrics << float(stats.min_call_time.round, stat_key)
-          metrics << float(stats.sum_of_squares.round, stat_key)
+          metrics << float(stats.min_call_time, stat_key)
+          metrics << float(stats.sum_of_squares, stat_key)
         end
 
         metrics
