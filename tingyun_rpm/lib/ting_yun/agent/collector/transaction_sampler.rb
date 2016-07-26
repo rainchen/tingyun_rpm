@@ -11,7 +11,6 @@ module TingYun
     module Collector
       class TransactionSampler
 
-
         attr_accessor :last_sample
 
 

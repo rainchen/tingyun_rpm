@@ -3,6 +3,7 @@
 require 'ting_yun/support/helper'
 module TingYun
   module Agent
+    # sql explain plan
     module Database
 
       MAX_QUERY_LENGTH = 16384

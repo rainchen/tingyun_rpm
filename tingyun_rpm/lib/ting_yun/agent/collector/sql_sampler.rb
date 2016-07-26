@@ -21,7 +21,6 @@ module TingYun
       # Each slow SQL trace keeps track of the number of times the same normalized
       # query was seen, the min, max, and total time spent executing those
       # queries, and an example backtrace from one of the aggregated queries.
-      #
 
       class SqlSampler
 
@@ -115,7 +114,6 @@ module TingYun
 
         def harvest!
           return [] unless TingYun::Agent::Database.sql_sampler_enabled?
-
           slowest = []
           @samples_lock.synchronize do
             slowest = @sql_traces.values
@@ -143,8 +141,6 @@ module TingYun
             end
           end
         end
-
-
       end
 
       class TransactionSqlData

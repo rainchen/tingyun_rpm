@@ -37,12 +37,13 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'hometown', '~> 0.2.5'
   s.add_development_dependency 'yard'
   s.add_development_dependency 'rubycritic'
-  s.add_development_dependency 'guard-rubycritic'
+
 
   if RUBY_VERSION >= '1.9.3'
     s.add_development_dependency 'guard', '= 2.12.5'
     s.add_development_dependency 'guard-minitest', '= 2.4.4'
     s.add_development_dependency 'rb-fsevent', '= 0.9.4'
+    s.add_development_dependency 'guard-rubycritic'
   end
 
   # compatible with Ruby 1.8.7
