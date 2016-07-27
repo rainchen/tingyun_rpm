@@ -109,7 +109,7 @@ module TingYun
         category ||= :controller
         txn = state.current_transaction
         options[:client_transaction_id] = state.client_transaction_id
-        if txn && options[:transaction_name]
+        if txn
           txn.create_nested_frame(state, category, options)
         else
           txn = start_new_transaction(state, category, options)
@@ -139,6 +139,11 @@ module TingYun
 
       def create_nested_frame(state, category, options)
         @has_children = true
+        if options[:filtered_params] && !options[:filtered_params].empty?
+          @filtered_params = options[:filtered_params]
+          @attributes.merge_request_parameters(options[:filtered_params])
+        end
+
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame(options[:transaction_name])
 
@@ -153,6 +158,7 @@ module TingYun
           @category = category if category
         end
       end
+
 
       def self.stop(state, end_time = Time.now)
 
