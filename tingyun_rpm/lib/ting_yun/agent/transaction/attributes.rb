@@ -17,7 +17,7 @@ module TingYun
         end
 
         def merge_request_parameters(hash)
-          @request_params.merge hash
+          @request_params.merge!(hash) unless hash
         end
       end
     end
