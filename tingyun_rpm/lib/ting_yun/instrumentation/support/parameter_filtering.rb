@@ -16,6 +16,7 @@ module TingYun
           result.delete("commit")
           result.delete("authenticity_token")
           result.delete_if{|_,v| !v.is_a? String}
+          TingYun::Agent.config["nbs.ignored_params"].split(',').each{|key| result.delete(key)}
           result
         end
 
