@@ -45,7 +45,6 @@ module TingYun
                     :category,
                     :frame_stack,
                     :exceptions,
-                    :filtered_params,
                     :default_name,
                     :metrics,
                     :http_response_code,
@@ -64,7 +63,6 @@ module TingYun
         @start_time = Time.now
         @apdex_start = options[:apdex_start_time] || @start_time
         @frame_stack = []
-        @filtered_params = options[:filtered_params] || {}
         @frozen_name = nil
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
         @metrics = TingYun::Agent::TransactionMetrics.new
@@ -72,6 +70,7 @@ module TingYun
         @error_recorded = false
 
         @attributes = TingYun::Agent::Transaction::Attributes.new
+
 
         if request = options[:request]
           @request_attributes = TingYun::Agent::Transaction::RequestAttributes.new request
@@ -109,11 +108,14 @@ module TingYun
         category ||= :controller
         txn = state.current_transaction
         options[:client_transaction_id] = state.client_transaction_id
-        if txn && options[:transaction_name]
+        if txn
           txn.create_nested_frame(state, category, options)
         else
           txn = start_new_transaction(state, category, options)
         end
+
+        # merge params every step into here
+        txn.attributes.merge_request_parameters(options[:filtered_params])
 
         txn
       rescue => e
@@ -153,6 +155,7 @@ module TingYun
           @category = category if category
         end
       end
+
 
       def self.stop(state, end_time = Time.now)
 

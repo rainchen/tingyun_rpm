@@ -16,6 +16,7 @@ module TingYun
         @operations ||= {}
       end
 
+
       def self.started_time_and_node(operations,operate)
         _op = operations.delete(operate) || {}
         [_op[:started_time] || Time.now.to_f, _op[:node]]

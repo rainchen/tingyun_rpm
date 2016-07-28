@@ -5,6 +5,7 @@ require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/evented_subscriber'
 require 'ting_yun/agent/transaction'
 require 'ting_yun/instrumentation/support/split_controller'
+require 'ting_yun/instrumentation/support/parameter_filtering'
 
 module TingYun
   module Instrumentation
@@ -36,9 +37,10 @@ module TingYun
         end
 
         def start_transaction(state, event)
+          params = TingYun::Instrumentation::Support::ParameterFiltering.flattened_filter_request_parameters(event.payload[:params])
           TingYun::Agent::Transaction.start(state, :controller,
                                             :request => event.request,
-                                            :filtered_params => event.payload[:params],
+                                            :filtered_params => params,
                                             :apdex_start_time => event.queue_start,
                                             :transaction_name => event.metric_name)
         end

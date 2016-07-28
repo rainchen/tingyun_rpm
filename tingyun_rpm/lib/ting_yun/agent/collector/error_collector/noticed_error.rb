@@ -119,7 +119,8 @@ module TingYun
         end
 
         def request_params
-          attributes.agent_attributes[:request_params]
+          return {}  unless TingYun::Agent.config['nbs.capture_params']
+          attributes.request_params
         end
 
       end

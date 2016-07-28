@@ -5,9 +5,10 @@ module TingYun
     class Transaction
       class Attributes
 
-        attr_accessor :agent_attributes
+        attr_accessor :agent_attributes, :request_params
         def initialize
           @agent_attributes  = {}
+          @request_params = {}
         end
 
         def add_agent_attribute(key, value)
@@ -15,6 +16,9 @@ module TingYun
           @agent_attributes[key] = value
         end
 
+        def merge_request_parameters(hash)
+          @request_params.merge!(hash) if hash
+        end
       end
     end
   end
