@@ -30,7 +30,7 @@ module TingYun
 
 
         def process_action(*args)
-          params = TingYun::Instrumentation::Support::ParameterFiltering.filter_rails_request_parameters(request.filtered_parameters)
+          params = TingYun::Instrumentation::Support::ParameterFiltering.flattened_filter_request_parameters(request.filtered_parameters)
           perform_action_with_tingyun_trace(:category => :controller,
                                             :name     => self.action_name,
                                             :path     => tingyun_metric_path,

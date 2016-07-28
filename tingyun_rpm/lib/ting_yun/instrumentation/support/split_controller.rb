@@ -1,3 +1,5 @@
+require 'ting_yun/instrumentation/support/parameter_filtering'
+
 module TingYun
   module Instrumentation
     module Support
@@ -125,15 +127,7 @@ module TingYun
 
         # turns {'a' => {'b' => 'c'}} into {'b' => 'c'}
         def dot_flattened(nested_hash, result={})
-          nested_hash.each do |key, val|
-            next if val == nil
-            if val.respond_to?(:has_key?)
-              dot_flattened(val, result)
-            else
-              result[key] = val
-            end
-          end
-          result
+          TingYun::Instrumentation::Support::ParameterFiltering.dot_flattened(nested_hash, result={})
         end
       end
     end
