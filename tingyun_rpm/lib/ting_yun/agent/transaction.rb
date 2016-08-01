@@ -239,42 +239,18 @@ module TingYun
       end
 
       def commit!(state, end_time, outermost_node_name)
-        assign_agent_attributes
-
-
+        @attributes.assign_agent_attributes(http_response_code, response_content_type)
+        @request_attributes.assign_agent_attributes(@attributes) if @request_attributes
         transaction_sampler.on_finishing_transaction(state, self, end_time)
-
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
-
         record_summary_metrics(outermost_node_name, end_time)
-        record_apdex(state, end_time)
+        record_apdex(end_time)
         record_exceptions
         merge_metrics
       end
 
-      def assign_agent_attributes
 
-        add_agent_attribute(:threadName,  "pid-#{$$}");
-
-        if http_response_code
-          add_agent_attribute(:httpStatus, http_response_code.to_s)
-        end
-
-        if response_content_type
-          add_agent_attribute(:contentType, response_content_type)
-        end
-
-
-        if @request_attributes
-          @request_attributes.assign_agent_attributes self
-        end
-
-      end
-
-      def add_agent_attribute(key, value)
-        @attributes.add_agent_attribute(key, value)
-      end
 
       #collector error
       def had_error?
@@ -299,7 +275,7 @@ module TingYun
         end
       end
 
-      def record_apdex(state, end_time=Time.now)
+      def record_apdex(end_time=Time.now)
         total_duration = (end_time - apdex_start)*1000
         if recording_web_transaction?
           record_apdex_metrics(APDEX_TXN_METRIC_PREFIX, total_duration, apdex_t)
