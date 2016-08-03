@@ -164,7 +164,7 @@ module TingYun
           generate_environment_report
           install_exit_handler
           cpu_and_memory
-
+          connect_in_sync if Agent.config[:sync_startup]
           start_worker_thread(options)
 
         end

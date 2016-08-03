@@ -203,5 +203,17 @@ module TingYun
     end
 
 
+    # Shutdown the agent.  Call this before exiting.  Sends any queued data
+    # and kills the background thread.
+    #
+    # @param options [Hash] Unused options Hash, for back compatibility only
+    #
+    # @api public
+    #
+    def shutdown
+      agent.shutdown if agent
+    end
+
+
   end
 end

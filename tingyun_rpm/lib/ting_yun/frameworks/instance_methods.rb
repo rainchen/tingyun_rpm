@@ -64,7 +64,7 @@ module TingYun
           start_agent
           install_instrumentation
         else
-          LibraryDetection.detect!
+          TingYun::Support::LibraryDetection.detect!
         end
 
       end
