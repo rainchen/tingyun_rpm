@@ -45,7 +45,6 @@ module TingYun
                     :category,
                     :frame_stack,
                     :exceptions,
-                    :filtered_params,
                     :default_name,
                     :metrics,
                     :http_response_code,
@@ -64,7 +63,6 @@ module TingYun
         @start_time = Time.now
         @apdex_start = options[:apdex_start_time] || @start_time
         @frame_stack = []
-        @filtered_params = options[:filtered_params] || {}
         @frozen_name = nil
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
         @metrics = TingYun::Agent::TransactionMetrics.new
@@ -72,6 +70,7 @@ module TingYun
         @error_recorded = false
 
         @attributes = TingYun::Agent::Transaction::Attributes.new
+
 
         if request = options[:request]
           @request_attributes = TingYun::Agent::Transaction::RequestAttributes.new request
@@ -115,6 +114,9 @@ module TingYun
           txn = start_new_transaction(state, category, options)
         end
 
+        # merge params every step into here
+        txn.attributes.merge_request_parameters(options[:filtered_params])
+
         txn
       rescue => e
         TingYun::Agent.logger.error("Exception during Transaction.start", e)
@@ -139,11 +141,6 @@ module TingYun
 
       def create_nested_frame(state, category, options)
         @has_children = true
-        if options[:filtered_params] && !options[:filtered_params].empty?
-          @filtered_params = options[:filtered_params]
-          @attributes.merge_request_parameters(options[:filtered_params])
-        end
-
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame(options[:transaction_name])
 
