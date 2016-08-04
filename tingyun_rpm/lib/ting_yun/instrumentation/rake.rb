@@ -5,7 +5,10 @@ TingYun::Support::LibraryDetection.defer do
   named :rake
 
   depends_on do
-    defined?(::Rake)
+    defined?(::Rake)&&
+        !::TingYun::Agent.config[:'disable_rake'] &&
+        ::TingYun::Agent.config[:'rake.tasks'].any? &&
+        ::TingYun::Agent::Instrumentation::RakeInstrumentation.should_install?
   end
 
   executes do
@@ -37,6 +40,11 @@ module TingYun
   module Agent
     module Instrumentation
       module RakeInstrumentation
+
+        def self.supported_version?
+          ::TingYun::VersionNumber.new(::Rake::VERSION) >= ::TingYun::VersionNumber.new("0.9.0")
+        end
+
         def self.before_invoke_transaction
           ensure_at_exit
         end

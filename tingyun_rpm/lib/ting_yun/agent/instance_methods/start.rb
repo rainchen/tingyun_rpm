@@ -164,9 +164,12 @@ module TingYun
           generate_environment_report
           install_exit_handler
           cpu_and_memory
-          connect_in_sync if TingYun::Agent.config[:sync_startup]
-          start_worker_thread(options)
 
+          if TingYun::Agent.config[:sync_startup]
+            connect_in_sync
+          else
+            start_worker_thread(options)
+          end
         end
 
         # This method should be called in a forked process after a fork.

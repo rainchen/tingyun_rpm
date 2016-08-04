@@ -57,7 +57,7 @@ module TingYun
           unless stats.is_reset?
             metric_id = metric_id_cache[metric_spec.name]
 
-            if metric_spec.name.start_with?('WebAction')
+            if metric_spec.name.start_with?('WebAction','BackgroundAction')
               action_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Apdex')
               adpex_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)

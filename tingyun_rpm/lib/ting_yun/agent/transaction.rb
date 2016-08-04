@@ -21,7 +21,7 @@ module TingYun
       SINATRA_PREFIX = 'Sinatra/'.freeze
       MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
       GRAPE_PREFIX = 'Grape/'.freeze
-      RAKE_PREFIX = 'OtherTransaction/Rake/'.freeze
+      RAKE_PREFIX = 'BackgroundAction/Rake/'.freeze
       WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware, :thrift].freeze
       EMPTY_SUMMARY_METRICS = [].freeze
       MIDDLEWARE_SUMMARY_METRICS = ['Middleware/all'.freeze].freeze
@@ -29,10 +29,7 @@ module TingYun
       TRACE_OPTIONS_SCOPED = {:metric => true, :scoped_metric => true}.freeze
       TRACE_OPTIONS_UNSCOPED = {:metric => true, :scoped_metric => false}.freeze
       NESTED_TRACE_STOP_OPTIONS = {:metric => true}.freeze
-
-
-      WEB_SUMMARY_METRIC = 'HttpDispatcher'.freeze
-      OTHER_SUMMARY_METRIC = 'OtherTransaction/all'.freeze
+      
 
       # A Time instance for the start time, never nil
       attr_accessor :start_time
@@ -247,7 +244,6 @@ module TingYun
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
 
-        record_summary_metrics(outermost_node_name, end_time)
         record_apdex(state, end_time)
         record_exceptions
         merge_metrics
@@ -413,33 +409,6 @@ module TingYun
 
       def merge_metrics
         TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
-      end
-
-
-      def summary_metrics
-        if @frozen_name.start_with?(CONTROLLER_PREFIX)
-          [WEB_SUMMARY_METRIC]
-        else
-          background_summary_metrics
-        end
-      end
-
-      def background_summary_metrics
-        segments = @frozen_name.split('/')
-        if segments.size > 2
-          ["OtherTransaction/#{segments[1]}/all", OTHER_SUMMARY_METRIC]
-        else
-          []
-        end
-      end
-
-
-      # The summary metrics recorded by this method all end up with a duration
-      # equal to the transaction itself, and an exclusive time of zero.
-      def record_summary_metrics(outermost_node_name, end_time)
-        metrics = summary_metrics
-        metrics << @frozen_name unless @frozen_name == outermost_node_name
-        @metrics.record_unscoped(metrics, (end_time.to_f - start_time.to_f)*1000)
       end
 
       def name_last_frame(name)

@@ -629,6 +629,13 @@ module TingYun
             :allowed_from_server => true,
             :description => 'defined nme rule '
         },
+        :disable_rake => {
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'If true, disables Rake instrumentation.'
+        },
         :'rake.tasks' => {
             :default => [],
             :public => true,
