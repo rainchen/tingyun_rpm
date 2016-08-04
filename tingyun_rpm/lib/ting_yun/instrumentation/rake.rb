@@ -8,7 +8,7 @@ TingYun::Support::LibraryDetection.defer do
     defined?(::Rake)&&
         !::TingYun::Agent.config[:'disable_rake'] &&
         ::TingYun::Agent.config[:'rake.tasks'].any? &&
-        ::TingYun::Agent::Instrumentation::RakeInstrumentation.should_install?
+        ::TingYun::Agent::Instrumentation::RakeInstrumentation.supported_version?
   end
 
   executes do
