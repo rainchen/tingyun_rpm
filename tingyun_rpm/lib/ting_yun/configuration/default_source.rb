@@ -565,11 +565,11 @@ module TingYun
             :allowed_from_server => true,
             :description => 'Enable or disable to use default name '
         },
-        :capture_params => {
+        :'nbs.capture_params' => {
             :default => false,
             :public => true,
             :type => Boolean,
-            :allowed_from_server => false,
+            :allowed_from_server => true,
             :description => 'Enable or disable the capture of HTTP request parameters to be attached to transaction traces and traced errors.'
         },
         :config_path => {
