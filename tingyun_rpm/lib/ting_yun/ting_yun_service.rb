@@ -105,6 +105,8 @@ module TingYun
         TingYun::Agent.logger.info("the send-process end")
       end
       @marshaller.load(decompress_response(response))
+    ensure
+      data = nil # take the initiative to GC
     end
 
     def handle_serialization_error(method, e)
