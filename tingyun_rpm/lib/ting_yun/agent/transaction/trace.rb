@@ -43,8 +43,8 @@ module TingYun
           [
               @start_time.round,
               duration,
-              TingYun::Helper.correctly_encoded(metric_name),
-              TingYun::Helper.correctly_encoded(uri),
+              TingYun::Helper.correctly_encoded(metric_name)|| '',
+              TingYun::Helper.correctly_encoded(uri)|| '',
               encoder.encode(trace_tree),
               tx_id || '',
               guid
@@ -93,11 +93,13 @@ module TingYun
         end
 
         def custom_params
-          {
+          custom_param = {
               :threadName => string(attributes.agent_attributes[:threadName]),
-              :httpStatus => int(attributes.agent_attributes[:httpStatus]),
               :referer    => string(attributes.agent_attributes[:referer]) || ''
           }
+          custom_param[:httpStatus] = int(attributes.agent_attributes[:httpStatus]) if attributes.agent_attributes[:httpStatus]
+
+          custom_param
         end
 
         def request_params

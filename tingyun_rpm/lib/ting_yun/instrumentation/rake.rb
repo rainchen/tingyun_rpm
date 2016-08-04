@@ -42,7 +42,7 @@ module TingYun
       module RakeInstrumentation
 
         def self.supported_version?
-          ::TingYun::VersionNumber.new(::Rake::VERSION) >= ::TingYun::VersionNumber.new("0.9.0")
+          ::TingYun::Support::VersionNumber.new(::Rake::VERSION) >= ::TingYun::Support::VersionNumber.new("0.9.0")
         end
 
         def self.before_invoke_transaction

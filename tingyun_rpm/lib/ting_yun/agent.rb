@@ -23,7 +23,6 @@ module TingYun
     def agent
       return @agent if @agent
       TingYun::Agent.logger.warn("Agent unavailable as it hasn't been started.")
-      TingYun::Agent.logger.warn(caller.join("\n"))
       nil
     end
 
