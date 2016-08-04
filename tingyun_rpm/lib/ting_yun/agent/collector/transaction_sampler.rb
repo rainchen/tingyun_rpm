@@ -196,7 +196,7 @@ module TingYun
           end
         end
 
-        def merge!
+        def merge!(previous)
 
           @lock.synchronize do
             @sample_buffers.each do |buffer|

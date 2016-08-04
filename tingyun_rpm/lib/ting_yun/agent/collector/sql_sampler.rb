@@ -154,7 +154,7 @@ module TingYun
           end
         end
 
-        def merge!
+        def merge!(sql_traces)
           @samples_lock.synchronize do
             sql_traces.each do |trace|
               existing_trace = @sql_traces[trace.sql]
