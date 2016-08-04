@@ -17,11 +17,14 @@ TingYun::Support::LibraryDetection.defer do
       class Task
         alias_method :invoke_without_tingyun, :invoke
         def invoke(*args)
+          unless TingYun::Agent::Instrumentation::RakeInstrumentation.should_trace? name
+            invoke_without_tingyun(*args)
+          end
 
           TingYun::Agent::Instrumentation::RakeInstrumentation.before_invoke_transaction
 
           state = TingYun::Agent::TransactionState.tl_get
-          TingYun::Agent::Transaction.wrap(state, "OtherTransaction/Rake/invoke/#{name}", :rake)  do
+          TingYun::Agent::Transaction.wrap(state, "BackgroundAction/Rake/#{name}", :rake)  do
             invoke_without_tingyun(*args)
           end
         end
@@ -36,6 +39,12 @@ module TingYun
       module RakeInstrumentation
         def self.before_invoke_transaction
           ensure_at_exit
+        end
+
+        def self.should_trace? name
+          TingYun::Agent.config[:'rake.tasks'].any? do |task|
+            task == name
+          end
         end
 
         def self.ensure_at_exit

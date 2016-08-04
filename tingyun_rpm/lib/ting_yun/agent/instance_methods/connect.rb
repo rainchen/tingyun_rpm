@@ -160,7 +160,7 @@ module TingYun
         end
 
         def connect_in_sync
-          TingYun::Agent.disable_all_tracing { connect(:keep_retrying => false) }
+          TingYun::Agent.disable_all_tracing { connect!(:keep_retrying => false) }
         end
       end
     end

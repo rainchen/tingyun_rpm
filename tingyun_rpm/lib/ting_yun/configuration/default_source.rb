@@ -628,6 +628,13 @@ module TingYun
             :type => String,
             :allowed_from_server => true,
             :description => 'defined nme rule '
+        },
+        :'rake.tasks' => {
+            :default => [],
+            :public => true,
+            :type => Array,
+            :allowed_from_server => false,
+            :description => 'Specify an array of Rake tasks to automatically instrument.'
         }
     }.freeze
   end
