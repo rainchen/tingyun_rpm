@@ -37,7 +37,7 @@ module TingYun
         end
 
         def start_transaction(state, event)
-          params = TingYun::Instrumentation::Support::ParameterFiltering.filter_rails_request_parameters(event.payload[:params])
+          params = TingYun::Instrumentation::Support::ParameterFiltering.flattened_filter_request_parameters(event.payload[:params])
           TingYun::Agent::Transaction.start(state, :controller,
                                             :request => event.request,
                                             :filtered_params => params,
