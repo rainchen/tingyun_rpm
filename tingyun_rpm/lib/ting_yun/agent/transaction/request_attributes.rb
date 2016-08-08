@@ -113,12 +113,12 @@ module TingYun
         def set_cookie(request)
           cookie = {}
           _c = attribute_from_env(request, 'HTTP_COOKIE')
-          _c.split(';').each do |i|
+          _c.split(/\s*;\s*/).each do |i|
             _k, _v = i.split('=')
             if _k && _v
-              cookie[_k.strip] = _v.strip
+              cookie[_k] = _v
             end
-          end unless _c.nil?
+          end if _c
           cookie
         end
 
