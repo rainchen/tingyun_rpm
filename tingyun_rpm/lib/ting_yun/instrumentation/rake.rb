@@ -24,10 +24,10 @@ TingYun::Support::LibraryDetection.defer do
             invoke_without_tingyun(*args)
           end
 
-          TingYun::Agent::Instrumentation::RakeInstrumentation.before_invoke_transaction
+          TingYun::Agent::Instrumentation::RakeInstrumentation.before_invoke_transaction(self)
 
           state = TingYun::Agent::TransactionState.tl_get
-          TingYun::Agent::Transaction.wrap(state, "BackgroundAction/Rake/#{name}", :rake)  do
+          TingYun::Agent::Transaction.wrap(state, "BackgroundAction/Rake/invoke/#{name}", :rake)  do
             invoke_without_tingyun(*args)
           end
         end
@@ -45,8 +45,16 @@ module TingYun
           ::TingYun::Support::VersionNumber.new(::Rake::VERSION) >= ::TingYun::Support::VersionNumber.new("0.9.0")
         end
 
-        def self.before_invoke_transaction
+        def self.before_invoke_transaction(task)
           ensure_at_exit
+
+          if task.application.options.always_multitask
+            instrument_invoke_prerequisites_concurrently(task)
+          else
+            instrument_execute_on_prereqs(task)
+          end
+        rescue => e
+          TingYun::Agent.logger.error("Error during Rake task invoke", e)
         end
 
         def self.should_trace? name
@@ -65,6 +73,37 @@ module TingYun
           end
 
           @installed_at_exit = true
+        end
+
+        def self.instrument_execute_on_prereqs(task)
+          task.prerequisite_tasks.each do |child_task|
+            instrument_execute(child_task)
+          end
+        end
+
+        def self.instrument_execute(task)
+          return if task.instance_variable_get(:@__tingyun_instrumented_execute)
+
+          task.instance_variable_set(:@__tingyun_instrumented_execute, true)
+          task.instance_eval do
+            def execute(*args, &block)
+              TingYun::Agent::MethodTracer.trace_execution_scoped("Rake/execute/#{self.name}") do
+                super
+              end
+            end
+          end
+
+          instrument_execute_on_prereqs(task)
+        end
+
+        def self.instrument_invoke_prerequisites_concurrently(task)
+          task.instance_eval do
+            def invoke_prerequisites_concurrently(*_)
+              TingYun::Agent::MethodTracer.trace_execution_scoped("Rake/execute/multitask") do
+                super
+              end
+            end
+          end
         end
       end
     end

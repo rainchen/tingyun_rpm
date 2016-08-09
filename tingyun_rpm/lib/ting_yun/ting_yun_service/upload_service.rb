@@ -63,7 +63,7 @@ module TingYun
               adpex_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('Database','View','MongoDB','Redis','Memcached','External','Nested', 'CPU', 'Memory', 'WebFrontend')
+            elsif metric_spec.name.start_with?('Database','View','MongoDB','Redis','Memcached','External','Nested', 'CPU', 'Memory', 'WebFrontend','Rake')
               if metric_spec.scope.empty?
                 general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
               else

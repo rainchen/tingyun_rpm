@@ -16,6 +16,7 @@ module TingYun
       APDEX_TXN_METRIC_PREFIX = 'Apdex/'.freeze
       SUBTRANSACTION_PREFIX = 'Nested/'.freeze
       CONTROLLER_PREFIX = 'WebAction/'.freeze
+      OTHER_TRANSACTION_PREFIX     = 'BackgroundAction/'.freeze
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
       RACK_PREFIX = 'Rack/'.freeze
       SINATRA_PREFIX = 'Sinatra/'.freeze
@@ -228,7 +229,7 @@ module TingYun
       end
 
       def self.nested_transaction_name(name)
-        if name.start_with?(CONTROLLER_PREFIX)
+        if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(OTHER_TRANSACTION_PREFIX)
           "#{SUBTRANSACTION_PREFIX}#{name}"
         else
           name
