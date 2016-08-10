@@ -46,7 +46,12 @@ module TingYun
               collection = overrides[1] || collection
             end
           end
-          metrics = [ALL_WEB,ALL]
+          if TingYun::Agent::Transaction.recording_web_transaction?
+            metrics = [ALL_WEB,ALL]
+          else
+            metrics = [ALL_BACKGROUND,ALL]
+          end
+
           metrics << operation
           metrics = metrics.map do |suffix|
             product_suffixed_rollup(product,suffix)

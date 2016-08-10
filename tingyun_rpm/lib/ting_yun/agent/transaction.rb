@@ -16,13 +16,13 @@ module TingYun
       APDEX_TXN_METRIC_PREFIX = 'Apdex/'.freeze
       SUBTRANSACTION_PREFIX = 'Nested/'.freeze
       CONTROLLER_PREFIX = 'WebAction/'.freeze
-      OTHER_TRANSACTION_PREFIX     = 'BackgroundAction/'.freeze
+      RAKE_TRANSACTION_PREFIX     = 'BackgroundAction/Rake'.freeze
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
-      RACK_PREFIX = 'BackgroundAction/Rack/'.freeze
+      RACK_PREFIX = 'Rack/'.freeze
       SINATRA_PREFIX = 'Sinatra/'.freeze
       MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
       GRAPE_PREFIX = 'Grape/'.freeze
-      RAKE_PREFIX = 'BackgroundAction/Rake/'.freeze
+      RAKE_PREFIX = 'Rake'.freeze
       WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware, :thrift].freeze
       EMPTY_SUMMARY_METRICS = [].freeze
       MIDDLEWARE_SUMMARY_METRICS = ['Middleware/all'.freeze].freeze
@@ -30,7 +30,7 @@ module TingYun
       TRACE_OPTIONS_SCOPED = {:metric => true, :scoped_metric => true}.freeze
       TRACE_OPTIONS_UNSCOPED = {:metric => true, :scoped_metric => false}.freeze
       NESTED_TRACE_STOP_OPTIONS = {:metric => true}.freeze
-      
+
 
       # A Time instance for the start time, never nil
       attr_accessor :start_time
@@ -135,6 +135,7 @@ module TingYun
         TingYun::Agent.instance.events.notify(:start_transaction)
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
+        freeze_name_and_execute if @default_name.start_with?(RAKE_TRANSACTION_PREFIX)
       end
 
       def create_nested_frame(state, category, options)
@@ -229,7 +230,7 @@ module TingYun
       end
 
       def self.nested_transaction_name(name)
-        if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(OTHER_TRANSACTION_PREFIX)
+        if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(RAKE_TRANSACTION_PREFIX)
           "#{SUBTRANSACTION_PREFIX}#{name}"
         else
           name
@@ -252,7 +253,7 @@ module TingYun
       end
 
       def record_rake_action(end_time)
-        if @frozen_name.start_with(RACK_PREFIX)
+        if @frozen_name.start_with?(RAKE_TRANSACTION_PREFIX)
           @metrics.record_unscoped(@frozen_name, TingYun::Helper.time_to_millis(end_time.to_f - start_time.to_f))
         end
       end
