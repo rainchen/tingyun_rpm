@@ -18,7 +18,7 @@ module TingYun
       CONTROLLER_PREFIX = 'WebAction/'.freeze
       OTHER_TRANSACTION_PREFIX     = 'BackgroundAction/'.freeze
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
-      RACK_PREFIX = 'Rack/'.freeze
+      RACK_PREFIX = 'BackgroundAction/Rack/'.freeze
       SINATRA_PREFIX = 'Sinatra/'.freeze
       MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
       GRAPE_PREFIX = 'Grape/'.freeze
@@ -225,7 +225,7 @@ module TingYun
             trace_options,
             end_time.to_f)
 
-        commit!(state, end_time, name) unless ignore(best_name)
+        commit!(state, end_time) unless ignore(best_name)
       end
 
       def self.nested_transaction_name(name)
@@ -236,7 +236,8 @@ module TingYun
         end
       end
 
-      def commit!(state, end_time, outermost_node_name)
+      def commit!(state, end_time)
+        record_rake_action(end_time)
         assign_agent_attributes
 
 
@@ -248,6 +249,12 @@ module TingYun
         record_apdex(state, end_time)
         record_exceptions
         merge_metrics
+      end
+
+      def record_rake_action(end_time)
+        if @frozen_name.start_with(RACK_PREFIX)
+          @metrics.record_unscoped(@frozen_name, TingYun::Helper.time_to_millis(end_time.to_f - start_time.to_f))
+        end
       end
 
       def assign_agent_attributes
