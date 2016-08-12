@@ -226,7 +226,7 @@ module TingYun
             trace_options,
             end_time.to_f)
 
-        commit!(state, end_time) unless ignore(best_name)
+        commit!(state, end_time, name) unless ignore(best_name)
       end
 
       def self.nested_transaction_name(name)
@@ -237,8 +237,8 @@ module TingYun
         end
       end
 
-      def commit!(state, end_time)
-        record_rake_action(end_time)
+      def commit!(state, end_time, outermost_node_name)
+
         assign_agent_attributes
 
 
@@ -246,14 +246,15 @@ module TingYun
 
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
-
+        record_summary_metrics(outermost_node_name, end_time)
         record_apdex(state, end_time)
         record_exceptions
         merge_metrics
       end
 
-      def record_rake_action(end_time)
-        if @frozen_name.start_with?(RAKE_TRANSACTION_PREFIX)
+
+      def record_summary_metrics(outermost_node_name,end_time)
+        unless @frozen_name == outermost_node_name
           @metrics.record_unscoped(@frozen_name, TingYun::Helper.time_to_millis(end_time.to_f - start_time.to_f))
         end
       end

@@ -12,6 +12,8 @@ module TingYun
 
         NOSQL = %w(MongoDB Redis Memcached).freeze
 
+        CACHE = %w(Redis Memcached).freeze
+
         def self.checkNosql(product)
           NOSQL.include?(product)
         end
@@ -57,10 +59,13 @@ module TingYun
             product_suffixed_rollup(product,suffix)
           end
 
-          metrics.unshift metric_name(product, collection, operation)
+          metrics.unshift metric_name(product, collection, operation) unless include_database?(product)
           metrics
         end
 
+        def include_database?(name)
+          CACHE.include?(name)
+        end
         # Allow Transaction#with_database_metric_name to override our
         # collection and operation
         def self.overridden_operation_and_collection #THREAD_LOCAL_ACCESS
