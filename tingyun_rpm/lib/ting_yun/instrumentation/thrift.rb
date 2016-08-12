@@ -253,6 +253,8 @@ TingYun::Support::LibraryDetection.defer do
             @oprot.write_field_begin("TingyunField", 11, 6)
             @oprot.write_string(data)
             @oprot.write_field_end
+          rescue => e
+            TingYun::Agent.notice_error e
           ensure
             send_message_args_without_tingyun(args_class, args)
           end
@@ -272,6 +274,8 @@ TingYun::Support::LibraryDetection.defer do
           stack = state.traced_method_stack
           node = stack.push_frame(state,:thrift,t0)
           operations[tag][:node] = node
+        rescue => e
+          TingYun::Agent.notice_error e
         ensure
           send_message_without_tingyun(name, args_class, args)
         end
@@ -289,7 +293,8 @@ TingYun::Support::LibraryDetection.defer do
           duration = (Time.now.to_f - op_started)*1000
           TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, duration)
           result
-        rescue
+        rescue => e
+          TingYun::Agent.notice_error e
           return send_oneway_message_without_tingyun(name, args_class, args)
         end
       end
@@ -327,7 +332,8 @@ TingYun::Support::LibraryDetection.defer do
           end
 
           result
-        rescue
+        rescue => e
+          TingYun::Agent.notice_error e
           return  receive_message_without_tingyun(result_klass)
         end
       end

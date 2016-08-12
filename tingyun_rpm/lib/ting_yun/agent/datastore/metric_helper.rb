@@ -63,7 +63,7 @@ module TingYun
           metrics
         end
 
-        def include_database?(name)
+        def self.include_database?(name)
           CACHE.include?(name)
         end
         # Allow Transaction#with_database_metric_name to override our
