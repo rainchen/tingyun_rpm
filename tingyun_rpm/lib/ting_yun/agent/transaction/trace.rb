@@ -44,7 +44,7 @@ module TingYun
               @start_time.round,
               duration,
               TingYun::Helper.correctly_encoded(metric_name)|| '',
-              TingYun::Helper.correctly_encoded(uri)|| '',
+              TingYun::Helper.correctly_encoded(uri||metric_name||''),
               encoder.encode(trace_tree),
               tx_id || '',
               guid
