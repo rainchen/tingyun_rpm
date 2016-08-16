@@ -32,7 +32,7 @@ module TingYun
         
         def trace_tree
           [
-              duration,
+              @start_time.round,
               request_params,
               custom_params,
               root_node.to_array
