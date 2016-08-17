@@ -172,6 +172,7 @@ module TingYun
 
 
 
+
     # Shutdown the agent.  Call this before exiting.  Sends any queued data
     # and kills the background thread.
     #
@@ -182,7 +183,6 @@ module TingYun
     def shutdown
       agent.shutdown if agent
     end
-
 
   end
 end

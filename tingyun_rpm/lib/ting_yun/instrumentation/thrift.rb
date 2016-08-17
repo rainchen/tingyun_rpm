@@ -268,6 +268,7 @@ TingYun::Support::LibraryDetection.defer do
 
 
       def send_message_with_tingyun(name, args_class, args = {})
+
         begin
           tag = "#{args_class.to_s.split('::').first}.#{name}".downcase
           t0 = Time.now.to_f
@@ -282,12 +283,14 @@ TingYun::Support::LibraryDetection.defer do
         ensure
           send_message_without_tingyun(name, args_class, args)
         end
+
       end
 
       alias :send_message_without_tingyun :send_message
       alias :send_message  :send_message_with_tingyun
 
       def send_oneway_message_with_tingyun(name, args_class, args = {})
+
         begin
           tag = "#{args_class.to_s.split('::').first}.#{name}".downcase
           op_started = Time.now.to_f
@@ -300,6 +303,7 @@ TingYun::Support::LibraryDetection.defer do
           TingYun::Agent.logger.error("Failed to thrift send_oneway_message_with_tingyun : ", e)
           return send_oneway_message_without_tingyun(name, args_class, args)
         end
+
       end
       alias :send_oneway_message_without_tingyun :send_oneway_message
       alias :send_oneway_message :send_oneway_message_with_tingyun
