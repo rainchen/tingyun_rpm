@@ -286,7 +286,7 @@ module TingYun
               @slow_sql.start_time,
               string(@action_metric_name),
               string(@slow_sql.metric_name),
-              string(@uri),
+              string(@uri||@action_metric_name),
               string(@sql),
               int(@call_count),
               TingYun::Helper.time_to_millis(@total_call_time),
