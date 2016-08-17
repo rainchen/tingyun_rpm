@@ -21,7 +21,7 @@ TingYun::Support::LibraryDetection.defer do
         alias_method :invoke_without_tingyun, :invoke
         def invoke(*args)
           unless TingYun::Agent::Instrumentation::RakeInstrumentation.should_trace? name
-            invoke_without_tingyun(*args)
+            return invoke_without_tingyun(*args)
           end
 
           TingYun::Agent::Instrumentation::RakeInstrumentation.before_invoke_transaction(self)
