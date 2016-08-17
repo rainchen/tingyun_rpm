@@ -229,7 +229,8 @@ TingYun::Support::LibraryDetection.defer do
         state.client_tingyun_id_secret = tingyun_id_secret
         state.client_transaction_id = client_transaction_id
         state.client_req_id = client_req_id
-        state.transaction_sample_builder.trace.tx_id = state.client_req_id
+        state.transaction_sample_builder.trace.tx_id = client_transaction_id
+
       end
 
       alias :skip_without_tingyun :skip
@@ -249,6 +250,7 @@ TingYun::Support::LibraryDetection.defer do
                 raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
             txn_guid = state.request_guid
             tingyun_id = "#{cross_app_id};c=1;x=#{txn_guid}"
+            state.transaction_sample_builder.trace.tx_id = txn_guid
 
             data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
             @oprot.write_field_begin("TingyunField", 11, 6)
