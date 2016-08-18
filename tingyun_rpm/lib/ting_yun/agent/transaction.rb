@@ -226,7 +226,7 @@ module TingYun
             trace_options,
             end_time.to_f)
 
-        commit!(state, end_time, name) unless ignore(best_name)
+        commit(state, end_time, name) unless ignore(best_name)
       end
 
       def self.nested_transaction_name(name)
@@ -237,7 +237,7 @@ module TingYun
         end
       end
 
-      def commit!(state, end_time, outermost_node_name)
+      def commit(state, end_time, outermost_node_name)
 
         assign_agent_attributes
 
