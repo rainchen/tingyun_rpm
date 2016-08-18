@@ -6,6 +6,7 @@ require 'ting_yun/agent/method_tracer_helpers'
 require 'ting_yun/agent/transaction/transaction_metrics'
 require 'ting_yun/agent/transaction/request_attributes'
 require 'ting_yun/agent/transaction/attributes'
+require 'ting_yun/agent/transaction/exceptions'
 
 
 module TingYun
@@ -42,8 +43,8 @@ module TingYun
       attr_accessor :apdex_start,
                     :category,
                     :frame_stack,
-                    :exceptions,
                     :default_name,
+                    :exceptions,
                     :metrics,
                     :http_response_code,
                     :response_content_type,
@@ -57,7 +58,7 @@ module TingYun
         @guid = options[:client_transaction_id] || generate_guid
         @has_children = false
         @category = category
-        @exceptions = {}
+        @exceptions = TingYun::Agent::Transaction::Exceptions.new
         @start_time = Time.now
         @apdex_start = options[:apdex_start_time] || @start_time
         @frame_stack = []
@@ -248,7 +249,9 @@ module TingYun
 
         record_summary_metrics(outermost_node_name, end_time)
         record_apdex(state, end_time)
-        record_exceptions
+        @exceptions.record_exceptions(request_path, request_port, best_name, @attributes)
+
+
         merge_metrics
       end
 
@@ -282,29 +285,6 @@ module TingYun
         @attributes.add_agent_attribute(key, value)
       end
 
-      #collector error
-      def had_error?
-        if @exceptions.empty?
-          return false
-        else
-          return true
-        end
-      end
-
-      def record_exceptions
-        unless @exceptions.empty?
-          @exceptions.each do |exception, options|
-
-            options[:uri]      ||= request_path if request_path
-            options[:port]       = request_port if request_port
-            options[:metric_name]     = best_name
-            options[:attributes] = @attributes
-
-            @error_recorded = !!::TingYun::Agent.instance.error_collector.notice_error(exception, options) || @error_recorded
-          end
-        end
-      end
-
       def record_apdex(state, end_time=Time.now)
         total_duration = (end_time - apdex_start)*1000
         if recording_web_transaction?
@@ -324,7 +304,7 @@ module TingYun
 
 
       def apdex_bucket(duration, current_apdex_t)
-        self.class.apdex_bucket(duration, had_error?, current_apdex_t)
+        self.class.apdex_bucket(duration, @exceptions.had_error?, current_apdex_t)
       end
 
       def self.apdex_bucket(duration, failed, apdex_t)
@@ -344,26 +324,6 @@ module TingYun
         TingYun::Agent.config[:apdex_t]
       end
 
-
-      # See TingYun::Agent.notice_error for options and commentary
-      def self.notice_error(e, options={})
-        state = TingYun::Agent::TransactionState.tl_get
-        txn = state.current_transaction
-        if txn
-          txn.notice_error(e, options)
-        elsif TingYun::Agent.instance
-          TingYun::Agent.instance.error_collector.notice_error(e, options)
-        end
-      end
-
-      # Do not call this.  Invoke the class method instead.
-      def notice_error(error, options={}) # :nodoc:
-        if @exceptions[error]
-          @exceptions[error].merge! options
-        else
-          @exceptions[error] = options
-        end
-      end
 
 
       # This transaction-local hash may be used as temprory storage by
@@ -485,6 +445,17 @@ module TingYun
 
       def transaction_sampler
         TingYun::Agent.instance.transaction_sampler
+      end
+
+      # See TingYun::Agent.notice_error for options and commentary
+      def self.notice_error(e, options={})
+        state = TingYun::Agent::TransactionState.tl_get
+        txn = state.current_transaction
+        if txn
+          txn.exceptions.notice_error(e, options)
+        elsif TingYun::Agent.instance
+          TingYun::Agent.instance.error_collector.notice_error(e, options)
+        end
       end
 
       HEX_DIGITS = (0..15).map{|i| i.to_s(16)}

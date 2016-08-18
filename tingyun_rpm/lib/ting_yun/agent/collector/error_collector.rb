@@ -72,7 +72,7 @@ module TingYun
         def notice_error(exception, options={})
           tag_exception(exception)
           state = ::TingYun::Agent::TransactionState.tl_get
-          increment_error_count!(state, exception, options)
+          increment_error_count(state)
           noticed_error = create_noticed_error(exception, options)
           if noticed_error.is_external_error
             external_error_array.add_to_error_queue(noticed_error)
@@ -85,7 +85,7 @@ module TingYun
         end
 
         # Increments a statistic that tracks total error rate
-        def increment_error_count!(state, exception, options={})
+        def increment_error_count(state)
           txn = state.current_transaction
 
           metric_names = aggregated_metric_names(txn)
@@ -106,8 +106,8 @@ module TingYun
 
           noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
           noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING
-          noticed_error.request_port = options.delete(:port)
-          noticed_error.attributes  = options.delete(:attributes)
+          noticed_error.request_port = options.delete(:port) || EMPTY_STRING
+          noticed_error.attributes  = options.delete(:attributes) || EMPTY_STRING
 
           noticed_error.file_name   = sense_method(exception, :file_name)
           noticed_error.line_number = sense_method(exception, :line_number)
