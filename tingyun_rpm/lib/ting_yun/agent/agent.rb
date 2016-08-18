@@ -61,6 +61,7 @@ module TingYun
         TingYun::Agent.logger.info "Starting Agent shutdown"
 
         stop_event_loop
+        untraced_graceful_disconnect
         reset_to_default_configuration
 
         @started = nil
@@ -122,7 +123,17 @@ module TingYun
         defined?(RUBY_ENGINE) && RUBY_ENGINE == "ruby" && RUBY_VERSION.match(/^1\.9/)
       end
 
-
+      def untraced_graceful_disconnect
+        begin
+          TingYun::Agent.disable_all_tracing do
+            if connected?
+              transmit_data
+            end
+          end
+        rescue => e
+          ::TingYun::Agent.logger.error e
+        end
+      end
     end
   end
 end

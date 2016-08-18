@@ -54,7 +54,7 @@ module TingYun
             # Calculate the true utilization by taking cpu times and dividing by
             # elapsed time X processor_count.
 
-            record_user_util(usertime / (elapsed * @processor_count))
+            record_user_util((usertime * 100) / (elapsed * @processor_count))
             # record_system_util(systemtime / (elapsed * @processor_count))
           end
           @last_utime = t.utime

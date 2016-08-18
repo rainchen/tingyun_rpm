@@ -7,6 +7,7 @@ module TingYun
   class TingYunService
     module UploadService
 
+      EMPTY_PARENT = ''.freeze
       def compressed_json
         TingYun::Support::Serialize::Encoders::CompressedJSON
       end
@@ -55,15 +56,15 @@ module TingYun
 
           # Omit empty stats as an optimization
           unless stats.is_reset?
-            metric_id = metric_id_cache[metric_spec.name]
+            metric_id = metric_id_cache[metric_spec.hash]
 
-            if metric_spec.name.start_with?('WebAction')
+            if metric_spec.name.start_with?('WebAction','BackgroundAction')
               action_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Apdex')
               adpex_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('Database','View','MongoDB','Redis','Memcached','External','Nested', 'CPU', 'Memory', 'WebFrontend')
+            elsif metric_spec.name.start_with?('Database','View','MongoDB','Redis','Memcached','External','Nested', 'CPU', 'Memory', 'WebFrontend','Rake')
               if metric_spec.scope.empty?
                 general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
               else
@@ -97,7 +98,7 @@ module TingYun
           if value.is_a? Array
             value.each do |array|
               if array.is_a? Array
-                metric_id_cache[array[0]["name"]] = array[1]
+                metric_id_cache[array[0]['name'].hash ^ (array[0]['parent']||EMPTY_PARENT).hash] = array[1]
               end
             end
           end

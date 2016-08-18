@@ -16,12 +16,13 @@ module TingYun
       APDEX_TXN_METRIC_PREFIX = 'Apdex/'.freeze
       SUBTRANSACTION_PREFIX = 'Nested/'.freeze
       CONTROLLER_PREFIX = 'WebAction/'.freeze
+      RAKE_TRANSACTION_PREFIX     = 'BackgroundAction/Rake'.freeze
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
       RACK_PREFIX = 'Rack/'.freeze
       SINATRA_PREFIX = 'Sinatra/'.freeze
       MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
       GRAPE_PREFIX = 'Grape/'.freeze
-      RAKE_PREFIX = 'OtherTransaction/Rake/'.freeze
+      RAKE_PREFIX = 'Rake'.freeze
       WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware, :thrift].freeze
       EMPTY_SUMMARY_METRICS = [].freeze
       MIDDLEWARE_SUMMARY_METRICS = ['Middleware/all'.freeze].freeze
@@ -30,9 +31,6 @@ module TingYun
       TRACE_OPTIONS_UNSCOPED = {:metric => true, :scoped_metric => false}.freeze
       NESTED_TRACE_STOP_OPTIONS = {:metric => true}.freeze
 
-
-      WEB_SUMMARY_METRIC = 'HttpDispatcher'.freeze
-      OTHER_SUMMARY_METRIC = 'OtherTransaction/all'.freeze
 
       # A Time instance for the start time, never nil
       attr_accessor :start_time
@@ -132,11 +130,12 @@ module TingYun
       def start(state)
         return if !state.execution_traced?
 
-        ::TingYun::Agent::Collector::TransactionSampler.on_start_transaction(state, start_time)
-        ::TingYun::Agent::Collector::SqlSampler.on_start_transaction(state, request_path)
-        ::TingYun::Agent.instance.events.notify(:start_transaction)
+        transaction_sampler.on_start_transaction(state, start_time)
+        sql_sampler.on_start_transaction(state, request_path)
+        TingYun::Agent.instance.events.notify(:start_transaction)
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
+        freeze_name_and_execute if @default_name.start_with?(RAKE_TRANSACTION_PREFIX)
       end
 
       def create_nested_frame(state, category, options)
@@ -161,7 +160,7 @@ module TingYun
 
         txn = state.current_transaction
 
-        unless txn
+        if txn.nil?
           TingYun::Agent.logger.error("Failed during Transaction.stop because there is no current transaction")
           return
         end
@@ -231,7 +230,7 @@ module TingYun
       end
 
       def self.nested_transaction_name(name)
-        if name.start_with?(CONTROLLER_PREFIX)
+        if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(RAKE_TRANSACTION_PREFIX)
           "#{SUBTRANSACTION_PREFIX}#{name}"
         else
           name
@@ -239,18 +238,49 @@ module TingYun
       end
 
       def commit!(state, end_time, outermost_node_name)
-        @attributes.assign_agent_attributes(http_response_code, response_content_type)
-        @request_attributes.assign_agent_attributes(@attributes) if @request_attributes
+
+        assign_agent_attributes
+
+
         transaction_sampler.on_finishing_transaction(state, self, end_time)
+
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
         record_summary_metrics(outermost_node_name, end_time)
-        record_apdex(end_time)
+        record_apdex(state, end_time)
         record_exceptions
         merge_metrics
       end
 
 
+      def record_summary_metrics(outermost_node_name,end_time)
+        unless @frozen_name == outermost_node_name
+          @metrics.record_unscoped(@frozen_name, TingYun::Helper.time_to_millis(end_time.to_f - start_time.to_f))
+        end
+      end
+
+      def assign_agent_attributes
+
+        add_agent_attribute(:threadName,  "pid-#{$$}");
+
+        if http_response_code
+          add_agent_attribute(:httpStatus, http_response_code.to_s)
+        end
+
+        if response_content_type
+          add_agent_attribute(:contentType, response_content_type)
+        end
+
+
+        if @request_attributes
+          @request_attributes.assign_agent_attributes self
+        end
+
+      end
+
+      def add_agent_attribute(key, value)
+        @attributes.add_agent_attribute(key, value)
+      end
 
       #collector error
       def had_error?
@@ -275,7 +305,7 @@ module TingYun
         end
       end
 
-      def record_apdex(end_time=Time.now)
+      def record_apdex(state, end_time=Time.now)
         total_duration = (end_time - apdex_start)*1000
         if recording_web_transaction?
           record_apdex_metrics(APDEX_TXN_METRIC_PREFIX, total_duration, apdex_t)
@@ -389,33 +419,6 @@ module TingYun
 
       def merge_metrics
         TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
-      end
-
-
-      def summary_metrics
-        if @frozen_name.start_with?(CONTROLLER_PREFIX)
-          [WEB_SUMMARY_METRIC]
-        else
-          background_summary_metrics
-        end
-      end
-
-      def background_summary_metrics
-        segments = @frozen_name.split('/')
-        if segments.size > 2
-          ["OtherTransaction/#{segments[1]}/all", OTHER_SUMMARY_METRIC]
-        else
-          []
-        end
-      end
-
-
-      # The summary metrics recorded by this method all end up with a duration
-      # equal to the transaction itself, and an exclusive time of zero.
-      def record_summary_metrics(outermost_node_name, end_time)
-        metrics = summary_metrics
-        metrics << @frozen_name unless @frozen_name == outermost_node_name
-        @metrics.record_unscoped(metrics, (end_time.to_f - start_time.to_f)*1000)
       end
 
       def name_last_frame(name)

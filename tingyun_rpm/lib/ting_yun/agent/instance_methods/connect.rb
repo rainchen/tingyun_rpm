@@ -158,6 +158,10 @@ module TingYun
             ::TingYun::Agent.logger.send(message['level'].downcase, message['message'])
           end
         end
+
+        def connect_in_sync
+          TingYun::Agent.disable_all_tracing { connect!(:keep_retrying => false) }
+        end
       end
     end
   end

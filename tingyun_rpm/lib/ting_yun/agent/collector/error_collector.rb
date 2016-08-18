@@ -54,7 +54,7 @@ module TingYun
             metric_names
           end
 
-          def action_metric_name(txn,options)
+          def action_metric_name(txn)
             "#{ERRORS_ACTION}#{txn.best_name}" if txn
           end
 
@@ -90,7 +90,7 @@ module TingYun
 
           metric_names = aggregated_metric_names(txn)
 
-          action_metric = action_metric_name(txn, options)
+          action_metric = action_metric_name(txn)
           metric_names << action_metric if action_metric
 
           stats_engine = TingYun::Agent.agent.stats_engine

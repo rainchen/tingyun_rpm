@@ -12,17 +12,15 @@ module TingYun
 
         NOSQL = %w(MongoDB Redis Memcached).freeze
 
+        CACHE = %w(Redis Memcached).freeze
+
         def self.checkNosql(product)
           NOSQL.include?(product)
         end
 
         def self.metric_name(product, collection, operation)
           if checkNosql(product)
-            if product == 'MongoDB'
               "#{product}/#{collection}/#{operation}"
-            else
-              "#{product}/NULL/#{operation}"
-            end
           else
             "Database #{product}/#{collection}/#{operation}"
           end
@@ -46,16 +44,25 @@ module TingYun
               collection = overrides[1] || collection
             end
           end
-          metrics = [ALL_WEB,ALL]
-          metrics << operation
+          metrics  = [operation]
+          if TingYun::Agent::Transaction.recording_web_transaction?
+            metrics = metrics + [ALL_WEB,ALL]
+          else
+            metrics = metrics + [ALL_BACKGROUND,ALL]
+          end
+
+
           metrics = metrics.map do |suffix|
             product_suffixed_rollup(product,suffix)
           end
 
-          metrics.unshift metric_name(product, collection, operation)
+          metrics.unshift metric_name(product, collection, operation) if collection
           metrics
         end
 
+        def self.include_database?(name)
+          CACHE.include?(name)
+        end
         # Allow Transaction#with_database_metric_name to override our
         # collection and operation
         def self.overridden_operation_and_collection #THREAD_LOCAL_ACCESS

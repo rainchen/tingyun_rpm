@@ -16,7 +16,7 @@ module TingYun
       end
 
       def teardown
-
+        TingYun::Agent.config.reset_to_defaults
       end
 
       def test_class_methods
@@ -40,6 +40,7 @@ module TingYun
       #
       #   end
       # end
+
     end
   end
 end

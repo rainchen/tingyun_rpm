@@ -23,7 +23,6 @@ module TingYun
     def agent
       return @agent if @agent
       TingYun::Agent.logger.warn("Agent unavailable as it hasn't been started.")
-      TingYun::Agent.logger.warn(caller.join("\n"))
       nil
     end
 
@@ -173,35 +172,17 @@ module TingYun
 
 
 
-    # Register this method as a callback for processes that fork
-    # jobs.
+
+    # Shutdown the agent.  Call this before exiting.  Sends any queued data
+    # and kills the background thread.
     #
-    # If the master/parent connects to the agent prior to forking the
-    # agent in the forked process will use that agent_run.  Otherwise
-    # the forked process will establish a new connection with the
-    # server.
-    #
-    # Use this especially when you fork the process to run background
-    # jobs or other work.  If you are doing this with a web dispatcher
-    # that forks worker processes then you will need to force the
-    # agent to reconnect, which it won't do by default.  Passenger and
-    # Rainbows and Unicorn are already handled, nothing special needed for them.
-    #
-    # Options:
-    # * <tt>:force_reconnect => true</tt> to force the spawned process to
-    #   establish a new connection, such as when forking a long running process.
-    #   The default is false--it will only connect to the server if the parent
-    #   had not connected.
-    # * <tt>:keep_retrying => false</tt> if we try to initiate a new
-    #   connection, this tells me to only try it once so this method returns
-    #   quickly if there is some kind of latency with the server.
+    # @param options [Hash] Unused options Hash, for back compatibility only
     #
     # @api public
     #
-    def after_fork(options={})
-      agent.after_fork(options) if agent
+    def shutdown
+      agent.shutdown if agent
     end
-
 
   end
 end

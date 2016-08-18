@@ -359,6 +359,13 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Autodetected application component that reports metrics to Ting YUN.'
         },
+        :sync_startup => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'When set to true, forces a synchronous connection to the collector during application startup. For very short-lived processes, this helps ensure the has time to report.'
+        },
         :framework => {
             :default => DefaultSource.framework,
             :public => false,
@@ -621,6 +628,20 @@ module TingYun
             :type => String,
             :allowed_from_server => true,
             :description => 'defined nme rule '
+        },
+        :disable_rake => {
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'If true, disables Rake instrumentation.'
+        },
+        :'rake.tasks' => {
+            :default => [],
+            :public => true,
+            :type => Array,
+            :allowed_from_server => false,
+            :description => 'Specify an array of Rake tasks to automatically instrument.'
         }
     }.freeze
   end

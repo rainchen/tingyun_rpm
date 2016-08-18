@@ -6,6 +6,26 @@ require 'ting_yun/agent/transaction/trace'
 module TingYun
   module Agent
     class TransactionSampleBuilder
+
+      class PlaceholderNode
+        attr_reader :parent_node
+        attr_accessor :depth
+
+        def initialize(parent_node)
+          @parent_node = parent_node
+          @depth = 1
+        end
+
+        # No-op - some clients expect to be able to use these to read/write
+        # params on TT nodes.
+        def [](key); end
+        def []=(key, value); end
+
+        # Stubbed out in case clients try to touch params directly.
+        def params; {}; end
+        def params=; end
+      end
+
       attr_reader :current_node, :trace
 
       def initialize(time=Time.now)
@@ -28,14 +48,27 @@ module TingYun
           if @trace.node_count == node_limit
             ::TingYun::Agent.logger.debug("Node limit of #{node_limit} reached, ceasing collection.")
           end
+        else
+          if @current_node.is_a?(PlaceholderNode)
+            @current_node.depth += 1
+          else
+            @current_node = PlaceholderNode.new(@current_node)
+          end
         end
         @current_node
       end
 
       def trace_exit(metric_name, time)
-        @current_node.metric_name = metric_name
-        @current_node.end_trace(time.to_f - @trace_start)
-        @current_node = @current_node.parent_node
+        if @current_node.is_a?(PlaceholderNode)
+          @current_node.depth -= 1
+          if @current_node.depth == 0
+            @current_node = @current_node.parent_node
+          end
+        else
+          @current_node.metric_name = metric_name
+          @current_node.end_trace(time.to_f - @trace_start)
+          @current_node = @current_node.parent_node
+        end
       end
 
       def finish_trace(time=Time.now.to_f)

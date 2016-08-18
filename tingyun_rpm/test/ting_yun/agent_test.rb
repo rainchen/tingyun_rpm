@@ -11,13 +11,13 @@ require 'ting_yun/agent/agent'
 module TingYun
   class AgentTest < Minitest::Test
 
-     include TingYun::Agent
-  	def setup
+    include TingYun::Agent
+    def setup
       @agent = TingYun::Agent
       @agent.agent  = TingYun::Agent::Agent.instance
-  	end
+    end
 
-  	def teardown
+    def teardown
       @agent.agent.drop_buffered_data
     end
 
@@ -72,5 +72,37 @@ module TingYun
       assert_equal 4, stats.total_exclusive_time
       assert_equal 10, stats.sum_of_squares
     end
+
+    def test_manual_start_default
+      mocked_framework
+
+      TingYun::Frameworks.expects(:init_start).with({:'nbs.agent_enabled' => true, :sync_startup => true})
+      TingYun::Agent.manual_start
+    end
+
+    def test_manual_start_with_opts
+      TingYun::Frameworks.expects(:init_start).with({:'nbs.agent_enabled' => true, :sync_startup => false})
+      TingYun::Agent.manual_start(:sync_startup => false)
+    end
+
+
+    private
+
+     def mocked_framework
+       server = TingYun::Support::Collector.new('localhost', 3000)
+       framework = OpenStruct.new(:license_key => 'abcdef',
+                                :server => server)
+       framework.instance_eval do
+         def [](key)
+           nil
+         end
+
+         def fetch(k,d)
+           nil
+         end
+       end
+       TingYun::Frameworks::Framework.stubs(:instance).returns(framework)
+       framework
+     end
   end
 end

@@ -32,6 +32,7 @@ module TingYun
         t0 = Time.now.to_f
         state = TingYun::Agent::TransactionState.tl_get
         return yield unless state.execution_traced?
+        return yield unless state.current_transaction #如果还没有创建Transaction，就发生跨应用，就直接先跳过跟踪。
 
         begin
           node = start_trace(state, t0, request)
