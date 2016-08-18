@@ -25,26 +25,26 @@ require 'ting_yun/frameworks'
 
 require 'pry'
 #if the agent had started in manual , then shouldn't start in auto again
-unless defined?(::TingYun::Agent) && TingYun::Agent.agent
-if defined?(Rails::VERSION)
-  if Rails::VERSION::MAJOR.to_i >= 3
-    module TingYun
-      class Railtie < Rails::Railtie
+unless  TingYun::Agent.agent
+  if defined?(Rails::VERSION)
+    if Rails::VERSION::MAJOR.to_i >= 3
+      module TingYun
+        class Railtie < Rails::Railtie
 
-        initializer "tingyun_rpm.start_plugin" do |app|
-            TingYun::Agent.logger.info('initialize tingyun_rpm start_plugin')
-            TingYun::Frameworks.init_start(:config => app.config)
+          initializer "tingyun_rpm.start_plugin" do |app|
+              TingYun::Agent.logger.info('initialize tingyun_rpm start_plugin')
+              TingYun::Frameworks.init_start(:config => app.config)
+          end
         end
       end
+    else
+      # After version 2.0 of Rails we can access the configuration directly.
+      # We need it to add dev mode routes after initialization finished.
+      config = nil
+      config = Rails.configuration if Rails.respond_to?(:configuration)
+      TingYun::Frameworks.init_start(:config => config)
     end
   else
-    # After version 2.0 of Rails we can access the configuration directly.
-    # We need it to add dev mode routes after initialization finished.
-    config = nil
-    config = Rails.configuration if Rails.respond_to?(:configuration)
-    TingYun::Frameworks.init_start(:config => config)
+    TingYun::Frameworks.init_start
   end
-else
-  TingYun::Frameworks.init_start
-end
 end
