@@ -47,7 +47,6 @@ module TingYun
                     :default_name,
                     :exceptions,
                     :metrics,
-                    :error_recorded,
                     :guid,
                     :attributes,
                     :request_attributes
@@ -64,8 +63,7 @@ module TingYun
         @frozen_name = nil
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
         @metrics = TingYun::Agent::TransactionMetrics.new
-
-        @error_recorded = false
+        
 
         @attributes = TingYun::Agent::Transaction::Attributes.new
 
