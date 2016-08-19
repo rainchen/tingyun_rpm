@@ -25,15 +25,15 @@ module TingYun
           @cookie = set_cookie(request)
         end
 
-        def assign_agent_attributes(txn)
-          txn.add_agent_attribute :request_path, request_path
-          txn.add_agent_attribute :referer, referer
-          txn.add_agent_attribute :accept, accept
-          txn.add_agent_attribute :contentLength, content_length
-          txn.add_agent_attribute :host, host
-          txn.add_agent_attribute :port, port
-          txn.add_agent_attribute :userAgent, user_agent
-          txn.add_agent_attribute :method, request_method
+        def assign_agent_attributes(attributes)
+          attributes.add_agent_attribute :request_path, request_path
+          attributes.add_agent_attribute :referer, referer
+          attributes.add_agent_attribute :accept, accept
+          attributes.add_agent_attribute :contentLength, content_length
+          attributes.add_agent_attribute :host, host
+          attributes.add_agent_attribute :port, port
+          attributes.add_agent_attribute :userAgent, user_agent
+          attributes.add_agent_attribute :method, request_method
         end
 
 
