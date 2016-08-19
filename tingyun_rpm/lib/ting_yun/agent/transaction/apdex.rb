@@ -22,7 +22,7 @@ module TingYun
 
         def record_apdex_metrics(transaction_prefix, total_duration, current_apdex_t, metric_name, failed)
           return unless current_apdex_t
-          return unless metric_name.start_with?(::TingYun::Agent::Transaction::CONTROLLER_PREFIX)
+          return unless metric_name.start_with?(CONTROLLER_PREFIX)
 
           apdex_bucket_global = apdex_bucket(total_duration, failed, current_apdex_t)
           txn_apdex_metric = metric_name.sub(/^[^\/]+\//, transaction_prefix)
