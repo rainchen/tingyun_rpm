@@ -45,7 +45,7 @@ module TingYun
             metric_names = [ERRORS_ALL]
             return metric_names unless txn
 
-            if txn.recording_web_transaction?
+            if TingYun::Agent::Transaction.recording_web_transaction?
               metric_names << ERRORS_ALL_WEB
             else
               metric_names << ERRORS_ALL_BACK_GROUND

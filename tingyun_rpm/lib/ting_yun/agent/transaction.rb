@@ -76,7 +76,6 @@ module TingYun
         end
       end
 
-
       def request_path
         @request_attributes && @request_attributes.request_path
       end
@@ -107,7 +106,10 @@ module TingYun
 
 
       def set_default_transaction_name(name, category)
-        return log_frozen_name(name) if name_frozen?
+        if @frozen_name
+          TingYun::Agent.logger.warn("Attempted to rename transaction to '#{name}' after transaction name was already frozen as '#{@frozen_name}'.")
+          return
+        end
         if influences_transaction_name?(category)
           self.default_name = name
           @category = category if category
@@ -163,7 +165,7 @@ module TingYun
         @exceptions.record_exceptions(request_path, request_port, best_name, @attributes)
 
 
-        merge_metrics
+        TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
       end
 
 
@@ -219,37 +221,16 @@ module TingYun
       end
 
       def freeze_name_and_execute
-        if !name_frozen?
-          @name_frozen = true
+        unless @frozen_name
           @frozen_name = best_name
         end
 
         yield if block_given?
       end
 
-      def promoted_transaction_name(name)
-        if name.start_with?(MIDDLEWARE_PREFIX)
-          "#{CONTROLLER_PREFIX}#{name}"
-        else
-          name
-        end
-      end
-
-      def merge_metrics
-        TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
-      end
 
       def name_last_frame(name)
         frame_stack.last.name = name
-      end
-
-      def name_frozen?
-        @frozen_name ? true : false
-      end
-
-      def log_frozen_name(name)
-        TingYun::Agent.logger.warn("Attempted to rename transaction to '#{name}' after transaction name was already frozen as '#{@frozen_name}'.")
-        nil
       end
 
       def influences_transaction_name?(category)
@@ -263,11 +244,6 @@ module TingYun
       def similar_category?(category)
         web_category?(@category) == web_category?(category)
       end
-
-      def recording_web_transaction?
-        web_category?(@category)
-      end
-
 
 
       def needs_middleware_summary_metrics?(name)
@@ -404,7 +380,7 @@ module TingYun
 
       def self.recording_web_transaction? #THREAD_LOCAL_ACCESS
         txn = tl_current
-        txn && txn.recording_web_transaction?
+        txn && txn.web_category?(@category)
       end
 
       def self.tl_current
