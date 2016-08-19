@@ -9,9 +9,9 @@ module TingYun
 
         attr_accessor :apdex_start, :transaction_start_time
 
-        def initialize(apdex_start = Time.now, transaction_start_time)
-          @apdex_start = apdex_start
-          @transaction_start_time = transaction_start_time
+        def initialize(start = Time.now, transaction_start)
+          @apdex_start = start
+          @transaction_start_time = transaction_start
         end
 
         def record_apdex(metric_name, end_time, failed)
