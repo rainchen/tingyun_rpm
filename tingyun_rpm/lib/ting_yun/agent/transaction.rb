@@ -7,6 +7,7 @@ require 'ting_yun/agent/transaction/transaction_metrics'
 require 'ting_yun/agent/transaction/request_attributes'
 require 'ting_yun/agent/transaction/attributes'
 require 'ting_yun/agent/transaction/exceptions'
+require 'ting_yun/agent/transaction/apdex'
 
 
 module TingYun
@@ -41,7 +42,7 @@ module TingYun
       # A Time instance used for calculating the apdex score, which
       # might end up being @start, or it might be further upstream if
       # we can find a request header for the queue entry time
-      attr_accessor :apdex_start,
+      attr_accessor :apdex,
                     :category,
                     :frame_stack,
                     :default_name,
@@ -54,18 +55,23 @@ module TingYun
 
       def initialize(category, options)
         @guid = options[:client_transaction_id] || generate_guid
+        @exceptions = TingYun::Agent::Transaction::Exceptions.new
+        @metrics = TingYun::Agent::TransactionMetrics.new
+        @attributes = TingYun::Agent::Transaction::Attributes.new
+        @apdex = TingYun::Agent::Transaction::Apdex.new(options[:apdex_start_time] || @start_time)
+
         @has_children = false
         @category = category
-        @exceptions = TingYun::Agent::Transaction::Exceptions.new
+
         @start_time = Time.now
-        @apdex_start = options[:apdex_start_time] || @start_time
+
         @frame_stack = []
         @frozen_name = nil
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
-        @metrics = TingYun::Agent::TransactionMetrics.new
-        
 
-        @attributes = TingYun::Agent::Transaction::Attributes.new
+
+
+
 
 
         if request = options[:request]
