@@ -31,7 +31,7 @@ module TingYun
 
       def capture_http_response_code(state, result)
         if result.is_a?(Array) && state.current_transaction
-          state.current_transaction.http_response_code = result[0]
+          state.current_transaction.add_agent_attribute(:httpStatus, result[0].to_s)
         end
       end
       # the trailing unless is for the benefit for Ruby 1.8.7 and can be removed
@@ -41,7 +41,7 @@ module TingYun
       def capture_response_content_type(state, result)
         if result.is_a?(Array) && state.current_transaction
           _, headers, _ = result
-          state.current_transaction.response_content_type = headers[CONTENT_TYPE]
+          state.current_transaction.add_agent_attribute(:contentType, headers[CONTENT_TYPE].to_s)
         end
       end
 

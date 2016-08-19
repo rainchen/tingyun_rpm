@@ -11,6 +11,7 @@ require 'ting_yun/agent/transaction/exceptions'
 
 module TingYun
   module Agent
+    # web transaction
     class Transaction
 
 
@@ -46,8 +47,6 @@ module TingYun
                     :default_name,
                     :exceptions,
                     :metrics,
-                    :http_response_code,
-                    :response_content_type,
                     :error_recorded,
                     :guid,
                     :attributes,
@@ -131,9 +130,10 @@ module TingYun
       def start(state)
         return if !state.execution_traced?
 
-        transaction_sampler.on_start_transaction(state, start_time)
-        sql_sampler.on_start_transaction(state, request_path)
-        TingYun::Agent.instance.events.notify(:start_transaction)
+        ::TingYun::Agent::Collector::TransactionSampler.on_start_transaction(state, start_time)
+        ::TingYun::Agent::Collector::SqlSampler.on_start_transaction(state, request_path)
+        ::TingYun::Agent.instance.events.notify(:start_transaction)
+
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
         freeze_name_and_execute if @default_name.start_with?(RAKE_TRANSACTION_PREFIX)
@@ -161,7 +161,7 @@ module TingYun
 
         txn = state.current_transaction
 
-        if txn.nil?
+        unless txn
           TingYun::Agent.logger.error("Failed during Transaction.stop because there is no current transaction")
           return
         end
@@ -248,7 +248,7 @@ module TingYun
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
         record_summary_metrics(outermost_node_name, end_time)
-        record_apdex(state, end_time)
+        record_apdex(end_time)
         @exceptions.record_exceptions(request_path, request_port, best_name, @attributes)
 
 
@@ -264,16 +264,7 @@ module TingYun
 
       def assign_agent_attributes
 
-        add_agent_attribute(:threadName,  "pid-#{$$}");
-
-        if http_response_code
-          add_agent_attribute(:httpStatus, http_response_code.to_s)
-        end
-
-        if response_content_type
-          add_agent_attribute(:contentType, response_content_type)
-        end
-
+        @attributes.add_agent_attribute(:threadName,  "pid-#{$$}");
 
         if @request_attributes
           @request_attributes.assign_agent_attributes self
@@ -281,11 +272,9 @@ module TingYun
 
       end
 
-      def add_agent_attribute(key, value)
-        @attributes.add_agent_attribute(key, value)
-      end
 
-      def record_apdex(state, end_time=Time.now)
+
+      def record_apdex(end_time=Time.now)
         total_duration = (end_time - apdex_start)*1000
         if recording_web_transaction?
           record_apdex_metrics(APDEX_TXN_METRIC_PREFIX, total_duration, apdex_t)
