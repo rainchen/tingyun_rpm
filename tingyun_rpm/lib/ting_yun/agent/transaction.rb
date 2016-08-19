@@ -94,7 +94,7 @@ module TingYun
 
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
-        # freeze_name_and_execute if @default_name.start_with?(RAKE_TRANSACTION_PREFIX)
+        freeze_name_and_execute if @default_name.start_with?(RAKE_TRANSACTION_PREFIX)
       end
 
       def create_nested_frame(state, category, options)
