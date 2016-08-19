@@ -16,7 +16,7 @@ module TingYun
     class Transaction
 
 
-      APDEX_TXN_METRIC_PREFIX = 'Apdex/'.freeze
+
       SUBTRANSACTION_PREFIX = 'Nested/'.freeze
       CONTROLLER_PREFIX = 'WebAction/'.freeze
       RAKE_TRANSACTION_PREFIX     = 'BackgroundAction/Rake'.freeze
@@ -69,11 +69,6 @@ module TingYun
         @frozen_name = nil
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
 
-
-
-
-
-
         if request = options[:request]
           @request_attributes = TingYun::Agent::Transaction::RequestAttributes.new request
         else
@@ -88,47 +83,6 @@ module TingYun
 
       def request_port
         @request_attributes && @request_attributes.port
-      end
-
-      def self.wrap(state, name, category, options = {})
-        Transaction.start(state, category, options.merge(:transaction_name => name))
-
-        begin
-          # We shouldn't raise from Transaction.start, but only wrap the yield
-          # to be absolutely sure we don't report agent problems as app errors
-          yield
-        rescue => e
-          Transaction.notice_error(e)
-          raise e
-        ensure
-          Transaction.stop(state)
-        end
-      end
-
-
-      def self.start(state, category, options)
-        category ||= :controller
-        txn = state.current_transaction
-        options[:client_transaction_id] = state.client_transaction_id
-        if txn
-          txn.create_nested_frame(state, category, options)
-        else
-          txn = start_new_transaction(state, category, options)
-        end
-
-        # merge params every step into here
-        txn.attributes.merge_request_parameters(options[:filtered_params])
-
-        txn
-      rescue => e
-        TingYun::Agent.logger.error("Exception during Transaction.start", e)
-      end
-
-      def self.start_new_transaction(state, category, options)
-        txn = Transaction.new(category, options)
-        state.reset(txn)
-        txn.start(state)
-        txn
       end
 
       def start(state)
@@ -161,46 +115,6 @@ module TingYun
       end
 
 
-      def self.stop(state, end_time = Time.now)
-
-        txn = state.current_transaction
-
-        unless txn
-          TingYun::Agent.logger.error("Failed during Transaction.stop because there is no current transaction")
-          return
-        end
-
-        nested_frame = txn.frame_stack.pop
-
-        if txn.frame_stack.empty?
-          txn.stop(state, end_time, nested_frame)
-          state.reset
-        else
-          nested_name = nested_transaction_name(nested_frame.name)
-
-          if nested_name.start_with?(MIDDLEWARE_PREFIX)
-            summary_metrics = MIDDLEWARE_SUMMARY_METRICS
-          else
-            summary_metrics = EMPTY_SUMMARY_METRICS
-          end
-
-          TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
-              state,
-              nested_frame.start_time.to_f,
-              nested_name,
-              summary_metrics,
-              nested_frame,
-              NESTED_TRACE_STOP_OPTIONS,
-              end_time.to_f)
-
-        end
-
-        :transaction_stopped
-      rescue => e
-        state.reset
-        TingYun::Agent.logger.error("Exception during Transaction.stop", e)
-        nil
-      end
 
 
       def stop(state, end_time, outermost_frame)
@@ -234,13 +148,6 @@ module TingYun
         commit(state, end_time, name) unless ignore(best_name)
       end
 
-      def self.nested_transaction_name(name)
-        if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(RAKE_TRANSACTION_PREFIX)
-          "#{SUBTRANSACTION_PREFIX}#{name}"
-        else
-          name
-        end
-      end
 
       def commit(state, end_time, outermost_node_name)
 
@@ -252,7 +159,7 @@ module TingYun
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
         record_summary_metrics(outermost_node_name, end_time)
-        record_apdex(end_time)
+        @apdex.record_apdex(@frozen_name, end_time,@exceptions.had_error?)
         @exceptions.record_exceptions(request_path, request_port, best_name, @attributes)
 
 
@@ -275,48 +182,6 @@ module TingYun
         end
 
       end
-
-
-
-      def record_apdex(end_time=Time.now)
-        total_duration = (end_time - apdex_start)*1000
-        if recording_web_transaction?
-          record_apdex_metrics(APDEX_TXN_METRIC_PREFIX, total_duration, apdex_t)
-        end
-      end
-
-
-      def record_apdex_metrics(transaction_prefix, total_duration, current_apdex_t)
-        return unless current_apdex_t
-        return unless @frozen_name.start_with?(CONTROLLER_PREFIX)
-
-        apdex_bucket_global = apdex_bucket(total_duration, current_apdex_t)
-        txn_apdex_metric = @frozen_name.sub(/^[^\/]+\//, transaction_prefix)
-        @metrics.record_unscoped(txn_apdex_metric, apdex_bucket_global, current_apdex_t)
-      end
-
-
-      def apdex_bucket(duration, current_apdex_t)
-        self.class.apdex_bucket(duration, @exceptions.had_error?, current_apdex_t)
-      end
-
-      def self.apdex_bucket(duration, failed, apdex_t)
-        case
-          when failed
-            :apdex_f
-          when duration <= apdex_t
-            :apdex_s
-          when duration <= 4 * apdex_t
-            :apdex_t
-          else
-            :apdex_f
-        end
-      end
-
-      def apdex_t
-        TingYun::Agent.config[:apdex_t]
-      end
-
 
 
       # This transaction-local hash may be used as temprory storage by
@@ -403,14 +268,7 @@ module TingYun
         web_category?(@category)
       end
 
-      def self.recording_web_transaction? #THREAD_LOCAL_ACCESS
-        txn = tl_current
-        txn && txn.recording_web_transaction?
-      end
 
-      def self.tl_current
-        TingYun::Agent::TransactionState.tl_get.current_transaction
-      end
 
       def needs_middleware_summary_metrics?(name)
         name.start_with?(MIDDLEWARE_PREFIX)
@@ -440,6 +298,99 @@ module TingYun
         TingYun::Agent.instance.transaction_sampler
       end
 
+
+      def self.wrap(state, name, category, options = {})
+        Transaction.start(state, category, options.merge(:transaction_name => name))
+
+        begin
+          # We shouldn't raise from Transaction.start, but only wrap the yield
+          # to be absolutely sure we don't report agent problems as app errors
+          yield
+        rescue => e
+          Transaction.notice_error(e)
+          raise e
+        ensure
+          Transaction.stop(state)
+        end
+      end
+
+
+      def self.start(state, category, options)
+        category ||= :controller
+        txn = state.current_transaction
+        options[:client_transaction_id] = state.client_transaction_id
+        if txn
+          txn.create_nested_frame(state, category, options)
+        else
+          txn = start_new_transaction(state, category, options)
+        end
+
+        # merge params every step into here
+        txn.attributes.merge_request_parameters(options[:filtered_params])
+
+        txn
+      rescue => e
+        TingYun::Agent.logger.error("Exception during Transaction.start", e)
+      end
+
+      def self.start_new_transaction(state, category, options)
+        txn = Transaction.new(category, options)
+        state.reset(txn)
+        txn.start(state)
+        txn
+      end
+
+      def self.nested_transaction_name(name)
+        if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(RAKE_TRANSACTION_PREFIX)
+          "#{SUBTRANSACTION_PREFIX}#{name}"
+        else
+          name
+        end
+      end
+
+
+      def self.stop(state, end_time = Time.now)
+
+        txn = state.current_transaction
+
+        unless txn
+          TingYun::Agent.logger.error("Failed during Transaction.stop because there is no current transaction")
+          return
+        end
+
+        nested_frame = txn.frame_stack.pop
+
+        if txn.frame_stack.empty?
+          txn.stop(state, end_time, nested_frame)
+          state.reset
+        else
+          nested_name = nested_transaction_name(nested_frame.name)
+
+          if nested_name.start_with?(MIDDLEWARE_PREFIX)
+            summary_metrics = MIDDLEWARE_SUMMARY_METRICS
+          else
+            summary_metrics = EMPTY_SUMMARY_METRICS
+          end
+
+          TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
+              state,
+              nested_frame.start_time.to_f,
+              nested_name,
+              summary_metrics,
+              nested_frame,
+              NESTED_TRACE_STOP_OPTIONS,
+              end_time.to_f)
+
+        end
+
+        :transaction_stopped
+      rescue => e
+        state.reset
+        TingYun::Agent.logger.error("Exception during Transaction.stop", e)
+        nil
+      end
+
+
       # See TingYun::Agent.notice_error for options and commentary
       def self.notice_error(e, options={})
         state = TingYun::Agent::TransactionState.tl_get
@@ -449,6 +400,20 @@ module TingYun
         elsif TingYun::Agent.instance
           TingYun::Agent.instance.error_collector.notice_error(e, options)
         end
+      end
+
+      def self.recording_web_transaction? #THREAD_LOCAL_ACCESS
+        txn = tl_current
+        txn && txn.recording_web_transaction?
+      end
+
+      def self.tl_current
+        TingYun::Agent::TransactionState.tl_get.current_transaction
+      end
+
+      def self.metrics
+        txn = tl_current
+        txn && txn.metrics
       end
 
       HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
