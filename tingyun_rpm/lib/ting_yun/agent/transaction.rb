@@ -271,7 +271,7 @@ module TingYun
         @attributes.add_agent_attribute(:threadName,  "pid-#{$$}");
 
         if @request_attributes
-          @request_attributes.assign_agent_attributes self
+          @request_attributes.assign_agent_attributes @attributes
         end
 
       end
