@@ -156,9 +156,9 @@ module TingYun
         assign_agent_attributes
 
 
-        transaction_sampler.on_finishing_transaction(state, self, end_time)
+        TingYun::Agent.instance.transaction_sampler.on_finishing_transaction(state, self, end_time)
 
-        sql_sampler.on_finishing_transaction(state, @frozen_name)
+        TingYun::Agent.instance.sql_sampler.on_finishing_transaction(state, @frozen_name)
 
         record_summary_metrics(outermost_node_name, end_time)
         @apdex.record_apdex(@frozen_name, end_time, @exceptions.had_error?)
@@ -248,20 +248,6 @@ module TingYun
 
       def best_name
         @frozen_name || @default_name || ::TingYun::Agent::UNKNOWN_METRIC
-      end
-
-
-      def agent
-        TingYun::Agent.instance
-      end
-
-      def sql_sampler
-        agent.sql_sampler
-      end
-
-
-      def transaction_sampler
-        TingYun::Agent.instance.transaction_sampler
       end
 
 
