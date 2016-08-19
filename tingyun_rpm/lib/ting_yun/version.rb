@@ -4,7 +4,7 @@
 module TingYun
   module VERSION
 
-    MAJOR = 2
+    MAJOR = 1
 
     MINOR = 1
 
