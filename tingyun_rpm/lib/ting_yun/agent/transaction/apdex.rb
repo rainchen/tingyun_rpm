@@ -7,10 +7,11 @@ module TingYun
       class Apdex
         APDEX_TXN_METRIC_PREFIX = 'Apdex/'.freeze
 
-        attr_accessor :apdex_start
+        attr_accessor :apdex_start, :transaction_start_time
 
-        def initialize(start_time)
-          @apdex_start = start_time
+        def initialize(apdex_start = Time.now, transaction_start_time)
+          @apdex_start = apdex_start
+          @transaction_start_time = transaction_start_time
         end
 
         def record_apdex(metric_name, end_time, failed)
@@ -41,6 +42,10 @@ module TingYun
             else
               :apdex_f
           end
+        end
+
+        def queue_time
+          TingYun::Helper.time_to_millis(transaction_start_time - apdex_start)
         end
       end
     end

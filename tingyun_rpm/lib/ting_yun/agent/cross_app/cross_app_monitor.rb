@@ -34,7 +34,7 @@ module TingYun
 
         events.subscribe(:after_call) do |_status_code, headers, _body| #THREAD_LOCAL_ACCESS
           state = TingYun::Agent::TransactionState.tl_get
-          state.queue_duration = state.current_transaction.queue_time * 1000
+          state.queue_duration = state.current_transaction.apdex.queue_time
           state.web_duration = (Time.now - state.current_transaction.start_time) * 1000
           insert_response_header(state, headers)
         end

@@ -59,7 +59,7 @@ module TingYun
         @exceptions = TingYun::Agent::Transaction::Exceptions.new
         @metrics = TingYun::Agent::TransactionMetrics.new
         @attributes = TingYun::Agent::Transaction::Attributes.new
-        @apdex = TingYun::Agent::Transaction::Apdex.new(options[:apdex_start_time] || @start_time)
+        @apdex = TingYun::Agent::Transaction::Apdex.new(options[:apdex_start_time], @start_time)
 
         @has_children = false
         @category = category
@@ -131,7 +131,7 @@ module TingYun
           trace_options = TRACE_OPTIONS_UNSCOPED
         end
 
-        if needs_middleware_summary_metrics?(name)
+        if name.start_with?(MIDDLEWARE_PREFIX)
           summary_metrics_with_exclusive_time = MIDDLEWARE_SUMMARY_METRICS
         else
           summary_metrics_with_exclusive_time = EMPTY_SUMMARY_METRICS
@@ -147,7 +147,7 @@ module TingYun
             trace_options,
             end_time.to_f)
 
-        commit(state, end_time, name) unless ignore(best_name)
+        commit(state, end_time, name)
       end
 
 
@@ -161,7 +161,7 @@ module TingYun
         sql_sampler.on_finishing_transaction(state, @frozen_name)
 
         record_summary_metrics(outermost_node_name, end_time)
-        @apdex.record_apdex(@frozen_name, end_time,@exceptions.had_error?)
+        @apdex.record_apdex(@frozen_name, end_time, @exceptions.had_error?)
         @exceptions.record_exceptions(request_path, request_port, best_name, @attributes)
 
 
@@ -246,18 +246,8 @@ module TingYun
       end
 
 
-      def needs_middleware_summary_metrics?(name)
-        name.start_with?(MIDDLEWARE_PREFIX)
-      end
-
-      alias_method :ignore, :needs_middleware_summary_metrics?
-
       def best_name
         @frozen_name || @default_name || ::TingYun::Agent::UNKNOWN_METRIC
-      end
-
-      def queue_time
-        @apdex_start ? @start_time - @apdex_start : 0
       end
 
 
