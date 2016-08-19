@@ -42,16 +42,17 @@ module TingYun
       # A Time instance used for calculating the apdex score, which
       # might end up being @start, or it might be further upstream if
       # we can find a request header for the queue entry time
-      attr_accessor :apdex,
-                    :category,
+      attr_accessor :category,
                     :frame_stack,
                     :default_name,
-                    :exceptions,
-                    :metrics,
-                    :guid,
-                    :attributes,
-                    :request_attributes
+                    :guid
 
+
+      attr_reader :apdex,
+                  :exceptions,
+                  :metrics,
+                  :attributes,
+                  :request_attributes
 
       def initialize(category, options)
         @start_time = Time.now
@@ -93,7 +94,7 @@ module TingYun
 
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
-        freeze_name_and_execute if @default_name.start_with?(RAKE_TRANSACTION_PREFIX)
+        # freeze_name_and_execute if @default_name.start_with?(RAKE_TRANSACTION_PREFIX)
       end
 
       def create_nested_frame(state, category, options)
