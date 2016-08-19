@@ -207,10 +207,10 @@ TingYun::Support::LibraryDetection.defer do
             transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
             transaction_sampler.tl_builder.current_node[:txId] = state.request_guid
             transaction_sampler.tl_builder.current_node[:txData] = my_data["TingyunTxData"]
-            # elsif data.include?("TingyunID")
-            #   TingYun::Agent::Transaction.start(state, :thrift, :apdex_start_time => Time.now)
-            #   my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
-            #   save_referring_transaction_info(state, my_data)
+          # elsif data.include?("TingyunID")
+          #   TingYun::Agent::Transaction.start(state, :thrift, :apdex_start_time => Time.now)
+          #   my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
+          #   save_referring_transaction_info(state, my_data)
           end
         end
       end
@@ -229,6 +229,8 @@ TingYun::Support::LibraryDetection.defer do
         state.client_tingyun_id_secret = tingyun_id_secret
         state.client_transaction_id = client_transaction_id
         state.client_req_id = client_req_id
+        state.transaction_sample_builder.trace.tx_id = client_transaction_id
+
       end
 
       alias :skip_without_tingyun :skip
@@ -240,84 +242,107 @@ TingYun::Support::LibraryDetection.defer do
       include TingYun::Instrumentation::ThriftHelper
 
 
-      def send_message_args_with_tingyun(args_class, args = {})
-        state = TingYun::Agent::TransactionState.tl_get
-        return  unless state.execution_traced?
-        cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
-            raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
-        txn_guid = state.request_guid
-        tingyun_id = "#{cross_app_id};c=1;x=#{txn_guid}"
+        def send_message_args_with_tingyun(args_class, args = {})
+          begin
+            state = TingYun::Agent::TransactionState.tl_get
+            return  unless state.execution_traced?
+            cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+                raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+            txn_guid = state.request_guid
+            tingyun_id = "#{cross_app_id};c=1;x=#{txn_guid}"
+            state.transaction_sample_builder.trace.tx_id = txn_guid
 
-        data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
-        @oprot.write_field_begin("TingyunField", 11, 6)
-        @oprot.write_string(data)
-        @oprot.write_field_end
-        send_message_args_without_tingyun(args_class, args)
-      end
+            data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
+            @oprot.write_field_begin("TingyunField", 11, 6)
+            @oprot.write_string(data)
+            @oprot.write_field_end
+          rescue => e
+            TingYun::Agent.logger.error("Failed to thrift send_message_args_with_tingyun : ", e)
+          ensure
+            send_message_args_without_tingyun(args_class, args)
+          end
+        end
 
-      alias :send_message_args_without_tingyun :send_message_args
-      alias :send_message_args  :send_message_args_with_tingyun
+        alias :send_message_args_without_tingyun :send_message_args
+        alias :send_message_args  :send_message_args_with_tingyun
 
 
       def send_message_with_tingyun(name, args_class, args = {})
 
-        tag = "#{args_class.to_s.split('::').first}.#{name}".downcase
-        t0 = Time.now.to_f
-        operations[tag] = {:started_time => t0}
-        state = TingYun::Agent::TransactionState.tl_get
-        return  unless state.execution_traced?
-        stack = state.traced_method_stack
-        node = stack.push_frame(state,:thrift,t0)
-        operations[tag][:node] = node
+        begin
+          tag = "#{args_class.to_s.split('::').first}.#{name}".downcase
+          t0 = Time.now.to_f
+          operations[tag] = {:started_time => t0}
+          state = TingYun::Agent::TransactionState.tl_get
+          return  unless state.execution_traced?
+          stack = state.traced_method_stack
+          node = stack.push_frame(state,:thrift,t0)
+          operations[tag][:node] = node
+        rescue => e
+          TingYun::Agent.logger.error("Failed to thrift send_message_with_tingyun : ", e)
+        ensure
+          send_message_without_tingyun(name, args_class, args)
+        end
 
-        send_message_without_tingyun(name, args_class, args)
       end
 
       alias :send_message_without_tingyun :send_message
       alias :send_message  :send_message_with_tingyun
 
       def send_oneway_message_with_tingyun(name, args_class, args = {})
-        tag = "#{args_class.to_s.split('::').first}.#{name}".downcase
-        op_started = Time.now.to_f
-        base, *other_metrics = metrics(tag)
-        result = send_oneway_message_without_tingyun(name, args_class, args)
-        duration = (Time.now.to_f - op_started)*1000
-        TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, duration)
-        result
+
+        begin
+          tag = "#{args_class.to_s.split('::').first}.#{name}".downcase
+          op_started = Time.now.to_f
+          base, *other_metrics = metrics(tag)
+          result = send_oneway_message_without_tingyun(name, args_class, args)
+          duration = (Time.now.to_f - op_started)*1000
+          TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, duration)
+          result
+        rescue => e
+          TingYun::Agent.logger.error("Failed to thrift send_oneway_message_with_tingyun : ", e)
+          return send_oneway_message_without_tingyun(name, args_class, args)
+        end
+
       end
       alias :send_oneway_message_without_tingyun :send_oneway_message
       alias :send_oneway_message :send_oneway_message_with_tingyun
 
       def receive_message_with_tingyun(result_klass)
-        state = TingYun::Agent::TransactionState.tl_get
+        begin
+          state = TingYun::Agent::TransactionState.tl_get
 
-        operate = operator(result_klass)
+          operate = operator(result_klass)
 
-        t0, node =  started_time_and_node(operate)
+          t0, node =  started_time_and_node(operate)
 
 
-        result = receive_message_without_tingyun(result_klass)
-        if result.nil? || result.success.nil?
-          e = ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, "#{operate} failed: unknown result")
-          ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,metrics(operate)[0])
+          result = receive_message_without_tingyun(result_klass)
+          if result.nil? || result.success.nil?
+            e = ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, "#{operate} failed: unknown result")
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,metrics(operate)[0])
+          end
+
+          t1 = Time.now.to_f
+          node_name, *other_metrics = metrics(operate)
+          duration = TingYun::Helper.time_to_millis(t1 - t0)
+
+          TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
+              other_metrics.pop, other_metrics, duration
+          )
+          if node
+            node.name = node_name
+            transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
+            transaction_sampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
+            stack = state.traced_method_stack
+            stack.pop_frame(state, node, node_name, t1)
+          end
+
+          result
+        rescue => e
+          TingYun::Agent.logger.error("Failed to thrift receive_message_with_tingyun : ", e)
+          return  receive_message_without_tingyun(result_klass)
         end
-
-        t1 = Time.now.to_f
-        node_name, *other_metrics = metrics(operate)
-        duration = TingYun::Helper.time_to_millis(t1 - t0)
-
-        TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
-            other_metrics.pop, other_metrics, duration
-        )
-        if node
-          node.name = node_name
-          transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
-          transaction_sampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
-          stack = state.traced_method_stack
-          stack.pop_frame(state, node, node_name, t1)
-        end
-
-        result
       end
 
       alias :receive_message_without_tingyun :receive_message
