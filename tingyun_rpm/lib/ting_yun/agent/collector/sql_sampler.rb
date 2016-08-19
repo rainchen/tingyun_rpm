@@ -33,7 +33,7 @@ module TingYun
           @samples_lock = Mutex.new
         end
 
-        def self.on_start_transaction(state, uri=nil)
+        def self.on_start_transaction(state, uri)
           return unless TingYun::Agent::Database.sql_sampler_enabled?
 
           state.sql_sampler_transaction_data = ::TingYun::Agent::Collector::TransactionSqlData.new

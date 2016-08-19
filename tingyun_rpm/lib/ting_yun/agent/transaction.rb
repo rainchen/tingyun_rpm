@@ -54,7 +54,8 @@ module TingYun
 
 
       def initialize(category, options)
-        @guid = options[:client_transaction_id] || generate_guid
+        @start_time = Time.now
+
         @exceptions = TingYun::Agent::Transaction::Exceptions.new
         @metrics = TingYun::Agent::TransactionMetrics.new
         @attributes = TingYun::Agent::Transaction::Attributes.new
@@ -63,8 +64,7 @@ module TingYun
         @has_children = false
         @category = category
 
-        @start_time = Time.now
-
+        @guid = options[:client_transaction_id] || generate_guid
         @frame_stack = []
         @frozen_name = nil
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
