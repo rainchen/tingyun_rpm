@@ -109,7 +109,7 @@ module TingYun
             set_log_format!
           rescue => e
             @log = ::Logger.new(STDOUT)
-            warn("check_log_file:  Failed creating logger for file #{file_path}, using standard out for logging.", e)
+            warn("check_log_file:  Failed creating logger for file #{@file_path}, using standard out for logging.", e)
           end
         end
       end
@@ -139,7 +139,7 @@ module TingYun
             @log = ::Logger.new(@file_path)
           rescue => e
             @log = ::Logger.new(STDOUT)
-            warn("Failed creating logger for file #{file_path}, using standard out for logging.", e)
+            warn("Failed creating logger for file #{@file_path}, using standard out for logging.", e)
           end
         end
       end
