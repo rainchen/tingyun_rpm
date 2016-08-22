@@ -121,18 +121,18 @@ TingYun::Support::LibraryDetection.defer do
     ::Thrift::BaseProtocol.class_eval do
 
       def skip_with_tingyun(type)
-
-        data = skip_without_tingyun(type)
-        state = TingYun::Agent::TransactionState.tl_get
-        if data.is_a? ::String
-          if data.include?("TingyunTxData")
-            my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
-            state.set_thrift_return_data(my_data["TingyunTxData"])
-            ::TingYun::Agent.instance.transaction_sampler.tl_builder.set_txId_and_txData(state.request_guid,my_data["TingyunTxData"])
-          # elsif data.include?("TingyunID")
-          #   TingYun::Agent::Transaction.start(state, :thrift, :apdex_start_time => Time.now)
-          #   my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
-          #   save_referring_transaction_info(state, my_data)
+        begin
+          data = skip_without_tingyun(type)
+        ensure
+          if data.is_a? ::String
+            if data.include?("TingyunTxData")
+              my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
+              TingYun::Agent::TransactionState.process_thrift_data(my_data["TingyunTxData"])
+            # elsif data.include?("TingyunID")
+            #   TingYun::Agent::Transaction.start(state, :thrift, :apdex_start_time => Time.now)
+            #   my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
+            #   save_referring_transaction_info(state, my_data)
+            end
           end
         end
       end
@@ -253,8 +253,7 @@ TingYun::Support::LibraryDetection.defer do
           )
           if node
             node.name = node_name
-            transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
-            transaction_sampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
+            ::TingYun::Agent.instance.transaction_sampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
             stack = state.traced_method_stack
             stack.pop_frame(state, node, node_name, t1)
           end

@@ -10,7 +10,7 @@ module TingYun
 
       # Request data
       attr_accessor :transaction_sample_builder
-      attr_reader   :current_transaction, :traced_method_stack, :thrift_return_data
+      attr_reader   :current_transaction, :traced_method_stack
       # Sql Sampler Transaction Data
       attr_accessor :sql_sampler_transaction_data,
                     :client_transaction_id,
@@ -22,7 +22,8 @@ module TingYun
                     :queue_duration,
                     :rds_duration,
                     :mc_duration,
-                    :mon_duration
+                    :mon_duration,
+                    :thrift_return_data
 
 
 
@@ -108,8 +109,10 @@ module TingYun
         @sql_sampler_transaction_data = obj
       end
 
-      def set_thrift_return_data(data)
-        @thrift_return_data = data
+      def self.process_thrift_data(data)
+        state = tl_state_for
+        state.thrift_return_data = data
+        ::TingYun::Agent.instance.transaction_sampler.tl_builder.set_txId_and_txData(state.request_guid, data)
       end
 
 
