@@ -126,14 +126,9 @@ TingYun::Support::LibraryDetection.defer do
         state = TingYun::Agent::TransactionState.tl_get
         if data.is_a? ::String
           if data.include?("TingyunTxData")
-
             my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
-
-            state.thrift_return_data = my_data["TingyunTxData"]
-
-            transaction_sampler = ::TingYun::Agent.instance.transaction_sampler
-            transaction_sampler.tl_builder.current_node[:txId] = state.request_guid
-            transaction_sampler.tl_builder.current_node[:txData] = my_data["TingyunTxData"]
+            state.set_thrift_return_data(my_data["TingyunTxData"])
+            ::TingYun::Agent.instance.transaction_sampler.tl_builder.set_txId_and_txData(state.request_guid,my_data["TingyunTxData"])
           # elsif data.include?("TingyunID")
           #   TingYun::Agent::Transaction.start(state, :thrift, :apdex_start_time => Time.now)
           #   my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
@@ -170,29 +165,27 @@ TingYun::Support::LibraryDetection.defer do
       include TingYun::Instrumentation::ThriftHelper
 
 
-        def send_message_args_with_tingyun(args_class, args = {})
-          begin
-            state = TingYun::Agent::TransactionState.tl_get
-            return  unless state.execution_traced?
-            cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
-                raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
-            txn_guid = state.request_guid
-            tingyun_id = "#{cross_app_id};c=1;x=#{txn_guid}"
-            state.transaction_sample_builder.trace.tx_id = txn_guid
+      def send_message_args_with_tingyun(args_class, args = {})
+        begin
+          state = TingYun::Agent::TransactionState.tl_get
+          return  unless state.execution_traced?
+          cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+              raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+          state.transaction_sample_builder.set_trace_id(state.request_guid)
 
-            data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
-            @oprot.write_field_begin("TingyunField", 11, 6)
-            @oprot.write_string(data)
-            @oprot.write_field_end
-          rescue => e
-            TingYun::Agent.logger.error("Failed to thrift send_message_args_with_tingyun : ", e)
-          ensure
-            send_message_args_without_tingyun(args_class, args)
-          end
+          data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => "#{cross_app_id};c=1;x=#{state.request_guid}")
+          @oprot.write_field_begin("TingyunField", 11, 6)
+          @oprot.write_string(data)
+          @oprot.write_field_end
+        rescue => e
+          TingYun::Agent.logger.error("Failed to thrift send_message_args_with_tingyun : ", e)
+        ensure
+          send_message_args_without_tingyun(args_class, args)
         end
+      end
 
-        alias :send_message_args_without_tingyun :send_message_args
-        alias :send_message_args  :send_message_args_with_tingyun
+      alias :send_message_args_without_tingyun :send_message_args
+      alias :send_message_args  :send_message_args_with_tingyun
 
 
       def send_message_with_tingyun(name, args_class, args = {})
@@ -246,7 +239,7 @@ TingYun::Support::LibraryDetection.defer do
 
 
           result = receive_message_without_tingyun(result_klass)
-          if result.nil? || result.success.nil?
+          unless result || result.success
             e = ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, "#{operate} failed: unknown result")
             ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,metrics(operate)[0])
           end
@@ -277,5 +270,4 @@ TingYun::Support::LibraryDetection.defer do
       alias :receive_message :receive_message_with_tingyun
     end
   end
-
 end
