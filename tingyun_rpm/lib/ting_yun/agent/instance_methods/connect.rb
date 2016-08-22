@@ -122,7 +122,7 @@ module TingYun
           handle_force_restart(e)
           retry
         rescue TingYun::Support::Exception::InvalidDataException => e
-          handle_server_error(e)
+          handle_force_restart(e)
         rescue => e
           handle_other_error(e)
         end

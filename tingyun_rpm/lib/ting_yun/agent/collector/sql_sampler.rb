@@ -2,9 +2,11 @@
 
 require 'ting_yun/agent/database'
 require 'ting_yun/agent/transaction/transaction_state'
-require 'ting_yun/support/coerce'
-require 'ting_yun/metrics/stats'
-require 'ting_yun/support/helper'
+
+
+require 'ting_yun/agent/collector/sql_sampler/transaction_sql_data'
+require 'ting_yun/agent/collector/sql_sampler/slow_sql'
+require 'ting_yun/agent/collector/sql_sampler/sql_trace'
 module TingYun
   module Agent
     module Collector
@@ -36,11 +38,7 @@ module TingYun
         def self.on_start_transaction(state, uri)
           return unless TingYun::Agent::Database.sql_sampler_enabled?
 
-          state.sql_sampler_transaction_data = ::TingYun::Agent::Collector::TransactionSqlData.new
-
-          if Agent.config[:'nbs.action_tracer.slow_sql']
-            state.sql_sampler_transaction_data.set_transaction_info(uri)
-          end
+          state.init_sql_transaction(::TingYun::Agent::Collector::TransactionSqlData.new(uri))
         end
 
         # duration{:type => sec}
@@ -50,16 +48,15 @@ module TingYun
           data = state.sql_sampler_transaction_data
           return unless data
 
-          if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold'] && state.sql_recorded? && metric_name
+          if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold'] && state.sql_recorded?
             if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.stack_trace_threshold']
               backtrace = (caller.reject! { |t| t.include?('tingyun_rpm') })
-              backtrace = backtrace.first(40) if backtrace.length > 40
-              backtrace = backtrace.join("\n")
+              backtrace = backtrace.first(20).join("\n")
             else
               backtrace = ''
             end
             statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
-            data.sql_data << SlowSql.new(statement, metric_name, duration, start_time, backtrace)
+            data.sql_data << ::TingYun::Agent::Collector::SlowSql.new(statement, metric_name, duration, start_time, backtrace)
           end
         end
 
@@ -84,7 +81,7 @@ module TingYun
         end
 
         def save (transaction_sql_data)
-          action_metric_name = transaction_sql_data.action_metric_name
+          action_metric_name = transaction_sql_data.metric_name
           uri                = transaction_sql_data.uri
 
           transaction_sql_data.sql_data.each do |sql_item|
@@ -94,12 +91,12 @@ module TingYun
               sql_trace.aggregate(sql_item, action_metric_name, uri)
             else
               if has_room?
-                @sql_traces[normalized_sql] = SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)
+                @sql_traces[normalized_sql] = ::TingYun::Agent::Collector::SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)
               else
                 min, max = @sql_traces.minmax_by { |(_, trace)| trace.max_call_time }
                 if max.last.max_call_time < sql_item.duration
                   @sql_traces.delete(min.first)
-                  @sql_traces[normalized_sql] = SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)
+                  @sql_traces[normalized_sql] = ::TingYun::Agent::Collector::SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)
                 end
               end
             end
@@ -143,125 +140,6 @@ module TingYun
         end
       end
 
-      class TransactionSqlData
-        attr_reader :action_metric_name
-        attr_reader :uri
-        attr_reader :sql_data
-
-        def initialize
-          @sql_data = []
-        end
-
-        def set_transaction_info(uri)
-          @uri = uri
-        end
-
-        def set_transaction_name(name)
-          @action_metric_name = name
-        end
-      end
-
-      class SlowSql
-        attr_reader :statement
-        attr_reader :metric_name
-        attr_reader :duration
-        attr_reader :backtrace
-        attr_reader :start_time
-
-
-        def initialize(statement, metric_name, duration, time,  backtrace=nil)
-          @start_time = time
-          @statement = statement
-          @metric_name = metric_name
-          @duration = duration
-          @backtrace = backtrace
-        end
-
-        def sql
-          statement.sql
-        end
-
-        def obfuscate
-          TingYun::Agent::Database.obfuscate_sql(statement)
-        end
-
-
-        def normalize
-          TingYun::Agent::Database::Obfuscator.instance.default_sql_obfuscator(statement)
-        end
-
-        def explain
-          TingYun::Agent::Database.explain_sql(statement.sql, statement.config, statement.explainer)
-        end
-
-        # We can't serialize the explainer, so clear it before we transmit
-        def prepare_to_send
-          statement.explainer = nil
-        end
-      end
-
-
-
-      class SqlTrace < TingYun::Metrics::Stats
-
-        attr_reader :action_metric_name
-        attr_reader :uri
-        attr_reader :sql
-        attr_reader :slow_sql
-        attr_reader :params
-
-        def initialize(normalized_query, slow_sql, action_name, uri)
-          super()
-          @params = {}
-
-          @action_metric_name = action_name
-          @slow_sql = slow_sql
-          @sql = normalized_query
-          @uri = uri
-          @params[:stacktrace] = slow_sql.backtrace
-          record_data_point(float(slow_sql.duration))
-        end
-
-        def aggregate(slow_sql, action_name, uri)
-          duration = slow_sql.duration
-          if duration > max_call_time
-            @action_metric_name = action_name
-            @slow_sql = slow_sql
-            @uri = uri
-            @params[:stacktrace] = slow_sql.backtrace
-          end
-          record_data_point(float(duration))
-        end
-
-
-        def prepare_to_send
-          @sql = @slow_sql.sql unless Agent.config[:'nbs.action_tracer.record_sql'].to_s == 'obfuscated'
-          @params[:explainPlan] = @slow_sql.explain if need_to_explain?
-        end
-
-
-        def need_to_explain?
-          Agent.config[:'nbs.action_tracer.explain_enabled'] &&  @slow_sql.duration * 1000 > TingYun::Agent.config[:'nbs.action_tracer.explain_threshold']
-        end
-
-
-        include TingYun::Support::Coerce
-
-        def to_collector_array(encoder)
-          [
-              @slow_sql.start_time,
-              string(@action_metric_name),
-              string(@slow_sql.metric_name),
-              string(@uri||@action_metric_name),
-              string(@sql),
-              int(@call_count),
-              TingYun::Helper.time_to_millis(@total_call_time),
-              TingYun::Helper.time_to_millis(@max_call_time),
-              TingYun::Helper.time_to_millis(@min_call_time),
-              encoder.encode(@params)
-          ]
-        end
-      end
     end
   end
 end

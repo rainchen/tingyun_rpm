@@ -105,6 +105,10 @@ module TingYun
         current_transaction.guid
       end
 
+      def init_sql_transaction(obj)
+        @sql_sampler_transaction_data = obj
+      end
+
 
     end
   end
