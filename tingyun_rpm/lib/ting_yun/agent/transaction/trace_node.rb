@@ -95,9 +95,7 @@ module TingYun
           return nil unless statement.respond_to?(:config) &&
               statement.respond_to?(:explainer)
 
-          TingYun::Agent::Database.explain_sql(statement.sql,
-                                                statement.config,
-                                                statement.explainer)
+          TingYun::Agent::Database.explain_sql(statement)
         end
 
         protected
