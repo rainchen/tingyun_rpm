@@ -35,24 +35,23 @@ module TingYun
       NESTED_TRACE_STOP_OPTIONS = {:metric => true}.freeze
 
 
-      # A Time instance for the start time, never nil
-      attr_accessor :start_time
-
 
       # A Time instance used for calculating the apdex score, which
       # might end up being @start, or it might be further upstream if
       # we can find a request header for the queue entry time
-      attr_accessor :category,
-                    :frame_stack,
-                    :default_name,
-                    :guid
 
 
       attr_reader :apdex,
                   :exceptions,
                   :metrics,
                   :attributes,
-                  :request_attributes
+                  :request_attributes,
+                  :frame_stack,
+                  :guid,
+                  :category,
+                  :default_name,
+                  :start_time
+
 
       def initialize(category, options)
         @start_time = Time.now
@@ -112,7 +111,7 @@ module TingYun
           return
         end
         if influences_transaction_name?(category)
-          self.default_name = name
+          @default_name = name
           @category = category if category
         end
       end

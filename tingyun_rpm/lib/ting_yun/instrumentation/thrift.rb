@@ -141,24 +141,24 @@ TingYun::Support::LibraryDetection.defer do
           end
         end
       end
-
-      def save_referring_transaction_info(state,data)
-
-        info = data["TingyunID"].split(';')
-        tingyun_id_secret = info[0]
-        client_transaction_id = info.find do |e|
-          e.match(/x=/)
-        end.split('=')[1] rescue nil
-        client_req_id = info.find do |e|
-          e.match(/r=/)
-        end.split('=')[1] rescue nil
-
-        state.client_tingyun_id_secret = tingyun_id_secret
-        state.client_transaction_id = client_transaction_id
-        state.client_req_id = client_req_id
-        state.transaction_sample_builder.trace.tx_id = client_transaction_id
-
-      end
+      #
+      # def save_referring_transaction_info(state,data)
+      #
+      #   info = data["TingyunID"].split(';')
+      #   tingyun_id_secret = info[0]
+      #   client_transaction_id = info.find do |e|
+      #     e.match(/x=/)
+      #   end.split('=')[1] rescue nil
+      #   client_req_id = info.find do |e|
+      #     e.match(/r=/)
+      #   end.split('=')[1] rescue nil
+      #
+      #   state.client_tingyun_id_secret = tingyun_id_secret
+      #   state.client_transaction_id = client_transaction_id
+      #   state.client_req_id = client_req_id
+      #   state.transaction_sample_builder.trace.tx_id = client_transaction_id
+      #
+      # end
 
       alias :skip_without_tingyun :skip
       alias :skip  :skip_with_tingyun
