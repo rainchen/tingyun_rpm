@@ -23,13 +23,14 @@
 
 require 'ting_yun/frameworks'
 
-require 'pry'
+
 #if the agent had started in manual , then shouldn't start in auto again
-unless  TingYun::Agent.agent
-  if defined?(Rails::VERSION)
-    if Rails::VERSION::MAJOR.to_i >= 3
-      module TingYun
-        class Railtie < Rails::Railtie
+
+unless TingYun::Agent.agent
+if defined?(Rails::VERSION)
+  if Rails::VERSION::MAJOR.to_i >= 3
+    module TingYun
+      class Railtie < Rails::Railtie
 
           initializer "tingyun_rpm.start_plugin" do |app|
               TingYun::Agent.logger.info('initialize tingyun_rpm start_plugin')
