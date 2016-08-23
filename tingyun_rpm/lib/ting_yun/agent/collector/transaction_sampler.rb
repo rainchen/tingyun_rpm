@@ -80,13 +80,13 @@ module TingYun
         # @param explainer [Proc] for internal use only - 3rd-party clients must
         #                         not pass this parameter.
         # duration{:type => sec}
-        def notice_sql(sql, config, duration, state=nil, explainer=nil)
+        def notice_sql(sql, config, duration, state=nil, explainer=nil, binds=[], name="SQL")
           # some statements (particularly INSERTS with large BLOBS
           # may be very large; we should trim them to a maximum usable length
           state ||= TingYun::Agent::TransactionState.tl_get
           builder = state.transaction_sample_builder
           if state.sql_recorded?
-            statement = TingYun::Agent::Database::Statement.new(sql, config, explainer)
+            statement = TingYun::Agent::Database::Statement.new(sql, config, explainer, binds, name)
             action_tracer_segment(builder, statement, duration, :sql)
           end
         end

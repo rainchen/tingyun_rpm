@@ -8,13 +8,14 @@ module TingYun
       class Statement
         include TingYun::Agent::Database::ExplainPlanHelpers
 
-        attr_accessor :sql, :config, :explainer
+        attr_accessor :sql, :config, :explainer, :binds, :name
 
-
-        def initialize(sql, config={}, explainer=nil)
+        def initialize(sql, config={}, explainer=nil, binds=[], name=DEFAULT_QUERY_NAME)
           @sql = TingYun::Agent::Database.capture_query(sql)
           @config = config
           @explainer = explainer
+          @binds = binds
+          @name = name
         end
 
         def adapter
@@ -34,10 +35,10 @@ module TingYun
 
         SUPPORTED_ADAPTERS_FOR_EXPLAIN = [:postgres, :mysql2, :mysql, :sqlite]
 
-        def explain(sql, config, explainer=nil)
+        def explain
           return unless explainable?
           handle_exception_in_explain do
-            plan = explainer.call(config, sql)
+            plan = explainer.call(self)
             return process_resultset(plan, adapter) if plan
           end
         end
@@ -48,6 +49,11 @@ module TingYun
 
           if sql[-3,3] == '...'
             TingYun::Agent.logger.debug('Unable to collect explain plan for truncated query.')
+            return false
+          end
+
+          if parameterized?(@sql) && @binds.empty?
+            TingYun::Agent.logger.debug('Unable to collect explain plan for parameter-less parameterized query.')
             return false
           end
 

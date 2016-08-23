@@ -23,6 +23,9 @@ module TingYun
           parse_operation_from_query(sql) == 'select'
         end
 
+        def parameterized?(sql)
+          TingYun::Agent::Database::Obfuscator.instance.obfuscate_single_quote_literals(sql) =~ /\$\d+/
+        end
 
         SQL_COMMENT_REGEX = Regexp.new('/\*.*?\*/', Regexp::MULTILINE).freeze
         EMPTY_STRING      = ''.freeze

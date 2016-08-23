@@ -11,13 +11,13 @@ module TingYun
   module Instrumentation
     module ActiveRecord
 
-      EXPLAINER = lambda do |config, query|
-        connection = TingYun::Agent::Database.get_connection(config) do
-          ::ActiveRecord::Base.send("#{config[:adapter]}_connection",
-                                    config)
+      EXPLAINER = lambda do |statement|
+        connection = TingYun::Agent::Database.get_connection(statement.config) do
+          ::ActiveRecord::Base.send("#{statement.config[:adapter]}_connection",
+                                    statement.config)
         end
         if connection && connection.respond_to?(:execute)
-          return connection.execute("EXPLAIN #{query}")
+          return connection.execute("EXPLAIN #{statement.sql}")
         end
       end
 

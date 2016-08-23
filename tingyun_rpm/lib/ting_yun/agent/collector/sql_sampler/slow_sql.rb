@@ -33,7 +33,7 @@ module TingYun
         end
 
         def explain
-          TingYun::Agent::Database.explain_sql(statement)
+          TingYun::Agent::Database.explain_sql(statement) if statement.config && statement.explainer
         end
 
         # We can't serialize the explainer, so clear it before we transmit
