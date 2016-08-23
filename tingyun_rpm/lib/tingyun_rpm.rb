@@ -23,9 +23,9 @@
 
 require 'ting_yun/frameworks'
 
-require 'pry'
+
 #if the agent had started in manual , then shouldn't start in auto again
-unless defined?(::TingYun::Agent) && TingYun::Agent.agent
+unless TingYun::Agent.agent
 if defined?(Rails::VERSION)
   if Rails::VERSION::MAJOR.to_i >= 3
     module TingYun
