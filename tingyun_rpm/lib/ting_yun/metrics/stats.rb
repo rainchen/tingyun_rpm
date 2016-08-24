@@ -79,25 +79,7 @@ module TingYun
         }.to_json(*_)
       end
 
-      include TingYun::Support::Coerce
 
-      def metrics(stat_key)
-        metrics = []
-
-        metrics << int(call_count, stat_key)
-        if max_call_time != 0.0 #apedx
-          metrics << float(total_call_time, stat_key)
-          metrics << float(total_exclusive_time, stat_key)
-          metrics << float(max_call_time, stat_key)
-        end
-
-        if min_call_time !=0.0 #
-          metrics << float(min_call_time, stat_key)
-          metrics << float(sum_of_squares, stat_key)
-        end
-
-        metrics
-      end
 
 
 
@@ -129,8 +111,6 @@ module TingYun
           ::TingYun::Agent.logger.warn("Attempted to set apdex_t to #{apdex_t.inspect}, backtrace = #{caller.join("\n")}")
         end
       end
-
-
 
       # record a single data point into the statistical gatherer.  The gatherer
       # will aggregate all data points collected over a specified period and upload
@@ -165,6 +145,25 @@ module TingYun
             )
       end
 
+      include TingYun::Support::Coerce
+
+      def metrics(stat_key)
+        metrics = []
+
+        metrics << int(call_count, stat_key)
+        if max_call_time != 0.0 #apedx
+          metrics << float(total_call_time, stat_key)
+          metrics << float(total_exclusive_time, stat_key)
+          metrics << float(max_call_time, stat_key)
+        end
+
+        if min_call_time !=0.0 #
+          metrics << float(min_call_time, stat_key)
+          metrics << float(sum_of_squares, stat_key)
+        end
+
+        metrics
+      end
 
       protected
 

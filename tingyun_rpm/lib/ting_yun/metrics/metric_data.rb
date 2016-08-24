@@ -48,7 +48,7 @@ module TingYun
 
       def to_collector_array(encoder=nil)
         stat_key = metric_id || to_hash
-        [ stat_key,metrics(stat_key)]
+        [stat_key, metrics(stat_key)]
       end
 
       def to_hash
