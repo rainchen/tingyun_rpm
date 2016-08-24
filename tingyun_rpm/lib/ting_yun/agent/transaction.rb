@@ -356,7 +356,7 @@ module TingYun
 
       def self.recording_web_transaction? #THREAD_LOCAL_ACCESS
         txn = tl_current
-        txn && txn.web_category?(@category)
+        txn && txn.web_category?(txn.category)
       end
 
       def self.tl_current
