@@ -95,6 +95,8 @@ module TingYun
               process_explain_results_mysql(results)
             when :sqlite
               process_explain_results_sqlite(results)
+            else
+              return {}
           end
         end
 
@@ -125,7 +127,6 @@ module TingYun
         end
 
         def process_explain_results_mysql2(results)
-          return string_explain_plan_results("MySQL", results) if results.is_a?(String)
           headers = results.fields
           values  = []
           results.each { |row| values << row }
@@ -133,7 +134,6 @@ module TingYun
         end
 
         def process_explain_results_mysql(results)
-          return string_explain_plan_results("MySQL", results) if results.is_a?(String)
           headers = []
           values  = []
           if results.is_a?(Array)
@@ -157,7 +157,6 @@ module TingYun
         SQLITE_EXPLAIN_COLUMNS = %w[addr opcode p1 p2 p3 p4 p5 comment]
 
         def process_explain_results_sqlite(results)
-          return string_explain_plan_results("sqlite", results) if results.is_a?(String)
           headers = SQLITE_EXPLAIN_COLUMNS
           values  = []
           results.each do |row|

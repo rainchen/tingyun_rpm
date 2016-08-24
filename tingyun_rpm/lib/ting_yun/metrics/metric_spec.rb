@@ -82,6 +82,17 @@ module TingYun
         return (self.scope || '') <=> (o.scope || '')
       end
 
+      def to_hash
+        hash =  { 'name' => name }
+        hash['calleeId'] = calleeId if calleeId
+        hash['calleeName'] = calleeName if calleeName
+        unless scope.empty?
+          hash['parent'] = scope
+        end
+
+        return hash
+      end
+
 
 
     end

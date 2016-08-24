@@ -1,7 +1,7 @@
 # encoding: utf-8
 # This file is distributed under Ting Yun's license terms.
 
-require 'ting_yun/support/coerce'
+
 
 module TingYun
   module Metrics
@@ -16,8 +16,8 @@ module TingYun
 
       def initialize(metric_spec, stats, metric_id)
         @metric_spec = metric_spec
-        self.stats = stats
-        self.metric_id = metric_id
+        @stats = stats
+        @metric_id = metric_id
       end
 
       def eql?(o)
@@ -45,41 +45,18 @@ module TingYun
         "#<MetricData metric_spec:#{metric_spec.inspect}, stats:#{stats.inspect}, metric_id:#{metric_id.inspect}>"
       end
 
-      include TingYun::Support::Coerce
 
       def to_collector_array(encoder=nil)
-        stat_key = metric_id || stats_has_parent?
+        stat_key = metric_id || to_hash
         [ stat_key,metrics(stat_key)]
       end
 
-      def stats_has_parent?
-        hash =  { 'name' => metric_spec.name }
-        hash['calleeId'] = metric_spec.calleeId unless metric_spec.calleeId.nil?
-        hash['calleeName'] = metric_spec.calleeName unless metric_spec.calleeName.nil?
-        unless metric_spec.scope.empty?
-          hash['parent'] = metric_spec.scope
-        end
-
-        return hash
+      def to_hash
+        metric_spec.to_hash
       end
 
       def metrics(stat_key)
-
-        metrics = []
-
-        metrics << int(stats.call_count, stat_key)
-        if stats.max_call_time != 0.0 #apedx
-          metrics << float(stats.total_call_time, stat_key)
-          metrics << float(stats.total_exclusive_time, stat_key)
-          metrics << float(stats.max_call_time, stat_key)
-        end
-
-        if stats.min_call_time !=0.0 #
-          metrics << float(stats.min_call_time, stat_key)
-          metrics << float(stats.sum_of_squares, stat_key)
-        end
-
-        metrics
+        stats.metrics(stat_key)
       end
     end
   end
