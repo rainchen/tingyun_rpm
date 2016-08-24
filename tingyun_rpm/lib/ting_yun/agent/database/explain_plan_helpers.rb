@@ -98,7 +98,7 @@ module TingYun
           end
         end
 
-
+        QUERY_PLAN = 'QUERY PLAN'.freeze
 
         def process_explain_results_postgres(results)
           if defined?(::ActiveRecord::Result) && results.is_a?(::ActiveRecord::Result)
