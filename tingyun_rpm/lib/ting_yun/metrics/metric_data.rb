@@ -58,6 +58,7 @@ module TingYun
       def metrics(stat_key)
         stats.metrics(stat_key)
       end
+
     end
   end
 end

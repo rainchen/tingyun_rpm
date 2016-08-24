@@ -31,24 +31,13 @@ module TingYun
         if TingYun::Agent.config[:'nbs.auto_app_naming']
           begin
           [::TingYun::Frameworks.framework.root.split('/').last]
-          rescue Exception => e
-            get_name
+          rescue
+            ::TingYun::Configuration.get_name
           end
         else
-          get_name
+          ::TingYun::Configuration.get_name
         end
 
-      end
-
-      def get_name
-        case TingYun::Agent.config[:app_name]
-          when Array then
-            TingYun::Agent.config[:app_name]
-          when String then
-            TingYun::Agent.config[:app_name].split(';')
-          else
-            []
-        end
       end
 
       def reset_to_defaults
@@ -74,7 +63,7 @@ module TingYun
           accessor = key.to_sym
 
           if config.has_key?(accessor)
-            return evaluated = evaluate_procs(config[accessor]) #if it's proc
+            return evaluate_procs(config[accessor]) #if it's proc
           end
         end
         nil
@@ -144,12 +133,9 @@ module TingYun
 
         log_config(:add, source)
 
-        notify_finished_configuring if !was_finished && finished_configuring?
+        TingYun::Agent.instance.events.notify(:finished_configuring) if !was_finished && finished_configuring?
       end
 
-      def notify_finished_configuring
-        TingYun::Agent.instance.events.notify(:finished_configuring)
-      end
 
       def finished_configuring?
         !@server_source.nil?

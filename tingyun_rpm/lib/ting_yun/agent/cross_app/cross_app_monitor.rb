@@ -26,9 +26,9 @@ module TingYun
         TingYun::Agent.logger.debug("Wiring up Cross Application Tracing to events after finished configuring")
 
         events.subscribe(:before_call) do |env| #THREAD_LOCAL_ACCESS
-          if cross_app_enabled?
+          if TingYun::Agent::CrossAppTracing.cross_app_enabled?
             state = TingYun::Agent::TransactionState.tl_get
-            save_referring_transaction_info(state, env)  unless env[TY_ID_HEADER].nil?
+            state.save_referring_transaction_info(env[TY_ID_HEADER].split(';')) if env[TY_ID_HEADER]
           end
         end
 
@@ -42,57 +42,18 @@ module TingYun
       end
 
 
-      def cross_app_enabled?
-        TingYun::Agent::CrossAppTracing.cross_app_enabled?
-      end
-
-
-      def save_referring_transaction_info(state,request)
-
-        info = request[TY_ID_HEADER].split(';')
-        tingyun_id_secret = info[0]
-        client_transaction_id = info.find do |e|
-          e.match(/x=/)
-        end.split('=')[1] rescue nil
-        client_req_id = info.find do |e|
-          e.match(/r=/)
-        end.split('=')[1] rescue nil
-
-        state.client_tingyun_id_secret = tingyun_id_secret
-        state.client_transaction_id = client_transaction_id
-        state.transaction_sample_builder.trace.tx_id = client_transaction_id
-        state.client_req_id = client_req_id
-      end
-
-
       def insert_response_header(state, response_headers)
-        if same_account?(state)
+        if state.same_account?
           txn = state.current_transaction
-          unless txn.nil?
-            set_response_headers(state, response_headers)
+          if txn
+            # set_response_headers
+            response_headers[TY_DATA_HEADER] = TingYun::Support::Serialize::JSONWrapper.dump build_payload(state)
+            TingYun::Agent.logger.debug("now,cross app will send response_headers  #{response_headers[TY_DATA_HEADER]}")
           end
-          clear_client_tingyun_id_secret(state)
+          state.client_tingyun_id_secret = nil #clear_client_tingyun_id_secret
         end
       end
 
-      def clear_client_tingyun_id_secret(state)
-        state.client_tingyun_id_secret = nil
-      end
-
-      def same_account?(state)
-        server_info = TingYun::Agent.config[:tingyunIdSecret].split('|')
-        client_info = (state.client_tingyun_id_secret || '').split('|')
-        if !server_info[0].nil? && server_info[0] == client_info[0] && !server_info[0].empty?
-          return true
-        else
-          return false
-        end
-      end
-
-      def set_response_headers(state, response_headers)
-        response_headers[TY_DATA_HEADER] = TingYun::Support::Serialize::JSONWrapper.dump build_payload(state)
-        TingYun::Agent.logger.debug("now,cross app will send response_headers  #{response_headers[TY_DATA_HEADER]}")
-      end
 
       def build_payload(state)
         payload = {
@@ -107,24 +68,12 @@ module TingYun
                 :rds => state.rds_duration,
                 :mc => state.mc_duration,
                 :mon => state.mon_duration,
-                :code => execute_duration(state)
+                :code => state.execute_duration
             }
         }
-        payload[:tr] = 1 if slow_action_tracer?(state)
-        payload[:r] = state.client_req_id unless state.client_req_id.nil?
+        payload[:tr] = 1 if state.slow_action_tracer?
+        payload[:r] = state.client_req_id if state.client_req_id
         payload
-      end
-
-      def slow_action_tracer?(state)
-        if state.web_duration > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
-          return true
-        else
-          return false
-        end
-      end
-
-      def execute_duration(state)
-        state.web_duration - state.queue_duration - state.sql_duration - state.external_duration - state.rds_duration - state.mc_duration - state.mon_duration
       end
     end
   end

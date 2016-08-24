@@ -115,7 +115,36 @@ module TingYun
         ::TingYun::Agent.instance.transaction_sampler.tl_builder.set_txId_and_txData(state.request_guid, data)
       end
 
+      def save_referring_transaction_info(data)
+        data = Array(data)
+        @client_tingyun_id_secret = data.shift
+        data.each do |e|
+          if m = e.match(/x=/)
+            @client_transaction_id = m.post_match
+            @transaction_sample_builder.set_trace_id(@client_transaction_id)
+          elsif m = e.match(/r=/)
+            @client_req_id = m.post_match
+          end
+        end
+      end
 
+      def same_account?
+        server_info = TingYun::Agent.config[:tingyunIdSecret].split('|')
+        client_info = (@client_tingyun_id_secret || '').split('|')
+        if server_info[0] && !server_info[0].empty? && server_info[0] == client_info[0]
+          return true
+        else
+          return false
+        end
+      end
+
+      def execute_duration
+        web_duration - queue_duration - sql_duration - external_duration - rds_duration - mc_duration - mon_duration
+      end
+
+      def slow_action_tracer?
+        return web_duration > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
+      end
     end
   end
 end

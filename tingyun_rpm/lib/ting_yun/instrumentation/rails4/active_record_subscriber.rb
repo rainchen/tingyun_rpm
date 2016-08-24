@@ -33,7 +33,7 @@ module TingYun
           config = active_record_config_for_event(event)
           base_metric = record_metrics(event, config)
           notice_sql(state, event, config, base_metric)
-        rescue => e
+        rescue Exception => e
           log_notification_error(e, name, 'finish')
         end
 

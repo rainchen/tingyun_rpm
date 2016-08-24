@@ -15,6 +15,7 @@ module TingYun
         TingYun::Agent.config[key]
       end
     end
+    
 
     class Boolean;
     end

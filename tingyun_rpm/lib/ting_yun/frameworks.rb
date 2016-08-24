@@ -15,6 +15,7 @@ module TingYun
       framework.init_plugin(options)
     end
 
+
     class Framework
       include InstanceMethods
       extend ClassMethods

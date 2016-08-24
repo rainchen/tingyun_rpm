@@ -112,6 +112,7 @@ module TingYun
         end
       end
 
+
       # record a single data point into the statistical gatherer.  The gatherer
       # will aggregate all data points collected over a specified period and upload
       # its data to the TingYun server
