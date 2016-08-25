@@ -1,6 +1,4 @@
 # encoding: utf-8
-
-require 'ting_yun/agent'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/active_record_helper'
 require 'ting_yun/support/helper'

@@ -23,25 +23,22 @@ module TingYun
       TY_DATA_HEADER = 'X-Tingyun-Tx-Data'.freeze
 
 
-
-
       module_function
 
 
-
       def tl_trace_http_request(request)
-        t0 = Time.now.to_f
         state = TingYun::Agent::TransactionState.tl_get
         return yield unless state.execution_traced?
         return yield unless state.current_transaction #如果还没有创建Transaction，就发生跨应用，就直接先跳过跟踪。
 
+        t0 = Time.now.to_f
         begin
           node = start_trace(state, t0, request)
           response = yield
-          capture_exception(response,request,'net%2Fhttp')
+          capture_exception(response, request, 'net%2Fhttp')
         rescue => e
           klass = "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
-          handle_error(e,klass)
+          handle_error(e, klass)
           raise e
         ensure
           finish_trace(state, t0, node, request, response)
@@ -52,7 +49,7 @@ module TingYun
       def start_trace(state, t0, request)
         inject_request_headers(state, request) if cross_app_enabled?
         stack = state.traced_method_stack
-        node = stack.push_frame(state,:http_request,t0)
+        node = stack.push_frame(state, :http_request, t0)
 
         return node
       end
@@ -64,7 +61,9 @@ module TingYun
 
         begin
           if request
-            metrics = metrics_for(state, request, response)
+            cross_app = response_is_cross_app?(response)
+
+            metrics = metrics_for(request, response, cross_app)
             node_name = metrics.pop
             scoped_metric = metrics.pop
 
@@ -72,36 +71,34 @@ module TingYun
 
             if node
               node.name = node_name
-              add_transaction_trace_info(request, response)
+              add_transaction_trace_info(request, response, cross_app)
             end
           end
+        rescue => err
+          TingYun::Agent.logger.error "Uncaught exception while finishing an HTTP request trace", err
         ensure
           if node
             stack = state.traced_method_stack
             stack.pop_frame(state, node, node_name, t1)
           end
         end
-      rescue => err
-        TingYun::Agent.logger.error "Uncaught exception while finishing an HTTP request trace", err
-
       end
 
 
 
-      def add_transaction_trace_info(request, response)
+      def add_transaction_trace_info(request, response, cross_app)
         state = TingYun::Agent::TransactionState.tl_get
-        filtered_uri = TingYun::Agent::HTTPClients::URIUtil.filter_uri request.uri
-        transaction_sampler.add_node_info(:uri => filtered_uri)
-        if response && response_is_cross_app?( response )
-          my_data = TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
-          transaction_sampler.tl_builder.set_txId_and_txData(state.client_transaction_id || state.request_guid, my_data)
+        transaction_sampler.add_node_info(:uri => TingYun::Agent::HTTPClients::URIUtil.filter_uri(request.uri))
+        if cross_app
+          transaction_sampler.tl_builder.set_txId_and_txData(state.client_transaction_id || state.request_guid,
+                                                             TingYun::Support::Serialize::JSONWrapper.load(response[TY_DATA_HEADER].gsub("'",'"')))
         end
       end
 
-      def metrics_for(state, request, response)
+      def metrics_for(request, response, cross_app)
         metrics = common_metrics(request)
 
-        if response && response_is_cross_app?( response )
+        if cross_app
           begin
             metrics.concat metrics_for_cross_app_response( request, response )
           rescue => err
@@ -130,7 +127,6 @@ module TingYun
       end
 
       def metrics_for_regular_request( request )
-        state = TingYun::Agent::TransactionState.tl_get
         metrics = []
         metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
         metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
@@ -168,8 +164,8 @@ module TingYun
         cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
             raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
 
-        txn_guid =  state.client_transaction_id || state.request_guid
-        state.transaction_sample_builder.trace.tx_id = txn_guid
+        txn_guid = state.client_transaction_id || state.request_guid
+        state.transaction_sample_builder.set_trace_id(txn_guid)
         request[TY_ID_HEADER] = "#{cross_app_id};c=1;x=#{txn_guid}"
 
       rescue TingYun::Agent::CrossAppTracing::Error => err
@@ -179,17 +175,16 @@ module TingYun
       # Returns +true+ if Cross Application Tracing is enabled, and the given +response+
       # has the appropriate headers.
       def response_is_cross_app?( response )
+        return false unless response
+        return false unless response[TY_DATA_HEADER]
         return false unless cross_app_enabled?
-        unless response[TY_DATA_HEADER]
-          return false
-        end
+
         return true
       end
 
       # Return the set of metric objects appropriate for the given cross app
       # +response+.
       def metrics_for_cross_app_response(request, response )
-        state = TingYun::Agent::TransactionState.tl_get
         my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
         uri = "#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
         metrics = []

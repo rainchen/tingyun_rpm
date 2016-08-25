@@ -168,6 +168,7 @@ module TingYun
           end
         end
 
+
         # Appends a backtrace to a node if that node took longer
         # than the specified duration
         def self.append_backtrace(node, duration)
