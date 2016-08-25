@@ -42,7 +42,7 @@ module TingYun
         end
 
         # duration{:type => sec}
-        def notice_sql(sql, metric_name, config, duration, state=nil, explainer=nil, binds=[], name="SQL") #THREAD_LOCAL_ACCESS sometimes
+        def self.notice_sql(sql, metric_name, config, duration, state=nil, explainer=nil, binds=[], name="SQL") #THREAD_LOCAL_ACCESS sometimes
           start_time = Time.now.to_f
           state ||= TingYun::Agent::TransactionState.tl_get
           data = state.sql_sampler_transaction_data
@@ -50,7 +50,7 @@ module TingYun
 
           if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold'] && state.sql_recorded?
             if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.stack_trace_threshold']
-              backtrace = (caller.reject! { |t| t.include?('tingyun_rpm') })
+              backtrace = caller.reject! { |t| t.include?('tingyun_rpm') }
               backtrace = backtrace.first(20).join("\n")
             else
               backtrace = ''

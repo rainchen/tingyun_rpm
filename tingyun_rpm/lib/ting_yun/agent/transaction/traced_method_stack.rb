@@ -1,4 +1,5 @@
 # encoding: utf-8
+require 'ting_yun/agent/collector/transaction_sampler'
 
 module TingYun
   module Agent
@@ -62,10 +63,8 @@ module TingYun
         TingYun::Agent.config[:'nbs.action_tracer.enabled']
       end
 
-
-
       def transaction_sampler
-        TingYun::Agent.instance.transaction_sampler
+        ::TingYun::Agent::Collector::TransactionSampler
       end
 
       def clear

@@ -5,7 +5,8 @@ require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/active_record_helper'
 require 'ting_yun/support/helper'
 require 'ting_yun/agent/method_tracer'
-
+require 'ting_yun/agent/collector/transaction_sampler'
+require 'ting_yun/agent/collector/sql_sampler'
 
 module TingYun
   module Instrumentation
@@ -60,15 +61,21 @@ module TingYun
             elapsed_time = (Time.now - t0).to_f
             state.sql_duration = elapsed_time * 1000
 
-            TingYun::Agent.instance.transaction_sampler.notice_sql(sql, @config, elapsed_time,
-                                                                   state, EXPLAINER)
-            TingYun::Agent.instance.sql_sampler.notice_sql(sql, scoped_metric,
-                                                           @config, elapsed_time,
-                                                           state, EXPLAINER)
+            transaction_sampler.notice_sql(sql, @config, elapsed_time, state, EXPLAINER)
+            sql_sampler.notice_sql(sql, scoped_metric, @config, elapsed_time, state, EXPLAINER)
           end
 
         end
       end
+
+      def transaction_sampler
+        ::TingYun::Agent::Collector::TransactionSampler
+      end
+
+      def sql_sampler
+        ::TingYun::Agent::Collector::SqlSampler
+      end
+
 
     end
   end

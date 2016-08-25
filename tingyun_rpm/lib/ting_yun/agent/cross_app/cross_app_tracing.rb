@@ -5,6 +5,7 @@ require 'ting_yun/agent/transaction'
 require 'ting_yun/support/http_clients/uri_util'
 require 'ting_yun/support/serialize/json_wrapper'
 require 'ting_yun/instrumentation/support/external_error'
+require 'ting_yun/agent/collector/transaction_sampler'
 
 
 module TingYun
@@ -92,9 +93,8 @@ module TingYun
         filtered_uri = TingYun::Agent::HTTPClients::URIUtil.filter_uri request.uri
         transaction_sampler.add_node_info(:uri => filtered_uri)
         if response && response_is_cross_app?( response )
-          transaction_sampler.tl_builder.current_node[:txId] = state.client_transaction_id || state.request_guid
           my_data = TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
-          transaction_sampler.tl_builder.current_node[:txData] = my_data
+          transaction_sampler.tl_builder.set_txId_and_txData(state.client_transaction_id || state.request_guid, my_data)
         end
       end
 
@@ -143,7 +143,7 @@ module TingYun
       end
 
       def transaction_sampler
-        ::TingYun::Agent.instance.transaction_sampler
+        ::TingYun::Agent::Collector::TransactionSampler
       end
 
 

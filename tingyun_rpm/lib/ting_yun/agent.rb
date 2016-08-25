@@ -46,6 +46,7 @@ module TingYun
     end
 
 
+
     # Record a value for the given metric name.
     #
     # This method should be used to record event-based metrics such as method

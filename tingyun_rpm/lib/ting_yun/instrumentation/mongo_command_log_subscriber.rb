@@ -5,7 +5,7 @@ require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/agent/datastore/metric_helper'
 require 'ting_yun/agent/datastore/mongo'
 require 'ting_yun/instrumentation/support/event_formatter'
-
+require 'ting_yun/agent/collector/transaction_sampler'
 
 module TingYun
   module Instrumentation
@@ -87,10 +87,14 @@ module TingYun
         # enter transaction trace node
         frame = stack.push_frame(state, :mongo_db, end_time - duration)
 
-        TingYun::Agent.instance.transaction_sampler.notice_nosql_statement(generate_statement(event),duration*1000)
+        transaction_sampler.notice_nosql_statement(generate_statement(event),duration*1000)
 
         # exit transaction trace node
         stack.pop_frame(state, frame, metric, end_time)
+      end
+
+      def transaction_sampler
+        ::TingYun::Agent::Collector::TransactionSampler
       end
     end
   end

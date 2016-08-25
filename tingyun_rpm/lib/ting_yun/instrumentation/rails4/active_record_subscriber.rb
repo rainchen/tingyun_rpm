@@ -3,7 +3,8 @@ require 'ting_yun/instrumentation/support/evented_subscriber'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/active_record_helper'
 require 'ting_yun/support/helper'
-
+require 'ting_yun/agent/collector/transaction_sampler'
+require 'ting_yun/agent/collector/sql_sampler'
 
 module TingYun
   module Instrumentation
@@ -55,14 +56,11 @@ module TingYun
           # enter transaction trace node
           frame = stack.push_frame(state, :active_record, event.time)
 
-          TingYun::Agent.instance.sql_sampler \
-            .notice_sql(event.payload[:sql], metric, config,
+          sql_sampler.notice_sql(event.payload[:sql], metric, config,
                         TingYun::Helper.milliseconds_to_seconds(event.duration),
                         state, @explainer, event.payload[:binds], event.payload[:name])
 
-          TingYun::Agent.instance.transaction_sampler \
-            .notice_sql(event.payload[:sql], config,
-                        event.duration,
+          transaction_sampler.notice_sql(event.payload[:sql], config, event.duration,
                         state, @explainer, event.payload[:binds], event.payload[:name])
           # exit transaction trace node
           stack.pop_frame(state, frame, metric, event.end)
@@ -94,6 +92,14 @@ module TingYun
           end
 
           connection.instance_variable_get(:@config) if connection
+        end
+
+        def transaction_sampler
+          ::TingYun::Agent::Collector::TransactionSampler
+        end
+
+        def sql_sampler
+          ::TingYun::Agent::Collector::SqlSampler
         end
       end
     end

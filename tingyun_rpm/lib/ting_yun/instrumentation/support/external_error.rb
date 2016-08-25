@@ -44,7 +44,7 @@ module TingYun
             exception.instance_variable_set(:@tingyun_klass, klass)
             exception.instance_variable_set(:@tingyun_external, true)
             trace = caller.reject! { |t| t.include?('tingyun_rpm') }
-            trace = trace.first(40) if trace.length > 40
+            trace = trace.first(20)
             exception.instance_variable_set(:@tingyun_trace, trace)
           rescue => e
             TingYun::Agent.logger.warn("Failed to set attributes for : #{exception}: ", e)

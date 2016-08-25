@@ -9,6 +9,7 @@ require 'ting_yun/agent/event/event_listener'
 require 'ting_yun/agent/dispatcher'
 require 'ting_yun/agent/collector/middle_ware_collector'
 require 'ting_yun/agent/cross_app/cross_app_monitor'
+require 'ting_yun/agent/collector/transaction_sampler'
 
 
 # The Agent is a singleton that is instantiated when the plugin is
@@ -134,6 +135,8 @@ module TingYun
           ::TingYun::Agent.logger.error e
         end
       end
+
+
     end
   end
 end
