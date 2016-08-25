@@ -159,8 +159,9 @@ module TingYun
         # appends an ellipsis because it makes the trucation clearer in
         # the UI
         def self.truncate_message(message)
-          if message.length > (MAX_DATA_LENGTH - 4)
-            message.slice!(MAX_DATA_LENGTH - 4..message.length)
+          size = MAX_DATA_LENGTH - 4
+          if message.length > size
+            message.slice!(size..message.length)
             message << '...'
           else
             message
@@ -175,7 +176,6 @@ module TingYun
             trace = trace.first(20)
             node[:stacktrace] = trace
           end
-
         end
 
         def self.add_node_info(params)
@@ -193,15 +193,13 @@ module TingYun
           return unless builder
           builder.trace_entry(time.to_f)
         end
+
         # Informs the transaction sample builder about the end of a traced frame
         def self.notice_pop_frame(state, frame, time = Time.now)
           builder = state.transaction_sample_builder
           return unless builder
           builder.trace_exit(frame, time.to_f)
         end
-
-
-
 
       end
     end
