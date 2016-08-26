@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">Thrift</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-22 18:33:52 +0800'>2016-08-22 18:33:52 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      182 complexity
+    </div>
+    <div class="file-stat">
+      36.4 complexity per method
+    </div>
+    <div class="file-stat">
+      40 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+
+
+TingYun::Support::LibraryDetection.defer do
+  named :thrift
+
+  depends_on do
+    defined?(::Thrift) &amp;&amp; defined?(::Thrift::Client) &amp;&amp; defined?(::Thrift::BaseProtocol)
+  end
+
+
+  executes do
+    TingYun::Agent.logger.info &#39;Installing Thrift Instrumentation&#39;
+    require &#39;ting_yun/support/serialize/json_wrapper&#39;
+  end
+
+  executes do
+    # ::Thrift::Processor.module_eval do
+    #
+    #
+    #
+    #   def same_account?(state)
+    #     server_info = TingYun::Agent.config[:tingyunIdSecret].split(&#39;|&#39;)
+    #     client_info = (state.client_tingyun_id_secret || &#39;&#39;).split(&#39;|&#39;)
+    #     if !server_info[0].nil? &amp;&amp; server_info[0] == client_info[0] &amp;&amp; !server_info[0].empty?
+    #       return true
+    #     else
+    #       return false
+    #     end
+    #   end
+    #   def write_result_with_tingyun(result, oprot, name, seqid)
+    #
+    #     state = TingYun::Agent::TransactionState.tl_get
+    #     oprot.write_message_begin(name, ::Thrift::MessageTypes::REPLY, seqid)
+    #
+    #     if state.execution_traced? &amp;&amp; same_account?(state)
+    #       class_name = &quot;WebAction/thrift/#{self.class.to_s.split(&#39;::&#39;).first.downcase}.#{name}&quot;
+    #       state.current_transaction.default_name = class_name
+    #       data = TingYun::Support::Serialize::JSONWrapper.dump(&quot;TingyunTxData&quot; =&gt; build_payload(state))
+    #       oprot.write_field_begin(&quot;TingyunField&quot;, 11, 6)
+    #       oprot.write_string(data)
+    #       oprot.write_field_end
+    #       write_result_without_tingyun(result, oprot, name, seqid)
+    #       state.current_transaction.add_agent_attribute(:httpStatus, 200)
+    #       TingYun::Agent::Transaction.stop(state)
+    #     else
+    #       write_result_without_tingyun(result, oprot, name, seqid)
+    #     end
+    #   end
+    #
+    #   def write_error_with_tingyun(err, oprot, name, seqid)
+    #     p &#39;write_error&#39;
+    #     state = TingYun::Agent::TransactionState.tl_get
+    #     oprot.write_message_begin(name, ::Thrift::MessageTypes::EXCEPTION, seqid)
+    #
+    #     if state.execution_traced? &amp;&amp; same_account?(state)
+    #
+    #       class_name = &quot;WebAction/thrift/#{self.class.to_s.split(&#39;::&#39;).first.downcase}.#{name}&quot;
+    #       state.current_transaction.default_name = class_name
+    #       data = TingYun::Support::Serialize::JSONWrapper.dump(&quot;TingyunTxData&quot; =&gt; build_payload(state))
+    #       oprot.write_field_begin(&quot;TingyunField&quot;, 11, 6)
+    #       oprot.write_string(data)
+    #       oprot.write_field_end
+    #       write_result_without_tingyun(err, oprot, name, seqid)
+    #       p &#39;write_error end&#39;
+    #       state.current_transaction.add_agent_attribute(:httpStatus, 500)
+    #
+    #       TingYun::Agent::Transaction.stop(state)
+    #     else
+    #       write_result_without_tingyun(err, oprot, name, seqid)
+    #     end
+    #   end
+    #
+    #
+    #   def build_payload(state)
+    #     state.web_duration = TingYun::Helper.time_to_millis(Time.now - state.current_transaction.start_time)
+    #     payload = {
+    #         :id =&gt; TingYun::Agent.config[:tingyunIdSecret].split(&#39;|&#39;)[1],
+    #         :action =&gt; state.current_transaction.best_name,
+    #         :trId =&gt; state.transaction_sample_builder.trace.guid,
+    #         :time =&gt; {
+    #             :duration =&gt; state.web_duration,
+    #             :qu =&gt; state.queue_duration,
+    #             :db =&gt; state.sql_duration,
+    #             :ex =&gt; state.external_duration,
+    #             :rds =&gt; state.rds_duration,
+    #             :mc =&gt; state.mc_duration,
+    #             :mon =&gt; state.mon_duration,
+    #             :code =&gt; execute_duration(state)
+    #         }
+    #     }
+    #     payload[:tr] = 1 if slow_action_tracer?(state)
+    #     payload[:r] = state.client_req_id unless state.client_req_id.nil?
+    #     payload
+    #   end
+    #
+    #   def slow_action_tracer?(state)
+    #     if state.web_duration &gt; TingYun::Agent.config[:&#39;nbs.action_tracer.action_threshold&#39;]
+    #       return true
+    #     else
+    #       return false
+    #     end
+    #   end
+    #
+    #   def write_result_without_tingyun(result, oprot, name, seqid)
+    #     result.write(oprot)
+    #     oprot.write_message_end
+    #     oprot.trans.flush
+    #   end
+    #
+    #   def execute_duration(state)
+    #     state.web_duration - state.queue_duration - state.sql_duration - state.external_duration - state.rds_duration - state.mc_duration - state.mon_duration
+    #   end
+    #
+    #   alias :write_result  :write_result_with_tingyun
+    #   alias :write_error  :write_error_with_tingyun
+    #   # alias :write_result_without_tingyun  :write_result
+    # end
+
+    ::Thrift::BaseProtocol.class_eval do
+
+      def skip_with_tingyun(type)
+        begin
+          data = skip_without_tingyun(type)
+        ensure
+          if data.is_a? ::String<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      skip_with_tingyun refers to data more than self (maybe move it to another class?)                        <a href="thrift.html#L127" class="js-smell-location">0</a>                  <a href="thrift.html#L128" class="js-smell-location">1</a>                  <a href="thrift.html#L129" class="js-smell-location">2</a>                  </span>  </li></ul>
+            if data.include?(&quot;TingyunTxData&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      skip_with_tingyun refers to data more than self (maybe move it to another class?)                        <a href="thrift.html#L127" class="js-smell-location">0</a>                  <a href="thrift.html#L128" class="js-smell-location">1</a>                  <a href="thrift.html#L129" class="js-smell-location">2</a>                  </span>  </li></ul>
+              my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub(&quot;&#39;&quot;,&#39;&quot;&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      skip_with_tingyun refers to data more than self (maybe move it to another class?)                        <a href="thrift.html#L127" class="js-smell-location">0</a>                  <a href="thrift.html#L128" class="js-smell-location">1</a>                  <a href="thrift.html#L129" class="js-smell-location">2</a>                  </span>  </li></ul>
+              TingYun::Agent::TransactionState.process_thrift_data(my_data[&quot;TingyunTxData&quot;])
+            # elsif data.include?(&quot;TingyunID&quot;)
+            #   TingYun::Agent::Transaction.start(state, :thrift, :apdex_start_time =&gt; Time.now)
+            #   my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub(&quot;&#39;&quot;,&#39;&quot;&#39;)
+            #   save_referring_transaction_info(state, my_data)
+            end
+          end
+        end
+      end
+      #
+      # def save_referring_transaction_info(state,data)
+      #
+      #   info = data[&quot;TingyunID&quot;].split(&#39;;&#39;)
+      #   tingyun_id_secret = info[0]
+      #   client_transaction_id = info.find do |e|
+      #     e.match(/x=/)
+      #   end.split(&#39;=&#39;)[1] rescue nil
+      #   client_req_id = info.find do |e|
+      #     e.match(/r=/)
+      #   end.split(&#39;=&#39;)[1] rescue nil
+      #
+      #   state.client_tingyun_id_secret = tingyun_id_secret
+      #   state.client_transaction_id = client_transaction_id
+      #   state.client_req_id = client_req_id
+      #   state.transaction_sample_builder.trace.tx_id = client_transaction_id
+      #
+      # end
+
+      alias :skip_without_tingyun :skip
+      alias :skip  :skip_with_tingyun
+    end
+
+    ::Thrift::Client.module_eval do
+      require &#39;ting_yun/instrumentation/support/thrift_helper&#39;
+
+      include TingYun::Instrumentation::ThriftHelper
+
+
+      def send_message_args_with_tingyun(args_class, args = {})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      main#send_message_args_with_tingyun has a flog score of 32          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      send_message_args_with_tingyun has approx 10 statements          </span>  </li></ul>
+        begin
+          state = TingYun::Agent::TransactionState.tl_get
+          return  unless state.execution_traced?
+          cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+              raise TingYun::Agent::CrossAppTracing::Error, &quot;no tingyunIdSecret configured&quot;
+          state.transaction_sample_builder.set_trace_id(state.request_guid)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      send_message_args_with_tingyun calls state.request_guid 2 times                        <a href="thrift.html#L174" class="js-smell-location">0</a>                  <a href="thrift.html#L176" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          data = TingYun::Support::Serialize::JSONWrapper.dump(&quot;TingyunID&quot; =&gt; &quot;#{cross_app_id};c=1;x=#{state.request_guid}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      send_message_args_with_tingyun calls state.request_guid 2 times                        <a href="thrift.html#L174" class="js-smell-location">0</a>                  <a href="thrift.html#L176" class="js-smell-location">1</a>                  </span>  </li></ul>
+          @oprot.write_field_begin(&quot;TingyunField&quot;, 11, 6)
+          @oprot.write_string(data)
+          @oprot.write_field_end
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      send_message_args_with_tingyun has the variable name 'e'          </span>  </li></ul>
+          TingYun::Agent.logger.error(&quot;Failed to thrift send_message_args_with_tingyun : &quot;, e)
+        ensure
+          send_message_args_without_tingyun(args_class, args)
+        end
+      end
+
+      alias :send_message_args_without_tingyun :send_message_args
+      alias :send_message_args  :send_message_args_with_tingyun
+
+
+      def send_message_with_tingyun(name, args_class, args = {})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      main#send_message_with_tingyun has a flog score of 34          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      send_message_with_tingyun has approx 10 statements          </span>  </li></ul>
+
+        begin
+          tag = &quot;#{args_class.to_s.split(&#39;::&#39;).first}.#{name}&quot;.downcase
+          t0 = Time.now.to_f<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      send_message_with_tingyun has the variable name 't0'          </span>  </li></ul>
+          operations[tag] = {:started_time =&gt; t0}
+          state = TingYun::Agent::TransactionState.tl_get
+          return  unless state.execution_traced?
+          stack = state.traced_method_stack
+          node = stack.push_frame(state,:thrift,t0)
+          operations[tag][:node] = node
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      send_message_with_tingyun has the variable name 'e'          </span>  </li></ul>
+          TingYun::Agent.logger.error(&quot;Failed to thrift send_message_with_tingyun : &quot;, e)
+        ensure
+          send_message_without_tingyun(name, args_class, args)
+        end
+
+      end
+
+      alias :send_message_without_tingyun :send_message
+      alias :send_message  :send_message_with_tingyun
+
+      def send_oneway_message_with_tingyun(name, args_class, args = {})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      main#send_oneway_message_with_tingyun has a flog score of 39          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      send_oneway_message_with_tingyun has approx 10 statements          </span>  </li></ul>
+
+        begin
+          tag = &quot;#{args_class.to_s.split(&#39;::&#39;).first}.#{name}&quot;.downcase
+          op_started = Time.now.to_f<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      send_oneway_message_with_tingyun calls Time.now 2 times                        <a href="thrift.html#L217" class="js-smell-location">0</a>                  <a href="thrift.html#L220" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      send_oneway_message_with_tingyun calls Time.now.to_f 2 times                        <a href="thrift.html#L217" class="js-smell-location">0</a>                  <a href="thrift.html#L220" class="js-smell-location">1</a>                  </span>  </li></ul>
+          base, *other_metrics = metrics(tag)
+          result = send_oneway_message_without_tingyun(name, args_class, args)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      send_oneway_message_with_tingyun calls send_oneway_message_without_tingyun(name, args_class, args) 2 times                        <a href="thrift.html#L219" class="js-smell-location">0</a>                  <a href="thrift.html#L225" class="js-smell-location">1</a>                  </span>  </li></ul>
+          duration = (Time.now.to_f - op_started)*1000<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      send_oneway_message_with_tingyun calls Time.now 2 times                        <a href="thrift.html#L217" class="js-smell-location">0</a>                  <a href="thrift.html#L220" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      send_oneway_message_with_tingyun calls Time.now.to_f 2 times                        <a href="thrift.html#L217" class="js-smell-location">0</a>                  <a href="thrift.html#L220" class="js-smell-location">1</a>                  </span>  </li></ul>
+          TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, duration)
+          result
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      send_oneway_message_with_tingyun has the variable name 'e'          </span>  </li></ul>
+          TingYun::Agent.logger.error(&quot;Failed to thrift send_oneway_message_with_tingyun : &quot;, e)
+          return send_oneway_message_without_tingyun(name, args_class, args)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      send_oneway_message_with_tingyun calls send_oneway_message_without_tingyun(name, args_class, args) 2 times                        <a href="thrift.html#L219" class="js-smell-location">0</a>                  <a href="thrift.html#L225" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+      end
+      alias :send_oneway_message_without_tingyun :send_oneway_message
+      alias :send_oneway_message :send_oneway_message_with_tingyun
+
+      def receive_message_with_tingyun(result_klass)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">VeryHighComplexity</a>)      main#receive_message_with_tingyun has a flog score of 62          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      receive_message_with_tingyun has approx 18 statements          </span>  </li></ul>
+        begin
+          state = TingYun::Agent::TransactionState.tl_get
+
+          operate = operator(result_klass)
+
+          t0, node =  started_time_and_node(operate)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      receive_message_with_tingyun has the variable name 't0'          </span>  </li></ul>
+
+
+          result = receive_message_without_tingyun(result_klass)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      receive_message_with_tingyun calls receive_message_without_tingyun(result_klass) 2 times                        <a href="thrift.html#L241" class="js-smell-location">0</a>                  <a href="thrift.html#L264" class="js-smell-location">1</a>                  </span>  </li></ul>
+          unless result || result.success
+            e = ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, &quot;#{operate} failed: unknown result&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      receive_message_with_tingyun has the variable name 'e'                        <a href="thrift.html#L243" class="js-smell-location">0</a>                  <a href="thrift.html#L262" class="js-smell-location">1</a>                  </span>  </li></ul>
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,metrics(operate)[0])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      receive_message_with_tingyun calls metrics(operate) 2 times                        <a href="thrift.html#L244" class="js-smell-location">0</a>                  <a href="thrift.html#L248" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+
+          t1 = Time.now.to_f<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      receive_message_with_tingyun has the variable name 't1'          </span>  </li></ul>
+          node_name, *other_metrics = metrics(operate)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      receive_message_with_tingyun calls metrics(operate) 2 times                        <a href="thrift.html#L244" class="js-smell-location">0</a>                  <a href="thrift.html#L248" class="js-smell-location">1</a>                  </span>  </li></ul>
+          duration = TingYun::Helper.time_to_millis(t1 - t0)
+
+          TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
+              other_metrics.pop, other_metrics, duration
+          )
+          if node
+            node.name = node_name
+            ::TingYun::Agent.instance.transaction_sampler.add_node_info(:uri =&gt; &quot;thrift:#{tingyun_host}:#{tingyun_port}/#{operate}&quot;)
+            stack = state.traced_method_stack
+            stack.pop_frame(state, node, node_name, t1)
+          end
+
+          result
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      receive_message_with_tingyun has the variable name 'e'                        <a href="thrift.html#L243" class="js-smell-location">0</a>                  <a href="thrift.html#L262" class="js-smell-location">1</a>                  </span>  </li></ul>
+          TingYun::Agent.logger.error(&quot;Failed to thrift receive_message_with_tingyun : &quot;, e)
+          return  receive_message_without_tingyun(result_klass)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      receive_message_with_tingyun calls receive_message_without_tingyun(result_klass) 2 times                        <a href="thrift.html#L241" class="js-smell-location">0</a>                  <a href="thrift.html#L264" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      end
+
+      alias :receive_message_without_tingyun :receive_message
+      alias :receive_message :receive_message_with_tingyun
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Rails4::ActiveRecordSubscriber</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-24 17:13:57 +0800'>2016-08-24 17:13:57 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      105 complexity
+    </div>
+    <div class="file-stat">
+      15.0 complexity per method
+    </div>
+    <div class="file-stat">
+      18 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      20 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/instrumentation/support/evented_subscriber&#39;
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+require &#39;ting_yun/instrumentation/support/active_record_helper&#39;
+require &#39;ting_yun/support/helper&#39;
+
+
+module TingYun
+  module Instrumentation
+    module Rails4<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Module-Name.md" target="_blank">UncommunicativeModuleName</a>)      TingYun::Instrumentation::Rails4 has the name 'Rails4'          </span>  </li></ul>
+      class ActiveRecordSubscriber &lt; TingYun::Instrumentation::Support::EventedSubscriber<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber has no descriptive comment          </span>  </li></ul>
+        CACHED_QUERY_NAME = &#39;CACHE&#39;.freeze unless defined? CACHED_QUERY_NAME
+
+        def initialize
+          # We cache this in an instance variable to avoid re-calling method
+          # on each query.
+          @explainer = method(:get_explain_plan)
+          super
+        end
+
+        def start(name, id, payload) #THREAD_LOCAL_ACCESS
+
+          return if payload[:name] == CACHED_QUERY_NAME
+          super
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#start has the variable name 'e'          </span>  </li></ul>
+          log_notification_error(e, name, &#39;start&#39;)
+        end
+
+        def finish(name, id, payload) #THREAD_LOCAL_ACCESS<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#finish has approx 8 statements          </span>  </li></ul>
+          return if payload[:name] == CACHED_QUERY_NAME
+          state = TingYun::Agent::TransactionState.tl_get
+          event = pop_event(id)
+          config = active_record_config_for_event(event)
+          base_metric = record_metrics(event, config)
+          notice_sql(state, event, config, base_metric)
+        rescue Exception =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#finish has the variable name 'e'          </span>  </li></ul>
+          log_notification_error(e, name, &#39;finish&#39;)
+        end
+
+        def get_explain_plan(statement)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#get_explain_plan doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          connection = TingYun::Agent::Database.get_connection(statement.config) do<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Identical code found in 2 nodes                        <a href="../active_record.html#L15" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L41" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#get_explain_plan calls statement.config 3 times                        <a href="active_record_subscriber.html#L41" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L42" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L43" class="js-smell-location">2</a>                  </span>  </li></ul>
+            ::ActiveRecord::Base.send(&quot;#{statement.config[:adapter]}_connection&quot;,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#get_explain_plan calls statement.config 3 times                        <a href="active_record_subscriber.html#L41" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L42" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L43" class="js-smell-location">2</a>                  </span>  </li></ul>
+                                      statement.config)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#get_explain_plan calls statement.config 3 times                        <a href="active_record_subscriber.html#L41" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L42" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L43" class="js-smell-location">2</a>                  </span>  </li></ul>
+          end
+          if connection &amp;&amp; connection.respond_to?(:exec_query)
+            return connection.exec_query(&quot;EXPLAIN #{statement.sql}&quot;,
+                                         &quot;Explain #{statement.name}&quot;,
+                                         statement.binds)
+          end
+        end
+
+        def notice_sql(state, event, config, metric)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql has a flog score of 36          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql has 4 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql has approx 6 statements          </span>  </li></ul>
+          stack  = state.traced_method_stack
+          state.sql_duration = event.duration<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.duration 3 times                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+          # enter transaction trace node
+          frame = stack.push_frame(state, :active_record, event.time)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+
+          TingYun::Agent.instance.sql_sampler \<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls TingYun::Agent.instance 2 times                        <a href="active_record_subscriber.html#L58" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L63" class="js-smell-location">1</a>                  </span>  </li></ul>
+            .notice_sql(event.payload[:sql], metric, config,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload 6 times                        <a href="active_record_subscriber.html#L59" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload[:sql] 2 times                        <a href="active_record_subscriber.html#L59" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+                        TingYun::Helper.milliseconds_to_seconds(event.duration),<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.duration 3 times                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+                        state, @explainer, event.payload[:binds], event.payload[:name])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload 6 times                        <a href="active_record_subscriber.html#L59" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload[:binds] 2 times                        <a href="active_record_subscriber.html#L61" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload[:name] 2 times                        <a href="active_record_subscriber.html#L61" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+
+          TingYun::Agent.instance.transaction_sampler \<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls TingYun::Agent.instance 2 times                        <a href="active_record_subscriber.html#L58" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L63" class="js-smell-location">1</a>                  </span>  </li></ul>
+            .notice_sql(event.payload[:sql], config,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload 6 times                        <a href="active_record_subscriber.html#L59" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload[:sql] 2 times                        <a href="active_record_subscriber.html#L59" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+                        event.duration,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.duration 3 times                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+                        state, @explainer, event.payload[:binds], event.payload[:name])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload 6 times                        <a href="active_record_subscriber.html#L59" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload[:binds] 2 times                        <a href="active_record_subscriber.html#L61" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql calls event.payload[:name] 2 times                        <a href="active_record_subscriber.html#L61" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+          # exit transaction trace node
+          stack.pop_frame(state, frame, metric, event.end)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#notice_sql refers to event more than self (maybe move it to another class?)                        <a href="active_record_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L56" class="js-smell-location">1</a>                  <a href="active_record_subscriber.html#L59" class="js-smell-location">2</a>                  <a href="active_record_subscriber.html#L60" class="js-smell-location">3</a>                  <a href="active_record_subscriber.html#L61" class="js-smell-location">4</a>                  <a href="active_record_subscriber.html#L64" class="js-smell-location">5</a>                  <a href="active_record_subscriber.html#L65" class="js-smell-location">6</a>                  <a href="active_record_subscriber.html#L66" class="js-smell-location">7</a>                  <a href="active_record_subscriber.html#L68" class="js-smell-location">8</a>                  </span>  </li></ul>
+        end
+
+        def record_metrics(event, config)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#record_metrics doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          base, *other_metrics = TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(event.payload[:name],<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#record_metrics calls event.payload 2 times                        <a href="active_record_subscriber.html#L72" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L73" class="js-smell-location">1</a>                  </span>  </li></ul>
+                                                                                                   TingYun::Helper.correctly_encoded(event.payload[:sql]),<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#record_metrics calls event.payload 2 times                        <a href="active_record_subscriber.html#L72" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L73" class="js-smell-location">1</a>                  </span>  </li></ul>
+                                                                                                   config &amp;&amp; config[:adapter])
+
+          TingYun::Agent.agent.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, event.duration)
+
+          base
+        end
+
+
+        def active_record_config_for_event(event)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#active_record_config_for_event has approx 8 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#active_record_config_for_event doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          return unless event.payload[:connection_id]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#active_record_config_for_event calls event.payload 2 times                        <a href="active_record_subscriber.html#L83" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L86" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#active_record_config_for_event calls event.payload[:connection_id] 2 times                        <a href="active_record_subscriber.html#L83" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L86" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          connection = nil
+          connection_id = event.payload[:connection_id]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#active_record_config_for_event calls event.payload 2 times                        <a href="active_record_subscriber.html#L83" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L86" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#active_record_config_for_event calls event.payload[:connection_id] 2 times                        <a href="active_record_subscriber.html#L83" class="js-smell-location">0</a>                  <a href="active_record_subscriber.html#L86" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          ::ActiveRecord::Base.connection_handler.connection_pool_list.each do |handler|
+            connection = handler.connections.detect do |conn|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nested-Iterators.md" target="_blank">NestedIterators</a>)      TingYun::Instrumentation::Rails4::ActiveRecordSubscriber#active_record_config_for_event contains iterators nested 2 deep          </span>  </li></ul>
+              conn.object_id == connection_id
+            end
+
+            break if connection
+          end
+
+          connection.instance_variable_get(:@config) if connection
+        end
+      end
+    end
+  end
+end
+
+TingYun::Support::LibraryDetection.defer do
+  named :active_record_4
+
+
+  depends_on do
+    defined?(::ActiveRecord) &amp;&amp; defined?(::ActiveRecord::Base) &amp;&amp;
+        defined?(::ActiveRecord::VERSION) &amp;&amp;
+        ::ActiveRecord::VERSION::MAJOR.to_i &gt;= 4
+  end
+
+  depends_on do
+    !TingYun::Instrumentation::Rails4::ActiveRecordSubscriber.subscribed?
+  end
+
+  executes do
+    ::TingYun::Agent.logger.info &#39;Installing ActiveRecord 4 instrumentation&#39;
+  end
+
+  executes do
+    ActiveSupport::Notifications.subscribe(&#39;sql.active_record&#39;,
+                                           TingYun::Instrumentation::Rails4::ActiveRecordSubscriber.new)
+    ::TingYun::Instrumentation::Support::ActiveRecordHelper.instrument_additional_methods
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

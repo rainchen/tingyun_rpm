@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::LibraryDetection::Dependent</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      74 complexity
+    </div>
+    <div class="file-stat">
+      4.9 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      15 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+
+#
+#
+#@items=[{dependent =&gt; dependencies}...]
+#every dependent has some dependencies
+#
+module TingYun
+  module Support
+    module LibraryDetection<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::LibraryDetection has no descriptive comment          </span>  </li></ul>
+
+      module_function
+
+      @items = []
+
+      def defer(&amp;block)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::LibraryDetection#defer has approx 7 statements          </span>  </li></ul>
+        item = Dependent.new
+        item.instance_eval(&amp;block)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::LibraryDetection#defer refers to item more than self (maybe move it to another class?)                        <a href="library_detection.html#L19" class="js-smell-location">0</a>                  <a href="library_detection.html#L21" class="js-smell-location">1</a>                  <a href="library_detection.html#L23" class="js-smell-location">2</a>                  <a href="library_detection.html#L24" class="js-smell-location">3</a>                  </span>  </li></ul>
+
+        if item.name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LibraryDetection#defer calls item.name 3 times                        <a href="library_detection.html#L21" class="js-smell-location">0</a>                  <a href="library_detection.html#L23" class="js-smell-location">1</a>                  <a href="library_detection.html#L24" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::LibraryDetection#defer refers to item more than self (maybe move it to another class?)                        <a href="library_detection.html#L19" class="js-smell-location">0</a>                  <a href="library_detection.html#L21" class="js-smell-location">1</a>                  <a href="library_detection.html#L23" class="js-smell-location">2</a>                  <a href="library_detection.html#L24" class="js-smell-location">3</a>                  </span>  </li></ul>
+          seen_names = @items.map { |i| i.name }.compact<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::LibraryDetection#defer has the variable name 'i'          </span>  </li></ul>
+          if seen_names.include?(item.name)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LibraryDetection#defer calls item.name 3 times                        <a href="library_detection.html#L21" class="js-smell-location">0</a>                  <a href="library_detection.html#L23" class="js-smell-location">1</a>                  <a href="library_detection.html#L24" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::LibraryDetection#defer refers to item more than self (maybe move it to another class?)                        <a href="library_detection.html#L19" class="js-smell-location">0</a>                  <a href="library_detection.html#L21" class="js-smell-location">1</a>                  <a href="library_detection.html#L23" class="js-smell-location">2</a>                  <a href="library_detection.html#L24" class="js-smell-location">3</a>                  </span>  </li></ul>
+            TingYun::Agent.logger.warn(&quot;Refusing to re-register LibraryDetection block with name &#39;#{item.name}&#39;&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LibraryDetection#defer calls item.name 3 times                        <a href="library_detection.html#L21" class="js-smell-location">0</a>                  <a href="library_detection.html#L23" class="js-smell-location">1</a>                  <a href="library_detection.html#L24" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::LibraryDetection#defer refers to item more than self (maybe move it to another class?)                        <a href="library_detection.html#L19" class="js-smell-location">0</a>                  <a href="library_detection.html#L21" class="js-smell-location">1</a>                  <a href="library_detection.html#L23" class="js-smell-location">2</a>                  <a href="library_detection.html#L24" class="js-smell-location">3</a>                  </span>  </li></ul>
+            return @items
+          end
+        end
+
+        @items &lt;&lt; item
+      end
+
+      def detect!
+        @items.each do |item|
+          if item.dependencies_satisfied?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::LibraryDetection#detect! refers to item more than self (maybe move it to another class?)                        <a href="library_detection.html#L34" class="js-smell-location">0</a>                  <a href="library_detection.html#L35" class="js-smell-location">1</a>                  </span>  </li></ul>
+            item.execute<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::LibraryDetection#detect! refers to item more than self (maybe move it to another class?)                        <a href="library_detection.html#L34" class="js-smell-location">0</a>                  <a href="library_detection.html#L35" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        end
+      end
+
+      def dependency_by_name(name)
+        @items.find {|i| i.name == name }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::LibraryDetection#dependency_by_name has the variable name 'i'          </span>  </li></ul>
+      end
+
+      def installed?(name)
+        item = dependency_by_name(name)
+        item &amp;&amp; item.executed
+      end
+
+      def items
+        @items
+      end
+
+      def items=(new_items)
+        @items = new_items
+      end
+
+
+      class Dependent<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::LibraryDetection::Dependent has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Support::LibraryDetection::Dependent has prima donna method `executed!`          </span>  </li></ul>
+        attr_reader :dependencies
+        attr_reader :executed
+        attr_accessor :name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Support::LibraryDetection::Dependent#name is a writable attribute          </span>  </li></ul>
+
+        def executed!
+          @executed = true
+        end
+
+        def dependencies_satisfied?
+          !executed and check_dependencies
+        end
+
+        def initialize
+          @dependencies = []
+          @executes = []
+          @name = nil
+        end
+
+        def execute
+          @executes.each do |e|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::LibraryDetection::Dependent#execute has the variable name 'e'          </span>  </li></ul>
+            begin
+              e.call
+            rescue =&gt; err
+              TingYun::Agent.logger.error( &quot;Error while installing #{self.name} instrumentation:&quot;, err )
+              break
+            end
+          end
+        ensure
+          executed!
+        end
+
+        def check_dependencies<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::LibraryDetection::Dependent#check_dependencies has approx 6 statements          </span>  </li></ul>
+          return false unless allowed_by_config? &amp;&amp; dependencies
+
+          dependencies.all? do |depend|
+            begin
+              depend.call
+            rescue =&gt; err
+              TingYun::Agent.logger.error( &quot;Error while detecting #{self.name}:&quot;, err )
+              false
+            end
+          end
+        end
+
+        def depends_on
+          @dependencies &lt;&lt; Proc.new
+        end
+
+        def allowed_by_config?
+          # If we don&#39;t have a name, can&#39;t check config so allow it
+          return true if self.name.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LibraryDetection::Dependent#allowed_by_config? calls self.name 3 times                        <a href="library_detection.html#L109" class="js-smell-location">0</a>                  <a href="library_detection.html#L111" class="js-smell-location">1</a>                  <a href="library_detection.html#L113" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Support::LibraryDetection::Dependent#allowed_by_config? performs a nil-check          </span>  </li></ul>
+
+          key = &quot;disable_#{self.name}&quot;.to_sym<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LibraryDetection::Dependent#allowed_by_config? calls self.name 3 times                        <a href="library_detection.html#L109" class="js-smell-location">0</a>                  <a href="library_detection.html#L111" class="js-smell-location">1</a>                  <a href="library_detection.html#L113" class="js-smell-location">2</a>                  </span>  </li></ul>
+          if TingYun::Agent.config[key]
+            TingYun::Agent.logger.debug(&quot;Not installing #{self.name} instrumentation because of configuration #{key}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LibraryDetection::Dependent#allowed_by_config? calls self.name 3 times                        <a href="library_detection.html#L109" class="js-smell-location">0</a>                  <a href="library_detection.html#L111" class="js-smell-location">1</a>                  <a href="library_detection.html#L113" class="js-smell-location">2</a>                  </span>  </li></ul>
+          else
+            true
+          end
+        end
+
+        def named(new_name)
+          self.name = new_name
+        end
+
+        def executes
+          @executes &lt;&lt; Proc.new
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

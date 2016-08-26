@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Transaction::TraceNode</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-22 16:54:05 +0800'>2016-08-22 16:54:05 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      64 complexity
+    </div>
+    <div class="file-stat">
+      4.6 complexity per method
+    </div>
+    <div class="file-stat">
+      15 churn
+    </div>
+    <div class="file-stat">
+      14 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/support/helper&#39;
+require &#39;ting_yun/support/coerce&#39;
+require &#39;ting_yun/agent/database&#39;
+
+
+module TingYun
+  module Agent
+    class Transaction
+      class TraceNode<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Transaction::TraceNode has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::Transaction::TraceNode has at least 7 instance variables          </span>  </li></ul>
+
+        attr_reader :entry_timestamp, :parent_node, :called_nodes
+        attr_accessor :metric_name, :exit_timestamp, :uri, :count, :klass, :method<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::TraceNode#count is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::TraceNode#exit_timestamp is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::TraceNode#klass is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::TraceNode#method is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::TraceNode#metric_name is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::TraceNode#uri is a writable attribute          </span>  </li></ul>
+
+
+
+        UNKNOWN_NODE_NAME = &#39;&lt;unknown&gt;&#39;.freeze
+
+
+        def initialize(timestamp, metric_name)
+          @entry_timestamp = timestamp
+          @metric_name     = metric_name || UNKNOWN_NODE_NAME<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::Transaction::TraceNode#initialize is controlled by argument metric_name          </span>  </li></ul>
+          @called_nodes    = nil
+          @count           = 1
+        end
+
+        def add_called_node(s)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::Transaction::TraceNode#add_called_node has the parameter name 's'          </span>  </li></ul>
+          @called_nodes ||= []
+          @called_nodes &lt;&lt; s
+          s.parent_node = self
+        end
+
+        def end_trace(timestamp)
+          @exit_timestamp = timestamp
+        end
+
+        # return the total duration of this node
+        def duration
+          TingYun::Helper.time_to_millis(@exit_timestamp - @entry_timestamp)
+        end
+
+
+        def to_array<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Transaction::TraceNode#to_array has a flog score of 29          </span>  </li></ul>
+          [TingYun::Helper.time_to_millis(entry_timestamp),
+           TingYun::Helper.time_to_millis(exit_timestamp),
+           TingYun::Support::Coerce.string(metric_name),<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::TraceNode#to_array calls TingYun::Support::Coerce.string(metric_name) 2 times                        <a href="trace_node.html#L46" class="js-smell-location">0</a>                  <a href="trace_node.html#L49" class="js-smell-location">1</a>                  </span>  </li></ul>
+           TingYun::Support::Coerce.string(uri)||&#39;&#39;,
+           TingYun::Support::Coerce.int(count),
+           TingYun::Support::Coerce.string(klass)||TingYun::Support::Coerce.string(metric_name),<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::TraceNode#to_array calls TingYun::Support::Coerce.string(metric_name) 2 times                        <a href="trace_node.html#L46" class="js-smell-location">0</a>                  <a href="trace_node.html#L49" class="js-smell-location">1</a>                  </span>  </li></ul>
+           TingYun::Support::Coerce.string(method)||&#39;&#39;,
+           params] +
+           [(@called_nodes ? @called_nodes.map{|s| s.to_array} : [])]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Transaction::TraceNode#to_array has the variable name 's'          </span>  </li></ul>
+        end
+
+        def custom_params
+          {}
+        end
+
+        def request_params
+          {}
+        end
+
+        def []=(key, value)
+          # only create a parameters field if a parameter is set; this will save
+          # bandwidth etc as most nodes have no parameters
+          params[key] = value
+        end
+
+        def [](key)
+          params[key]
+        end
+
+        def params
+          @params ||= {}
+        end
+
+        def params=(p)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::Transaction::TraceNode#params= has the parameter name 'p'          </span>  </li></ul>
+          @params = p
+        end
+
+        def each_call(&amp;blk)
+          blk.call self
+
+          if @called_nodes
+            @called_nodes.each do |node|
+              node.each_call(&amp;blk)
+            end
+          end
+        end
+
+        def explain_sql
+          return params[:explainPlan] if params.key?(:explainPlan)
+
+          statement = params[:sql]
+          return nil unless statement.respond_to?(:config) &amp;&amp;
+              statement.respond_to?(:explainer)
+
+          TingYun::Agent::Database.explain_sql(statement)
+        end
+
+        protected
+        def parent_node=(s)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::Transaction::TraceNode#parent_node= has the parameter name 's'          </span>  </li></ul>
+          @parent_node = s
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

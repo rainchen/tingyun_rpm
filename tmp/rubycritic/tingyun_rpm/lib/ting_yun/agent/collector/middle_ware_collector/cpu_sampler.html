@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Collector::CpuSampler</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-10 10:00:12 +0800'>2016-08-10 10:00:12 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      33 complexity
+    </div>
+    <div class="file-stat">
+      5.5 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      6 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/agent/collector/middle_ware_collector/sampler&#39;
+require &#39;ting_yun/support/system_info&#39;
+
+module TingYun
+  module Agent
+    module Collector
+      class CpuSampler &lt; ::TingYun::Agent::Collector::Sampler<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::CpuSampler has no descriptive comment          </span>  </li></ul>
+        attr_reader :last_time
+
+        named :cpu
+
+        def initialize
+          @last_time = nil
+          @processor_count = TingYun::Support::SystemInfo.num_logical_processors
+          if @processor_count.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Agent::Collector::CpuSampler#initialize performs a nil-check          </span>  </li></ul>
+            TingYun::Agent.logger.warn(&quot;Failed to determine processor count, assuming 1&quot;)
+            @processor_count = 1
+          end
+          poll
+        end
+
+        def record_user_util(value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::CpuSampler#record_user_util doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Agent.record_metric(&quot;CPU/NULL/UserUtilization&quot;, value)
+        end
+
+        def record_system_util(value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::CpuSampler#record_system_util doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Agent.record_metric(&quot;CPU/System/Utilization&quot;, value)
+        end
+
+        def record_usertime(value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::CpuSampler#record_usertime doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Agent.record_metric(&quot;CPU/NULL/UserTime&quot;, value)
+        end
+
+        def record_systemtime(value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::CpuSampler#record_systemtime doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Agent.record_metric(&quot;CPU/System Time&quot;, value)
+        end
+
+        def poll<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::CpuSampler#poll has approx 10 statements          </span>  </li></ul>
+          now = Time.now
+          t = Process.times<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::CpuSampler#poll has the variable name 't'          </span>  </li></ul>
+          if @last_time
+            elapsed = now - @last_time
+            return if elapsed &lt; 1 # Causing some kind of math underflow
+
+            usertime = t.utime - @last_utime<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::CpuSampler#poll calls t.utime 2 times                        <a href="cpu_sampler.html#L48" class="js-smell-location">0</a>                  <a href="cpu_sampler.html#L60" class="js-smell-location">1</a>                  </span>  </li></ul>
+            # systemtime = t.stime - @last_stime
+
+            # record_systemtime(systemtime) if systemtime &gt;= 0
+            record_usertime(usertime) if usertime &gt;= 0
+
+            # Calculate the true utilization by taking cpu times and dividing by
+            # elapsed time X processor_count.
+
+            record_user_util((usertime * 100) / (elapsed * @processor_count))
+            # record_system_util(systemtime / (elapsed * @processor_count))
+          end
+          @last_utime = t.utime<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::CpuSampler#poll calls t.utime 2 times                        <a href="cpu_sampler.html#L48" class="js-smell-location">0</a>                  <a href="cpu_sampler.html#L60" class="js-smell-location">1</a>                  </span>  </li></ul>
+          @last_stime = t.stime
+          @last_time = now
+        end
+      end
+    end
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

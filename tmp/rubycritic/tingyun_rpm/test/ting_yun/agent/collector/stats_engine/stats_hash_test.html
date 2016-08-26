@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Agent::Collector::StatsHashTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-15 05:37:30 +0000'>2016-07-15 05:37:30 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      162 complexity
+    </div>
+    <div class="file-stat">
+      13.5 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      12 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">
+require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;..&#39;, &#39;..&#39;,&#39;test_helper&#39;))
+require &#39;ting_yun/agent/collector/stats_engine/stats_hash&#39;
+require &#39;ting_yun/metrics/metric_spec&#39;
+
+module TingYun::Agent::Collector
+  class StatsHashTest &lt;  MiniTest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::StatsHashTest has no descriptive comment          </span>  </li></ul>
+    def setup
+      @hash = TingYun::Agent::Collector::StatsHash.new
+    end
+
+    def test_creates_default_entries
+      stats = @hash[TingYun::Metrics::MetricSpec.new(&#39;a/b/c/d&#39;)]
+      assert_kind_of(TingYun::Metrics::Stats, stats)
+    end
+
+    def test_record_accpets_single_metric_spec
+      spec = TingYun::Metrics::MetricSpec.new(&#39;foo/bar&#39;)
+      stats = @hash[spec]
+      stats.expects(:record_data_point).with(42, 42)
+      @hash.record(spec,42)
+    end
+
+    def test_record_accepts_multiple_metric_specs<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_multiple_metric_specs has approx 7 statements          </span>  </li></ul>
+      spec1 = TingYun::Metrics::MetricSpec.new(&#39;foo/bar&#39;, &#39;scope1&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_multiple_metric_specs has the variable name 'spec1'          </span>  </li></ul>
+      spec2 = TingYun::Metrics::MetricSpec.new(&#39;foo/bar&#39;, &#39;scope2&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_multiple_metric_specs has the variable name 'spec2'          </span>  </li></ul>
+      stats1 = @hash[spec1]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_multiple_metric_specs has the variable name 'stats1'          </span>  </li></ul>
+      stats2 = @hash[spec2]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_multiple_metric_specs has the variable name 'stats2'          </span>  </li></ul>
+      stats1.expects(:record_data_point).with(42, 42)
+      stats2.expects(:record_data_point).with(42, 42)
+      @hash.record([spec1, spec2], 42)
+    end
+
+    def test_record_accepts_single_metric_spec_with_block
+      spec = TingYun::Metrics::MetricSpec.new(&#39;foo&#39;)
+      stats = @hash[spec]
+      stats.expects(:do_stuff)
+      @hash.record(spec) do |s|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_single_metric_spec_with_block has the variable name 's'          </span>  </li></ul>
+        s.do_stuff
+      end
+    end
+
+    def test_record_accepts_multiple_metric_specs_with_block<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_multiple_metric_specs_with_block has approx 7 statements          </span>  </li></ul>
+      specs = [
+          TingYun::Metrics::MetricSpec.new(&#39;foo&#39;),
+          TingYun::Metrics::MetricSpec.new(&#39;bar&#39;)
+      ]
+      stats = specs.map { |spec| @hash[spec] }
+      stats.each { |stat| stat.expects(:do_stuff) }
+      @hash.record(specs) do |s|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_multiple_metric_specs_with_block has the variable name 's'          </span>  </li></ul>
+        s.do_stuff
+      end
+    end
+
+    def test_record_accepts_stats_value
+      spec = TingYun::Metrics::MetricSpec.new(&#39;foo&#39;)
+      other_stats = TingYun::Metrics::Stats.new
+      stats = @hash[spec]
+      stats.expects(:merge!).with(other_stats)
+      @hash.record(spec, other_stats)
+    end
+
+    def test_record_accepts_exclusive_time_with_numeric
+      spec = TingYun::Metrics::MetricSpec.new(&#39;foo&#39;)
+      stats = @hash[spec]
+      stats.expects(:record_data_point).with(42, 10)
+      @hash.record(spec, 42, 10)
+    end
+
+    def test_record_accepts_apdex_t_with_symbol<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_apdex_t_with_symbol has a flog score of 26          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::StatsHashTest#test_record_accepts_apdex_t_with_symbol has approx 15 statements          </span>  </li></ul>
+      spec = TingYun::Metrics::MetricSpec.new(&#39;foo&#39;)
+      apdex_t = 99
+      1.times { @hash.record(spec, :apdex_s, apdex_t) }
+      2.times { @hash.record(spec, :apdex_t, apdex_t) }
+      3.times { @hash.record(spec, :apdex_f, apdex_t) }
+      stats = @hash[spec]
+      assert_equal(1, stats.apdex_s)
+      assert_equal(2, stats.apdex_t)
+      assert_equal(3, stats.apdex_f)
+      assert_equal(0, stats.min_call_time)
+      assert_equal(99, stats.max_call_time)
+      assert_equal(0, stats.sum_of_squares)
+    end
+
+    def test_merge_merges<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges has a flog score of 57          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges has approx 15 statements          </span>  </li></ul>
+      specs = [
+          TingYun::Metrics::MetricSpec.new(&#39;foo&#39;),
+          TingYun::Metrics::MetricSpec.new(&#39;bar&#39;),
+          TingYun::Metrics::MetricSpec.new(&#39;baz&#39;),
+          TingYun::Metrics::MetricSpec.new(&#39;baz&#39;, &#39;a_scope&#39;)
+      ]
+
+      hash1 = TingYun::Agent::Collector::StatsHash.new<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges has the variable name 'hash1'          </span>  </li></ul>
+      hash1.record(specs[0], 1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[0] 3 times                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+      hash1.record(specs[1], 2)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[1] 3 times                        <a href="stats_hash_test.html#L95" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+      hash1.record(specs[2], 3)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[2] 2 times                        <a href="stats_hash_test.html#L96" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+
+      hash2 = TingYun::Agent::Collector::StatsHash.new<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges has the variable name 'hash2'          </span>  </li></ul>
+      hash2.record(specs[0], 1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[0] 3 times                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+      hash2.record(specs[1], 2)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[1] 3 times                        <a href="stats_hash_test.html#L95" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+      hash2.record(specs[3], 3)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[3] 2 times                        <a href="stats_hash_test.html#L101" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+
+      hash1.merge!(hash2)
+
+      assert_equal(4, hash1.to_h.keys.size)
+      assert_equal(2, hash1[specs[0]].call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[0] 3 times                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+      assert_equal(2, hash1[specs[1]].call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[1] 3 times                        <a href="stats_hash_test.html#L95" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+      assert_equal(1, hash1[specs[2]].call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[2] 2 times                        <a href="stats_hash_test.html#L96" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+      assert_equal(1, hash1[specs[3]].call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges calls specs[3] 2 times                        <a href="stats_hash_test.html#L101" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_merges refers to specs more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L94" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L95" class="js-smell-location">1</a>                  <a href="stats_hash_test.html#L96" class="js-smell-location">2</a>                  <a href="stats_hash_test.html#L99" class="js-smell-location">3</a>                  <a href="stats_hash_test.html#L100" class="js-smell-location">4</a>                  <a href="stats_hash_test.html#L101" class="js-smell-location">5</a>                  <a href="stats_hash_test.html#L106" class="js-smell-location">6</a>                  <a href="stats_hash_test.html#L107" class="js-smell-location">7</a>                  <a href="stats_hash_test.html#L108" class="js-smell-location">8</a>                  <a href="stats_hash_test.html#L109" class="js-smell-location">9</a>                  </span>  </li></ul>
+    end
+
+    def test_merge_re_sets_started_at_if_needed<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_re_sets_started_at_if_needed has approx 6 statements          </span>  </li></ul>
+      t0 = Time.at(0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_re_sets_started_at_if_needed has the variable name 't0'          </span>  </li></ul>
+      t1 = Time.at(100)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_re_sets_started_at_if_needed has the variable name 't1'          </span>  </li></ul>
+
+      hash0 = TingYun::Agent::Collector::StatsHash.new(t0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_re_sets_started_at_if_needed has the variable name 'hash0'          </span>  </li></ul>
+      hash1 = TingYun::Agent::Collector::StatsHash.new(t1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_re_sets_started_at_if_needed has the variable name 'hash1'          </span>  </li></ul>
+
+      hash1.merge!(hash0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_re_sets_started_at_if_needed refers to hash1 more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L119" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L120" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal(t0.to_f, hash1.started_at)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::StatsHashTest#test_merge_re_sets_started_at_if_needed refers to hash1 more than self (maybe move it to another class?)                        <a href="stats_hash_test.html#L119" class="js-smell-location">0</a>                  <a href="stats_hash_test.html#L120" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    def test_marshal_dump
+      @hash.record(TingYun::Metrics::MetricSpec.new(&#39;foo&#39;), 1)
+      @hash.record(TingYun::Metrics::MetricSpec.new(&#39;bar&#39;), 2)
+      copy = Marshal.load(Marshal.dump(@hash))
+      assert_equal(@hash, copy)
+      assert_equal(@hash.started_at, copy.started_at)
+    end
+
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Metrics::MetricSpec</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-24 15:11:54 +0800'>2016-08-24 15:11:54 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      81 complexity
+    </div>
+    <div class="file-stat">
+      8.1 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      10 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+
+
+# this struct uniquely defines a metric, optionally inside
+# the call scope of another metric
+module TingYun
+  module Metrics
+    class MetricSpec<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Metrics::MetricSpec has no descriptive comment          </span>  </li></ul>
+      attr_accessor :name, :scope, :calleeId, :calleeName<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::MetricSpec#calleeId is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::MetricSpec#calleeName is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::MetricSpec#name is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::MetricSpec#scope is a writable attribute          </span>  </li></ul>
+
+      # the maximum length of a metric name or metric scope
+      MAX_LENGTH = 255
+      LENGTH_RANGE = (0...MAX_LENGTH)
+      EMPTY_SCOPE = &#39;&#39;.freeze
+
+      def initialize(metric_name=&#39;&#39;, metric_scope=nil)
+        if metric_name.to_s.length &gt; MAX_LENGTH<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricSpec#initialize calls metric_name.to_s 3 times                        <a href="metric_spec.html#L19" class="js-smell-location">0</a>                  <a href="metric_spec.html#L20" class="js-smell-location">1</a>                  <a href="metric_spec.html#L22" class="js-smell-location">2</a>                  </span>  </li></ul>
+          @name = metric_name.to_s[LENGTH_RANGE]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricSpec#initialize calls metric_name.to_s 3 times                        <a href="metric_spec.html#L19" class="js-smell-location">0</a>                  <a href="metric_spec.html#L20" class="js-smell-location">1</a>                  <a href="metric_spec.html#L22" class="js-smell-location">2</a>                  </span>  </li></ul>
+        else
+          @name = metric_name.to_s<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricSpec#initialize calls metric_name.to_s 3 times                        <a href="metric_spec.html#L19" class="js-smell-location">0</a>                  <a href="metric_spec.html#L20" class="js-smell-location">1</a>                  <a href="metric_spec.html#L22" class="js-smell-location">2</a>                  </span>  </li></ul>
+        end
+
+        if metric_scope
+          if metric_scope.to_s.length &gt; MAX_LENGTH<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricSpec#initialize calls metric_scope.to_s 3 times                        <a href="metric_spec.html#L26" class="js-smell-location">0</a>                  <a href="metric_spec.html#L27" class="js-smell-location">1</a>                  <a href="metric_spec.html#L29" class="js-smell-location">2</a>                  </span>  </li></ul>
+            @scope = metric_scope.to_s[LENGTH_RANGE]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricSpec#initialize calls metric_scope.to_s 3 times                        <a href="metric_spec.html#L26" class="js-smell-location">0</a>                  <a href="metric_spec.html#L27" class="js-smell-location">1</a>                  <a href="metric_spec.html#L29" class="js-smell-location">2</a>                  </span>  </li></ul>
+          else
+            @scope = metric_scope.to_s<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricSpec#initialize calls metric_scope.to_s 3 times                        <a href="metric_spec.html#L26" class="js-smell-location">0</a>                  <a href="metric_spec.html#L27" class="js-smell-location">1</a>                  <a href="metric_spec.html#L29" class="js-smell-location">2</a>                  </span>  </li></ul>
+          end
+        else
+          @scope = EMPTY_SCOPE
+        end
+      end
+
+      def ==(o)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Metrics::MetricSpec#== has the parameter name 'o'          </span>  </li></ul>
+        self.eql?(o)
+      end
+
+      def eql? o<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Metrics::MetricSpec#eql? has the parameter name 'o'          </span>  </li></ul>
+        @name == o.name &amp;&amp; @scope == o.scope
+      end
+
+      def hash
+        @name.hash ^ @scope.hash
+      end
+
+      # return a new metric spec if the given regex
+      # matches the name or scope.
+      def sub(pattern, replacement, apply_to_scope = true)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Metrics::MetricSpec#sub has a flog score of 25          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Metrics::MetricSpec#sub has boolean parameter 'apply_to_scope'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricSpec#sub has approx 7 statements          </span>  </li></ul>
+        ::TingYun::Agent.logger.warn(&quot;The sub method on metric specs is deprecated&quot;) rescue nil
+        return nil if name !~ pattern &amp;&amp;
+            (!apply_to_scope || scope.nil? || scope !~ pattern)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Metrics::MetricSpec#sub performs a nil-check          </span>  </li></ul>
+        new_name = name.sub(pattern, replacement)[LENGTH_RANGE]
+
+        if apply_to_scope
+          new_scope = (scope &amp;&amp; scope.sub(pattern, replacement)[LENGTH_RANGE])
+        else
+          new_scope = scope
+        end
+
+        self.class.new new_name, new_scope
+      end
+
+      def to_s
+        return name if scope.empty?
+        &quot;#{name}:#{scope}&quot;
+      end
+
+      def inspect
+        &quot;#&lt;TingYun::Metrics::MetricSpec &#39;#{name}&#39;:&#39;#{scope}&#39;&gt;&quot;
+      end
+
+      def to_json(*a)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Metrics::MetricSpec#to_json has the parameter name 'a'          </span>  </li></ul>
+        {&#39;name&#39; =&gt; name,
+         &#39;scope&#39; =&gt; scope}.to_json(*a)
+      end
+
+      def &lt;=&gt;(o)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Metrics::MetricSpec#<=> has the parameter name 'o'          </span>  </li></ul>
+        namecmp = self.name &lt;=&gt; o.name
+        return namecmp if namecmp != 0
+        return (self.scope || &#39;&#39;) &lt;=&gt; (o.scope || &#39;&#39;)
+      end
+
+      def to_hash
+        hash =  { &#39;name&#39; =&gt; name }
+        hash[&#39;calleeId&#39;] = calleeId if calleeId
+        hash[&#39;calleeName&#39;] = calleeName if calleeName
+        unless scope.empty?
+          hash[&#39;parent&#39;] = scope
+        end
+
+        return hash
+      end
+
+
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

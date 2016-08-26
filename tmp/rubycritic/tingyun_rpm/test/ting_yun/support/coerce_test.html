@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Support::CoerceTest::Unstringable</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      143 complexity
+    </div>
+    <div class="file-stat">
+      13.0 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      11 methods
+    </div>
+    <div class="file-stat">
+      46 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;test_helper&#39;))
+require &#39;ting_yun/support/coerce&#39;
+
+
+module TingYun::Support
+  class CoerceTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::CoerceTest has no descriptive comment          </span>  </li></ul>
+    include TingYun::Support::Coerce
+
+    def test_int_coerce<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::CoerceTest#test_int_coerce has approx 7 statements          </span>  </li></ul>
+      assert_equal 1, int(1)
+      assert_equal 1, int(&quot;1&quot;)
+      assert_equal 1, int(1.0)
+      assert_equal 1, int(Rational(1, 1))
+      assert_equal 0, int(&quot;invalid&quot;)
+      assert_equal 0, int(nil)
+
+      # http://ruby-doc.org/core-1.8.7/Symbol.html#method-i-to_i
+      assert_equal 0, int(:wat) unless RUBY_VERSION &lt; &#39;1.9&#39;
+    end
+
+    def test_int_coerce_logs
+      expects_logging(:warn, Not(includes(&quot;context&quot;)), any_parameters)
+      int(&quot;not valid&quot;)
+    end
+
+    def test_int_coerce_logs_with_context
+      expects_logging(:warn, all_of(includes(&quot;HERE&quot;), includes(&quot;Integer&quot;)), anything)
+      int(&quot;not valid&quot;, &quot;HERE&quot;)
+    end
+
+    def test_int_coerce_or_nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::CoerceTest#test_int_coerce_or_nil has approx 6 statements          </span>  </li></ul>
+      assert_equal 1, int_or_nil(1)
+      assert_equal 1, int_or_nil(&quot;1&quot;)
+      assert_equal 1, int_or_nil(1.0)
+      assert_equal 1, int_or_nil(Rational(1, 1))
+      assert_equal nil, int_or_nil(&quot;invalid&quot;)
+      assert_equal nil, int_or_nil(nil)
+    end
+
+
+    def test_int_or_nil_coerce_logs_with_context
+      expects_logging(:warn, all_of(includes(&quot;HERE&quot;), includes(&quot;Integer&quot;)), anything)
+      int_or_nil(&quot;not valid&quot;, &quot;HERE&quot;)
+    end
+
+    def test_float_coerce<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::CoerceTest#test_float_coerce has approx 7 statements          </span>  </li></ul>
+      assert_equal 1.0, float(1.0)
+      assert_equal 1.0, float(&quot;1.0&quot;)
+      assert_equal 1.0, float(1)
+      assert_equal 1.0, float(Rational(1, 1))
+      assert_equal 0.0, float(&quot;invalid&quot;)
+      assert_equal 0.0, float(nil)
+      assert_equal 0.0, float(:symbols_are_fun)
+    end
+
+    def test_float_coerce_logs_with_context
+      expects_logging(:warn, all_of(includes(&quot;HERE&quot;), includes(&quot;Float&quot;)), anything)
+      float(&quot;not valid&quot;, &quot;HERE&quot;)
+    end
+
+    def test_float_coerce_with_infinite_value_logs_and_returns_0_0<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="coerce_test.html#L61" class="js-smell-location">0</a>                  <a href="coerce_test.html#L68" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Method-Name.md" target="_blank">UncommunicativeMethodName</a>)      TingYun::Support::CoerceTest#test_float_coerce_with_infinite_value_logs_and_returns_0_0 has the name 'test_float_coerce_with_infinite_value_logs_and_returns_0_0'          </span>  </li></ul>
+      expects_logging(:warn, all_of(includes(&quot;TestingInfinity&quot;), includes(&quot;Float&quot;), includes(&quot;&#39;Infinity&#39;&quot;)), anything)
+      infinity = 1337807.0/0.0
+      result = float(infinity, &quot;TestingInfinity&quot;)
+      assert_equal 0.0, result
+    end
+
+    def test_float_coerce_with_nan_value_logs_and_returns_0_0<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="coerce_test.html#L61" class="js-smell-location">0</a>                  <a href="coerce_test.html#L68" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Method-Name.md" target="_blank">UncommunicativeMethodName</a>)      TingYun::Support::CoerceTest#test_float_coerce_with_nan_value_logs_and_returns_0_0 has the name 'test_float_coerce_with_nan_value_logs_and_returns_0_0'          </span>  </li></ul>
+      expects_logging(:warn, all_of(includes(&quot;TestingNaN&quot;), includes(&quot;Float&quot;), includes(&quot;&#39;NaN&#39;&quot;)), anything)
+      nan = 0.0/0.0
+      result = float(nan, &quot;TestingNaN&quot;)
+      assert_equal 0.0, result
+    end
+
+    def test_string_coerce<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::CoerceTest#test_string_coerce has approx 7 statements          </span>  </li></ul>
+      assert_equal &quot;1&quot;,      string(1)
+      assert_equal &quot;1.0&quot;,    string(1.0)
+      assert_equal &quot;string&quot;, string(&quot;string&quot;)
+      assert_equal &quot;1/100&quot;,  string(Rational(1, 100))
+      assert_equal &quot;yeah&quot;,   string(:yeah)
+      assert_equal nil,      string(nil)
+      assert_equal &quot;&quot;,       string(Unstringable.new)
+    end
+
+    def test_string_coerce_logs_with_context
+      expects_logging(:warn, all_of(includes(&quot;HERE&quot;), includes(&quot;String&quot;)), anything)
+      string(Unstringable.new, &quot;HERE&quot;)
+    end
+
+    class Unstringable
+      undef :to_s
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Database::Statement</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-23 18:28:00 +0800'>2016-08-23 18:28:00 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      57 complexity
+    </div>
+    <div class="file-stat">
+      14.3 complexity per method
+    </div>
+    <div class="file-stat">
+      2 churn
+    </div>
+    <div class="file-stat">
+      4 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/support/helper&#39;
+require &#39;ting_yun/agent/database/explain_plan_helpers&#39;
+
+module TingYun
+  module Agent
+    module Database
+      class Statement<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Database::Statement has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::Database::Statement has at least 6 instance variables          </span>  </li></ul>
+        include TingYun::Agent::Database::ExplainPlanHelpers
+
+        attr_accessor :sql, :config, :explainer, :binds, :name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Database::Statement#binds is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Database::Statement#config is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Database::Statement#explainer is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Database::Statement#name is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Database::Statement#sql is a writable attribute          </span>  </li></ul>
+
+        def initialize(sql, config={}, explainer=nil, binds=[], name=DEFAULT_QUERY_NAME)
+          @sql = TingYun::Agent::Database.capture_query(sql)
+          @config = config
+          @explainer = explainer
+          @binds = binds
+          @name = name
+        end
+
+        def adapter
+          return unless @config
+
+          @adapter ||= if @config[:adapter]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Statement#adapter calls @config[:adapter] 2 times                        <a href="statement.html#L24" class="js-smell-location">0</a>                  <a href="statement.html#L25" class="js-smell-location">1</a>                  </span>  </li></ul>
+                         symbolized_adapter(@config[:adapter].to_s.downcase)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Statement#adapter calls @config[:adapter] 2 times                        <a href="statement.html#L24" class="js-smell-location">0</a>                  <a href="statement.html#L25" class="js-smell-location">1</a>                  </span>  </li></ul>
+                       elsif @config[:uri] &amp;&amp; @config[:uri].to_s =~ /^jdbc:([^:]+):/<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Statement#adapter calls @config[:uri] 2 times          </span>  </li></ul>
+                         # This case is for Sequel with the jdbc-mysql, jdbc-postgres, or jdbc-sqlite3 gems.
+                         symbolized_adapter($1)
+                       else
+                         nil
+                       end
+        end
+
+
+
+        SUPPORTED_ADAPTERS_FOR_EXPLAIN = [:postgres, :mysql2, :mysql, :sqlite]
+
+        def explain
+          return unless explainable?
+          handle_exception_in_explain do
+            plan = explainer.call(self)
+            return process_resultset(plan, adapter) if plan
+          end
+        end
+
+
+        def explainable?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Database::Statement#explainable? has approx 8 statements          </span>  </li></ul>
+          return false unless @explainer &amp;&amp; is_select?(sql)
+
+          if sql[-3,3] == &#39;...&#39;
+            TingYun::Agent.logger.debug(&#39;Unable to collect explain plan for truncated query.&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Statement#explainable? calls TingYun::Agent.logger 3 times                        <a href="statement.html#L51" class="js-smell-location">0</a>                  <a href="statement.html#L56" class="js-smell-location">1</a>                  <a href="statement.html#L61" class="js-smell-location">2</a>                  </span>  </li></ul>
+            return false
+          end
+
+          if parameterized?(@sql) &amp;&amp; @binds.empty?
+            TingYun::Agent.logger.debug(&#39;Unable to collect explain plan for parameter-less parameterized query.&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Statement#explainable? calls TingYun::Agent.logger 3 times                        <a href="statement.html#L51" class="js-smell-location">0</a>                  <a href="statement.html#L56" class="js-smell-location">1</a>                  <a href="statement.html#L61" class="js-smell-location">2</a>                  </span>  </li></ul>
+            return false
+          end
+
+          if !SUPPORTED_ADAPTERS_FOR_EXPLAIN.include?(adapter)
+            TingYun::Agent.logger.debug(&quot;Not collecting explain plan because an unknown connection adapter (&#39;#{adapter}&#39;) was used.&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Statement#explainable? calls TingYun::Agent.logger 3 times                        <a href="statement.html#L51" class="js-smell-location">0</a>                  <a href="statement.html#L56" class="js-smell-location">1</a>                  <a href="statement.html#L61" class="js-smell-location">2</a>                  </span>  </li></ul>
+            return false
+          end
+
+          true
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

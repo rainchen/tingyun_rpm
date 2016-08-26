@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-d circled-text circle">
+    D
+  </span>
+  <h2 class="file-name">TingYun::Metrics::MetricDateTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-15 05:37:30 +0000'>2016-07-15 05:37:30 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      184 complexity
+    </div>
+    <div class="file-stat">
+      13.1 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      14 methods
+    </div>
+    <div class="file-stat">
+      158 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;test_helper&#39;))
+require &#39;ting_yun/metrics/metric_data&#39;
+require &#39;ting_yun/metrics/metric_spec&#39;
+require &#39;ting_yun/metrics/stats&#39;
+
+
+
+module TingYun::Metrics
+  class MetricDateTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Metrics::MetricDateTest has no descriptive comment          </span>  </li></ul>
+    def test_initialize_basic
+      spec = mock(&#39;metric_spec&#39;)
+      stats = mock(&#39;stats&#39;)
+      metric_id = mock(&#39;metric_id&#39;)
+      md = TingYun::Metrics::MetricData.new(spec, stats, metric_id)
+      assert_equal spec, md.metric_spec
+      assert_equal stats, md.stats
+      assert_equal metric_id, md.metric_id
+    end
+
+    def test_eql_basic<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricDateTest#test_eql_basic has approx 7 statements          </span>  </li></ul>
+      spec = mock(&#39;metric_spec&#39;)
+      stats = mock(&#39;stats&#39;)
+      metric_id = mock(&#39;metric_id&#39;)
+      md1 = TingYun::Metrics::MetricData.new(spec, stats, metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_eql_basic has the variable name 'md1'          </span>  </li></ul>
+      md2 = TingYun::Metrics::MetricData.new(spec, stats, metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_eql_basic has the variable name 'md2'          </span>  </li></ul>
+      assert(md1.eql?(md2), &quot;The example metric data objects should be eql?: #{md1.inspect} #{md2.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_basic calls md1.inspect 2 times                        <a href="metric_data_test.html#L26" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L27" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_basic calls md2.inspect 2 times                        <a href="metric_data_test.html#L26" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L27" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert(md2.eql?(md1), &quot;The example metric data objects should be eql?: #{md1.inspect} #{md2.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_basic calls md1.inspect 2 times                        <a href="metric_data_test.html#L26" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L27" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_basic calls md2.inspect 2 times                        <a href="metric_data_test.html#L26" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L27" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    def test_eql_unequal_specs<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="metric_data_test.html#L30" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L41" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_specs has approx 8 statements          </span>  </li></ul>
+      spec = mock(&#39;metric_spec&#39;)
+      other_spec = mock(&#39;other_spec&#39;)
+      stats = mock(&#39;stats&#39;)
+      metric_id = mock(&#39;metric_id&#39;)
+      md1 = TingYun::Metrics::MetricData.new(spec, stats, metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_specs has the variable name 'md1'          </span>  </li></ul>
+      md2 = TingYun::Metrics::MetricData.new(other_spec, stats, metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_specs has the variable name 'md2'          </span>  </li></ul>
+      assert(!md1.eql?(md2), &quot;The example metric data objects should not be eql?: #{md1.inspect} #{md2.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_specs calls md1.inspect 2 times                        <a href="metric_data_test.html#L37" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L38" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_specs calls md2.inspect 2 times                        <a href="metric_data_test.html#L37" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L38" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert(!md2.eql?(md1), &quot;The example metric data objects should not be eql?: #{md1.inspect} #{md2.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_specs calls md1.inspect 2 times                        <a href="metric_data_test.html#L37" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L38" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_specs calls md2.inspect 2 times                        <a href="metric_data_test.html#L37" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L38" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    def test_eql_unequal_stats<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="metric_data_test.html#L30" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L41" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_stats has approx 8 statements          </span>  </li></ul>
+      spec = mock(&#39;metric_spec&#39;)
+      stats = mock(&#39;stats&#39;)
+      other_stats = mock(&#39;other_stats&#39;)
+      metric_id = mock(&#39;metric_id&#39;)
+      md1 = TingYun::Metrics::MetricData.new(spec, stats, metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_stats has the variable name 'md1'          </span>  </li></ul>
+      md2 = TingYun::Metrics::MetricData.new(spec, other_stats, metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_stats has the variable name 'md2'          </span>  </li></ul>
+      assert(!md1.eql?(md2), &quot;The example metric data objects should not be eql?: #{md1.inspect} #{md2.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_stats calls md1.inspect 2 times                        <a href="metric_data_test.html#L48" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L49" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_stats calls md2.inspect 2 times                        <a href="metric_data_test.html#L48" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L49" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert(!md2.eql?(md1), &quot;The example metric data objects should not be eql?: #{md1.inspect} #{md2.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_stats calls md1.inspect 2 times                        <a href="metric_data_test.html#L48" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L49" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_stats calls md2.inspect 2 times                        <a href="metric_data_test.html#L48" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L49" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    def test_eql_unequal_metric_ids_dont_matter<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_metric_ids_dont_matter has approx 8 statements          </span>  </li></ul>
+      spec = mock(&#39;metric_spec&#39;)
+      stats = mock(&#39;stats&#39;)
+      metric_id = mock(&#39;metric_id&#39;)
+      other_metric_id = mock(&#39;other_metric_id&#39;)
+      md1 = TingYun::Metrics::MetricData.new(spec, stats, metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_metric_ids_dont_matter has the variable name 'md1'          </span>  </li></ul>
+      md2 = TingYun::Metrics::MetricData.new(spec, stats, other_metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_metric_ids_dont_matter has the variable name 'md2'          </span>  </li></ul>
+      assert(md1.eql?(md2), &quot;The example metric data objects should be eql? with different metric_ids: #{md1.inspect} #{md2.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_metric_ids_dont_matter calls md1.inspect 2 times                        <a href="metric_data_test.html#L59" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L60" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_metric_ids_dont_matter calls md2.inspect 2 times                        <a href="metric_data_test.html#L59" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L60" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert(md2.eql?(md1), &quot;The example metric data objects should be eql? with different metric_ids: #{md1.inspect} #{md2.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_metric_ids_dont_matter calls md1.inspect 2 times                        <a href="metric_data_test.html#L59" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L60" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_eql_unequal_metric_ids_dont_matter calls md2.inspect 2 times                        <a href="metric_data_test.html#L59" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L60" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    def test_hash
+      spec = mock(&#39;metric_spec&#39;)
+      stats = mock(&#39;stats&#39;)
+      metric_id = mock(&#39;metric_id&#39;)
+      md1 = TingYun::Metrics::MetricData.new(spec, stats, metric_id)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Metrics::MetricDateTest#test_hash has the variable name 'md1'          </span>  </li></ul>
+      assert((spec.hash ^ stats.hash) == md1.hash, &quot;expected #{spec.hash ^ stats.hash} to equal #{md1.hash}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_hash calls md1.hash 2 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_hash calls spec.hash 2 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_hash calls spec.hash ^ stats.hash 2 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::MetricDateTest#test_hash calls stats.hash 2 times          </span>  </li></ul>
+    end
+
+
+    if {}.respond_to?(:to_json)
+      def test_to_json_no_metric_id
+        md = TingYun::Metrics::MetricData.new(TingYun::Metrics::MetricSpec.new(&#39;Custom/test/method&#39;, &#39;&#39;), TingYun::Metrics::Stats.new, nil)
+        json = md.to_json
+        assert(json.include?(&#39;&quot;Custom/test/method&quot;&#39;), &quot;should include the metric spec in the json&quot;)
+        assert(json.include?(&#39;&quot;metric_id&quot;:null}&#39;), &quot;should have a null metric_id&quot;)
+      end
+
+      def test_to_json_with_metric_id<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="metric_data_test.html#L80" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L88" class="js-smell-location">1</a>                  </span>  </li></ul>
+        md = TingYun::Metrics::MetricData.new(TingYun::Metrics::MetricSpec.new(&#39;Custom/test/method&#39;, &#39;&#39;), TingYun::Metrics::Stats.new, 12345)
+        assert_equal(&#39;{&quot;metric_spec&quot;:null,&quot;stats&quot;:{&quot;total_exclusive_time&quot;:0.0,&quot;min_call_time&quot;:0.0,&quot;call_count&quot;:0,&quot;sum_of_squares&quot;:0.0,&quot;total_call_time&quot;:0.0,&quot;max_call_time&quot;:0.0},&quot;metric_id&quot;:12345}&#39;, md.to_json, &quot;should not include the metric spec and should have a metric_id&quot;)
+      end
+    else
+      puts &quot;Skipping tests in #{__FILE__} because Hash#to_json not available&quot;
+    end
+
+    def test_to_s_with_metric_spec<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="metric_data_test.html#L80" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L88" class="js-smell-location">1</a>                  </span>  </li></ul>
+      md = TingYun::Metrics::MetricData.new(TingYun::Metrics::MetricSpec.new(&#39;Custom/test/method&#39;, &#39;&#39;), TingYun::Metrics::Stats.new, 12345)
+      assert_equal(&#39;Custom/test/method(): [ 0 calls 0.0000s / 0.0000s ex]&#39;, md.to_s, &quot;should not include the metric id and should include the metric spec&quot;)
+    end
+
+    def test_to_s_without_metric_spec
+      md = TingYun::Metrics::MetricData.new(nil, TingYun::Metrics::Stats.new, 12345)
+      assert_equal(&#39;12345: [ 0 calls 0.0000s / 0.0000s ex]&#39;, md.to_s, &quot;should include the metric id and not have a metric spec&quot;)
+    end
+
+    def test_to_collector_array_with_spec<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_spec has approx 6 statements          </span>  </li></ul>
+      stats = TingYun::Metrics::Stats.new
+      stats.record_data_point(1.0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_spec refers to stats more than self (maybe move it to another class?)                        <a href="metric_data_test.html#L100" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L101" class="js-smell-location">1</a>                  </span>  </li></ul>
+      stats.record_data_point(2.0, 1.0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_spec refers to stats more than self (maybe move it to another class?)                        <a href="metric_data_test.html#L100" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L101" class="js-smell-location">1</a>                  </span>  </li></ul>
+      md = TingYun::Metrics::MetricData.new(TingYun::Metrics::MetricSpec.new(&#39;Custom/test/method&#39;, &#39;parent&#39;),
+                                    stats, nil)
+      expected = [ {&#39;name&#39; =&gt; &#39;Custom/test/method&#39;, &#39;parent&#39; =&gt; &#39;parent&#39;},
+                   [2, 3.0, 2.0, 2.0, 1.0, 5.0] ]
+      assert_equal expected, md.to_collector_array
+    end
+
+    def test_to_collector_array_with_spec_and_id<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_spec_and_id has approx 6 statements          </span>  </li></ul>
+      stats = TingYun::Metrics::Stats.new
+      stats.record_data_point(1.0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_spec_and_id refers to stats more than self (maybe move it to another class?)                        <a href="metric_data_test.html#L111" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L112" class="js-smell-location">1</a>                  </span>  </li></ul>
+      stats.record_data_point(2.0, 1.0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_spec_and_id refers to stats more than self (maybe move it to another class?)                        <a href="metric_data_test.html#L111" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L112" class="js-smell-location">1</a>                  </span>  </li></ul>
+      md = TingYun::Metrics::MetricData.new(TingYun::Metrics::MetricSpec.new(&#39;Custom/test/method&#39;, &#39;scope&#39;),
+                                    stats, 1234)
+      expected = [ 1234, [2, 3.0, 2.0, 2.0, 1.0, 5.0] ]
+      assert_equal expected, md.to_collector_array
+    end
+
+    def test_to_collector_array_with_id<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_id has approx 6 statements          </span>  </li></ul>
+      stats = TingYun::Metrics::Stats.new
+      stats.record_data_point(1.0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_id refers to stats more than self (maybe move it to another class?)                        <a href="metric_data_test.html#L121" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L122" class="js-smell-location">1</a>                  </span>  </li></ul>
+      stats.record_data_point(2.0, 1.0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_id refers to stats more than self (maybe move it to another class?)                        <a href="metric_data_test.html#L121" class="js-smell-location">0</a>                  <a href="metric_data_test.html#L122" class="js-smell-location">1</a>                  </span>  </li></ul>
+      md = TingYun::Metrics::MetricData.new(nil, stats, 1234)
+      expected = [ 1234, [2, 3.0, 2.0, 2.0, 1.0, 5.0] ]
+      assert_equal expected, md.to_collector_array
+    end
+
+
+    def test_to_collector_array_with_rationals<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::MetricDateTest#test_to_collector_array_with_rationals has approx 10 statements          </span>  </li></ul>
+      stats = TingYun::Metrics::Stats.new
+      stats.call_count = Rational(1, 1)
+      stats.total_call_time = Rational(2, 1)
+      stats.total_exclusive_time = Rational(3, 1)
+      stats.min_call_time = Rational(4, 1)
+      stats.max_call_time = Rational(5, 1)
+      stats.sum_of_squares = Rational(6, 1)
+
+      md = TingYun::Metrics::MetricData.new(nil, stats, 1234)
+      expected = [1234, [1, 2.0, 3.0, 5.0, 4.0, 6.0]]
+      assert_equal expected, md.to_collector_array
+    end
+
+
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

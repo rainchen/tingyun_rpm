@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Configuration::ServerSourceTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      20 complexity
+    </div>
+    <div class="file-stat">
+      5.0 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      4 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require File.expand_path(File.join(File.dirname(__FILE__),&#39;..&#39;,&#39;..&#39;,&#39;test_helper&#39;))
+require &#39;ting_yun/configuration/default_source&#39;
+require &#39;ting_yun/configuration/server_source&#39;
+require &#39;ting_yun/agent&#39;
+
+
+module TingYun::Configuration
+  class ServerSourceTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Configuration::ServerSourceTest has no descriptive comment          </span>  </li></ul>
+  	
+    def setup
+      ServerSource.add_top_level_keys_for_testing([:TOP_LEVEL_KEYS,:other,:another,:daemon_debug,:dispatcher])
+      config = {
+      	:agent_log_file_name =&gt; true,
+      	:daemon_debug        =&gt; true,
+      	:wrong               =&gt; true,
+      	:TOP_LEVEL_KEYS      =&gt; true,
+      	:dispatcher          =&gt; &#39;dispatcher&#39;
+      }
+      @source = ServerSource.new(config)
+    end
+
+    def teardown<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::ServerSourceTest#teardown doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+      ServerSource.remove_top_level_keys_for_testing([:TOP_LEVEL_KEYS,:other,:another,:daemon_debug,:dispatcher])
+    end
+
+
+    def test_initialize
+      	assert_equal [:daemon_debug] ,@source.keys.find_all {|key| ServerSource::TOP_LEVEL_KEYS.include?(key) }
+    end
+    def test_server_corver_default_value
+        TingYun::Agent.config.replace_or_add_config(@source)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSourceTest#test_server_corver_default_value calls TingYun::Agent.config 3 times                        <a href="server_source_test.html#L34" class="js-smell-location">0</a>                  <a href="server_source_test.html#L35" class="js-smell-location">1</a>                  </span>  </li></ul>
+        assert TingYun::Agent.config[:daemon_debug],TingYun::Agent.config[:daemon_debug].to_s<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSourceTest#test_server_corver_default_value calls TingYun::Agent.config 3 times                        <a href="server_source_test.html#L34" class="js-smell-location">0</a>                  <a href="server_source_test.html#L35" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSourceTest#test_server_corver_default_value calls TingYun::Agent.config[:daemon_debug] 2 times          </span>  </li></ul>
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

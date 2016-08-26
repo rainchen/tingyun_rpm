@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Agent::Transaction::Trace</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-16 14:47:04 +0800'>2016-08-16 14:47:04 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      101 complexity
+    </div>
+    <div class="file-stat">
+      9.2 complexity per method
+    </div>
+    <div class="file-stat">
+      25 churn
+    </div>
+    <div class="file-stat">
+      11 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">  # encoding: utf-8
+require &#39;ting_yun/agent/transaction/trace_node&#39;
+require &#39;ting_yun/support/helper&#39;
+require &#39;ting_yun/support/coerce&#39;
+require &#39;ting_yun/agent/database&#39;
+module TingYun
+  module Agent
+    class Transaction
+      class Trace<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Transaction::Trace has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Transaction::Trace has prima donna method `collect_explain_plans!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Transaction::Trace has prima donna method `prepare_sql_for_transmission!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Transaction::Trace has prima donna method `prepare_to_send!`          </span>  </li></ul>
+
+        attr_accessor :root_node, :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished, :tx_id<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#attributes is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#finished is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#guid is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#metric_name is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#node_count is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#root_node is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#start_time is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#threshold is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#tx_id is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Trace#uri is a writable attribute          </span>  </li></ul>
+
+        def initialize(start_time)
+          @start_time = start_time
+          @node_count = 0
+          @prepared = false
+          @guid = generate_guid
+        end
+
+        def create_node(time_since_start, metric_name = nil)
+          @node_count += 1
+          TingYun::Agent::Transaction::TraceNode.new(time_since_start, metric_name)
+        end
+
+        def duration
+          root_node.duration
+        end
+
+
+
+        include TingYun::Support::Coerce
+        
+        def trace_tree
+          [
+              @start_time.round,
+              request_params,
+              custom_params,
+              root_node.to_array
+          ]
+        end
+
+        def to_collector_array(encoder)
+          [
+              @start_time.round,
+              duration,
+              TingYun::Helper.correctly_encoded(metric_name)|| &#39;&#39;,
+              TingYun::Helper.correctly_encoded(uri||metric_name||&#39;&#39;),
+              encoder.encode(trace_tree),
+              tx_id || &#39;&#39;,
+              guid
+          ]
+        end
+
+        def prepare_to_send!<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Transaction::Trace#prepare_to_send! has approx 7 statements          </span>  </li></ul>
+          return self if @prepared
+
+          if TingYun::Agent::Database.should_record_sql?(&#39;nbs.action_tracer.record_sql&#39;)
+            collect_explain_plans!
+            prepare_sql_for_transmission!
+          else
+            root_node.each_call do |node|
+              node.params.delete(:sql)
+            end
+          end
+          @prepared = true
+          self
+        end
+
+        def collect_explain_plans!
+          return unless TingYun::Agent::Database.should_action_collect_explain_plans?
+          threshold = TingYun::Agent.config[:&#39;nbs.action_tracer.action_threshold&#39;]
+          root_node.each_call do |node|
+            if node[:sql] &amp;&amp; node.duration &gt; threshold<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Trace#collect_explain_plans! refers to node more than self (maybe move it to another class?)                        <a href="trace.html#L73" class="js-smell-location">0</a>                  <a href="trace.html#L74" class="js-smell-location">1</a>                  </span>  </li></ul>
+              node[:explainPlan] = node.explain_sql<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Trace#collect_explain_plans! refers to node more than self (maybe move it to another class?)                        <a href="trace.html#L73" class="js-smell-location">0</a>                  <a href="trace.html#L74" class="js-smell-location">1</a>                  </span>  </li></ul>
+            end
+          end
+        end
+
+        def prepare_sql_for_transmission!(&amp;block)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Transaction::Trace#prepare_sql_for_transmission! has approx 6 statements          </span>  </li></ul>
+          strategy = TingYun::Agent::Database.record_sql_method(&#39;nbs.action_tracer.record_sql&#39;)
+          root_node.each_call do |node|
+            next unless node[:sql]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Trace#prepare_sql_for_transmission! calls node[:sql] 3 times                        <a href="trace.html#L82" class="js-smell-location">0</a>                  <a href="trace.html#L86" class="js-smell-location">1</a>                  <a href="trace.html#L88" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Trace#prepare_sql_for_transmission! refers to node more than self (maybe move it to another class?)                        <a href="trace.html#L82" class="js-smell-location">0</a>                  <a href="trace.html#L86" class="js-smell-location">1</a>                  <a href="trace.html#L88" class="js-smell-location">2</a>                  <a href="trace.html#L90" class="js-smell-location">3</a>                  </span>  </li></ul>
+
+            case strategy
+              when :obfuscated
+                node[:sql] = TingYun::Agent::Database.obfuscate_sql(node[:sql])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Trace#prepare_sql_for_transmission! calls node[:sql] 3 times                        <a href="trace.html#L82" class="js-smell-location">0</a>                  <a href="trace.html#L86" class="js-smell-location">1</a>                  <a href="trace.html#L88" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Trace#prepare_sql_for_transmission! refers to node more than self (maybe move it to another class?)                        <a href="trace.html#L82" class="js-smell-location">0</a>                  <a href="trace.html#L86" class="js-smell-location">1</a>                  <a href="trace.html#L88" class="js-smell-location">2</a>                  <a href="trace.html#L90" class="js-smell-location">3</a>                  </span>  </li></ul>
+              when :raw
+                node[:sql] = node[:sql].sql.to_s<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Trace#prepare_sql_for_transmission! calls node[:sql] 3 times                        <a href="trace.html#L82" class="js-smell-location">0</a>                  <a href="trace.html#L86" class="js-smell-location">1</a>                  <a href="trace.html#L88" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Trace#prepare_sql_for_transmission! refers to node more than self (maybe move it to another class?)                        <a href="trace.html#L82" class="js-smell-location">0</a>                  <a href="trace.html#L86" class="js-smell-location">1</a>                  <a href="trace.html#L88" class="js-smell-location">2</a>                  <a href="trace.html#L90" class="js-smell-location">3</a>                  </span>  </li></ul>
+              else
+                node[:sql] = nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Trace#prepare_sql_for_transmission! refers to node more than self (maybe move it to another class?)                        <a href="trace.html#L82" class="js-smell-location">0</a>                  <a href="trace.html#L86" class="js-smell-location">1</a>                  <a href="trace.html#L88" class="js-smell-location">2</a>                  <a href="trace.html#L90" class="js-smell-location">3</a>                  </span>  </li></ul>
+            end
+          end
+        end
+
+        def custom_params
+          custom_param = {
+              :threadName =&gt; string(attributes.agent_attributes[:threadName]),<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Trace#custom_params calls attributes.agent_attributes 4 times                        <a href="trace.html#L97" class="js-smell-location">0</a>                  <a href="trace.html#L98" class="js-smell-location">1</a>                  <a href="trace.html#L100" class="js-smell-location">2</a>                  </span>  </li></ul>
+              :referer    =&gt; string(attributes.agent_attributes[:referer]) || &#39;&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Trace#custom_params calls attributes.agent_attributes 4 times                        <a href="trace.html#L97" class="js-smell-location">0</a>                  <a href="trace.html#L98" class="js-smell-location">1</a>                  <a href="trace.html#L100" class="js-smell-location">2</a>                  </span>  </li></ul>
+          }
+          custom_param[:httpStatus] = int(attributes.agent_attributes[:httpStatus]) if attributes.agent_attributes[:httpStatus]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Trace#custom_params calls attributes.agent_attributes 4 times                        <a href="trace.html#L97" class="js-smell-location">0</a>                  <a href="trace.html#L98" class="js-smell-location">1</a>                  <a href="trace.html#L100" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Trace#custom_params calls attributes.agent_attributes[:httpStatus] 2 times          </span>  </li></ul>
+
+          custom_param
+        end
+
+        def request_params
+          return {} unless TingYun::Agent.config[&#39;nbs.capture_params&#39;]
+          attributes.request_params
+        end
+
+        HEX_DIGITS = (0..15).map{|i| i.to_s(16)}<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Transaction::Trace has the variable name 'i'          </span>  </li></ul>
+        GUID_LENGTH = 16
+
+        # generate a random 64 bit uuid
+        private
+        def generate_guid
+          guid = &#39;&#39;
+          GUID_LENGTH.times do
+            guid &lt;&lt; HEX_DIGITS[rand(16)]
+          end
+          guid
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

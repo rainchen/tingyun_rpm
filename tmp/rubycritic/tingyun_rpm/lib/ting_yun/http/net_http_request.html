@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Http::NetHttpRequest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-03-31 17:12:05 +0800'>2016-03-31 17:12:05 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      22 complexity
+    </div>
+    <div class="file-stat">
+      3.1 complexity per method
+    </div>
+    <div class="file-stat">
+      1 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require &#39;ting_yun/http/generic_request&#39;
+module TingYun
+  module Http
+    class NetHttpRequest &lt; GenericRequest<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Http::NetHttpRequest has no descriptive comment          </span>  </li></ul>
+      def initialize(connection, request)
+        @connection = connection
+        @request = request
+      end
+
+      def type
+        &#39;Net::HTTP&#39;
+      end
+
+      def host
+        if hostname = self[&#39;host&#39;]
+          hostname.split(&#39;:&#39;).first
+        else
+          @connection.address
+        end
+      end
+
+      def method
+        @request.method
+      end
+
+      def [](key)
+        @request[key]
+      end
+
+      def []=(key, value)
+        @request[key] = value
+      end
+
+      def uri
+        case @request.path<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Http::NetHttpRequest#uri calls @request.path 3 times                        <a href="net_http_request.html#L35" class="js-smell-location">0</a>                  <a href="net_http_request.html#L37" class="js-smell-location">1</a>                  <a href="net_http_request.html#L40" class="js-smell-location">2</a>                  </span>  </li></ul>
+          when /^https?:\/\//
+            URI(@request.path)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Http::NetHttpRequest#uri calls @request.path 3 times                        <a href="net_http_request.html#L35" class="js-smell-location">0</a>                  <a href="net_http_request.html#L37" class="js-smell-location">1</a>                  <a href="net_http_request.html#L40" class="js-smell-location">2</a>                  </span>  </li></ul>
+          else
+            scheme = @connection.use_ssl? ? &#39;https&#39; : &#39;http&#39;
+            URI(&quot;#{scheme}://#{@connection.address}:#{@connection.port}#{@request.path}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Http::NetHttpRequest#uri calls @request.path 3 times                        <a href="net_http_request.html#L35" class="js-smell-location">0</a>                  <a href="net_http_request.html#L37" class="js-smell-location">1</a>                  <a href="net_http_request.html#L40" class="js-smell-location">2</a>                  </span>  </li></ul>
+        end
+      end
+    end
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

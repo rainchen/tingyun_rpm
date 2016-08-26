@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::RackHelpers</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 05:23:13 +0000'>2016-01-12 05:23:13 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      24 complexity
+    </div>
+    <div class="file-stat">
+      4.8 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/instrumentation/middleware_proxy&#39;
+require &#39;ting_yun/support/version_number&#39;
+
+
+
+module TingYun
+  module Instrumentation
+
+    module RackHelpers<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::RackHelpers has no descriptive comment          </span>  </li></ul>
+      extend self
+
+      def middleware_instrumentation_enabled?
+        version_supported? &amp;&amp; !::TingYun::Agent.config[:disable_middleware_instrumentation]
+      end
+
+      def version_supported?
+        rack_version_supported?
+      end
+
+      def rack_version_supported?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::RackHelpers#rack_version_supported? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        return false unless defined? ::Rack
+
+        version = ::TingYun::Support::VersionNumber.new(::Rack.release)
+        min_version = ::TingYun::Support::VersionNumber.new(&#39;1.1.0&#39;)
+        version &gt;= min_version
+      end
+    end
+
+    module RackBuilder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::RackBuilder has no descriptive comment          </span>  </li></ul>
+      def run_with_tingyun(app, *args)
+        if ::TingYun::Instrumentation::RackHelpers.middleware_instrumentation_enabled?
+          wrapped_app = ::TingYun::Instrumentation::MiddlewareProxy.wrap(app, true)
+          run_without_tingyun(wrapped_app, *args)
+        else
+          run_without_tingyun(app, *args)
+        end
+      end
+
+
+      # def use_with_tingyun(middleware_class, *args, &amp;blk)
+      #   if ::TingYun::Instrumentation::RackHelpers.middleware_instrumentation_enabled?
+      #     wrapped_middleware_class = ::TingYun::Instrumentation::MiddlewareProxy.for_class(middleware_class)
+      #     use_without_tingyun(wrapped_middleware_class, *args, &amp;blk)
+      #   else
+      #     use_without_tingyun(middleware_class, *args, &amp;blk)
+      #   end
+      # end
+
+      # We patch this method for a reason that actually has nothing to do with
+      # instrumenting rack itself. It happens to be a convenient and
+      # easy-to-hook point that happens late in the startup sequence of almost
+      # every application, making it a good place to do a final call to
+      # LibraryDetection.detect!, since all libraries are likely loaded at
+      # this point.
+      def to_app_with_tingyun_deferred_dependency_detection
+        unless ::Rack::Builder._nr_deferred_detection_ran
+          TingYun::Agent.logger.info &quot;Doing deferred library-detection before Rack startup&quot;
+          TingYun::Support::LibraryDetection.detect!
+          ::Rack::Builder._nr_deferred_detection_ran = true
+        end
+
+        result = to_app_without_tingyun
+      end
+    end
+  end
+end
+
+
+
+
+
+TingYun::Support::LibraryDetection.defer do
+
+  named :rack
+
+  depends_on do
+    defined?(::Rack) &amp;&amp; defined?(::Rack::Builder)
+  end
+
+  executes do
+    ::TingYun::Agent.logger.info &#39;Installing deferred Rack instrumentation&#39;
+
+    class ::Rack::Builder
+      class &lt;&lt; self
+        attr_accessor :_nr_deferred_detection_ran<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      ::Rack::Builder#_nr_deferred_detection_ran is a writable attribute          </span>  </li></ul>
+      end
+
+      self._nr_deferred_detection_ran = false
+
+      include ::TingYun::Instrumentation::RackBuilder
+
+      alias_method :to_app_without_tingyun, :to_app
+      alias_method :to_app, :to_app_with_tingyun_deferred_dependency_detection
+
+      unless TingYun::Agent.config[:disable_middleware_instrumentation]
+        ::TingYun::Agent.logger.info &#39;Installing Rack::Builder middleware instrumentation&#39;
+
+        alias_method :run_without_tingyun, :run
+        alias_method :run, :run_with_tingyun
+        #
+        # alias_method :use_without_tingyun, :use
+        # alias_method :use, :use_with_tingyun
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

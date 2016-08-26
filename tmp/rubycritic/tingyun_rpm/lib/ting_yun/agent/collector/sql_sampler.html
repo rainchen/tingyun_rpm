@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Agent::Collector::SqlSampler</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-23 18:28:00 +0800'>2016-08-23 18:28:00 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      120 complexity
+    </div>
+    <div class="file-stat">
+      12.0 complexity per method
+    </div>
+    <div class="file-stat">
+      30 churn
+    </div>
+    <div class="file-stat">
+      10 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent/database&#39;
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+
+
+require &#39;ting_yun/agent/collector/sql_sampler/transaction_sql_data&#39;
+require &#39;ting_yun/agent/collector/sql_sampler/slow_sql&#39;
+require &#39;ting_yun/agent/collector/sql_sampler/sql_trace&#39;
+module TingYun
+  module Agent
+    module Collector
+      # This class contains the logic of recording slow SQL traces, which may
+      # represent multiple aggregated SQL queries.
+      #
+      # A slow SQL trace consists of a collection of SQL instrumented SQL queries
+      # that all normalize to the same text. For example, the following two
+      # queries would be aggregated together into a single slow SQL trace:
+      #
+      #   SELECT * FROM table WHERE id=42
+      #   SELECT * FROM table WHERE id=1234
+      #
+      # Each slow SQL trace keeps track of the number of times the same normalized
+      # query was seen, the min, max, and total time spent executing those
+      # queries, and an example backtrace from one of the aggregated queries.
+
+      class SqlSampler<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::SqlSampler has prima donna method `harvest!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::SqlSampler has prima donna method `merge!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::SqlSampler has prima donna method `reset!`          </span>  </li></ul>
+
+        MAX_SAMPLES = 10
+
+        attr_reader :sql_traces
+
+        def initialize
+          @sql_traces = {}
+          @samples_lock = Mutex.new
+        end
+
+        def self.on_start_transaction(state, uri)
+          return unless TingYun::Agent::Database.sql_sampler_enabled?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::SqlSampler tests TingYun::Agent::Database.sql_sampler_enabled? at least 3 times                        <a href="sql_sampler.html#L39" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L64" class="js-smell-location">1</a>                  <a href="sql_sampler.html#L113" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+          state.init_sql_transaction(::TingYun::Agent::Collector::TransactionSqlData.new(uri))
+        end
+
+        # duration{:type =&gt; sec}
+        def notice_sql(sql, metric_name, config, duration, state=nil, explainer=nil, binds=[], name=&quot;SQL&quot;) #THREAD_LOCAL_ACCESS sometimes<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql has a flog score of 35          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql has 8 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql has approx 10 statements          </span>  </li></ul>
+          start_time = Time.now.to_f
+          state ||= TingYun::Agent::TransactionState.tl_get
+          data = state.sql_sampler_transaction_data<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql refers to state more than self (maybe move it to another class?)                        <a href="sql_sampler.html#L48" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L51" class="js-smell-location">1</a>                  </span>  </li></ul>
+          return unless data
+
+          if duration*1000 &gt; TingYun::Agent.config[:&#39;nbs.action_tracer.slow_sql_threshold&#39;] &amp;&amp; state.sql_recorded?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql calls TingYun::Agent.config 2 times                        <a href="sql_sampler.html#L51" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L52" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql calls duration*1000 2 times                        <a href="sql_sampler.html#L51" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L52" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql refers to duration more than self (maybe move it to another class?)                        <a href="sql_sampler.html#L51" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L52" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql refers to state more than self (maybe move it to another class?)                        <a href="sql_sampler.html#L48" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L51" class="js-smell-location">1</a>                  </span>  </li></ul>
+            if duration*1000 &gt; TingYun::Agent.config[:&#39;nbs.action_tracer.stack_trace_threshold&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql calls TingYun::Agent.config 2 times                        <a href="sql_sampler.html#L51" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L52" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql calls duration*1000 2 times                        <a href="sql_sampler.html#L51" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L52" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql refers to duration more than self (maybe move it to another class?)                        <a href="sql_sampler.html#L51" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L52" class="js-smell-location">1</a>                  </span>  </li></ul>
+              backtrace = (caller.reject! { |t| t.include?(&#39;tingyun_rpm&#39;) })<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::SqlSampler#notice_sql has the variable name 't'          </span>  </li></ul>
+              backtrace = backtrace.first(20).join(&quot;\n&quot;)
+            else
+              backtrace = &#39;&#39;
+            end
+            statement = TingYun::Agent::Database::Statement.new(sql, config, explainer, binds, name)
+            data.sql_data &lt;&lt; ::TingYun::Agent::Collector::SlowSql.new(statement, metric_name, duration, start_time, backtrace)
+          end
+        end
+
+        def on_finishing_transaction(state, name)
+          return unless TingYun::Agent::Database.sql_sampler_enabled?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::SqlSampler tests TingYun::Agent::Database.sql_sampler_enabled? at least 3 times                        <a href="sql_sampler.html#L39" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L64" class="js-smell-location">1</a>                  <a href="sql_sampler.html#L113" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+          transaction_sql_data = state.sql_sampler_transaction_data
+          return unless transaction_sql_data
+
+          transaction_sql_data.set_transaction_name(name)
+
+          save_slow_sql(transaction_sql_data)
+        end
+
+        def save_slow_sql(data)
+          if data.sql_data.size &gt; 0<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#save_slow_sql calls data.sql_data 2 times                        <a href="sql_sampler.html#L75" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L77" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#save_slow_sql calls data.sql_data.size 2 times                        <a href="sql_sampler.html#L75" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L77" class="js-smell-location">1</a>                  </span>  </li></ul>
+            @samples_lock.synchronize do
+              ::TingYun::Agent.logger.debug &quot;Examining #{data.sql_data.size} slow transaction sql statement(s)&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#save_slow_sql calls data.sql_data 2 times                        <a href="sql_sampler.html#L75" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L77" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#save_slow_sql calls data.sql_data.size 2 times                        <a href="sql_sampler.html#L75" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L77" class="js-smell-location">1</a>                  </span>  </li></ul>
+              save data
+            end
+          end
+        end
+
+        def save (transaction_sql_data)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Collector::SqlSampler#save has a flog score of 34          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::SqlSampler#save has approx 11 statements          </span>  </li></ul>
+          action_metric_name = transaction_sql_data.metric_name
+          uri                = transaction_sql_data.uri
+
+          transaction_sql_data.sql_data.each do |sql_item|
+            normalized_sql = sql_item.normalize
+            sql_trace = @sql_traces[normalized_sql]
+            if sql_trace
+              sql_trace.aggregate(sql_item, action_metric_name, uri)
+            else
+              if has_room?
+                @sql_traces[normalized_sql] = ::TingYun::Agent::Collector::SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#save calls @sql_traces[normalized_sql] = ::TingYun::Agent::Collector::SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri) 2 times                        <a href="sql_sampler.html#L94" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L99" class="js-smell-location">1</a>                  </span>  </li></ul>
+              else
+                min, max = @sql_traces.minmax_by { |(_, trace)| trace.max_call_time }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nested-Iterators.md" target="_blank">NestedIterators</a>)      TingYun::Agent::Collector::SqlSampler#save contains iterators nested 2 deep          </span>  </li></ul>
+                if max.last.max_call_time &lt; sql_item.duration
+                  @sql_traces.delete(min.first)
+                  @sql_traces[normalized_sql] = ::TingYun::Agent::Collector::SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#save calls @sql_traces[normalized_sql] = ::TingYun::Agent::Collector::SqlTrace.new(normalized_sql, sql_item, action_metric_name, uri) 2 times                        <a href="sql_sampler.html#L94" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L99" class="js-smell-location">1</a>                  </span>  </li></ul>
+                end
+              end
+            end
+          end
+        end
+
+        # this should always be called under the @samples_lock
+        def has_room?
+          @sql_traces.size &lt; MAX_SAMPLES
+        end
+
+
+        def harvest!<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::SqlSampler#harvest! has approx 8 statements          </span>  </li></ul>
+          return [] unless TingYun::Agent::Database.sql_sampler_enabled?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::SqlSampler tests TingYun::Agent::Database.sql_sampler_enabled? at least 3 times                        <a href="sql_sampler.html#L39" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L64" class="js-smell-location">1</a>                  <a href="sql_sampler.html#L113" class="js-smell-location">2</a>                  </span>  </li></ul>
+          slowest = []
+          @samples_lock.synchronize do
+            slowest = @sql_traces.values
+            @sql_traces = {}
+          end
+          slowest.each {|trace| trace.prepare_to_send }
+          slowest
+        end
+
+        def reset!
+          @samples_lock.synchronize do
+            @sql_traces = {}
+          end
+        end
+
+        def merge!(sql_traces)
+          @samples_lock.synchronize do
+            sql_traces.each do |trace|
+              existing_trace = @sql_traces[trace.sql]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#merge! calls trace.sql 2 times                        <a href="sql_sampler.html#L132" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L136" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::SqlSampler#merge! refers to trace more than self (maybe move it to another class?)                        <a href="sql_sampler.html#L132" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L134" class="js-smell-location">1</a>                  <a href="sql_sampler.html#L136" class="js-smell-location">2</a>                  </span>  </li></ul>
+              if existing_trace
+                existing_trace.aggregate(trace.slow_sql, trace.path, trace.url)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::SqlSampler#merge! refers to trace more than self (maybe move it to another class?)                        <a href="sql_sampler.html#L132" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L134" class="js-smell-location">1</a>                  <a href="sql_sampler.html#L136" class="js-smell-location">2</a>                  </span>  </li></ul>
+              else
+                @sql_traces[trace.sql] = trace<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::SqlSampler#merge! calls trace.sql 2 times                        <a href="sql_sampler.html#L132" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L136" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::SqlSampler#merge! refers to trace more than self (maybe move it to another class?)                        <a href="sql_sampler.html#L132" class="js-smell-location">0</a>                  <a href="sql_sampler.html#L134" class="js-smell-location">1</a>                  <a href="sql_sampler.html#L136" class="js-smell-location">2</a>                  </span>  </li></ul>
+              end
+            end
+          end
+        end
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

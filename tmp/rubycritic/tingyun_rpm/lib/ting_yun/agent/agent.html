@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Agent::Agent</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-03 16:51:31 +0800'>2016-08-03 16:51:31 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      82 complexity
+    </div>
+    <div class="file-stat">
+      11.7 complexity per method
+    </div>
+    <div class="file-stat">
+      22 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/logger/agent_logger&#39;
+require &#39;ting_yun/agent/class_methods&#39;
+require &#39;ting_yun/agent/instance_methods&#39;
+require &#39;ting_yun/ting_yun_service&#39;
+require &#39;ting_yun/frameworks&#39;
+require &#39;ting_yun/agent/event/event_listener&#39;
+require &#39;ting_yun/agent/dispatcher&#39;
+require &#39;ting_yun/agent/collector/middle_ware_collector&#39;
+require &#39;ting_yun/agent/cross_app/cross_app_monitor&#39;
+
+
+# The Agent is a singleton that is instantiated when the plugin is
+# activated.  It collects performance data from ruby applications
+# in realtime as the application runs, and periodically sends that
+# data to the  server. TingYun::Agent::Agent.instance
+
+module TingYun
+  module Agent
+    class Agent<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Agent has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Agent has prima donna method `connect!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::Agent has at least 10 instance variables          </span>  </li></ul>
+
+      class &lt;&lt; self
+        private :new
+      end
+
+      # service for communicating with collector
+      attr_accessor :service, :cross_app_monitor<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Agent#cross_app_monitor is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Agent#service is a writable attribute          </span>  </li></ul>
+      attr_reader :events
+
+      extend ClassMethods
+      include InstanceMethods
+
+
+      def initialize
+        @started = false
+        @environment_report = nil
+        @service = TingYunService.new
+        @connect_state = :pending #[:pending, :connected, :disconnected]
+        @connect_attempts = 0
+        @events  = TingYun::Agent::Event::EventListener.new
+        @after_fork_lock = Mutex.new
+        @dispatcher = TingYun::Agent::Dispatcher.new(@events)
+        @cross_app_monitor = TingYun::Agent::CrossAppMonitor.new(@events)
+
+        init_containers
+      end
+
+      def start
+        # should hava the vaild app_name, unstart-state and able to start
+        return unless agent_should_start?
+        log_startup
+        check_config_and_start_agent
+        log_version_and_pid
+      end
+
+      # Attempt a graceful shutdown of the agent, flushing any remaining
+      # data.
+      def shutdown<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Agent#shutdown has approx 7 statements          </span>  </li></ul>
+        return unless started?
+        TingYun::Agent.logger.info &quot;Starting Agent shutdown&quot;
+
+        stop_event_loop
+        untraced_graceful_disconnect
+        reset_to_default_configuration
+
+        @started = nil
+
+        TingYun::Frameworks::Framework.reset
+      end
+
+      # Connect to the server and validate the license.  If successful,
+      # connected? returns true when finished.  If not successful, you can
+      # keep calling this.  Return false if we could not establish a
+      # connection with the server and we should not retry, such as if
+      # there&#39;s a bad license key.
+
+      def connect!(option={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Agent#connect! has a flog score of 33          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Agent#connect! has approx 21 statements          </span>  </li></ul>
+        defaults = {
+            :keep_retrying =&gt; ::TingYun::Agent.config[:keep_retrying],<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Agent#connect! calls ::TingYun::Agent.config 2 times                        <a href="agent.html#L80" class="js-smell-location">0</a>                  <a href="agent.html#L81" class="js-smell-location">1</a>                  </span>  </li></ul>
+            :force_reconnect =&gt; ::TingYun::Agent.config[:force_reconnect]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Agent#connect! calls ::TingYun::Agent.config 2 times                        <a href="agent.html#L80" class="js-smell-location">0</a>                  <a href="agent.html#L81" class="js-smell-location">1</a>                  </span>  </li></ul>
+        }
+        opts = defaults.merge(option)
+        return unless should_connect?(opts[:force_reconnect])
+        TingYun::Agent.logger.debug &quot;Connecting Process to Ting Yun: #$0&quot;
+        query_server_for_configuration
+        @connected_pid = $$
+        @connect_state = :connected
+      rescue TingYun::Support::Exception::LicenseException =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Agent#connect! has the variable name 'e'                        <a href="agent.html#L89" class="js-smell-location">0</a>                  <a href="agent.html#L91" class="js-smell-location">1</a>                  <a href="agent.html#L93" class="js-smell-location">2</a>                  <a href="agent.html#L103" class="js-smell-location">3</a>                  </span>  </li></ul>
+        handle_license_error(e)
+      rescue TingYun::Support::Exception::UnrecoverableAgentException =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Agent#connect! has the variable name 'e'                        <a href="agent.html#L89" class="js-smell-location">0</a>                  <a href="agent.html#L91" class="js-smell-location">1</a>                  <a href="agent.html#L93" class="js-smell-location">2</a>                  <a href="agent.html#L103" class="js-smell-location">3</a>                  </span>  </li></ul>
+        handle_unrecoverable_agent_error(e)
+      rescue StandardError, Timeout::Error, TingYun::Support::Exception::ServerConnectionException, TingYun::Support::Exception::AgentEnableException =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Agent#connect! has the variable name 'e'                        <a href="agent.html#L89" class="js-smell-location">0</a>                  <a href="agent.html#L91" class="js-smell-location">1</a>                  <a href="agent.html#L93" class="js-smell-location">2</a>                  <a href="agent.html#L103" class="js-smell-location">3</a>                  </span>  </li></ul>
+        log_error(e)
+        if TingYun::Agent.config[:keep_retrying]
+          note_connect_failure
+          ::TingYun::Agent.logger.info &quot;Will re-attempt in 60 seconds&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Agent#connect! calls ::TingYun::Agent.logger 2 times                        <a href="agent.html#L97" class="js-smell-location">0</a>                  <a href="agent.html#L104" class="js-smell-location">1</a>                  </span>  </li></ul>
+          sleep 60
+          retry
+        else
+          disconnect
+        end
+      rescue Exception =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Agent#connect! has the variable name 'e'                        <a href="agent.html#L89" class="js-smell-location">0</a>                  <a href="agent.html#L91" class="js-smell-location">1</a>                  <a href="agent.html#L93" class="js-smell-location">2</a>                  <a href="agent.html#L103" class="js-smell-location">3</a>                  </span>  </li></ul>
+        ::TingYun::Agent.logger.error &quot;Exception of unexpected type during Agent#connect():&quot;, e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Agent#connect! calls ::TingYun::Agent.logger 2 times                        <a href="agent.html#L97" class="js-smell-location">0</a>                  <a href="agent.html#L104" class="js-smell-location">1</a>                  </span>  </li></ul>
+        raise
+      end
+
+
+      def install_exit_handler<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Agent#install_exit_handler has approx 6 statements          </span>  </li></ul>
+        TingYun::Agent.logger.debug(&quot;Installing at_exit handler&quot;)
+        at_exit do
+          if need_exit_code_workaround?
+            exit_status = $!.status if $!.is_a?(SystemExit)
+            shutdown
+            exit exit_status if exit_status
+          else
+            shutdown
+          end
+        end
+      end
+
+      def need_exit_code_workaround?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Agent#need_exit_code_workaround? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        defined?(RUBY_ENGINE) &amp;&amp; RUBY_ENGINE == &quot;ruby&quot; &amp;&amp; RUBY_VERSION.match(/^1\.9/)
+      end
+
+      def untraced_graceful_disconnect
+        begin
+          TingYun::Agent.disable_all_tracing do
+            if connected?
+              transmit_data
+            end
+          end
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Agent#untraced_graceful_disconnect has the variable name 'e'          </span>  </li></ul>
+          ::TingYun::Agent.logger.error e
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

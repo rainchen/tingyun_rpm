@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Support::VersionNumberTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      94 complexity
+    </div>
+    <div class="file-stat">
+      13.4 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;test_helper&#39;))
+require &#39;ting_yun/support/version_number&#39;
+
+module TingYun::Support
+  class VersionNumberTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::VersionNumberTest has no descriptive comment          </span>  </li></ul>
+
+    def test_comparison__first<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::VersionNumberTest#test_comparison__first has approx 9 statements          </span>  </li></ul>
+      versions = %w[1.0.0 0.1.0 0.0.1 10.0.1 1.10.0].map {|s| TingYun::Support::VersionNumber.new s }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_comparison__first has the variable name 's'          </span>  </li></ul>
+      assert_equal %w[0.0.1 0.1.0 1.0.0 1.10.0 10.0.1], versions.sort.map(&amp;:to_s)
+      v0 = TingYun::Support::VersionNumber.new &#39;1.2.3&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_comparison__first has the variable name 'v0'          </span>  </li></ul>
+      v1 = TingYun::Support::VersionNumber.new &#39;1.2.2&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_comparison__first has the variable name 'v1'          </span>  </li></ul>
+      v3 = TingYun::Support::VersionNumber.new &#39;1.2.2&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_comparison__first has the variable name 'v3'          </span>  </li></ul>
+      assert v0 &gt; v1
+      assert v1 == v1
+      assert v1 == v3
+    end
+
+    def test_comparison__second<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::VersionNumberTest#test_comparison__second has approx 6 statements          </span>  </li></ul>
+      v0 = TingYun::Support::VersionNumber.new &#39;1.2.0&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_comparison__second has the variable name 'v0'          </span>  </li></ul>
+      v1 = TingYun::Support::VersionNumber.new &#39;2.2.2&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_comparison__second has the variable name 'v1'          </span>  </li></ul>
+      v3 = TingYun::Support::VersionNumber.new &#39;1.1.2&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_comparison__second has the variable name 'v3'          </span>  </li></ul>
+      assert v0 &lt; v1
+      assert v1 &gt; v3
+      assert v3 &lt; v0
+    end
+    def test_bug
+      v0 = TingYun::Support::VersionNumber.new &#39;2.8.999&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_bug has the variable name 'v0'          </span>  </li></ul>
+      v1 = TingYun::Support::VersionNumber.new &#39;2.9.10&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_bug has the variable name 'v1'          </span>  </li></ul>
+      assert v1 &gt; v0
+      assert v0 &lt;= v1
+    end
+
+    def test_sort
+      values = %w[1.1.1
+                1.1.99
+                1.1.999
+                2.0.6
+                2.6.5
+                2.7
+                2.7.1
+                2.7.2
+                2.7.2.0
+                3
+                999]
+      assert_equal values, values.map{|v| TingYun::Support::VersionNumber.new v}.sort.map(&amp;:to_s)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_sort has the variable name 'v'          </span>  </li></ul>
+    end
+
+    def test_prerelease<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::VersionNumberTest#test_prerelease has approx 10 statements          </span>  </li></ul>
+      v0 = TingYun::Support::VersionNumber.new &#39;1.2.0.beta&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_prerelease has the variable name 'v0'          </span>  </li></ul>
+      assert_equal [1,2,0,&#39;beta&#39;], v0.parts
+      assert v0 &gt; &#39;1.1.9.0&#39;
+      assert v0 &gt; &#39;1.1.9.alpha&#39;
+      assert v0 &gt; &#39;1.2.0.alpha&#39;
+      assert v0 == &#39;1.2.0.beta&#39;
+      assert v0 &lt; &#39;1.2.1&#39;
+      assert v0 &lt; &#39;1.2.0&#39;
+      assert v0 &lt; &#39;1.2.0.c&#39;
+      assert v0 &lt; &#39;1.2.0.0&#39;
+
+    end
+
+    def test_compare_string<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::VersionNumberTest#test_compare_string has approx 7 statements          </span>  </li></ul>
+      v0 = TingYun::Support::VersionNumber.new &#39;1.2.0&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_compare_string has the variable name 'v0'          </span>  </li></ul>
+      v1 = TingYun::Support::VersionNumber.new &#39;2.2.2&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_compare_string has the variable name 'v1'          </span>  </li></ul>
+      v3 = TingYun::Support::VersionNumber.new &#39;1.1.2&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumberTest#test_compare_string has the variable name 'v3'          </span>  </li></ul>
+      assert v0 &lt; &#39;2.2.2&#39;
+      assert v1 &gt; &#39;1.1.2&#39;
+      assert v3 &lt; &#39;1.2.0&#39;
+      assert v0 == &#39;1.2.0&#39;
+    end
+
+    def test_string
+      assert_equal &#39;1.2.0&#39;, TingYun::Support::VersionNumber.new(&#39;1.2.0&#39;).to_s
+      assert_equal &#39;1.2&#39;, TingYun::Support::VersionNumber.new(&#39;1.2&#39;).to_s
+    end
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

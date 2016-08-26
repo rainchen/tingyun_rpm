@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::MongoCommandLogSubscriber</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-06-21 07:25:48 +0000'>2016-06-21 07:25:48 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      68 complexity
+    </div>
+    <div class="file-stat">
+      8.5 complexity per method
+    </div>
+    <div class="file-stat">
+      8 churn
+    </div>
+    <div class="file-stat">
+      8 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+require &#39;ting_yun/agent/datastore/metric_helper&#39;
+require &#39;ting_yun/agent/datastore/mongo&#39;
+require &#39;ting_yun/instrumentation/support/event_formatter&#39;
+
+
+module TingYun
+  module Instrumentation
+    class MongoCommandLogSubscriber<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber has no descriptive comment          </span>  </li></ul>
+
+      MONGODB = &#39;MongoDB&#39;.freeze
+      GET_MORE = &quot;getMore&quot;.freeze
+      COLLECTION = &quot;collection&quot;.freeze
+
+      def started(event)
+        begin
+          operations[event.operation_id] = event
+        rescue Exception =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#started has the variable name 'e'          </span>  </li></ul>
+          log_notification_error(&#39;started&#39;, e)
+        end
+      end
+
+
+      def completed(event)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#completed has approx 8 statements          </span>  </li></ul>
+        begin
+          state = TingYun::Agent::TransactionState.tl_get
+          state.mon_duration = event.duration*1000<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#completed calls event.duration 3 times                        <a href="mongo_command_log_subscriber.html#L30" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L36" class="js-smell-location">1</a>                  <a href="mongo_command_log_subscriber.html#L38" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#completed calls event.duration*1000 2 times                        <a href="mongo_command_log_subscriber.html#L30" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L36" class="js-smell-location">1</a>                  </span>  </li></ul>
+          started_event = operations.delete(event.operation_id)
+
+          base, *other_metrics = metrics(started_event)
+
+          TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
+              base, other_metrics, event.duration*1000<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#completed calls event.duration 3 times                        <a href="mongo_command_log_subscriber.html#L30" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L36" class="js-smell-location">1</a>                  <a href="mongo_command_log_subscriber.html#L38" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#completed calls event.duration*1000 2 times                        <a href="mongo_command_log_subscriber.html#L30" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L36" class="js-smell-location">1</a>                  </span>  </li></ul>
+          )
+          notice_nosql_statement(state, started_event, base, event.duration)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#completed calls event.duration 3 times                        <a href="mongo_command_log_subscriber.html#L30" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L36" class="js-smell-location">1</a>                  <a href="mongo_command_log_subscriber.html#L38" class="js-smell-location">2</a>                  </span>  </li></ul>
+        rescue Exception =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#completed has the variable name 'e'          </span>  </li></ul>
+          log_notification_error(&#39;completed&#39;, e)
+        end
+      end
+
+      alias :succeeded :completed
+      alias :failed :completed
+
+
+
+
+      private
+
+      def collection(event)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#collection doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if event.command_name == GET_MORE
+          event.command[COLLECTION]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#collection calls event.command 2 times                        <a href="mongo_command_log_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L56" class="js-smell-location">1</a>                  </span>  </li></ul>
+        else
+          event.command.values.first<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#collection calls event.command 2 times                        <a href="mongo_command_log_subscriber.html#L54" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L56" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      end
+
+      def log_notification_error(event_type, error)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#log_notification_error doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TingYun::Agent.logger.error(&quot;Error during MongoDB #{event_type} event:&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#log_notification_error calls TingYun::Agent.logger 2 times                        <a href="mongo_command_log_subscriber.html#L61" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L62" class="js-smell-location">1</a>                  </span>  </li></ul>
+        TingYun::Agent.logger.log_exception(:error, error)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#log_notification_error calls TingYun::Agent.logger 2 times                        <a href="mongo_command_log_subscriber.html#L61" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L62" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+
+
+      def operations
+        @operations ||= {}
+      end
+
+      def metrics(event)
+        TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB, TingYun::Agent::Datastore::Mongo.transform_operation(event.command_name), collection(event))
+      end
+
+      def generate_statement(event)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#generate_statement doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TingYun::Instrumentation::Support::EventFormatter.format(
+            event.command_name,
+            event.database_name,
+            event.command
+        )
+      end
+
+      def notice_nosql_statement(state, event, metric, duration)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#notice_nosql_statement has 4 parameters          </span>  </li></ul>
+        end_time = Time.now.to_f
+
+        stack  = state.traced_method_stack
+
+        # enter transaction trace node
+        frame = stack.push_frame(state, :mongo_db, end_time - duration)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#notice_nosql_statement refers to stack more than self (maybe move it to another class?)                        <a href="mongo_command_log_subscriber.html#L88" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L93" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+        TingYun::Agent.instance.transaction_sampler.notice_nosql_statement(generate_statement(event),duration*1000)
+
+        # exit transaction trace node
+        stack.pop_frame(state, frame, metric, end_time)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::MongoCommandLogSubscriber#notice_nosql_statement refers to stack more than self (maybe move it to another class?)                        <a href="mongo_command_log_subscriber.html#L88" class="js-smell-location">0</a>                  <a href="mongo_command_log_subscriber.html#L93" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

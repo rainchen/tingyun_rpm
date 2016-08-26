@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Agent::Database::ExplainPlanHelpers</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-24 15:11:54 +0800'>2016-08-24 15:11:54 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      91 complexity
+    </div>
+    <div class="file-stat">
+      8.3 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      11 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/agent/database/obfuscator&#39;
+
+module TingYun
+  module Agent
+    module Database
+      module ExplainPlanHelpers<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Database::ExplainPlanHelpers has no descriptive comment          </span>  </li></ul>
+
+        def handle_exception_in_explain<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::ExplainPlanHelpers#handle_exception_in_explain doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          yield
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Database::ExplainPlanHelpers#handle_exception_in_explain has the variable name 'e'          </span>  </li></ul>
+          begin
+            # guarantees no throw from explain_sql
+            ::TingYun::Agent.logger.error(&quot;Error getting query plan:&quot;, e)
+            nil
+          rescue
+            # double exception. throw up your hands
+            nil
+          end
+        end
+
+        def is_select?(sql)
+          parse_operation_from_query(sql) == &#39;select&#39;
+        end
+
+        def parameterized?(sql)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::ExplainPlanHelpers#parameterized? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Agent::Database::Obfuscator.instance.obfuscate_single_quote_literals(sql) =~ /\$\d+/
+        end
+
+        SQL_COMMENT_REGEX = Regexp.new(&#39;/\*.*?\*/&#39;, Regexp::MULTILINE).freeze
+        EMPTY_STRING      = &#39;&#39;.freeze
+
+
+        KNOWN_OPERATIONS = [
+            &#39;alter&#39;,
+            &#39;select&#39;,
+            &#39;update&#39;,
+            &#39;delete&#39;,
+            &#39;insert&#39;,
+            &#39;create&#39;,
+            &#39;show&#39;,
+            &#39;set&#39;,
+            &#39;exec&#39;,
+            &#39;execute&#39;,
+            &#39;call&#39;
+        ]
+
+        def parse_operation_from_query(sql)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::ExplainPlanHelpers#parse_operation_from_query doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          sql = TingYun::Helper.correctly_encoded(sql).gsub(SQL_COMMENT_REGEX, EMPTY_STRING)
+          if sql =~ /(\w+)/
+            op = $1.downcase
+            return op if KNOWN_OPERATIONS.include?(op)
+          end
+        end
+
+
+
+
+        POSTGRES_PREFIX = &#39;postgres&#39;.freeze
+        MYSQL_PREFIX    = &#39;mysql&#39;.freeze
+        MYSQL2_PREFIX   = &#39;mysql2&#39;.freeze
+        SQLITE_PREFIX   = &#39;sqlite&#39;.freeze
+
+        def symbolized_adapter(adapter)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::ExplainPlanHelpers#symbolized_adapter doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          if adapter.start_with? POSTGRES_PREFIX
+            :postgres
+          elsif adapter == MYSQL_PREFIX
+            :mysql
+            # For the purpose of fetching explain plans, we need to maintain the distinction
+            # between usage of mysql and mysql2. Obfuscation is the same, though.
+          elsif adapter == MYSQL2_PREFIX
+            :mysql2
+          elsif adapter.start_with? SQLITE_PREFIX
+            :sqlite
+          else
+            adapter.to_sym
+          end
+        end
+
+
+        def process_resultset(results, adapter)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_resultset has approx 7 statements          </span>  </li></ul>
+          if adapter == :postgres<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_resultset is controlled by argument adapter                        <a href="explain_plan_helpers.html#L82" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L91" class="js-smell-location">1</a>                  </span>  </li></ul>
+            return process_explain_results_postgres(results)
+          elsif defined?(::ActiveRecord::Result) &amp;&amp; results.is_a?(::ActiveRecord::Result)
+            # Note if adapter is mysql, will only have headers, not values
+            return [results.columns, results.rows]
+          elsif results.is_a?(String)
+            return string_explain_plan_results(results)
+          end
+
+          case adapter<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_resultset is controlled by argument adapter                        <a href="explain_plan_helpers.html#L82" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L91" class="js-smell-location">1</a>                  </span>  </li></ul>
+            when :mysql2
+              process_explain_results_mysql2(results)
+            when :mysql
+              process_explain_results_mysql(results)
+            when :sqlite
+              process_explain_results_sqlite(results)
+            else
+              return {}
+          end
+        end
+
+        QUERY_PLAN = &#39;QUERY PLAN&#39;.freeze
+
+        def process_explain_results_postgres(results)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_postgres has approx 10 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_postgres doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          if defined?(::ActiveRecord::Result) &amp;&amp; results.is_a?(::ActiveRecord::Result)
+            query_plan_string = results.rows.join(&quot;\n&quot;)
+          elsif results.is_a?(String)
+            query_plan_string = results
+          else
+            lines = []
+            results.each { |row| lines &lt;&lt; row[QUERY_PLAN] }
+            query_plan_string = lines.join(&quot;\n&quot;)
+          end
+
+          unless TingYun::Agent::Database.record_sql_method(&quot;nbs.action_tracer.record_sql&quot;) == :raw
+            query_plan_string = TingYun::Agent::Database::Obfuscator.instance.obfuscate_postgres_explain(query_plan_string)
+          end
+          values = query_plan_string.split(&quot;\n&quot;).map { |line| [line] }
+
+          {&quot;dialect&quot;=&gt; &quot;PostgreSQL&quot;, &quot;keys&quot;=&gt;[QUERY_PLAN], &quot;values&quot;=&gt;values}
+        end
+
+
+        def string_explain_plan_results(adpater, results)
+          {&quot;dialect&quot;=&gt; adpater, &quot;keys&quot;=&gt;[], &quot;values&quot;=&gt;[results]}
+        end
+
+        def process_explain_results_mysql2(results)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Method-Name.md" target="_blank">UncommunicativeMethodName</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql2 has the name 'process_explain_results_mysql2'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql2 doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          headers = results.fields
+          values  = []
+          results.each { |row| values &lt;&lt; row }
+          {&quot;dialect&quot;=&gt; &quot;MySQL&quot;, &quot;keys&quot;=&gt;headers, &quot;values&quot;=&gt;values}
+        end
+
+        def process_explain_results_mysql(results)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql has approx 11 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          headers = []
+          values  = []
+          if results.is_a?(Array)
+            # We&#39;re probably using the jdbc-mysql gem for JRuby, which will give
+            # us an array of hashes.
+            headers = results.first.keys
+            results.each do |row|
+              values &lt;&lt; headers.map { |h| row[h] }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql calls headers.map 2 times                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql calls headers.map { |h| row[h] } 2 times                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql calls row[h] 2 times                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql calls values << headers.map { |h| row[h] } 2 times                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nested-Iterators.md" target="_blank">NestedIterators</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql contains iterators nested 2 deep                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql has the variable name 'h'                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li></ul>
+            end
+          else
+            # We&#39;re probably using the native mysql driver gem, which will give us
+            # a Mysql::Result object that responds to each_hash
+            results.each_hash do |row|
+              headers = row.keys
+              values &lt;&lt; headers.map { |h| row[h] }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql calls headers.map 2 times                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql calls headers.map { |h| row[h] } 2 times                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql calls row[h] 2 times                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql calls values << headers.map { |h| row[h] } 2 times                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nested-Iterators.md" target="_blank">NestedIterators</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql contains iterators nested 2 deep                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_mysql has the variable name 'h'                        <a href="explain_plan_helpers.html#L144" class="js-smell-location">0</a>                  <a href="explain_plan_helpers.html#L151" class="js-smell-location">1</a>                  </span>  </li></ul>
+            end
+          end
+          {&quot;dialect&quot;=&gt; &quot;MySQL&quot;, &quot;keys&quot;=&gt;headers, &quot;values&quot;=&gt;values}
+        end
+
+        SQLITE_EXPLAIN_COLUMNS = %w[addr opcode p1 p2 p3 p4 p5 comment]
+
+        def process_explain_results_sqlite(results)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_sqlite has approx 6 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_sqlite doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          headers = SQLITE_EXPLAIN_COLUMNS
+          values  = []
+          results.each do |row|
+            values &lt;&lt; headers.map { |h| row[h] }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nested-Iterators.md" target="_blank">NestedIterators</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_sqlite contains iterators nested 2 deep          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Database::ExplainPlanHelpers#process_explain_results_sqlite has the variable name 'h'          </span>  </li></ul>
+          end
+          {&quot;dialect&quot;=&gt; &quot;sqlite&quot;, &quot;keys&quot;=&gt;headers, &quot;values&quot;=&gt;values}
+        end
+
+
+
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

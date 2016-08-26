@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::EnvironmentReportTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-15 05:37:30 +0000'>2016-07-15 05:37:30 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      60 complexity
+    </div>
+    <div class="file-stat">
+      5.5 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      11 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require File.expand_path(File.join(File.dirname(__FILE__),&#39;..&#39;,&#39;test_helper&#39;))
+
+require &#39;ting_yun/environment_report&#39;
+
+
+
+module TingYun
+  class EnvironmentReportTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::EnvironmentReportTest has no descriptive comment          </span>  </li></ul>
+
+    def setup
+      @old_logic = ::TingYun::EnvironmentReport.registered_reporters.dup
+      @report = ::TingYun::EnvironmentReport.new
+    end
+
+    def teardown
+      ::TingYun::EnvironmentReport.registered_reporters = @old_logic
+    end
+
+    def test_converts_to_array
+      ::TingYun::EnvironmentReport.report_on(&quot;something&quot;){&quot;awesome&quot;}
+      data = Array(::TingYun::EnvironmentReport.new)
+      expected = [&quot;something&quot;, &quot;awesome&quot;]
+      assert data.include?(expected), &quot;expected to find #{expected} in #{data.inspect}&quot;
+    end
+
+    def test_register_a_value_to_report_on
+      ::TingYun::EnvironmentReport.report_on(&quot;What time is it?&quot;) do
+        &quot;beer-o-clock&quot;
+      end
+      assert_equal &#39;beer-o-clock&#39;, ::TingYun::EnvironmentReport.new[&quot;What time is it?&quot;]
+    end
+
+    def test_report_on_handles_errors_gracefully
+      ::TingYun::EnvironmentReport.report_on(&quot;What time is it?&quot;) do
+        raise ArgumentError, &quot;woah! something blew up&quot;
+      end
+      assert_nil ::TingYun::EnvironmentReport.new[&quot;What time is it?&quot;]
+    end
+
+    def test_it_does_not_set_keys_for_nil_values
+      ::TingYun::EnvironmentReport.report_on(&quot;What time is it?&quot;) do
+        nil
+      end
+      assert ! ::TingYun::EnvironmentReport.new.data.has_key?(&quot;What time is it?&quot;)
+    end
+
+    def test_can_set_an_environment_value_directly
+      @report[&#39;My Value&#39;] = &#39;so awesome!!&#39;
+      assert_equal &#39;so awesome!!&#39;, @report[&#39;My Value&#39;]
+    end
+
+
+    def test_gathers_ruby_version
+      assert_equal RUBY_VERSION, @report[&#39;Ruby version&#39;]
+    end
+
+    def test_gathers_openssl_version
+      refute_nil @report[&#39;OpenSSL version&#39;]
+    end
+
+    def test_gathers_system_info<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::EnvironmentReportTest#test_gathers_system_info has approx 6 statements          </span>  </li></ul>
+      TingYun::Support::SystemInfo.stubs({
+                                            :num_logical_processors =&gt; 8,
+                                            :processor_arch         =&gt; &#39;x86_64&#39;,
+                                            :os_version             =&gt; &#39;WiggleOS 1.1.1&#39;,
+                                            :ruby_os_identifier     =&gt; &#39;wiggleos&#39;
+                                        })
+      report = ::TingYun::EnvironmentReport.new
+      assert_equal(8, report[&#39;Logical Processors&#39;])
+      assert_equal(&#39;x86_64&#39;, report[&#39;os_arch&#39;])
+      assert_equal(&#39;WiggleOS 1.1.1&#39;, report[&#39;os_version&#39;])
+      assert_equal(&#39;wiggleos&#39;, report[&#39;kernel&#39;])
+    end
+
+    def test_has_logic_for_keys
+      [
+          &#39;Gems&#39;,
+          &#39;Plugin List&#39;,
+          &#39;Ruby version&#39;,
+          &#39;Ruby description&#39;,
+          &#39;Ruby platform&#39;,
+          &#39;Ruby patchlevel&#39;,
+          &#39;JRuby version&#39;,
+          &#39;Java VM version&#39;,
+          &#39;Logical Processors&#39;,
+          &#39;Physical Cores&#39;,
+          &#39;Database adapter&#39;,
+          &#39;Framework&#39;,
+          &#39;Dispatcher&#39;,
+          &#39;Environment&#39;,
+          &#39;os_arch&#39;,
+          &#39;os_version&#39;,
+          &#39;kernel&#39;,
+          &#39;Rails Env&#39;,
+          &#39;Rails version&#39;,
+          &#39;Rails threadsafe&#39;,
+          &#39;OpenSSL version&#39;,
+      ].each do |key|
+        assert TingYun::EnvironmentReport.registered_reporters.has_key?(key), &quot;Expected logic for #{key.inspect} in EnvironmentReport.&quot;
+        end
+      end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

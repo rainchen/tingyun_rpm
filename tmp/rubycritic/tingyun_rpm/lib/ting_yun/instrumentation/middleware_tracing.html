@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::MiddlewareTracing</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-19 11:34:24 +0800'>2016-08-19 11:34:24 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      59 complexity
+    </div>
+    <div class="file-stat">
+      6.6 complexity per method
+    </div>
+    <div class="file-stat">
+      14 churn
+    </div>
+    <div class="file-stat">
+      9 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+require &#39;rack/request&#39;
+require &#39;ting_yun/instrumentation/support/queue_time&#39;
+require &#39;ting_yun/agent/transaction&#39;
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/instrumentation/support/external_error&#39;
+
+module TingYun
+  module Instrumentation
+    module MiddlewareTracing<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::MiddlewareTracing has no descriptive comment          </span>  </li></ul>
+      TXN_STARTED_KEY = &#39;tingyun.transaction_started&#39;.freeze unless defined?(TXN_STARTED_KEY)
+
+      def _nr_has_middleware_tracing
+        true
+      end
+
+      def build_transaction_options(env, first_middleware)
+        opts = transaction_options
+        opts = merge_first_middleware_options(opts, env) if first_middleware<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Instrumentation::MiddlewareTracing#build_transaction_options is controlled by argument first_middleware          </span>  </li></ul>
+        opts
+      end
+
+      def merge_first_middleware_options(opts, env)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MiddlewareTracing#merge_first_middleware_options doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        opts.merge(
+            :request          =&gt; ::Rack::Request.new(env),
+            :apdex_start_time =&gt; TingYun::Instrumentation::Support::QueueTime.parse_frontend_timestamp(env)
+        )
+      end
+
+      def capture_http_response_code(state, result)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MiddlewareTracing#capture_http_response_code doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if result.is_a?(Array) &amp;&amp; state.current_transaction<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MiddlewareTracing#capture_http_response_code calls state.current_transaction 2 times                        <a href="middleware_tracing.html#L33" class="js-smell-location">0</a>                  <a href="middleware_tracing.html#L34" class="js-smell-location">1</a>                  </span>  </li></ul>
+          state.current_transaction.attributes.add_agent_attribute(:httpStatus, result[0].to_s)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MiddlewareTracing#capture_http_response_code calls state.current_transaction 2 times                        <a href="middleware_tracing.html#L33" class="js-smell-location">0</a>                  <a href="middleware_tracing.html#L34" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      end
+      # the trailing unless is for the benefit for Ruby 1.8.7 and can be removed
+      # when it is deprecated.
+      CONTENT_TYPE = &#39;Content-Type&#39;.freeze unless defined?(CONTENT_TYPE)
+
+      def capture_response_content_type(state, result)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MiddlewareTracing#capture_response_content_type doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if result.is_a?(Array) &amp;&amp; state.current_transaction<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MiddlewareTracing#capture_response_content_type calls state.current_transaction 2 times                        <a href="middleware_tracing.html#L42" class="js-smell-location">0</a>                  <a href="middleware_tracing.html#L44" class="js-smell-location">1</a>                  </span>  </li></ul>
+          _, headers, _ = result
+          state.current_transaction.attributes.add_agent_attribute(:contentType, headers[CONTENT_TYPE].to_s)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::MiddlewareTracing#capture_response_content_type calls state.current_transaction 2 times                        <a href="middleware_tracing.html#L42" class="js-smell-location">0</a>                  <a href="middleware_tracing.html#L44" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      end
+
+      def capture_request(state, env)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Instrumentation::MiddlewareTracing#capture_request has unused parameter 'state'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MiddlewareTracing#capture_request doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if env.is_a? Hash
+
+        end
+      end
+
+      def call(env)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::MiddlewareTracing#call has approx 13 statements          </span>  </li></ul>
+        first_middleware = note_transaction_started(env)
+
+        state = TingYun::Agent::TransactionState.tl_get
+        if first_middleware
+          capture_request(state, env)
+        end
+        begin
+          TingYun::Agent::Transaction.start(state, category, build_transaction_options(env, first_middleware))
+          events.notify(:before_call, env) if first_middleware
+
+          result = target.call(env)
+
+          if first_middleware
+            capture_http_response_code(state, result)
+            capture_response_content_type(state, result)
+            events.notify(:after_call, result)
+          end
+
+          result
+        rescue Exception =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::MiddlewareTracing#call has the variable name 'e'          </span>  </li></ul>
+
+          TingYun::Agent.notice_error(e)
+          raise e
+        ensure
+          TingYun::Agent::Transaction.stop(state)
+        end
+      end
+
+
+      def note_transaction_started(env)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MiddlewareTracing#note_transaction_started doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        env[TXN_STARTED_KEY] = true unless env[TXN_STARTED_KEY]
+      end
+
+      def events<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::MiddlewareTracing#events doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        ::TingYun::Agent.instance.events
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

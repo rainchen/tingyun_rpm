@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Agent::Collector::MemorySampler::Base</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-29 02:36:41 +0000'>2016-04-29 02:36:41 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      83 complexity
+    </div>
+    <div class="file-stat">
+      5.5 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      15 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/agent/collector/middle_ware_collector/sampler&#39;
+require &#39;ting_yun/support/system_info&#39;
+
+module TingYun
+  module Agent
+    module Collector
+      class MemorySampler &lt; ::TingYun::Agent::Collector::Sampler<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::MemorySampler has no descriptive comment          </span>  </li></ul>
+        named :memory
+
+        attr_accessor :sampler<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Collector::MemorySampler#sampler is a writable attribute          </span>  </li></ul>
+
+        def initialize<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Collector::MemorySampler#initialize has a flog score of 33          </span>  </li></ul>
+          # macos, linux, solaris
+          if platform =~ /linux/
+            @sampler = ProcStatus.new
+            if !@sampler.can_run?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::MemorySampler#initialize calls @sampler.can_run? 2 times                        <a href="memory_sampler.html#L19" class="js-smell-location">0</a>                  <a href="memory_sampler.html#L36" class="js-smell-location">1</a>                  </span>  </li></ul>
+              ::TingYun::Agent.logger.debug &quot;Error attempting to use /proc/#{$$}/status file for reading memory. Using ps command instead.&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::MemorySampler#initialize calls ::TingYun::Agent.logger 2 times                        <a href="memory_sampler.html#L20" class="js-smell-location">0</a>                  <a href="memory_sampler.html#L23" class="js-smell-location">1</a>                  </span>  </li></ul>
+              @sampler = ShellPS.new(&quot;ps -o rsz&quot;)
+            else
+              ::TingYun::Agent.logger.debug &quot;Using /proc/#{$$}/status for reading process memory.&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::MemorySampler#initialize calls ::TingYun::Agent.logger 2 times                        <a href="memory_sampler.html#L20" class="js-smell-location">0</a>                  <a href="memory_sampler.html#L23" class="js-smell-location">1</a>                  </span>  </li></ul>
+            end
+          elsif platform =~ /darwin9/ # 10.5
+            @sampler = ShellPS.new(&quot;ps -o rsz&quot;)
+          elsif platform =~ /darwin1\d+/ # &gt;= 10.6
+            @sampler = ShellPS.new(&quot;ps -o rss&quot;)
+          elsif platform =~ /freebsd/
+            @sampler = ShellPS.new(&quot;ps -o rss&quot;)
+          elsif platform =~ /solaris/
+            @sampler = ShellPS.new(&quot;/usr/bin/ps -o rss -p&quot;)
+          end
+
+          raise Unsupported, &quot;Unsupported platform for getting memory: #{platform}&quot; if @sampler.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Agent::Collector::MemorySampler#initialize performs a nil-check          </span>  </li></ul>
+          raise Unsupported, &quot;Unable to run #{@sampler}&quot; unless @sampler.can_run?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::MemorySampler#initialize calls @sampler.can_run? 2 times                        <a href="memory_sampler.html#L19" class="js-smell-location">0</a>                  <a href="memory_sampler.html#L36" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+        def self.supported_on_this_platform?
+          platform =~ /linux|darwin|freebsd|solaris/
+        end
+
+        def platform<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::MemorySampler#platform doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Support::SystemInfo.ruby_os_identifier.downcase
+        end
+
+        def self.platform
+          TingYun::Support::SystemInfo.ruby_os_identifier.downcase
+        end
+
+        def poll
+          sample = @sampler.get_sample
+          if sample
+            TingYun::Agent.record_metric(&quot;Memory/NULL/PhysicalUsed&quot;, sample)
+          end
+        end
+
+        class Base<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::MemorySampler::Base has no descriptive comment          </span>  </li></ul>
+          def initialize
+            @broken = false
+          end
+
+          def can_run?
+            return false if @broken
+            m = get_memory rescue nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::MemorySampler::Base#can_run? has the variable name 'm'          </span>  </li></ul>
+            m &amp;&amp; m &gt; 0
+          end
+
+          def get_memory
+            raise &#39;Implement in the subclass&#39;
+          end
+
+          def get_sample<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::MemorySampler::Base#get_sample has approx 9 statements          </span>  </li></ul>
+            return nil if @broken
+            begin
+              m = get_memory<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::MemorySampler::Base#get_sample has the variable name 'm'          </span>  </li></ul>
+              if m.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Agent::Collector::MemorySampler::Base#get_sample performs a nil-check          </span>  </li></ul>
+                ::TingYun::Agent.logger.warn &quot;Unable to get the resident memory for process #{$$}.  Disabling memory sampler.&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::MemorySampler::Base#get_sample calls ::TingYun::Agent.logger 2 times                        <a href="memory_sampler.html#L78" class="js-smell-location">0</a>                  <a href="memory_sampler.html#L83" class="js-smell-location">1</a>                  </span>  </li></ul>
+                @broken = true
+              end
+              return m
+            rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::MemorySampler::Base#get_sample has the variable name 'e'          </span>  </li></ul>
+              ::TingYun::Agent.logger.warn &quot;Unable to get the resident memory for process #{$$}. Disabling memory sampler.&quot;, e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::MemorySampler::Base#get_sample calls ::TingYun::Agent.logger 2 times                        <a href="memory_sampler.html#L78" class="js-smell-location">0</a>                  <a href="memory_sampler.html#L83" class="js-smell-location">1</a>                  </span>  </li></ul>
+              @broken = true
+              return nil
+            end
+          end
+        end
+
+        class ShellPS &lt; Base<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::MemorySampler::ShellPS has no descriptive comment          </span>  </li></ul>
+          def initialize(command)
+            super()
+            @command = command
+          end
+
+          # Returns the amount of resident memory this process is using in MB
+          #
+          def get_memory
+            process = $$
+            memory = `#{@command} #{process}`.split(&quot;\n&quot;)[1].to_f / 1024.0 rescue nil
+            # if for some reason the ps command doesn&#39;t work on the resident os,
+            # then don&#39;t execute it any more.
+            raise &quot;Faulty command: `#{@command} #{process}`&quot; if memory.nil? || memory &lt;= 0<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Agent::Collector::MemorySampler::ShellPS#get_memory performs a nil-check          </span>  </li></ul>
+            memory
+          end
+
+          def to_s
+            &quot;shell command sampler: #{@command}&quot;
+          end
+        end
+
+        # ProcStatus
+        #
+        # A class that samples memory by reading the file /proc/$$/status, which is specific to linux
+        #
+        class ProcStatus &lt; Base
+          # Returns the amount of resident memory this process is using in MB
+          def get_memory
+            proc_status = File.open(proc_status_file, &quot;r&quot;) {|f| f.read_nonblock(4096).strip }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::MemorySampler::ProcStatus#get_memory has the variable name 'f'          </span>  </li></ul>
+            if proc_status =~ /RSS:\s*(\d+) kB/i
+              return $1.to_f / 1024.0
+            end
+            raise &quot;Unable to find RSS in #{proc_status_file}&quot;
+          end
+
+          def proc_status_file
+            &quot;/proc/#{$$}/status&quot;
+          end
+
+          def to_s
+            &quot;proc status file sampler: #{proc_status_file}&quot;
+          end
+        end
+      end
+    end
+  end
+end
+
+
+</code>
+
+    </div>
+    <script src='../../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Collector::SqlTrace</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-22 15:24:39 +0800'>2016-08-22 15:24:39 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      51 complexity
+    </div>
+    <div class="file-stat">
+      10.2 complexity per method
+    </div>
+    <div class="file-stat">
+      1 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/metrics/stats&#39;
+require &#39;ting_yun/support/helper&#39;
+require &#39;ting_yun/support/coerce&#39;
+
+module TingYun
+  module Agent
+    module Collector
+
+      class SqlTrace &lt; TingYun::Metrics::Stats<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::SqlTrace has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::Collector::SqlTrace has at least 5 instance variables          </span>  </li></ul>
+
+        attr_reader :action_metric_name
+        attr_reader :uri
+        attr_reader :sql
+        attr_reader :slow_sql
+        attr_reader :params
+
+        def initialize(normalized_query, slow_sql, action_name, uri)
+          super()
+          @params = {}
+
+          @action_metric_name = action_name
+          @slow_sql = slow_sql
+          @sql = normalized_query
+          @uri = uri
+          @params[:stacktrace] = slow_sql.backtrace
+          record_data_point(float(slow_sql.duration))
+        end
+
+        def aggregate(slow_sql, action_name, uri)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::SqlTrace#aggregate has approx 6 statements          </span>  </li></ul>
+          duration = slow_sql.duration
+          if duration &gt; max_call_time
+            @action_metric_name = action_name
+            @slow_sql = slow_sql
+            @uri = uri
+            @params[:stacktrace] = slow_sql.backtrace
+          end
+          record_data_point(float(duration))
+        end
+
+
+        def prepare_to_send
+          @sql = @slow_sql.sql unless Agent.config[:&#39;nbs.action_tracer.record_sql&#39;].to_s == &#39;obfuscated&#39;
+          @params[:explainPlan] = @slow_sql.explain if need_to_explain?
+        end
+
+
+        def need_to_explain?
+          Agent.config[:&#39;nbs.action_tracer.explain_enabled&#39;] &amp;&amp;  @slow_sql.duration * 1000 &gt; TingYun::Agent.config[:&#39;nbs.action_tracer.explain_threshold&#39;]
+        end
+
+
+        include TingYun::Support::Coerce
+
+        def to_collector_array(encoder)
+          [
+              @slow_sql.start_time,
+              string(@action_metric_name),
+              string(@slow_sql.metric_name),
+              string(@uri||@action_metric_name),
+              string(@sql),
+              int(@call_count),
+              TingYun::Helper.time_to_millis(@total_call_time),
+              TingYun::Helper.time_to_millis(@max_call_time),
+              TingYun::Helper.time_to_millis(@min_call_time),
+              encoder.encode(@params)
+          ]
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

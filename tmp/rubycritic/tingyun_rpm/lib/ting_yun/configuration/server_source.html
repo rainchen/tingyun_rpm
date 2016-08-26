@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Configuration::ServerSource</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 05:47:48 +0000'>2016-01-12 05:47:48 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      32 complexity
+    </div>
+    <div class="file-stat">
+      4.6 complexity per method
+    </div>
+    <div class="file-stat">
+      7 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require &#39;ting_yun/configuration/dotted_hash&#39;
+
+module TingYun
+  module Configuration
+    class ServerSource &lt; DottedHash<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Configuration::ServerSource has no descriptive comment          </span>  </li></ul>
+      # These keys appear *outside* of the agent_config hash in the connect
+      # response, but should still be merged in as config settings to the
+      # main agent configuration.
+      TOP_LEVEL_KEYS = [
+          &quot;applicationId&quot;,
+          &quot;tingyunIdSecret&quot;,
+          &quot;enabled&quot;,
+          &quot;appSessionKey&quot;,
+          &quot;dataSentInterval&quot;,
+          &quot;apdex_t&quot;,
+          &quot;config&quot;
+      ]
+
+      def self.add_top_level_keys_for_testing(add_array)
+        TOP_LEVEL_KEYS.concat add_array
+      end
+
+      def self.remove_top_level_keys_for_testing(remove_arry)
+        remove_arry.each{|i| TOP_LEVEL_KEYS.delete(i)}<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::ServerSource#self.remove_top_level_keys_for_testing has the variable name 'i'          </span>  </li></ul>
+      end
+
+      def initialize(connect_reply)
+        merged_settings = {}
+
+        merge_top_level_keys(merged_settings, connect_reply)
+        merge_agent_config_hash(merged_settings, connect_reply)
+        filter_keys(merged_settings)
+        # apply_feature_gates(merged_settings, connect_reply, existing_config)
+
+        # The value under this key is a hash mapping transaction name strings
+        # to apdex_t values. We don&#39;t want the nested hash to be flattened
+        # as part of the call to super below, so it skips going through
+        # merged_settings.
+        # self[:web_transactions_apdex] = connect_reply[&#39;web_transactions_apdex&#39;]
+
+        # This causes keys in merged_settings to be symbolized and flattened
+        super(merged_settings)
+      end
+
+      def merge_top_level_keys(merged_settings, connect_reply)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::ServerSource#merge_top_level_keys doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TOP_LEVEL_KEYS.each do |key_name|
+          if connect_reply[key_name]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSource#merge_top_level_keys calls connect_reply[key_name] 2 times                        <a href="server_source.html#L50" class="js-smell-location">0</a>                  <a href="server_source.html#L51" class="js-smell-location">1</a>                  </span>  </li></ul>
+            merged_settings[key_name] = connect_reply[key_name]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSource#merge_top_level_keys calls connect_reply[key_name] 2 times                        <a href="server_source.html#L50" class="js-smell-location">0</a>                  <a href="server_source.html#L51" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        end
+      end
+
+      def merge_agent_config_hash(merged_settings, connect_reply)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::ServerSource#merge_agent_config_hash doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if connect_reply[&#39;config&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSource#merge_agent_config_hash calls connect_reply['config'] 2 times                        <a href="server_source.html#L57" class="js-smell-location">0</a>                  <a href="server_source.html#L58" class="js-smell-location">1</a>                  </span>  </li></ul>
+          merged_settings.merge!(connect_reply[&#39;config&#39;])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSource#merge_agent_config_hash calls connect_reply['config'] 2 times                        <a href="server_source.html#L57" class="js-smell-location">0</a>                  <a href="server_source.html#L58" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      end
+
+      def fix_transaction_threshold(merged_settings)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::ServerSource#fix_transaction_threshold doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        # when value is &quot;apdex_f&quot; remove the config and defer to default
+        if merged_settings[&#39;transaction_tracer.transaction_threshold&#39;] =~ /apdex_f/i
+          merged_settings.delete(&#39;transaction_tracer.transaction_threshold&#39;)
+        end
+      end
+
+      def filter_keys(merged_settings)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::ServerSource#filter_keys has approx 7 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::ServerSource#filter_keys doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        merged_settings.delete_if do |key, _|
+          setting_spec = DEFAULTS[key.to_sym]
+          if setting_spec
+            if setting_spec[:allowed_from_server]
+              false # it&#39;s allowed, so don&#39;t delete it
+            else
+              TingYun::Agent.logger.warn(&quot;Ignoring server-sent config for &#39;#{key}&#39; - this setting cannot be set from the server&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSource#filter_keys calls TingYun::Agent.logger 2 times                        <a href="server_source.html#L76" class="js-smell-location">0</a>                  <a href="server_source.html#L80" class="js-smell-location">1</a>                  </span>  </li></ul>
+              true # delete it
+            end
+          else
+            TingYun::Agent.logger.debug(&quot;Ignoring unrecognized config key from server: &#39;#{key}&#39;&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ServerSource#filter_keys calls TingYun::Agent.logger 2 times                        <a href="server_source.html#L76" class="js-smell-location">0</a>                  <a href="server_source.html#L80" class="js-smell-location">1</a>                  </span>  </li></ul>
+            true
+          end
+        end
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Agent::InstanceMethods::ConnectTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      118 complexity
+    </div>
+    <div class="file-stat">
+      6.6 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      18 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;..&#39;, &#39;test_helper&#39;))
+require &#39;ting_yun/agent/instance_methods/connect&#39;
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/ting_yun_service&#39;
+require &#39;ting_yun/configuration/server_source&#39;
+require &#39;ting_yun/support/exception&#39;
+require &#39;ting_yun/frameworks&#39;
+
+
+class TingYun::Agent::InstanceMethods::ConnectTest &lt; MiniTest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::InstanceMethods::ConnectTest has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::InstanceMethods::ConnectTest has at least 7 instance variables          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Methods.md" target="_blank">TooManyMethods</a>)      TingYun::Agent::InstanceMethods::ConnectTest has at least 18 methods          </span>  </li></ul>
+
+  include TingYun::Agent::InstanceMethods::Connect
+
+  def setup<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::ConnectTest#setup has approx 6 statements          </span>  </li></ul>
+    @connect_attempts = 0
+    @connect_state = nil
+    @connected = nil
+    @local_host = nil
+    collector = TingYun::Support::Collector.new(&#39;localhost&#39;, 30303)
+    @service = TingYun::TingYunService.new(&#39;abcdef&#39;, collector)
+  end
+
+  def local_host
+    @local_host
+  end
+
+  def test_should_connect_if_pending
+    @connect_state = :pending
+    assert(should_connect?, &quot;should attempt to connect if pending&quot;)
+  end
+
+  def test_should_not_connect_if_disconnected
+    @connect_state = :disconnected
+    assert(!should_connect?, &quot;should not attempt to connect if force disconnected&quot;)
+  end
+
+  def test_should_not_connect_if_connected
+    @connect_state = :connected
+    assert(!should_connect?, &quot;should not attempt to connect if force disconnected&quot;)
+  end
+
+  def test_should_connect_if_forced<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_should_connect_if_forced has approx 6 statements          </span>  </li></ul>
+    @connect_state = :disconnected
+    assert(should_connect?(true), &quot;should connect if forced&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_should_connect_if_forced calls assert(should_connect?(true), "should connect if forced") 3 times                        <a href="connect_test.html#L47" class="js-smell-location">0</a>                  <a href="connect_test.html#L49" class="js-smell-location">1</a>                  <a href="connect_test.html#L51" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_should_connect_if_forced calls should_connect?(true) 3 times                        <a href="connect_test.html#L47" class="js-smell-location">0</a>                  <a href="connect_test.html#L49" class="js-smell-location">1</a>                  <a href="connect_test.html#L51" class="js-smell-location">2</a>                  </span>  </li></ul>
+    @connect_state = :connected
+    assert(should_connect?(true), &quot;should connect if forced&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_should_connect_if_forced calls assert(should_connect?(true), "should connect if forced") 3 times                        <a href="connect_test.html#L47" class="js-smell-location">0</a>                  <a href="connect_test.html#L49" class="js-smell-location">1</a>                  <a href="connect_test.html#L51" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_should_connect_if_forced calls should_connect?(true) 3 times                        <a href="connect_test.html#L47" class="js-smell-location">0</a>                  <a href="connect_test.html#L49" class="js-smell-location">1</a>                  <a href="connect_test.html#L51" class="js-smell-location">2</a>                  </span>  </li></ul>
+    @connect_state = :pending
+    assert(should_connect?(true), &quot;should connect if forced&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_should_connect_if_forced calls assert(should_connect?(true), "should connect if forced") 3 times                        <a href="connect_test.html#L47" class="js-smell-location">0</a>                  <a href="connect_test.html#L49" class="js-smell-location">1</a>                  <a href="connect_test.html#L51" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_should_connect_if_forced calls should_connect?(true) 3 times                        <a href="connect_test.html#L47" class="js-smell-location">0</a>                  <a href="connect_test.html#L49" class="js-smell-location">1</a>                  <a href="connect_test.html#L51" class="js-smell-location">2</a>                  </span>  </li></ul>
+  end
+
+  def test_increment_retry_period
+    10.times do |i|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_increment_retry_period has the variable name 'i'          </span>  </li></ul>
+      assert_equal((i * 60), connect_retry_period)
+      note_connect_failure
+    end
+    assert_equal(600, connect_retry_period)
+  end
+
+  def test_disconnect
+    assert disconnect
+  end
+
+  def test_connect_settings_have_environment_report
+     generate_environment_report
+    assert connect_settings[:env].detect{ |(k, _)|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_connect_settings_have_environment_report has the variable name 'k'          </span>  </li></ul>
+             k == &#39;Gems&#39;
+           }, &quot;expected connect_settings to include gems from environment&quot;
+  end
+
+  def test_environment_for_connect_negative
+    with_config(:send_environment_info =&gt; false) do
+      generate_environment_report
+      assert_equal Hash.new, connect_settings[:env]
+    end
+  end
+
+  def test_connect_settings<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_connect_settings has approx 9 statements          </span>  </li></ul>
+    with_config(:app_names =&gt; &#39;apps&#39;) do
+      TingYun::Agent.config.expects(:app_names).returns([&quot;apps&quot;])
+      @local_host = &quot;lo-calhost&quot;
+      @environment_report = {}
+      keys = %w(pid host appName language agentVersion env).map(&amp;:to_sym)
+      settings = connect_settings
+      keys.each do |k|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_connect_settings has the variable name 'k'          </span>  </li></ul>
+        assert_includes(settings.keys, k)
+        refute_nil(settings[k], &quot;expected a value for #{k}&quot;)
+      end
+    end
+  end
+  def test_query_server_for_configuration
+    self.expects(:connect_to_server).returns(&quot;so happy&quot;)
+    self.expects(:finish_setup).with(&quot;so happy&quot;)
+    query_server_for_configuration
+  end
+
+  def test_finish_setup<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_finish_setup has approx 7 statements          </span>  </li></ul>
+    TingYun::Configuration::ServerSource.add_top_level_keys_for_testing([:daemon_debug])
+    config = {:daemon_debug =&gt; true}
+    finish_setup(config)
+    assert(::TingYun::Agent.config[:daemon_debug],&quot;should daemon_debug to be true&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_finish_setup calls ::TingYun::Agent.config 2 times                        <a href="connect_test.html#L103" class="js-smell-location">0</a>                  <a href="connect_test.html#L106" class="js-smell-location">1</a>                  </span>  </li></ul>
+    assert_kind_of TingYun::Configuration::ServerSource, TingYun::Agent.config.source(:daemon_debug)
+    TingYun::Configuration::ServerSource.remove_top_level_keys_for_testing([:daemon_debug])
+    ::TingYun::Agent.config.reset_to_defaults<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_finish_setup calls ::TingYun::Agent.config 2 times                        <a href="connect_test.html#L103" class="js-smell-location">0</a>                  <a href="connect_test.html#L106" class="js-smell-location">1</a>                  </span>  </li></ul>
+  end
+
+  def test_keep_retrying_or_force_reconnect?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_keep_retrying_or_force_reconnect? has approx 12 statements          </span>  </li></ul>
+    @connect_state = :unknown
+
+    catch_errors do
+      raise TingYun::Support::Exception::ForceDisconnectException.new(&quot;raise a ForceDisconnectException &quot;)
+    end
+    assert_equal :disconnected, @connect_state<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_keep_retrying_or_force_reconnect? calls assert_equal :disconnected, @connect_state 3 times                        <a href="connect_test.html#L115" class="js-smell-location">0</a>                  <a href="connect_test.html#L120" class="js-smell-location">1</a>                  <a href="connect_test.html#L126" class="js-smell-location">2</a>                  </span>  </li></ul>
+    @connect_state = :unknown
+    catch_errors do
+      raise TingYun::Support::Exception::LicenseException.new(&quot;raise a LicenseException &quot;)
+    end
+    assert_equal :disconnected, @connect_state<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_keep_retrying_or_force_reconnect? calls assert_equal :disconnected, @connect_state 3 times                        <a href="connect_test.html#L115" class="js-smell-location">0</a>                  <a href="connect_test.html#L120" class="js-smell-location">1</a>                  <a href="connect_test.html#L126" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+    @connect_state = :unknown
+    catch_errors do
+      raise TingYun::Support::Exception::UnrecoverableAgentException.new(&quot;raise a UnrecoverableAgentException &quot;)
+    end
+    assert_equal :disconnected, @connect_state<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ConnectTest#test_keep_retrying_or_force_reconnect? calls assert_equal :disconnected, @connect_state 3 times                        <a href="connect_test.html#L115" class="js-smell-location">0</a>                  <a href="connect_test.html#L120" class="js-smell-location">1</a>                  <a href="connect_test.html#L126" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+  end
+  def drop_buffered_data
+
+  end
+
+  def shutdown
+    @shutdown = true
+  end
+
+  def test_handle_force_disconnect
+    error = mock(:message =&gt; &#39;a message&#39;)
+
+    self.expects(:disconnect)
+    handle_force_disconnect(error)
+  end
+
+  def test_handle_other_error
+    error = StandardError.new(&#39;a message&#39;)
+
+    self.expects(:disconnect)
+    handle_other_error(error)
+  end
+
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

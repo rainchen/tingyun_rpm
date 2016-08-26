@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Configuration::ManagerTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      120 complexity
+    </div>
+    <div class="file-stat">
+      8.0 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      15 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require File.expand_path(File.join(File.dirname(__FILE__),&#39;..&#39;,&#39;..&#39;,&#39;test_helper&#39;))
+require &#39;ting_yun/configuration/manager&#39;
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/configuration/yaml_source&#39;
+require &#39;ting_yun/configuration/server_source&#39;
+
+
+module TingYun::Configuration
+  class ManagerTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Configuration::ManagerTest has no descriptive comment          </span>  </li></ul>
+
+  	def setup
+  	  @manager = Manager.new
+  	end
+
+  	def teardown
+      @manager.reset_to_defaults
+    end
+
+    def test_should_use_indifferent_access
+      config = DottedHash.new(&#39;string&#39; =&gt; &#39;string&#39;, :symbol =&gt; &#39;symbol&#39;)
+      @manager.add_config_for_testing(config)
+      assert_equal &#39;string&#39;, @manager[:string]
+      assert_equal &#39;symbol&#39;, @manager[&#39;symbol&#39;]
+    end
+
+
+    def test_should_decide_by_all_config<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config has a flog score of 25          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config has approx 12 statements          </span>  </li></ul>
+      assert @manager[:&#39;nbs.agent_enabled&#39;], &#39;default should true, but actual is false&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls @manager[:'nbs.agent_enabled'] 4 times                        <a href="manager_test.html#L31" class="js-smell-location">0</a>                  <a href="manager_test.html#L43" class="js-smell-location">1</a>                  <a href="manager_test.html#L45" class="js-smell-location">2</a>                  <a href="manager_test.html#L47" class="js-smell-location">3</a>                  </span>  </li></ul>
+
+      test_yml_path = File.expand_path(File.join(File.dirname(__FILE__),
+                                                 &#39;..&#39;,&#39;..&#39;,
+                                                 &#39;config&#39;,&#39;tingyun.yml&#39;))
+      yaml = YamlSource.new(test_yml_path, &#39;test&#39;)
+      server_able = TingYun::Configuration::ServerSource.new({&quot;config&quot; =&gt;{&#39;nbs.agent_enabled&#39; =&gt; true}})
+
+      server_unable = TingYun::Configuration::ServerSource.new({&quot;config&quot; =&gt;{&#39;nbs.agent_enabled&#39; =&gt; false}})
+      manual  = { :&#39;nbs.agent_enabled&#39; =&gt; true }
+
+      @manager.replace_or_add_config(server_unable)
+      assert  !@manager[:&#39;nbs.agent_enabled&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls !@manager[:'nbs.agent_enabled'] 3 times                        <a href="manager_test.html#L43" class="js-smell-location">0</a>                  <a href="manager_test.html#L45" class="js-smell-location">1</a>                  <a href="manager_test.html#L47" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls @manager[:'nbs.agent_enabled'] 4 times                        <a href="manager_test.html#L31" class="js-smell-location">0</a>                  <a href="manager_test.html#L43" class="js-smell-location">1</a>                  <a href="manager_test.html#L45" class="js-smell-location">2</a>                  <a href="manager_test.html#L47" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls assert  !@manager[:'nbs.agent_enabled'] 3 times                        <a href="manager_test.html#L43" class="js-smell-location">0</a>                  <a href="manager_test.html#L45" class="js-smell-location">1</a>                  <a href="manager_test.html#L47" class="js-smell-location">2</a>                  </span>  </li></ul>
+      @manager.replace_or_add_config(yaml)
+      assert  !@manager[:&#39;nbs.agent_enabled&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls !@manager[:'nbs.agent_enabled'] 3 times                        <a href="manager_test.html#L43" class="js-smell-location">0</a>                  <a href="manager_test.html#L45" class="js-smell-location">1</a>                  <a href="manager_test.html#L47" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls @manager[:'nbs.agent_enabled'] 4 times                        <a href="manager_test.html#L31" class="js-smell-location">0</a>                  <a href="manager_test.html#L43" class="js-smell-location">1</a>                  <a href="manager_test.html#L45" class="js-smell-location">2</a>                  <a href="manager_test.html#L47" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls assert  !@manager[:'nbs.agent_enabled'] 3 times                        <a href="manager_test.html#L43" class="js-smell-location">0</a>                  <a href="manager_test.html#L45" class="js-smell-location">1</a>                  <a href="manager_test.html#L47" class="js-smell-location">2</a>                  </span>  </li></ul>
+      @manager.replace_or_add_config(manual)
+      assert  !@manager[:&#39;nbs.agent_enabled&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls !@manager[:'nbs.agent_enabled'] 3 times                        <a href="manager_test.html#L43" class="js-smell-location">0</a>                  <a href="manager_test.html#L45" class="js-smell-location">1</a>                  <a href="manager_test.html#L47" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls @manager[:'nbs.agent_enabled'] 4 times                        <a href="manager_test.html#L31" class="js-smell-location">0</a>                  <a href="manager_test.html#L43" class="js-smell-location">1</a>                  <a href="manager_test.html#L45" class="js-smell-location">2</a>                  <a href="manager_test.html#L47" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_should_decide_by_all_config calls assert  !@manager[:'nbs.agent_enabled'] 3 times                        <a href="manager_test.html#L43" class="js-smell-location">0</a>                  <a href="manager_test.html#L45" class="js-smell-location">1</a>                  <a href="manager_test.html#L47" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+    end
+
+    def test_default_will_corver
+      assert &#39;&#39;, @manager[:license_key]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_default_will_corver calls @manager[:license_key] 2 times                        <a href="manager_test.html#L52" class="js-smell-location">0</a>                  <a href="manager_test.html#L54" class="js-smell-location">1</a>                  </span>  </li></ul>
+      with_config(:license_key =&gt; &#39;999-999-999&#39;) do
+        assert &#39;999-999-999&#39;, @manager[:license_key]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_default_will_corver calls @manager[:license_key] 2 times                        <a href="manager_test.html#L52" class="js-smell-location">0</a>                  <a href="manager_test.html#L54" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+    end
+
+    def test_should_apply_config_sources_in_order<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::ManagerTest#test_should_apply_config_sources_in_order has approx 9 statements          </span>  </li></ul>
+      config0 = {<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::ManagerTest#test_should_apply_config_sources_in_order has the variable name 'config0'          </span>  </li></ul>
+        :foo =&gt; &#39;default foo&#39;,
+        :bar =&gt; &#39;default bar&#39;,
+        :baz =&gt; &#39;default baz&#39;
+      }
+      @manager.add_config_for_testing(config0, false)
+      config1 = { :foo =&gt; &#39;wrong foo&#39;, :bar =&gt; &#39;real bar&#39; }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::ManagerTest#test_should_apply_config_sources_in_order has the variable name 'config1'          </span>  </li></ul>
+      @manager.add_config_for_testing(config1)
+      config2 = { :foo =&gt; &#39;real foo&#39; }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::ManagerTest#test_should_apply_config_sources_in_order has the variable name 'config2'          </span>  </li></ul>
+      @manager.add_config_for_testing(config2)
+
+      assert_equal &#39;real foo&#39;   , @manager[&#39;foo&#39;]
+      assert_equal &#39;real bar&#39;   , @manager[&#39;bar&#39;]
+      assert_equal &#39;default baz&#39;, @manager[&#39;baz&#39;]
+    end
+
+    def test_callable_value_for_config_should_return_computed_value<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::ManagerTest#test_callable_value_for_config_should_return_computed_value has approx 7 statements          </span>  </li></ul>
+      source = {
+        :foo          =&gt; &#39;bar&#39;,
+        :simple_value =&gt; Proc.new { &#39;666&#39; },
+        :reference    =&gt; Proc.new { self[&#39;foo&#39;] }
+      }
+      @manager.add_config_for_testing(source)
+
+      assert_equal &#39;bar&#39;, @manager[:foo]
+      assert_equal &#39;666&#39;, @manager[:simple_value]
+      assert_equal &#39;bar&#39;, @manager[:reference]
+    end
+
+    def test_should_not_apply_removed_sources
+      test_source = { :test_config_accessor =&gt; true }
+      @manager.add_config_for_testing(test_source)
+      @manager.remove_config(test_source)
+
+      assert_equal nil, @manager[&#39;test_config_accessor&#39;]
+    end
+
+    def test_should_read_license_key_from_env
+      ENV[&#39;TINGYUN_LICENSE_KEY&#39;] = &#39;right&#39;
+      config = Manager.new
+      config.add_config_for_testing({:license_key =&gt; &#39;wrong&#39;}, false)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::ManagerTest#test_should_read_license_key_from_env refers to config more than self (maybe move it to another class?)                        <a href="manager_test.html#L99" class="js-smell-location">0</a>                  <a href="manager_test.html#L100" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal &#39;right&#39;, config[:license_key]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::ManagerTest#test_should_read_license_key_from_env refers to config more than self (maybe move it to another class?)                        <a href="manager_test.html#L99" class="js-smell-location">0</a>                  <a href="manager_test.html#L100" class="js-smell-location">1</a>                  </span>  </li></ul>
+    ensure
+      ENV.delete(&#39;TINGYUN_LICENSE_KEY&#39;)
+    end
+
+    def test_config_values_should_be_memoized
+      @manager.add_config_for_testing(:setting =&gt; &#39;correct value&#39;)
+      assert_equal &#39;correct value&#39;, @manager[:setting]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_config_values_should_be_memoized calls @manager[:setting] 2 times                        <a href="manager_test.html#L107" class="js-smell-location">0</a>                  <a href="manager_test.html#L112" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_config_values_should_be_memoized calls assert_equal 'correct value', @manager[:setting] 2 times                        <a href="manager_test.html#L107" class="js-smell-location">0</a>                  <a href="manager_test.html#L112" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      @manager.instance_variable_get(:@configs_for_testing).
+               unshift(:setting =&gt; &#39;wrong value&#39;)
+
+      assert_equal &#39;correct value&#39;, @manager[:setting]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_config_values_should_be_memoized calls @manager[:setting] 2 times                        <a href="manager_test.html#L107" class="js-smell-location">0</a>                  <a href="manager_test.html#L112" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_config_values_should_be_memoized calls assert_equal 'correct value', @manager[:setting] 2 times                        <a href="manager_test.html#L107" class="js-smell-location">0</a>                  <a href="manager_test.html#L112" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    def test_dotted_hash_to_hash_is_plain_hash
+      dotted = DottedHash.new({})
+      assert_equal(::Hash, dotted.to_hash.class)
+    end
+
+    def test_config_is_correctly_initialized
+      assert @manager.config_classes_for_testing.include?(EnvironmentSource)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_config_is_correctly_initialized calls @manager.config_classes_for_testing 3 times                        <a href="manager_test.html#L121" class="js-smell-location">0</a>                  <a href="manager_test.html#L122" class="js-smell-location">1</a>                  <a href="manager_test.html#L123" class="js-smell-location">2</a>                  </span>  </li></ul>
+      assert @manager.config_classes_for_testing.include?(DefaultSource)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_config_is_correctly_initialized calls @manager.config_classes_for_testing 3 times                        <a href="manager_test.html#L121" class="js-smell-location">0</a>                  <a href="manager_test.html#L122" class="js-smell-location">1</a>                  <a href="manager_test.html#L123" class="js-smell-location">2</a>                  </span>  </li></ul>
+      refute @manager.config_classes_for_testing.include?(YamlSource)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::ManagerTest#test_config_is_correctly_initialized calls @manager.config_classes_for_testing 3 times                        <a href="manager_test.html#L121" class="js-smell-location">0</a>                  <a href="manager_test.html#L122" class="js-smell-location">1</a>                  <a href="manager_test.html#L123" class="js-smell-location">2</a>                  </span>  </li></ul>
+    end
+    def test_evaluate_procs_returns_evaluated_value_if_it_responds_to_call
+      callable = Proc.new { &#39;test&#39; }
+      assert_equal &#39;test&#39;, @manager.evaluate_procs(callable)
+    end
+
+    def test_evaluate_procs_returns_original_value_if_it_does_not_respond_to_call
+      assert_equal &#39;test&#39;, @manager.evaluate_procs(&#39;test&#39;)
+    end
+
+    def test_sources_applied_in_correct_order<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::ManagerTest#test_sources_applied_in_correct_order has approx 7 statements          </span>  </li></ul>
+      # in order of precedence
+      server_source = ServerSource.new(&#39;data_report_period&#39; =&gt; 3, &#39;capture_params&#39; =&gt; true)
+      manual_source = ManualSource.new(:data_report_period  =&gt; 2, :bar =&gt; &#39;bar&#39;, :capture_params =&gt; true)
+
+      # load them out of order, just to prove that load order
+      # doesn&#39;t determine precedence
+      @manager.replace_or_add_config(manual_source)
+      @manager.replace_or_add_config(server_source)
+
+      assert_equal 2,     @manager[&#39;data_report_period&#39;]
+      assert_equal &#39;bar&#39;, @manager[&#39;bar&#39;]
+      assert_equal true, @manager[&#39;capture_params&#39;]
+    end
+
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Serialize::Encoders::Identity</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-02-26 06:43:17 +0000'>2016-02-26 06:43:17 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      23 complexity
+    </div>
+    <div class="file-stat">
+      4.6 complexity per method
+    </div>
+    <div class="file-stat">
+      7 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"> # encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require &#39;base64&#39;
+require &#39;zlib&#39;
+require &#39;ting_yun/support/serialize/json_wrapper&#39;
+
+module TingYun
+  module Support
+    module Serialize
+      module Encoders
+        module Identity<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::Encoders::Identity has no descriptive comment          </span>  </li></ul>
+          def self.encode(data, opts=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Support::Serialize::Encoders::Identity#self.encode has unused parameter 'opts'          </span>  </li></ul>
+            data
+          end
+        end
+
+        module Compressed<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::Encoders::Compressed has no descriptive comment          </span>  </li></ul>
+          def self.encode(data, opts=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Support::Serialize::Encoders::Compressed#self.encode has unused parameter 'opts'          </span>  </li></ul>
+            Zlib::Deflate.deflate(data, Zlib::DEFAULT_COMPRESSION)
+          end
+        end
+
+        module Base64CompressedJSON<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::Encoders::Base64CompressedJSON has no descriptive comment          </span>  </li></ul>
+          def self.encode(data, opts={})
+            normalize_encodings = if opts[:skip_normalization]
+                                    false
+                                  else
+                                    TingYun::Agent.config[:normalize_json_string_encodings]
+                                  end
+            json = JSONWrapper.dump(data, :normalize =&gt; normalize_encodings)
+            Base64.encode64(Compressed.encode(json))
+          end
+        end
+        module CompressedJSON<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::Encoders::CompressedJSON has no descriptive comment          </span>  </li></ul>
+          def self.encode(data, opts={})
+            normalize_encodings = if opts[:skip_normalization]
+                                    false
+                                  else
+                                    TingYun::Agent.config[:normalize_json_string_encodings]
+                                  end
+            json = JSONWrapper.dump(data, :normalize =&gt; normalize_encodings)
+            Compressed.encode(json)
+          end
+        end
+
+        module Json<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::Encoders::Json has no descriptive comment          </span>  </li></ul>
+          def self.encode(data, opts={})
+            normalize_encodings = if opts[:skip_normalization]
+                                    false
+                                  else
+                                    TingYun::Agent.config[:normalize_json_string_encodings]
+                                  end
+            json = JSONWrapper.dump(data, :normalize =&gt; normalize_encodings)
+            return json
+          end
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

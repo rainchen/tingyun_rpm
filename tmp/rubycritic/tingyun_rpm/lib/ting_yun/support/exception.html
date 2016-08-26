@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Exception::LicenseException</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-06-21 07:28:09 +0000'>2016-06-21 07:28:09 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      1 complexity
+    </div>
+    <div class="file-stat">
+      1.0 complexity per method
+    </div>
+    <div class="file-stat">
+      8 churn
+    </div>
+    <div class="file-stat">
+      1 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+#
+
+module TingYun
+  module Support
+    module Exception
+      # An exception that is thrown by the server if the agent license is invalid.
+      class LicenseException &lt; StandardError;
+      end
+
+      # An exception that is thrown by the agent, if server[&#39;nbs.agent_enable&#39;]==false.
+      class AgentEnableException &lt;StandardError;
+      end
+
+      # An exception that is thrown by the server, drop the data.
+      class UnKnownServerException &lt; StandardError;
+      end
+
+      # An exception that forces an agent to stop reporting until its mongrel is restarted.
+      class ForceDisconnectException &lt; StandardError;
+      end
+
+      # An exception that forces an agent to restart.
+      class ForceRestartException &lt; StandardError;
+      end
+
+      # An exception that forces an agent to restart.
+      class InvalidDataException &lt; StandardError;
+      end
+
+      class ExpiredConfigurationException &lt; StandardError;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Exception::ExpiredConfigurationException has no descriptive comment          </span>  </li></ul>
+      end
+
+      # An exception that forces an agent to restart initAgentApp.
+      class InvalidDataTokenException &lt; StandardError;
+      end
+      # Used to blow out of a periodic task without logging a an error, such as for routine
+      # failures.
+      class ServerConnectionException &lt; StandardError;
+      end
+
+      # When a post is either too large or poorly formatted we should
+      # drop it and not try to resend
+      class UnrecoverableServerException &lt; ServerConnectionException;
+      end
+
+      # An unrecoverable client-side error that prevents the agent from continuing
+      class UnrecoverableAgentException &lt; ServerConnectionException;
+      end
+
+      # An error while serializing data for the collector
+      class SerializationError &lt; StandardError;
+      end
+
+      class BackgroundLoadingError &lt; StandardError;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Exception::BackgroundLoadingError has no descriptive comment          </span>  </li></ul>
+      end
+
+      class UnsupportedMediaType &lt; StandardError<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Exception::UnsupportedMediaType has no descriptive comment          </span>  </li></ul>
+      end
+      # Used to wrap errors reported to agent by the collector
+      class CollectorError &lt; StandardError;
+      end
+
+      #This is the base class for all errors that we want to record , It provides the
+      # standard support text at the front of the message, and is used for flagging
+      # agent errors when checking queue limits.
+      class InternalAgentError &lt; StandardError
+        def initialize(msg=nil)
+          super(&quot;Ruby agent internal error. Please contact support referencing this error.\n #{msg}&quot;)
+        end
+      end
+
+      class InternalServerError &lt; StandardError<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Exception::InternalServerError has no descriptive comment          </span>  </li></ul>
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

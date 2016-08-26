@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Agent::InstanceMethods::Start</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-04 16:15:21 +0800'>2016-08-04 16:15:21 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      135 complexity
+    </div>
+    <div class="file-stat">
+      6.8 complexity per method
+    </div>
+    <div class="file-stat">
+      18 churn
+    </div>
+    <div class="file-stat">
+      20 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/frameworks&#39;
+require &#39;ting_yun/version&#39;
+
+# before the real start,do check and log things
+module TingYun
+  module Agent
+    module InstanceMethods
+      module Start<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::InstanceMethods::Start has no descriptive comment          </span>  </li></ul>
+
+        # Check to see if the agent should start, returning +true+ if it should.
+        # should hava the vaild app_name, unstart-state and able to start
+        def agent_should_start?
+          return false if already_started? || disabled?
+          unless app_name_configured?
+            TingYun::Agent.logger.error &quot;No application name configured.&quot;,
+                               &quot;The Agent cannot start without at least one. Please check your &quot;,
+                               &quot;tingyun.yml and ensure that it is valid and has at least one &quot;,
+                               &quot;value set for app_name in the&quot;,
+                               &quot;environment.&quot;
+            return false
+          end
+          return true
+        end
+
+        def started?
+          @started
+        end
+
+        # Check whether we have already started, which is an error condition
+        def already_started?
+          if started?
+            TingYun::Agent.logger.info(&quot;Agent Started Already!&quot;)
+            true
+          end
+        end
+
+        # The agent is disabled when it is not force enabled by the
+        # &#39;nbs.agent_enabled&#39; option (e.g. in a manual start), or
+        # enabled normally through the configuration file
+        def disabled?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#disabled? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          !TingYun::Agent.config[:&#39;nbs.agent_enabled&#39;]
+        end
+
+        def log_startup
+          log_environment
+          log_dispatcher
+          log_app_name
+        end
+
+        def log_environment<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#log_environment doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          Agent.logger.info &quot;Environment: #{::TingYun::Frameworks.framework.env}&quot;
+        end
+
+        # Logs the dispatcher to the log file to assist with
+        # debugging. When no debugger is present, logs this fact to
+        # assist with proper dispatcher detection
+        def log_dispatcher<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#log_dispatcher doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          dispatcher_name = TingYun::Agent.config[:dispatcher].to_s
+
+          if dispatcher_name.empty?
+            TingYun::Agent.logger.info &#39;No known dispatcher detected.&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#log_dispatcher calls TingYun::Agent.logger 2 times                        <a href="start.html#L63" class="js-smell-location">0</a>                  <a href="start.html#L65" class="js-smell-location">1</a>                  </span>  </li></ul>
+          else
+            TingYun::Agent.logger.info &quot;Dispatcher: #{dispatcher_name}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#log_dispatcher calls TingYun::Agent.logger 2 times                        <a href="start.html#L63" class="js-smell-location">0</a>                  <a href="start.html#L65" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        end
+
+        def log_app_name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#log_app_name doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Agent.logger.info &quot;Application: #{TingYun::Agent.config.app_names.join(&quot;, &quot;)}&quot;
+        end
+
+        def sinatra_app?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#sinatra_app? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          (
+          defined?(Sinatra::Application) &amp;&amp;
+              Sinatra::Application.respond_to?(:run) &amp;&amp;
+              Sinatra::Application.run?
+          )
+        end
+
+        # Classy logging of the agent version and the current pid,
+        # so we can disambiguate processes in the log file and make
+        # sure they&#39;re running a reasonable version
+        def log_version_and_pid<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#log_version_and_pid doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Agent.logger.debug &quot;Ting Yun Ruby Agent #{TingYun::VERSION::STRING} Initialized: pid = #{$$}&quot;
+        end
+
+        # Warn the user if they have configured their agent not to
+        # send data, that way we can see this clearly in the log file
+        def monitoring?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#monitoring? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          if TingYun::Agent.config[:monitor_mode]
+            true
+          else
+            TingYun::Agent.logger.warn(&#39;Agent configured not to send data in this environment.&#39;)
+            false
+          end
+        end
+
+        # Tell the user when the license key is missing so they can
+        # fix it by adding it to the file
+        def has_license_key?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#has_license_key? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          if TingYun::Agent.config[:license_key] &amp;&amp; TingYun::Agent.config[:license_key].length &gt; 0<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#has_license_key? calls TingYun::Agent.config 2 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#has_license_key? calls TingYun::Agent.config[:license_key] 2 times          </span>  </li></ul>
+            true
+          else
+            TingYun::Agent.logger.warn(&quot;No license key found. &quot; +
+                                  &quot;This often means your tingyun.yml file was not found, or it lacks a section for the running environment,&#39;#{::TingYun::Frameworks.framework.env}&#39;. You may also want to try linting your tingyun.yml to ensure it is valid YML.&quot;)
+            false
+          end
+        end
+
+        # A license key is an arbitrary 40 character string,
+        # usually looks something like a SHA1 hash
+        def correct_license_length<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#correct_license_length doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          key = TingYun::Agent.config[:license_key]
+
+          if key.length &gt; 0
+            true
+          else
+            TingYun::Agent.logger.error(&quot;Invalid license key: #{key}&quot;)
+            false
+          end
+        end
+
+        # A correct license key exists and is of the proper length
+        def has_correct_license_key?
+          has_license_key? &amp;&amp; correct_license_length
+        end
+
+        # Logs the configured application names
+        def app_name_configured?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#app_name_configured? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          names = TingYun::Agent.config.app_names
+          return names.respond_to?(:any?) &amp;&amp; names.any?
+        end
+
+
+        # If we&#39;re using a dispatcher that forks before serving
+        # requests, we need to wait until the children are forked
+        # before connecting, otherwise the parent process sends useless data
+        def is_using_forking_dispatcher?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Start#is_using_forking_dispatcher? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          if [:puma, :passenger, :rainbows, :unicorn].include? TingYun::Agent.config[:dispatcher]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#is_using_forking_dispatcher? calls TingYun::Agent.config 2 times                        <a href="start.html#L140" class="js-smell-location">0</a>                  <a href="start.html#L141" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#is_using_forking_dispatcher? calls TingYun::Agent.config[:dispatcher] 2 times                        <a href="start.html#L140" class="js-smell-location">0</a>                  <a href="start.html#L141" class="js-smell-location">1</a>                  </span>  </li></ul>
+            TingYun::Agent.logger.info &quot;Deferring startup of agent reporting thread because #{TingYun::Agent.config[:dispatcher]} may fork.&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#is_using_forking_dispatcher? calls TingYun::Agent.config 2 times                        <a href="start.html#L140" class="js-smell-location">0</a>                  <a href="start.html#L141" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#is_using_forking_dispatcher? calls TingYun::Agent.config[:dispatcher] 2 times                        <a href="start.html#L140" class="js-smell-location">0</a>                  <a href="start.html#L141" class="js-smell-location">1</a>                  </span>  </li></ul>
+            true
+          else
+            false
+          end
+        end
+
+        # Sanity-check the agent configuration and start the agent,
+        # setting up the worker thread and the exit handler to shut
+        # down the agent
+        def check_config_and_start_agent
+          return unless monitoring? &amp;&amp; has_correct_license_key?
+          return if is_using_forking_dispatcher?
+          setup_and_start_agent
+        end
+
+        # This is the shared method between the main agent startup and the
+        # after_fork call restarting the thread in deferred dispatchers.
+        #
+        # Treatment of @started and env report is important to get right.
+        def setup_and_start_agent(options={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::Start#setup_and_start_agent has approx 7 statements          </span>  </li></ul>
+          @started = true
+          @dispatcher.mark_started
+          generate_environment_report
+          install_exit_handler
+          cpu_and_memory
+
+          if TingYun::Agent.config[:sync_startup]
+            connect_in_sync
+          else
+            start_worker_thread(options)
+          end
+        end
+
+        # This method should be called in a forked process after a fork.
+        # It assumes the parent process initialized the agent, but does
+        # not assume the agent started.
+        #
+        # The call is idempotent, but not re-entrant.
+        #
+        # * It clears any metrics carried over from the parent process
+        # * Restarts the sampler thread if necessary
+        # * Initiates a new agent run and worker loop unless that was done
+        #   in the parent process and +:force_reconnect+ is not true
+        #
+        # Options:
+        # * &lt;tt&gt;:force_reconnect =&gt; true&lt;/tt&gt; to force the spawned process to
+        #   establish a new connection, such as when forking a long running process.
+        #   The default is false--it will only connect to the server if the parent
+        #   had not connected.
+        # * &lt;tt&gt;:keep_retrying =&gt; false&lt;/tt&gt; if we try to initiate a new
+        #   connection, this tells me to only try it once so this method returns
+        #   quickly if there is some kind of latency with the server.
+        def after_fork(options={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::InstanceMethods::Start#after_fork has a flog score of 25          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::Start#after_fork has approx 9 statements          </span>  </li></ul>
+          needs_restart = false
+          @after_fork_lock.synchronize do
+            needs_restart = @dispatcher.needs_restart?
+            @dispatcher.mark_started
+          end
+
+          return if !needs_restart ||
+              !Agent.config[:&#39;nbs.agent_enabled&#39;] ||<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#after_fork calls Agent.config 2 times                        <a href="start.html#L202" class="js-smell-location">0</a>                  <a href="start.html#L203" class="js-smell-location">1</a>                  </span>  </li></ul>
+              !Agent.config[:monitor_mode] ||<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Start#after_fork calls Agent.config 2 times                        <a href="start.html#L202" class="js-smell-location">0</a>                  <a href="start.html#L203" class="js-smell-location">1</a>                  </span>  </li></ul>
+              disconnected?
+
+          ::TingYun::Agent.logger.debug &quot;Starting the worker thread in #{Process.pid} (parent #{Process.ppid}) after forking.&quot;
+
+          # Clear out locks and stats left over from parent process
+          reset_objects_with_locks
+          drop_buffered_data
+
+          setup_and_start_agent(options)
+        end
+
+        def cpu_and_memory
+          @middleware.load_samplers
+        end
+
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

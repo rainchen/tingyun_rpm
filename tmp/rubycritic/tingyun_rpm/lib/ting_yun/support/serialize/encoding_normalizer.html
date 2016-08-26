@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Serialize::EncodingNormalizer::EncodingNormalizer</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      50 complexity
+    </div>
+    <div class="file-stat">
+      10.0 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+# This module was normalize the date encode
+require &#39;ting_yun/support/language_support&#39;
+
+
+module TingYun
+  module Support
+    module Serialize
+      module EncodingNormalizer<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::EncodingNormalizer has no descriptive comment          </span>  </li></ul>
+        def self.normalize_object(object)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Support::Serialize::EncodingNormalizer::normalize_object has a flog score of 25          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Serialize::EncodingNormalizer#self.normalize_object has approx 13 statements          </span>  </li></ul>
+          case object
+            when String
+              normalize_string(object)
+            when Symbol
+              normalize_string(object.to_s)
+            when Array
+              return object if object.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::EncodingNormalizer#self.normalize_object calls object.empty? 2 times                        <a href="encoding_normalizer.html#L19" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L22" class="js-smell-location">1</a>                  </span>  </li></ul>
+              object.map { |x| normalize_object(x) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::EncodingNormalizer#self.normalize_object has the variable name 'x'          </span>  </li></ul>
+            when Hash
+              return object if object.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::EncodingNormalizer#self.normalize_object calls object.empty? 2 times                        <a href="encoding_normalizer.html#L19" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L22" class="js-smell-location">1</a>                  </span>  </li></ul>
+              hash = {}
+              object.each do |k, v|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::EncodingNormalizer#self.normalize_object has the variable name 'k'                        <a href="encoding_normalizer.html#L24" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L25" class="js-smell-location">1</a>                  <a href="encoding_normalizer.html#L26" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::EncodingNormalizer#self.normalize_object has the variable name 'v'          </span>  </li></ul>
+                k = normalize_string(k) if k.is_a?(String)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::EncodingNormalizer#self.normalize_object has the variable name 'k'                        <a href="encoding_normalizer.html#L24" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L25" class="js-smell-location">1</a>                  <a href="encoding_normalizer.html#L26" class="js-smell-location">2</a>                  </span>  </li></ul>
+                k = normalize_string(k.to_s) if k.is_a?(Symbol)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::EncodingNormalizer#self.normalize_object has the variable name 'k'                        <a href="encoding_normalizer.html#L24" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L25" class="js-smell-location">1</a>                  <a href="encoding_normalizer.html#L26" class="js-smell-location">2</a>                  </span>  </li></ul>
+                hash[k] = normalize_object(v)
+              end
+              hash
+            else
+              object
+          end
+        end
+        def self.normalize_string(str)
+          @normalizer ||= choose_normalizer
+          @normalizer.normalize(str)
+        end
+
+        def self.choose_normalizer
+          if TingYun::Support::LanguageSupport.supports_string_encodings?
+            EncodingNormalizer
+          else
+            IconvNormalizer
+          end
+        end
+
+        module EncodingNormalizer<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::EncodingNormalizer::EncodingNormalizer has no descriptive comment          </span>  </li></ul>
+          def self.normalize(str)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Serialize::EncodingNormalizer::EncodingNormalizer#self.normalize has approx 7 statements          </span>  </li></ul>
+            encoding = str.encoding
+            if (encoding == Encoding::UTF_8 || encoding == Encoding::ISO_8859_1) &amp;&amp; str.valid_encoding?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::EncodingNormalizer::EncodingNormalizer#self.normalize calls str.valid_encoding? 2 times                        <a href="encoding_normalizer.html#L50" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L56" class="js-smell-location">1</a>                  </span>  </li></ul>
+              return str
+            end
+            # If the encoding is not valid, or it&#39;s ASCII-8BIT, we know conversion to
+            # UTF-8 is likely to fail, so treat it as ISO-8859-1 (byte-preserving).
+            normalized = str.dup
+            if encoding == Encoding::ASCII_8BIT || !str.valid_encoding?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::EncodingNormalizer::EncodingNormalizer#self.normalize calls str.valid_encoding? 2 times                        <a href="encoding_normalizer.html#L50" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L56" class="js-smell-location">1</a>                  </span>  </li></ul>
+              normalized.force_encoding(Encoding::ISO_8859_1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::EncodingNormalizer::EncodingNormalizer#self.normalize calls normalized.force_encoding(Encoding::ISO_8859_1) 2 times                        <a href="encoding_normalizer.html#L57" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L64" class="js-smell-location">1</a>                  </span>  </li></ul>
+            else
+              # Encoding is valid and non-binary, so it might be cleanly convertible
+              # to UTF-8. Give it a try and fall back to ISO-8859-1 if it fails.
+              begin
+                normalized.encode!(Encoding::UTF_8)
+              rescue
+                normalized.force_encoding(Encoding::ISO_8859_1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::EncodingNormalizer::EncodingNormalizer#self.normalize calls normalized.force_encoding(Encoding::ISO_8859_1) 2 times                        <a href="encoding_normalizer.html#L57" class="js-smell-location">0</a>                  <a href="encoding_normalizer.html#L64" class="js-smell-location">1</a>                  </span>  </li></ul>
+              end
+            end
+            normalized
+          end
+        end
+
+
+        module IconvNormalizer<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::EncodingNormalizer::IconvNormalizer has no descriptive comment          </span>  </li></ul>
+          def self.normalize(raw_string)
+            if @iconv.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Support::Serialize::EncodingNormalizer::IconvNormalizer#self.normalize performs a nil-check          </span>  </li></ul>
+              require &#39;iconv&#39;
+              @iconv = Iconv.new(&#39;utf-8&#39;, &#39;iso-8859-1&#39;)
+            end
+            @iconv.iconv(raw_string)
+          end
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

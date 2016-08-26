@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::InstanceMethods::HandleErrors</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      36 complexity
+    </div>
+    <div class="file-stat">
+      5.1 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+#
+
+module TingYun
+  module Agent
+    module InstanceMethods
+      module HandleErrors<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::InstanceMethods::HandleErrors has no descriptive comment          </span>  </li></ul>
+        # When the server sends us an error with the license key, we
+        # want to tell the user that something went wrong, and let
+        # them know where to go to get a valid license key
+        #
+        # After this runs, it disconnects the agent so that it will
+        # no longer try to connect to the server, saving the
+        # application and the server load
+        def handle_license_error(error)
+          TingYun::Agent.logger.error(\
+              error.message, \
+              &quot;You need to obtain a valid license key, or to upgrade your account.&quot;)
+          disconnect
+        end
+
+        def handle_unrecoverable_agent_error(error)
+          TingYun::Agent.logger.error(error.message)
+          disconnect
+          shutdown
+        end
+
+        # When we have a problem connecting to the server, we need
+        # to tell the user what happened, since this is not an error
+        # we can handle gracefully.
+        def log_error(error)
+          TingYun::Agent.logger.error &quot;Error establishing connection with Ting Yun Service at #{service.inspect}:&quot;, error
+        end
+
+        # Handles an unknown error in the worker thread by logging
+        # it and disconnecting the agent, since we are now in an
+        # unknown state.
+        def handle_other_error(error)
+          TingYun::Agent.logger.error &quot;Unhandled error in worker thread, disconnecting this agent process:&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::HandleErrors#handle_other_error calls TingYun::Agent.logger 2 times                        <a href="handle_errors.html#L41" class="js-smell-location">0</a>                  <a href="handle_errors.html#L44" class="js-smell-location">1</a>                  </span>  </li></ul>
+          # These errors are fatal (that is, they will prevent the agent from
+          # reporting entirely), so we really want backtraces when they happen
+          TingYun::Agent.logger.log_exception(:error, error)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::HandleErrors#handle_other_error calls TingYun::Agent.logger 2 times                        <a href="handle_errors.html#L41" class="js-smell-location">0</a>                  <a href="handle_errors.html#L44" class="js-smell-location">1</a>                  </span>  </li></ul>
+          disconnect
+        end
+
+        # Handles the case where the server tells us to restart -
+        # this clears the data, clears connection attempts, and
+        # waits a while to reconnect.
+        def handle_force_restart(error)
+          TingYun::Agent.logger.debug error.message
+          drop_buffered_data
+          @service.force_restart if @service
+          @connect_state = :pending
+          sleep 30
+        end
+        def handle_force_disconnect(error)
+          TingYun::Agent.logger.warn &quot;Ting Yun forced this agent to disconnect (#{error.message})&quot;
+          disconnect
+        end
+
+        def handle_server_error(error)
+          TingYun::Agent.logger.error(error.message)
+          drop_buffered_data
+        end
+
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

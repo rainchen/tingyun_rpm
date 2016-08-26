@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Datastore::MetricHelper</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-15 17:13:34 +0800'>2016-08-15 17:13:34 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      38 complexity
+    </div>
+    <div class="file-stat">
+      5.4 complexity per method
+    </div>
+    <div class="file-stat">
+      18 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+module TingYun
+  module Agent
+    module Datastore
+      module MetricHelper<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Datastore::MetricHelper has no descriptive comment          </span>  </li></ul>
+
+
+        ALL_WEB = &quot;AllWeb&quot;.freeze
+        ALL_BACKGROUND = &quot;AllBackground&quot;.freeze
+        ALL = &quot;All&quot;.freeze
+
+        NOSQL = %w(MongoDB Redis Memcached).freeze
+
+        CACHE = %w(Redis Memcached).freeze
+
+        def self.checkNosql(product)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Method-Name.md" target="_blank">UncommunicativeMethodName</a>)      TingYun::Agent::Datastore::MetricHelper#self.checkNosql has the name 'checkNosql'          </span>  </li></ul>
+          NOSQL.include?(product)
+        end
+
+        def self.metric_name(product, collection, operation)
+          if checkNosql(product)
+              &quot;#{product}/#{collection}/#{operation}&quot;
+          else
+            &quot;Database #{product}/#{collection}/#{operation}&quot;
+          end
+        end
+
+        def self.product_suffixed_rollup(product,suffix)
+          if checkNosql(product)
+            &quot;#{product}/NULL/#{suffix}&quot;
+          else
+            &quot;Database #{product}/NULL/#{suffix}&quot;
+          end
+        end
+
+
+
+        def self.metrics_for(product, operation, collection = nil, generic_product = nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::Datastore::MetricHelper#self.metrics_for has 4 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Datastore::MetricHelper#self.metrics_for has approx 10 statements          </span>  </li></ul>
+          operation = operation.to_s.upcase
+          if overrides = overridden_operation_and_collection   # [method, model_name, product]
+            if should_override?(overrides, product, generic_product)
+              operation  = overrides[0] || operation
+              collection = overrides[1] || collection
+            end
+          end
+          metrics  = [operation]
+          if TingYun::Agent::Transaction.recording_web_transaction?
+            metrics = metrics + [ALL_WEB,ALL]
+          else
+            metrics = metrics + [ALL_BACKGROUND,ALL]
+          end
+
+
+          metrics = metrics.map do |suffix|
+            product_suffixed_rollup(product,suffix)
+          end
+
+          metrics.unshift metric_name(product, collection, operation) if collection
+          metrics
+        end
+
+        def self.include_database?(name)
+          CACHE.include?(name)
+        end
+        # Allow Transaction#with_database_metric_name to override our
+        # collection and operation
+        def self.overridden_operation_and_collection #THREAD_LOCAL_ACCESS
+          state = TingYun::Agent::TransactionState.tl_get
+          txn   = state.current_transaction
+          txn ? txn.instrumentation_state[:datastore_override] : nil
+        end
+
+        # If the override declared a product affiliation, abide by that
+        # ActiveRecord has database-specific product names, so we recognize
+        # it by the generic_product it passes.
+        def self.should_override?(overrides, product, generic_product)
+          override_product = overrides[2]
+
+          override_product.nil? ||<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Agent::Datastore::MetricHelper#self.should_override? performs a nil-check          </span>  </li></ul>
+              override_product == product ||<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::Datastore::MetricHelper#self.should_override? is controlled by argument product          </span>  </li></ul>
+              override_product == generic_product
+        end
+
+      end
+    end
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

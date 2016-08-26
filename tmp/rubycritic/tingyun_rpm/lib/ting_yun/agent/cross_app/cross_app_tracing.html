@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Agent::CrossAppTracing::Error</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-12 16:24:48 +0800'>2016-08-12 16:24:48 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      167 complexity
+    </div>
+    <div class="file-stat">
+      10.4 complexity per method
+    </div>
+    <div class="file-stat">
+      29 churn
+    </div>
+    <div class="file-stat">
+      16 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+require &#39;ting_yun/agent/transaction&#39;
+require &#39;ting_yun/support/http_clients/uri_util&#39;
+require &#39;ting_yun/support/serialize/json_wrapper&#39;
+require &#39;ting_yun/instrumentation/support/external_error&#39;
+
+
+module TingYun
+  module Agent
+    module CrossAppTracing<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::CrossAppTracing has no descriptive comment          </span>  </li></ul>
+
+      extend ::TingYun::Instrumentation::Support::ExternalError
+
+      # Exception raised if there is a problem with cross app transactions.
+      class Error &lt; RuntimeError; end
+
+      # The cross app id header for &quot;outgoing&quot; calls
+
+      TY_ID_HEADER = &#39;X-Tingyun-Id&#39;.freeze
+      TY_DATA_HEADER = &#39;X-Tingyun-Tx-Data&#39;.freeze
+
+
+
+
+      module_function
+
+
+
+      def tl_trace_http_request(request)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::CrossAppTracing#tl_trace_http_request has approx 12 statements          </span>  </li></ul>
+        t0 = Time.now.to_f<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::CrossAppTracing#tl_trace_http_request has the variable name 't0'          </span>  </li></ul>
+        state = TingYun::Agent::TransactionState.tl_get
+        return yield unless state.execution_traced?
+        return yield unless state.current_transaction #如果还没有创建Transaction，就发生跨应用，就直接先跳过跟踪。
+
+        begin
+          node = start_trace(state, t0, request)
+          response = yield
+          capture_exception(response,request,&#39;net%2Fhttp&#39;)
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::CrossAppTracing#tl_trace_http_request has the variable name 'e'          </span>  </li></ul>
+          klass = &quot;External/#{request.uri.to_s.gsub(&#39;/&#39;,&#39;%2F&#39;)}/net%2Fhttp&quot;
+          handle_error(e,klass)
+          raise e
+        ensure
+          finish_trace(state, t0, node, request, response)
+        end
+        return response
+      end
+
+      def start_trace(state, t0, request)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::CrossAppTracing#start_trace has the parameter name 't0'          </span>  </li></ul>
+        inject_request_headers(state, request) if cross_app_enabled?
+        stack = state.traced_method_stack
+        node = stack.push_frame(state,:http_request,t0)
+
+        return node
+      end
+
+      def finish_trace(state, t0, node, request, response)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::CrossAppTracing#finish_trace has a flog score of 25          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::CrossAppTracing takes parameters [request, response] to 4 methods                        <a href="cross_app_tracing.html#L59" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L90" class="js-smell-location">1</a>                  <a href="cross_app_tracing.html#L101" class="js-smell-location">2</a>                  <a href="cross_app_tracing.html#L191" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::CrossAppTracing#finish_trace has 5 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::CrossAppTracing#finish_trace has approx 12 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::CrossAppTracing#finish_trace has the parameter name 't0'          </span>  </li></ul>
+        t1 = Time.now.to_f<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::CrossAppTracing#finish_trace has the variable name 't1'          </span>  </li></ul>
+        duration = (t1- t0) * 1000
+        state.external_duration = duration
+
+        begin
+          if request
+            metrics = metrics_for(state, request, response)
+            node_name = metrics.pop<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#finish_trace calls metrics.pop 2 times                        <a href="cross_app_tracing.html#L67" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L68" class="js-smell-location">1</a>                  </span>  </li></ul>
+            scoped_metric = metrics.pop<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#finish_trace calls metrics.pop 2 times                        <a href="cross_app_tracing.html#L67" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L68" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+            stats_engine.record_scoped_and_unscoped_metrics(state, scoped_metric, metrics, duration)
+
+            if node
+              node.name = node_name
+              add_transaction_trace_info(request, response)
+            end
+          end
+        ensure
+          if node
+            stack = state.traced_method_stack
+            stack.pop_frame(state, node, node_name, t1)
+          end
+        end
+      rescue =&gt; err
+        TingYun::Agent.logger.error &quot;Uncaught exception while finishing an HTTP request trace&quot;, err
+
+      end
+
+
+
+      def add_transaction_trace_info(request, response)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::CrossAppTracing takes parameters [request, response] to 4 methods                        <a href="cross_app_tracing.html#L59" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L90" class="js-smell-location">1</a>                  <a href="cross_app_tracing.html#L101" class="js-smell-location">2</a>                  <a href="cross_app_tracing.html#L191" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::CrossAppTracing#add_transaction_trace_info has approx 6 statements          </span>  </li></ul>
+        state = TingYun::Agent::TransactionState.tl_get
+        filtered_uri = TingYun::Agent::HTTPClients::URIUtil.filter_uri request.uri
+        transaction_sampler.add_node_info(:uri =&gt; filtered_uri)
+        if response &amp;&amp; response_is_cross_app?( response )
+          transaction_sampler.tl_builder.current_node[:txId] = state.client_transaction_id || state.request_guid<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#add_transaction_trace_info calls transaction_sampler.tl_builder 2 times                        <a href="cross_app_tracing.html#L95" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L97" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#add_transaction_trace_info calls transaction_sampler.tl_builder.current_node 2 times                        <a href="cross_app_tracing.html#L95" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L97" class="js-smell-location">1</a>                  </span>  </li></ul>
+          my_data = TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub(&quot;&#39;&quot;,&#39;&quot;&#39;)
+          transaction_sampler.tl_builder.current_node[:txData] = my_data<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#add_transaction_trace_info calls transaction_sampler.tl_builder 2 times                        <a href="cross_app_tracing.html#L95" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L97" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#add_transaction_trace_info calls transaction_sampler.tl_builder.current_node 2 times                        <a href="cross_app_tracing.html#L95" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L97" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      end
+
+      def metrics_for(state, request, response)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::CrossAppTracing takes parameters [request, response] to 4 methods                        <a href="cross_app_tracing.html#L59" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L90" class="js-smell-location">1</a>                  <a href="cross_app_tracing.html#L101" class="js-smell-location">2</a>                  <a href="cross_app_tracing.html#L191" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::CrossAppTracing#metrics_for has approx 7 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Agent::CrossAppTracing#metrics_for has unused parameter 'state'          </span>  </li></ul>
+        metrics = common_metrics(request)
+
+        if response &amp;&amp; response_is_cross_app?( response )
+          begin
+            metrics.concat metrics_for_cross_app_response( request, response )
+          rescue =&gt; err
+            # Fall back to regular metrics if there&#39;s a problem with x-process metrics
+            TingYun::Agent.logger.debug &quot;%p while fetching x-process metrics: %s&quot; %
+                                            [ err.class, err.message ]
+            metrics.concat metrics_for_regular_request( request )<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for calls metrics.concat metrics_for_regular_request( request ) 2 times                        <a href="cross_app_tracing.html#L111" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L114" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for calls metrics_for_regular_request( request ) 2 times                        <a href="cross_app_tracing.html#L111" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L114" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        else
+          metrics.concat metrics_for_regular_request( request )<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for calls metrics.concat metrics_for_regular_request( request ) 2 times                        <a href="cross_app_tracing.html#L111" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L114" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for calls metrics_for_regular_request( request ) 2 times                        <a href="cross_app_tracing.html#L111" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L114" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+        return metrics
+      end
+
+      def common_metrics(request)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Agent::CrossAppTracing#common_metrics has unused parameter 'request'          </span>  </li></ul>
+        metrics = [ &quot;External/NULL/ALL&quot; ]
+
+        if TingYun::Agent::Transaction.recording_web_transaction?
+          metrics &lt;&lt; &quot;External/NULL/AllWeb&quot;
+        else
+          metrics &lt;&lt; &quot;External/NULL/AllBackground&quot;
+        end
+
+        return metrics
+      end
+
+      def metrics_for_regular_request( request )
+        state = TingYun::Agent::TransactionState.tl_get
+        metrics = []
+        metrics &lt;&lt; &quot;External/#{request.uri.to_s.gsub(&#39;/&#39;,&#39;%2F&#39;)}/net%2Fhttp&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_regular_request calls metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp" 2 times                        <a href="cross_app_tracing.html#L135" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L136" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_regular_request calls request.uri 2 times                        <a href="cross_app_tracing.html#L135" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L136" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_regular_request calls request.uri.to_s 2 times                        <a href="cross_app_tracing.html#L135" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L136" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_regular_request calls request.uri.to_s.gsub('/','%2F') 2 times                        <a href="cross_app_tracing.html#L135" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L136" class="js-smell-location">1</a>                  </span>  </li></ul>
+        metrics &lt;&lt; &quot;External/#{request.uri.to_s.gsub(&#39;/&#39;,&#39;%2F&#39;)}/net%2Fhttp&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_regular_request calls metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp" 2 times                        <a href="cross_app_tracing.html#L135" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L136" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_regular_request calls request.uri 2 times                        <a href="cross_app_tracing.html#L135" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L136" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_regular_request calls request.uri.to_s 2 times                        <a href="cross_app_tracing.html#L135" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L136" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_regular_request calls request.uri.to_s.gsub('/','%2F') 2 times                        <a href="cross_app_tracing.html#L135" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L136" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+        return metrics
+      end
+
+      def stats_engine
+        ::TingYun::Agent.instance.stats_engine
+      end
+
+      def transaction_sampler
+        ::TingYun::Agent.instance.transaction_sampler
+      end
+
+
+      def cross_app_enabled?
+        valid_tingyun_secret_id? &amp;&amp; web_action_tracer_enabled? &amp;&amp; cross_application_tracer_enabled?
+      end
+
+      def web_action_tracer_enabled?
+        TingYun::Agent.config[:&#39;nbs.action_tracer.enabled&#39;]
+      end
+
+      def cross_application_tracer_enabled?
+        TingYun::Agent.config[:&#39;nbs.transaction_tracer.enabled&#39;]
+      end
+
+      def valid_tingyun_secret_id?
+        TingYun::Agent.config[:tingyunIdSecret] &amp;&amp; TingYun::Agent.config[:tingyunIdSecret].size &gt; 0<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#valid_tingyun_secret_id? calls TingYun::Agent.config 2 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#valid_tingyun_secret_id? calls TingYun::Agent.config[:tingyunIdSecret] 2 times          </span>  </li></ul>
+      end
+
+      # Inject the X-Process header into the outgoing +request+.
+      def inject_request_headers(state, request)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::CrossAppTracing#inject_request_headers has approx 6 statements          </span>  </li></ul>
+        cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+            raise TingYun::Agent::CrossAppTracing::Error, &quot;no tingyunIdSecret configured&quot;
+
+        txn_guid =  state.client_transaction_id || state.request_guid<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::CrossAppTracing#inject_request_headers refers to state more than self (maybe move it to another class?)                        <a href="cross_app_tracing.html#L171" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L172" class="js-smell-location">1</a>                  </span>  </li></ul>
+        state.transaction_sample_builder.trace.tx_id = txn_guid<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::CrossAppTracing#inject_request_headers refers to state more than self (maybe move it to another class?)                        <a href="cross_app_tracing.html#L171" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L172" class="js-smell-location">1</a>                  </span>  </li></ul>
+        request[TY_ID_HEADER] = &quot;#{cross_app_id};c=1;x=#{txn_guid}&quot;
+
+      rescue TingYun::Agent::CrossAppTracing::Error =&gt; err
+        TingYun::Agent.logger.debug &quot;Not injecting x-process header&quot;, err
+      end
+
+      # Returns +true+ if Cross Application Tracing is enabled, and the given +response+
+      # has the appropriate headers.
+      def response_is_cross_app?( response )
+        return false unless cross_app_enabled?
+        unless response[TY_DATA_HEADER]
+          return false
+        end
+        return true
+      end
+
+      # Return the set of metric objects appropriate for the given cross app
+      # +response+.
+      def metrics_for_cross_app_response(request, response )<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::CrossAppTracing takes parameters [request, response] to 4 methods                        <a href="cross_app_tracing.html#L59" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L90" class="js-smell-location">1</a>                  <a href="cross_app_tracing.html#L101" class="js-smell-location">2</a>                  <a href="cross_app_tracing.html#L191" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::CrossAppTracing#metrics_for_cross_app_response has approx 7 statements          </span>  </li></ul>
+        state = TingYun::Agent::TransactionState.tl_get
+        my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub(&quot;&#39;&quot;,&#39;&quot;&#39;)
+        uri = &quot;#{request.uri.to_s.gsub(&#39;/&#39;,&#39;%2F&#39;)}/net%2Fhttp&quot;
+        metrics = []
+        metrics &lt;&lt; &quot;cross_app;#{my_data[&quot;id&quot;]};#{my_data[&quot;action&quot;]};#{uri}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_cross_app_response calls my_data["action"] 2 times                        <a href="cross_app_tracing.html#L196" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L197" class="js-smell-location">1</a>                  </span>  </li></ul>
+        metrics &lt;&lt; &quot;External/#{my_data[&quot;action&quot;]}:#{uri}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::CrossAppTracing#metrics_for_cross_app_response calls my_data["action"] 2 times                        <a href="cross_app_tracing.html#L196" class="js-smell-location">0</a>                  <a href="cross_app_tracing.html#L197" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+        return metrics
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

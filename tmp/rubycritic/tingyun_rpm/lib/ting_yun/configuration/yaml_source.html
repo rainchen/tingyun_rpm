@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Configuration::YamlSource</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      94 complexity
+    </div>
+    <div class="file-stat">
+      9.4 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      10 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/configuration/dotted_hash&#39;
+require &#39;ting_yun/support/language_support&#39;
+require &#39;erb&#39;
+
+module TingYun
+  module Configuration
+    class YamlSource &lt; DottedHash<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Configuration::YamlSource has no descriptive comment          </span>  </li></ul>
+      attr_accessor :file_path, :failures<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Configuration::YamlSource#failures is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Configuration::YamlSource#file_path is a writable attribute          </span>  </li></ul>
+
+      def initialize(path, env)
+        config = {}
+        @failures = []
+
+        begin
+          @file_path = vaildate_config_file_path(path)
+          return unless @file_path
+
+          ::TingYun::Agent.logger.info(&quot;Reading configuration from #{path} (#{Dir.pwd})&quot;)
+
+          raw_file = File.read(@file_path)
+          erb_file = process_erb(raw_file)
+          config = process_yaml(erb_file, env, config, @file_path)
+        rescue ScriptError, StandardError =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::YamlSource#initialize has the variable name 'e'          </span>  </li></ul>
+          log_failure(&quot;Failed to read or parse configuration file at #{path}&quot;, e)
+        end
+        booleanify_values(config, &#39;nbs.agent_enabled&#39;, &#39;enabled&#39;)
+        super(config, true)
+      end
+
+      def failed?
+        !@failures.empty?
+      end
+
+      protected
+
+      def vaildate_config_file_path(path)
+        expanded_path = File.expand_path(path)
+
+        if path.empty? || !File.exist?(expanded_path)
+          warn_missing_config_file(expanded_path)
+          return
+        end
+        expanded_path
+      end
+
+      def warn_missing_config_file(path)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::YamlSource#warn_missing_config_file has approx 9 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::YamlSource#warn_missing_config_file doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        based_on = &#39;unknown&#39;
+        source = ::TingYun::Agent.config.source(:config_path)
+        candidate_paths = [path]
+
+        case source
+          when DefaultSource
+            based_on = &quot;default&quot;
+            candidate_paths = TingYun::Agent.config[:config_search_paths].map do |p|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::YamlSource#warn_missing_config_file has the variable name 'p'          </span>  </li></ul>
+              File.expand_path(p)
+            end
+          when EnvironmentSource
+            based_on = &quot;environment_source&quot;
+          when ManualSource
+            based_on = &#39;API call&#39;
+        end
+
+        TingYun::Agent.logger.warn(
+            &quot;No configuration file found. Working directory = #{Dir.pwd}&quot;,
+            &quot;Looked in these locations (based on #{based_on}): #{candidate_paths.join(&quot;, &quot;)}&quot;
+        )
+      end
+
+      def process_erb(file)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::YamlSource#process_erb has approx 8 statements          </span>  </li></ul>
+        begin
+          # Exclude lines that are commented out so failing Ruby code in an
+          # ERB template commented at the YML level is fine. Leave the line,
+          # though, so ERB line numbers remain correct.
+          file.gsub!(/^\s*#.*$/, &#39;#&#39;)
+
+          # Next two are for populating the tingyun.yml via erb binding, necessary
+          # when using the default tingyun.yml file
+          generated_for_user = &#39;&#39;
+          license_key = &#39;&#39;
+
+          ERB.new(file).result(binding)
+        rescue ScriptError, StandardError =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::YamlSource#process_erb has the variable name 'e'          </span>  </li></ul>
+          log_failure(&quot;Failed ERB processing configuration file. This is typically caused by a Ruby error in &lt;% %&gt; templating blocks in your tingyun.yml file.&quot;, e)
+          nil
+        ensure
+          # Avoid warnings by using these again
+          generated_for_user = nil
+          license_key = nil
+        end
+      end
+
+      def process_yaml(file, env, config, path)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Configuration::YamlSource#process_yaml has 4 parameters          </span>  </li></ul>
+        if file
+          confighash = with_yaml_engine { YAML.load(file) }
+          unless confighash.key?(env)
+            log_failure(&quot;Config file at #{path} doesn&#39;t include a &#39;#{env}&#39; section!&quot;)
+          end
+
+          config = confighash[env] || {}
+        end
+        config
+      end
+
+      def with_yaml_engine<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::YamlSource#with_yaml_engine has approx 6 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::YamlSource#with_yaml_engine doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        return yield unless TingYun::Support::LanguageSupport.needs_syck?
+
+        yamler = ::YAML::ENGINE.yamler
+        ::YAML::ENGINE.yamler = &#39;syck&#39;
+        result = yield
+        ::YAML::ENGINE.yamler = yamler
+        result
+      end
+
+      def booleanify_values(config, *keys)
+        # auto means defer ro default
+        keys.each do |option|
+          if config[option] == &#39;auto&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::YamlSource#booleanify_values calls config[option] 4 times                        <a href="yaml_source.html#L118" class="js-smell-location">0</a>                  <a href="yaml_source.html#L120" class="js-smell-location">1</a>                  <a href="yaml_source.html#L121" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::YamlSource#booleanify_values refers to config more than self (maybe move it to another class?)                        <a href="yaml_source.html#L118" class="js-smell-location">0</a>                  <a href="yaml_source.html#L119" class="js-smell-location">1</a>                  <a href="yaml_source.html#L120" class="js-smell-location">2</a>                  <a href="yaml_source.html#L121" class="js-smell-location">3</a>                  </span>  </li></ul>
+            config.delete(option)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::YamlSource#booleanify_values refers to config more than self (maybe move it to another class?)                        <a href="yaml_source.html#L118" class="js-smell-location">0</a>                  <a href="yaml_source.html#L119" class="js-smell-location">1</a>                  <a href="yaml_source.html#L120" class="js-smell-location">2</a>                  <a href="yaml_source.html#L121" class="js-smell-location">3</a>                  </span>  </li></ul>
+          elsif !config[option].nil? &amp;&amp; !is_boolean?(config[option])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::YamlSource#booleanify_values calls config[option] 4 times                        <a href="yaml_source.html#L118" class="js-smell-location">0</a>                  <a href="yaml_source.html#L120" class="js-smell-location">1</a>                  <a href="yaml_source.html#L121" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::YamlSource#booleanify_values refers to config more than self (maybe move it to another class?)                        <a href="yaml_source.html#L118" class="js-smell-location">0</a>                  <a href="yaml_source.html#L119" class="js-smell-location">1</a>                  <a href="yaml_source.html#L120" class="js-smell-location">2</a>                  <a href="yaml_source.html#L121" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Configuration::YamlSource#booleanify_values performs a nil-check          </span>  </li></ul>
+            config[option] = !!(config[option] =~ /yes|on|true/i)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::YamlSource#booleanify_values calls config[option] 4 times                        <a href="yaml_source.html#L118" class="js-smell-location">0</a>                  <a href="yaml_source.html#L120" class="js-smell-location">1</a>                  <a href="yaml_source.html#L121" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::YamlSource#booleanify_values refers to config more than self (maybe move it to another class?)                        <a href="yaml_source.html#L118" class="js-smell-location">0</a>                  <a href="yaml_source.html#L119" class="js-smell-location">1</a>                  <a href="yaml_source.html#L120" class="js-smell-location">2</a>                  <a href="yaml_source.html#L121" class="js-smell-location">3</a>                  </span>  </li></ul>
+          end
+        end
+      end
+
+      def is_boolean?(value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::YamlSource#is_boolean? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        value == !!value
+      end
+
+      def log_failure(*messages)
+        ::TingYun::Agent.logger.error(*messages)
+        @failures &lt;&lt; messages
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::InstanceMethods::StartTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      74 complexity
+    </div>
+    <div class="file-stat">
+      5.3 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      14 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;..&#39;, &#39;test_helper&#39;))
+require &#39;ting_yun/agent/instance_methods/start&#39;
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/ting_yun_service&#39;
+require &#39;ting_yun/configuration/server_source&#39;
+require &#39;ting_yun/support/exception&#39;
+
+
+class TingYun::Agent::InstanceMethods::StartTest &lt; MiniTest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::InstanceMethods::StartTest has no descriptive comment          </span>  </li></ul>
+
+  include TingYun::Agent::InstanceMethods::Start
+
+  def setup
+    @started = true
+  end
+
+  def test_already_started_negative
+    self.expects(:started?).returns(false)
+    assert !already_started?
+  end
+
+
+  def test_disabled_positive
+    with_config(:&#39;nbs.agent_enabled&#39; =&gt; false) do
+      assert disabled?
+    end
+  end
+
+  def test_disabled_negative
+    with_config(:&#39;nbs.agent_enabled&#39; =&gt; true) do
+      assert !disabled?
+    end
+  end
+
+  def test_already_started?
+    assert already_started?,&quot;should return true&quot;
+    @started = false
+    assert_nil already_started?
+  end
+
+  def test_agent_should_start?
+    TingYun::Agent.config.add_config_for_testing(:&#39;nbs.agent_enabled&#39; =&gt; true )<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::StartTest#test_agent_should_start? calls TingYun::Agent.config 2 times                        <a href="start_test.html#L45" class="js-smell-location">0</a>                  <a href="start_test.html#L47" class="js-smell-location">1</a>                  </span>  </li></ul>
+    refute agent_should_start?,&quot;should be false&quot;
+    TingYun::Agent.config.reset_to_defaults<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::StartTest#test_agent_should_start? calls TingYun::Agent.config 2 times                        <a href="start_test.html#L45" class="js-smell-location">0</a>                  <a href="start_test.html#L47" class="js-smell-location">1</a>                  </span>  </li></ul>
+    @started = false
+    assert agent_should_start?,&quot;should be false&quot;
+  end
+
+  def test_monitoring_positive
+    with_config(:monitor_mode =&gt; true) do
+      assert monitoring?
+    end
+  end
+
+  def test_monitoring_negative
+    with_config(:monitor_mode =&gt; false) do
+      assert !monitoring?
+    end
+  end
+
+  def test_has_license_key_positive
+    with_config(:license_key =&gt; &#39;a&#39; * 40) do
+      assert has_license_key?
+    end
+  end
+
+  def test_has_license_key_negative
+    with_config(:license_key =&gt; false) do
+      assert !has_license_key?
+    end
+  end
+
+  def test_has_correct_license_key_positive
+    self.expects(:has_license_key?).returns(true)
+    self.expects(:correct_license_length).returns(true)
+    assert has_correct_license_key?
+  end
+
+  def test_has_correct_license_key_negative
+    self.expects(:has_license_key?).returns(false)
+    assert !has_correct_license_key?
+  end
+
+  def test_using_forking_dispatcher_positive
+    with_config(:dispatcher =&gt; :passenger) do
+      assert is_using_forking_dispatcher?
+    end
+  end
+
+  def test_using_forking_dispatcher_negative
+    with_config(:dispatcher =&gt; :frobnitz) do
+      assert !is_using_forking_dispatcher?
+    end
+  end
+
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

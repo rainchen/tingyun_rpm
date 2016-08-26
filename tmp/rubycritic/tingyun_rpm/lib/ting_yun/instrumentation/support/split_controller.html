@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Support::SplitController</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-28 11:20:11 +0800'>2016-07-28 11:20:11 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      190 complexity
+    </div>
+    <div class="file-stat">
+      14.6 complexity per method
+    </div>
+    <div class="file-stat">
+      18 churn
+    </div>
+    <div class="file-stat">
+      13 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require &#39;ting_yun/instrumentation/support/parameter_filtering&#39;
+
+module TingYun
+  module Instrumentation
+    module Support
+      module SplitController<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Support::SplitController has no descriptive comment          </span>  </li></ul>
+        attr_accessor :rule, :tingyun_http_verb<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Instrumentation::Support::SplitController#rule is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Instrumentation::Support::SplitController#tingyun_http_verb is a writable attribute          </span>  </li></ul>
+        HTTP = {
+          &#39;GET&#39; =&gt; 1,
+          &#39;POST&#39; =&gt; 2,
+          &#39;PUT&#39; =&gt; 3,
+          &#39;DELETE&#39; =&gt; 4,
+          &#39;HEAD&#39; =&gt; 5,
+          &#39;PATCH&#39; =&gt; 3
+        }
+
+        RULE = {
+          1=&gt; :eql?,
+          2=&gt; :start_with?,
+          3=&gt; :end_with?,
+          4=&gt; :include?,
+          5=&gt; :match
+        }
+
+        def find_rule(method, path, header, params)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Instrumentation::Support::SplitController#find_rule has 4 parameters          </span>  </li></ul>
+          @tingyun_http_verb = method
+          @rule = rules.detect do |_r|
+            method_match?(method, _r[&quot;match&quot;][&quot;method&quot;]) and<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#find_rule calls _r["match"] 4 times                        <a href="split_controller.html#L28" class="js-smell-location">0</a>                  <a href="split_controller.html#L29" class="js-smell-location">1</a>                  <a href="split_controller.html#L30" class="js-smell-location">2</a>                  </span>  </li></ul>
+                url_match?(path, _r[&quot;match&quot;][&quot;match&quot;], _r[&quot;match&quot;][&quot;value&quot;]) and<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#find_rule calls _r["match"] 4 times                        <a href="split_controller.html#L28" class="js-smell-location">0</a>                  <a href="split_controller.html#L29" class="js-smell-location">1</a>                  <a href="split_controller.html#L30" class="js-smell-location">2</a>                  </span>  </li></ul>
+                params_match?(header, dot_flattened(params), _r[&quot;match&quot;][&quot;params&quot;])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#find_rule calls _r["match"] 4 times                        <a href="split_controller.html#L28" class="js-smell-location">0</a>                  <a href="split_controller.html#L29" class="js-smell-location">1</a>                  <a href="split_controller.html#L30" class="js-smell-location">2</a>                  </span>  </li></ul>
+          end
+        end
+
+        def namespace
+          @rule[&quot;name&quot;]
+        end
+
+        def rules
+          require &#39;ting_yun/support/serialize/json_wrapper&#39;
+          TingYun::Support::Serialize::JSONWrapper.load(TingYun::Agent.config[:&#39;nbs.naming.rules&#39;])
+        end
+
+        def method_match?(method, _r)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#method_match? has the parameter name '_r'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Support::SplitController#method_match? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          _r == 0 || _r == HTTP[method]
+        end
+
+        def url_match?(url, _r, value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#url_match? has the parameter name '_r'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Support::SplitController#url_match? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          (!value.nil?) and (!value.strip.empty? rescue true) and url.send(RULE[_r], value.downcase)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Support::SplitController#url_match? performs a nil-check          </span>  </li></ul>
+        end
+
+        def params_match?(header, params, _rs)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Instrumentation::Support::SplitController#params_match? has a flog score of 43          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Support::SplitController#params_match? has approx 7 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#params_match? has the parameter name '_rs'          </span>  </li></ul>
+          return true if _rs.empty?
+          begin
+            _rs.each do |_r|
+              next if _r[&quot;name&quot;].nil? || _r[&quot;name&quot;].strip.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["name"] 4 times                        <a href="split_controller.html#L55" class="js-smell-location">0</a>                  <a href="split_controller.html#L57" class="js-smell-location">1</a>                  <a href="split_controller.html#L59" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::SplitController#params_match? refers to _r more than self (maybe move it to another class?)                        <a href="split_controller.html#L55" class="js-smell-location">0</a>                  <a href="split_controller.html#L56" class="js-smell-location">1</a>                  <a href="split_controller.html#L57" class="js-smell-location">2</a>                  <a href="split_controller.html#L59" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Support::SplitController#params_match? performs a nil-check          </span>  </li></ul>
+              if _r[&quot;type&quot;] == 2<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["type"] 3 times                        <a href="split_controller.html#L56" class="js-smell-location">0</a>                  <a href="split_controller.html#L57" class="js-smell-location">1</a>                  <a href="split_controller.html#L59" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::SplitController#params_match? refers to _r more than self (maybe move it to another class?)                        <a href="split_controller.html#L55" class="js-smell-location">0</a>                  <a href="split_controller.html#L56" class="js-smell-location">1</a>                  <a href="split_controller.html#L57" class="js-smell-location">2</a>                  <a href="split_controller.html#L59" class="js-smell-location">3</a>                  </span>  </li></ul>
+                raise_error(header[&quot;HTTP_#{_r[&quot;name&quot;].upcase}&quot;], RULE[_r[&quot;match&quot;]], _r[&quot;value&quot;], _r[&quot;type&quot;])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls RULE[_r["match"]] 2 times                        <a href="split_controller.html#L57" class="js-smell-location">0</a>                  <a href="split_controller.html#L59" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["match"] 2 times                        <a href="split_controller.html#L57" class="js-smell-location">0</a>                  <a href="split_controller.html#L59" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["name"] 4 times                        <a href="split_controller.html#L55" class="js-smell-location">0</a>                  <a href="split_controller.html#L57" class="js-smell-location">1</a>                  <a href="split_controller.html#L59" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["type"] 3 times                        <a href="split_controller.html#L56" class="js-smell-location">0</a>                  <a href="split_controller.html#L57" class="js-smell-location">1</a>                  <a href="split_controller.html#L59" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["value"] 2 times                        <a href="split_controller.html#L57" class="js-smell-location">0</a>                  <a href="split_controller.html#L59" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::SplitController#params_match? refers to _r more than self (maybe move it to another class?)                        <a href="split_controller.html#L55" class="js-smell-location">0</a>                  <a href="split_controller.html#L56" class="js-smell-location">1</a>                  <a href="split_controller.html#L57" class="js-smell-location">2</a>                  <a href="split_controller.html#L59" class="js-smell-location">3</a>                  </span>  </li></ul>
+              else
+                raise_error(params[_r[&quot;name&quot;].downcase], RULE[_r[&quot;match&quot;]], _r[&quot;value&quot;],  _r[&quot;type&quot;])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls RULE[_r["match"]] 2 times                        <a href="split_controller.html#L57" class="js-smell-location">0</a>                  <a href="split_controller.html#L59" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["match"] 2 times                        <a href="split_controller.html#L57" class="js-smell-location">0</a>                  <a href="split_controller.html#L59" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["name"] 4 times                        <a href="split_controller.html#L55" class="js-smell-location">0</a>                  <a href="split_controller.html#L57" class="js-smell-location">1</a>                  <a href="split_controller.html#L59" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["type"] 3 times                        <a href="split_controller.html#L56" class="js-smell-location">0</a>                  <a href="split_controller.html#L57" class="js-smell-location">1</a>                  <a href="split_controller.html#L59" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#params_match? calls _r["value"] 2 times                        <a href="split_controller.html#L57" class="js-smell-location">0</a>                  <a href="split_controller.html#L59" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::SplitController#params_match? refers to _r more than self (maybe move it to another class?)                        <a href="split_controller.html#L55" class="js-smell-location">0</a>                  <a href="split_controller.html#L56" class="js-smell-location">1</a>                  <a href="split_controller.html#L57" class="js-smell-location">2</a>                  <a href="split_controller.html#L59" class="js-smell-location">3</a>                  </span>  </li></ul>
+              end
+            end
+          rescue
+            return false
+          end
+          return true
+        end
+
+        def raise_error(_v, _r, _v2, _t)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Instrumentation::Support::SplitController#raise_error has 4 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#raise_error has the parameter name '_r'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#raise_error has the parameter name '_t'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#raise_error has the parameter name '_v'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#raise_error has the parameter name '_v2'          </span>  </li></ul>
+          raise &#39;this param unexist so the rule is unmatched&#39; if _v.nil? or _v2.nil? or _v2.strip.empty? rescue false<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Support::SplitController#raise_error performs a nil-check          </span>  </li></ul>
+          unless _t == 0<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Instrumentation::Support::SplitController#raise_error is controlled by argument _t          </span>  </li></ul>
+            raise &#39;this param  is unmatched  with the rule&#39; unless _v.send(_r, _v2)
+          end
+        end
+
+
+        def name(path, header, params, cookie)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Instrumentation::Support::SplitController#name has a flog score of 33          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Instrumentation::Support::SplitController#name has 4 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Support::SplitController#name has approx 10 statements          </span>  </li></ul>
+          return nil if @rule.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Support::SplitController#name performs a nil-check          </span>  </li></ul>
+
+          name = &quot;&quot;
+          name &lt;&lt; split_url(path.split(&#39;/&#39;))
+          name &lt;&lt; &quot;?&quot;
+          name &lt;&lt; split_params(@rule[&quot;split&quot;][&quot;urlParams&quot;], params)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#name calls @rule["split"] 4 times                        <a href="split_controller.html#L82" class="js-smell-location">0</a>                  <a href="split_controller.html#L83" class="js-smell-location">1</a>                  <a href="split_controller.html#L84" class="js-smell-location">2</a>                  <a href="split_controller.html#L85" class="js-smell-location">3</a>                  </span>  </li></ul>
+          name &lt;&lt; split_params(@rule[&quot;split&quot;][&quot;bodyParams&quot;], params)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#name calls @rule["split"] 4 times                        <a href="split_controller.html#L82" class="js-smell-location">0</a>                  <a href="split_controller.html#L83" class="js-smell-location">1</a>                  <a href="split_controller.html#L84" class="js-smell-location">2</a>                  <a href="split_controller.html#L85" class="js-smell-location">3</a>                  </span>  </li></ul>
+          name &lt;&lt; split_params(@rule[&quot;split&quot;][&quot;cookieParams&quot;], cookie)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#name calls @rule["split"] 4 times                        <a href="split_controller.html#L82" class="js-smell-location">0</a>                  <a href="split_controller.html#L83" class="js-smell-location">1</a>                  <a href="split_controller.html#L84" class="js-smell-location">2</a>                  <a href="split_controller.html#L85" class="js-smell-location">3</a>                  </span>  </li></ul>
+          name &lt;&lt; split_header(@rule[&quot;split&quot;][&quot;headerParams&quot;], header)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::SplitController#name calls @rule["split"] 4 times                        <a href="split_controller.html#L82" class="js-smell-location">0</a>                  <a href="split_controller.html#L83" class="js-smell-location">1</a>                  <a href="split_controller.html#L84" class="js-smell-location">2</a>                  <a href="split_controller.html#L85" class="js-smell-location">3</a>                  </span>  </li></ul>
+          name = name[0..-2] &lt;&lt; split_method
+          name.strip
+        end
+
+        def split_url(url)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Support::SplitController#split_url has approx 8 statements          </span>  </li></ul>
+          uri = @rule[&quot;split&quot;][&quot;uri&quot;]
+          return &#39;&#39; if uri.nil? or uri.strip.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::SplitController#split_url refers to uri more than self (maybe move it to another class?)                        <a href="split_controller.html#L92" class="js-smell-location">0</a>                  <a href="split_controller.html#L93" class="js-smell-location">1</a>                  <a href="split_controller.html#L94" class="js-smell-location">2</a>                  <a href="split_controller.html#L97" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Support::SplitController#split_url performs a nil-check          </span>  </li></ul>
+          if uri.include? &#39;,&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::SplitController#split_url refers to uri more than self (maybe move it to another class?)                        <a href="split_controller.html#L92" class="js-smell-location">0</a>                  <a href="split_controller.html#L93" class="js-smell-location">1</a>                  <a href="split_controller.html#L94" class="js-smell-location">2</a>                  <a href="split_controller.html#L97" class="js-smell-location">3</a>                  </span>  </li></ul>
+            _i = uri.split(&#39;,&#39;).map{|n|n.to_i}<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::SplitController#split_url refers to uri more than self (maybe move it to another class?)                        <a href="split_controller.html#L92" class="js-smell-location">0</a>                  <a href="split_controller.html#L93" class="js-smell-location">1</a>                  <a href="split_controller.html#L94" class="js-smell-location">2</a>                  <a href="split_controller.html#L97" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::Support::SplitController#split_url has the variable name 'n'          </span>  </li></ul>
+            url.values_at(*_i).join(&#39;/&#39;)
+          else
+            _i = uri.to_i<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::SplitController#split_url refers to uri more than self (maybe move it to another class?)                        <a href="split_controller.html#L92" class="js-smell-location">0</a>                  <a href="split_controller.html#L93" class="js-smell-location">1</a>                  <a href="split_controller.html#L94" class="js-smell-location">2</a>                  <a href="split_controller.html#L97" class="js-smell-location">3</a>                  </span>  </li></ul>
+            if _i &gt; 0
+              url.values_at(1.._i).join(&#39;/&#39;)
+            else
+              url.values_at(_i..-1).join(&#39;/&#39;)
+            end
+          end
+        end
+
+        def split_method
+           if @rule[&quot;split&quot;][&quot;method&quot;]
+             &quot;(#{tingyun_http_verb})&quot;
+           else
+             &#39;&#39;
+           end
+        end
+
+        def split_params(_r, params)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#split_params has the parameter name '_r'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Support::SplitController#split_params doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          return &#39;&#39; if _r.nil? or _r.strip.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Support::SplitController#split_params performs a nil-check          </span>  </li></ul>
+          query_string =&#39;&#39;
+          _r.split(&#39;,&#39;).each {|_i|query_string +=&quot;#{_i}=#{params[_i]}&amp;&quot;}
+          query_string
+        end
+
+        def split_header(_r, header)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Instrumentation::Support::SplitController#split_header has the parameter name '_r'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Support::SplitController#split_header doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          return &#39;&#39; if _r.nil? or _r.strip.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Support::SplitController#split_header performs a nil-check          </span>  </li></ul>
+          query_string =&#39;&#39;
+          _r.split(&#39;,&#39;).each {|_i|query_string +=&quot;#{_i}=#{header[&quot;HTTP_#{_i.upcase}&quot;]}&amp;&quot;}
+          query_string
+        end
+
+        # turns {&#39;a&#39; =&gt; {&#39;b&#39; =&gt; &#39;c&#39;}} into {&#39;b&#39; =&gt; &#39;c&#39;}
+        def dot_flattened(nested_hash, result={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Support::SplitController#dot_flattened doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Instrumentation::Support::ParameterFiltering.dot_flattened(nested_hash, result={})
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

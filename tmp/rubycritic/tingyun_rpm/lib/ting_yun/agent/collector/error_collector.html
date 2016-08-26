@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Collector::ErrorCollector::Tag</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-19 16:35:06 +0800'>2016-08-19 16:35:06 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      72 complexity
+    </div>
+    <div class="file-stat">
+      5.5 complexity per method
+    </div>
+    <div class="file-stat">
+      21 churn
+    </div>
+    <div class="file-stat">
+      13 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+require &#39;ting_yun/agent/collector/error_collector/noticed_error&#39;
+require &#39;ting_yun/agent/collector/error_collector/error_trace_array&#39;
+
+module TingYun
+  module Agent
+    module Collector
+      class ErrorCollector<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::ErrorCollector has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::ErrorCollector has prima donna method `reset!`          </span>  </li></ul>
+        ERRORS_ACTION = &quot;Errors/Count/&quot;.freeze
+
+
+
+        ERRORS_ALL = &quot;Errors/Count/All&quot;.freeze
+        ERRORS_ALL_WEB = &quot;Errors/Count/AllWeb&quot;.freeze
+        ERRORS_ALL_BACK_GROUND = &quot;Errors/Count/AllBackground&quot;.freeze
+
+        # Maximum possible length of the queue - defaults to 20, may be
+        MAX_ERROR_QUEUE_LENGTH = 20 unless defined? MAX_ERROR_QUEUE_LENGTH
+
+        #tag the exception,avoid the same exception record  multiple times in the middlwars and other point
+        module Tag
+
+          EXCEPTION_TAG_IVAR = :&#39;@__ty_seen_exception&#39; unless defined? EXCEPTION_TAG_IVAR
+
+          def tag_exception(exception)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::ErrorCollector::Tag#tag_exception doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+            begin
+              exception.instance_variable_set(EXCEPTION_TAG_IVAR, true)
+            rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::ErrorCollector::Tag#tag_exception has the variable name 'e'          </span>  </li></ul>
+              TingYun::Agent.logger.warn(&quot;Failed to tag exception: #{exception}: &quot;, e)
+            end
+          end
+
+          def exception_tagged?(exception)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::ErrorCollector::Tag#exception_tagged? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+            exception.instance_variable_defined?(EXCEPTION_TAG_IVAR)
+          end
+
+        end
+        include Tag
+
+        module Metric<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::ErrorCollector::Metric has no descriptive comment          </span>  </li></ul>
+          def aggregated_metric_names(txn)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::ErrorCollector::Metric#aggregated_metric_names doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+            metric_names = [ERRORS_ALL]
+            return metric_names unless txn<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::Collector::ErrorCollector::Metric#aggregated_metric_names is controlled by argument txn          </span>  </li></ul>
+
+            if TingYun::Agent::Transaction.recording_web_transaction?
+              metric_names &lt;&lt; ERRORS_ALL_WEB
+            else
+              metric_names &lt;&lt; ERRORS_ALL_BACK_GROUND
+            end
+
+            metric_names
+          end
+
+          def action_metric_name(txn)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::ErrorCollector::Metric#action_metric_name doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+            &quot;#{ERRORS_ACTION}#{txn.best_name}&quot; if txn
+          end
+
+        end
+        include Metric
+
+        attr_reader :error_trace_array, :external_error_array
+
+        def initialize
+          @error_trace_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
+          @external_error_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
+        end
+
+        # See TingYun::Agent.notice_error for options and commentary
+        def notice_error(exception, options={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::ErrorCollector#notice_error has approx 9 statements          </span>  </li></ul>
+          tag_exception(exception)
+          state = ::TingYun::Agent::TransactionState.tl_get
+          increment_error_count(state)
+          noticed_error = create_noticed_error(exception, options)
+          if noticed_error.is_external_error
+            external_error_array.add_to_error_queue(noticed_error)
+          else
+            error_trace_array.add_to_error_queue(noticed_error)
+          end
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::ErrorCollector#notice_error has the variable name 'e'          </span>  </li></ul>
+          ::TingYun::Agent.logger.warn(&quot;Failure when capturing error &#39;#{exception}&#39;:&quot;, e)
+          nil
+        end
+
+        # Increments a statistic that tracks total error rate
+        def increment_error_count(state)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::ErrorCollector#increment_error_count has approx 7 statements          </span>  </li></ul>
+          txn = state.current_transaction
+
+          metric_names = aggregated_metric_names(txn)
+
+          action_metric = action_metric_name(txn)
+          metric_names &lt;&lt; action_metric if action_metric
+
+          stats_engine = TingYun::Agent.agent.stats_engine
+          stats_engine.record_unscoped_metrics(state, metric_names) do |stats|
+            stats.increment_count
+          end
+        end
+
+        EMPTY_STRING = &#39;&#39;.freeze
+
+        def create_noticed_error(exception, options)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error has approx 11 statements          </span>  </li></ul>
+          error_metric = options.delete(:metric_name) || EMPTY_STRING
+
+          noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
+          noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error refers to noticed_error more than self (maybe move it to another class?)                        <a href="error_collector.html#L108" class="js-smell-location">0</a>                  <a href="error_collector.html#L109" class="js-smell-location">1</a>                  <a href="error_collector.html#L110" class="js-smell-location">2</a>                  <a href="error_collector.html#L112" class="js-smell-location">3</a>                  <a href="error_collector.html#L113" class="js-smell-location">4</a>                  <a href="error_collector.html#L114" class="js-smell-location">5</a>                  <a href="error_collector.html#L116" class="js-smell-location">6</a>                  <a href="error_collector.html#L120" class="js-smell-location">7</a>                  </span>  </li></ul>
+          noticed_error.request_port = options.delete(:port) || EMPTY_STRING<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error refers to noticed_error more than self (maybe move it to another class?)                        <a href="error_collector.html#L108" class="js-smell-location">0</a>                  <a href="error_collector.html#L109" class="js-smell-location">1</a>                  <a href="error_collector.html#L110" class="js-smell-location">2</a>                  <a href="error_collector.html#L112" class="js-smell-location">3</a>                  <a href="error_collector.html#L113" class="js-smell-location">4</a>                  <a href="error_collector.html#L114" class="js-smell-location">5</a>                  <a href="error_collector.html#L116" class="js-smell-location">6</a>                  <a href="error_collector.html#L120" class="js-smell-location">7</a>                  </span>  </li></ul>
+          noticed_error.attributes  = options.delete(:attributes) || EMPTY_STRING<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error refers to noticed_error more than self (maybe move it to another class?)                        <a href="error_collector.html#L108" class="js-smell-location">0</a>                  <a href="error_collector.html#L109" class="js-smell-location">1</a>                  <a href="error_collector.html#L110" class="js-smell-location">2</a>                  <a href="error_collector.html#L112" class="js-smell-location">3</a>                  <a href="error_collector.html#L113" class="js-smell-location">4</a>                  <a href="error_collector.html#L114" class="js-smell-location">5</a>                  <a href="error_collector.html#L116" class="js-smell-location">6</a>                  <a href="error_collector.html#L120" class="js-smell-location">7</a>                  </span>  </li></ul>
+
+          noticed_error.file_name   = sense_method(exception, :file_name)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error refers to noticed_error more than self (maybe move it to another class?)                        <a href="error_collector.html#L108" class="js-smell-location">0</a>                  <a href="error_collector.html#L109" class="js-smell-location">1</a>                  <a href="error_collector.html#L110" class="js-smell-location">2</a>                  <a href="error_collector.html#L112" class="js-smell-location">3</a>                  <a href="error_collector.html#L113" class="js-smell-location">4</a>                  <a href="error_collector.html#L114" class="js-smell-location">5</a>                  <a href="error_collector.html#L116" class="js-smell-location">6</a>                  <a href="error_collector.html#L120" class="js-smell-location">7</a>                  </span>  </li></ul>
+          noticed_error.line_number = sense_method(exception, :line_number)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error refers to noticed_error more than self (maybe move it to another class?)                        <a href="error_collector.html#L108" class="js-smell-location">0</a>                  <a href="error_collector.html#L109" class="js-smell-location">1</a>                  <a href="error_collector.html#L110" class="js-smell-location">2</a>                  <a href="error_collector.html#L112" class="js-smell-location">3</a>                  <a href="error_collector.html#L113" class="js-smell-location">4</a>                  <a href="error_collector.html#L114" class="js-smell-location">5</a>                  <a href="error_collector.html#L116" class="js-smell-location">6</a>                  <a href="error_collector.html#L120" class="js-smell-location">7</a>                  </span>  </li></ul>
+          noticed_error.stack_trace = extract_stack_trace(exception)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error refers to noticed_error more than self (maybe move it to another class?)                        <a href="error_collector.html#L108" class="js-smell-location">0</a>                  <a href="error_collector.html#L109" class="js-smell-location">1</a>                  <a href="error_collector.html#L110" class="js-smell-location">2</a>                  <a href="error_collector.html#L112" class="js-smell-location">3</a>                  <a href="error_collector.html#L113" class="js-smell-location">4</a>                  <a href="error_collector.html#L114" class="js-smell-location">5</a>                  <a href="error_collector.html#L116" class="js-smell-location">6</a>                  <a href="error_collector.html#L120" class="js-smell-location">7</a>                  </span>  </li></ul>
+
+          noticed_error.attributes_from_notice_error = options.delete(:custom_params) || {}<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error refers to noticed_error more than self (maybe move it to another class?)                        <a href="error_collector.html#L108" class="js-smell-location">0</a>                  <a href="error_collector.html#L109" class="js-smell-location">1</a>                  <a href="error_collector.html#L110" class="js-smell-location">2</a>                  <a href="error_collector.html#L112" class="js-smell-location">3</a>                  <a href="error_collector.html#L113" class="js-smell-location">4</a>                  <a href="error_collector.html#L114" class="js-smell-location">5</a>                  <a href="error_collector.html#L116" class="js-smell-location">6</a>                  <a href="error_collector.html#L120" class="js-smell-location">7</a>                  </span>  </li></ul>
+
+          # Any options that are passed to notice_error which aren&#39;t known keys
+          # get treated as custom attributes, so merge them into that hash.
+          noticed_error.attributes_from_notice_error.merge!(options)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::ErrorCollector#create_noticed_error refers to noticed_error more than self (maybe move it to another class?)                        <a href="error_collector.html#L108" class="js-smell-location">0</a>                  <a href="error_collector.html#L109" class="js-smell-location">1</a>                  <a href="error_collector.html#L110" class="js-smell-location">2</a>                  <a href="error_collector.html#L112" class="js-smell-location">3</a>                  <a href="error_collector.html#L113" class="js-smell-location">4</a>                  <a href="error_collector.html#L114" class="js-smell-location">5</a>                  <a href="error_collector.html#L116" class="js-smell-location">6</a>                  <a href="error_collector.html#L120" class="js-smell-location">7</a>                  </span>  </li></ul>
+
+          noticed_error
+        end
+
+        def skip_notice_error?(exception)
+          exception_tagged?(exception)
+        end
+
+        # calls a method on an object, if it responds to it - used for
+        # detection and soft fail-safe. Returns nil if the method does
+        # not exist
+        def sense_method(object, method)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::ErrorCollector#sense_method doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          object.send(method) if object.respond_to?(method)
+        end
+
+        # extracts a stack trace from the exception for debugging purposes
+        def extract_stack_trace(exception)
+          actual_exception = sense_method(exception, &#39;original_exception&#39;) || exception
+          sense_method(actual_exception, &#39;backtrace&#39;) || &#39;&lt;no stack trace&gt;&#39;
+        end
+
+        # *Use sparingly for difficult to track bugs.*
+        #
+        # Track internal agent errors for communication back to TingYun
+        # To use, make a specific subclass of  TingYun::Support::Exception::InternalAgentError,
+        # then pass an instance of it to this method when your problem occurs.
+        #
+        # Limits are treated differently for these errors. We only gather one per
+        # class per harvest, disregarding (and not impacting) the app error queue
+        # limit.
+        def notice_agent_error(exception)
+          error_trace_array.notice_agent_error(exception)
+        end
+
+        def reset!
+          @error_trace_array.reset!
+          @external_error_array.reset!
+          nil
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

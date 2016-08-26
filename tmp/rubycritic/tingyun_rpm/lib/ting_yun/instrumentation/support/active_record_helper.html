@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Support::ActiveRecordHelper</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-29 02:35:20 +0000'>2016-04-29 02:35:20 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      84 complexity
+    </div>
+    <div class="file-stat">
+      6.0 complexity per method
+    </div>
+    <div class="file-stat">
+      10 churn
+    </div>
+    <div class="file-stat">
+      14 methods
+    </div>
+    <div class="file-stat">
+      53 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+
+require &#39;ting_yun/instrumentation/support/database&#39;
+require &#39;ting_yun/agent/datastore/metric_helper&#39;
+require &#39;ting_yun/agent&#39;
+module TingYun
+  module Instrumentation
+    module Support
+      module ActiveRecordHelper<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper has no descriptive comment          </span>  </li></ul>
+        module_function
+
+
+        ACTIVE_RECORD = &quot;ActiveRecord&quot;.freeze unless defined?(ACTIVE_RECORD)
+
+        # Used by both the AR 3.x and 4.x instrumentation
+        def instrument_additional_methods
+          instrument_save_methods
+          instrument_relation_methods
+        end
+
+        def instrument_save_methods
+          ::ActiveRecord::Base.class_eval do
+            alias_method :save_without_tingyun, :save
+
+            def save(*args, &amp;blk)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="active_record_helper.html#L26" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L34" class="js-smell-location">1</a>                  </span>  </li></ul>
+              ::TingYun::Agent.with_database_metric_name(self.class.name, nil, ACTIVE_RECORD) do<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_save_methods calls ::TingYun::Agent.with_database_metric_name(self.class.name, nil, ACTIVE_RECORD) 2 times                        <a href="active_record_helper.html#L27" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L35" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_save_methods calls self.class 2 times                        <a href="active_record_helper.html#L27" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L35" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_save_methods calls self.class.name 2 times                        <a href="active_record_helper.html#L27" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L35" class="js-smell-location">1</a>                  </span>  </li></ul>
+                save_without_tingyun(*args, &amp;blk)
+              end
+            end
+
+            alias_method :save_without_tingyun!, :save!
+
+            def save!(*args, &amp;blk)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="active_record_helper.html#L26" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L34" class="js-smell-location">1</a>                  </span>  </li></ul>
+              ::TingYun::Agent.with_database_metric_name(self.class.name, nil, ACTIVE_RECORD) do<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_save_methods calls ::TingYun::Agent.with_database_metric_name(self.class.name, nil, ACTIVE_RECORD) 2 times                        <a href="active_record_helper.html#L27" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L35" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_save_methods calls self.class 2 times                        <a href="active_record_helper.html#L27" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L35" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_save_methods calls self.class.name 2 times                        <a href="active_record_helper.html#L27" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L35" class="js-smell-location">1</a>                  </span>  </li></ul>
+                save_without_tingyun!(*args, &amp;blk)
+              end
+            end
+          end
+        end
+
+        def instrument_relation_methods<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_relation_methods has approx 7 statements          </span>  </li></ul>
+
+          ::ActiveRecord::Relation.class_eval do
+            alias_method :update_all_without_tingyun, :update_all
+
+            def update_all(*args, &amp;blk)
+              ::TingYun::Agent.with_database_metric_name(self.name, nil, ACTIVE_RECORD) do<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_relation_methods calls ::TingYun::Agent.with_database_metric_name(self.name, nil, ACTIVE_RECORD) 3 times                        <a href="active_record_helper.html#L48" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L56" class="js-smell-location">1</a>                  <a href="active_record_helper.html#L64" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_relation_methods calls self.name 3 times                        <a href="active_record_helper.html#L48" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L56" class="js-smell-location">1</a>                  <a href="active_record_helper.html#L64" class="js-smell-location">2</a>                  </span>  </li></ul>
+                update_all_without_tingyun(*args, &amp;blk)
+              end
+            end
+
+            alias_method :delete_all_without_tingyun, :delete_all
+
+            def delete_all(*args, &amp;blk)
+              ::TingYun::Agent.with_database_metric_name(self.name, nil, ACTIVE_RECORD) do<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_relation_methods calls ::TingYun::Agent.with_database_metric_name(self.name, nil, ACTIVE_RECORD) 3 times                        <a href="active_record_helper.html#L48" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L56" class="js-smell-location">1</a>                  <a href="active_record_helper.html#L64" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_relation_methods calls self.name 3 times                        <a href="active_record_helper.html#L48" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L56" class="js-smell-location">1</a>                  <a href="active_record_helper.html#L64" class="js-smell-location">2</a>                  </span>  </li></ul>
+                delete_all_without_tingyun(*args, &amp;blk)
+              end
+            end
+
+            alias_method :destroy_all_without_tingyun, :destroy_all
+
+            def destroy_all(*args, &amp;blk)
+              ::TingYun::Agent.with_database_metric_name(self.name, nil, ACTIVE_RECORD) do<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_relation_methods calls ::TingYun::Agent.with_database_metric_name(self.name, nil, ACTIVE_RECORD) 3 times                        <a href="active_record_helper.html#L48" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L56" class="js-smell-location">1</a>                  <a href="active_record_helper.html#L64" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#instrument_relation_methods calls self.name 3 times                        <a href="active_record_helper.html#L48" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L56" class="js-smell-location">1</a>                  <a href="active_record_helper.html#L64" class="js-smell-location">2</a>                  </span>  </li></ul>
+                destroy_all_without_tingyun(*args, &amp;blk)
+              end
+            end
+          end
+        end
+
+        def metrics_for(name, sql, adapter_name)
+          product = map_product(adapter_name)
+          splits = split_name(name)
+          model = model_from_splits(splits) || product
+          operation = operation_from_splits(splits, sql)
+
+          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD)
+        end
+
+
+        SPACE = &#39; &#39;.freeze unless defined?(SPACE)
+        EMPTY = [].freeze unless defined?(EMPTY)
+
+        def split_name(name)
+          if name &amp;&amp; name.respond_to?(:split)
+            name.split(SPACE)
+          else
+            EMPTY
+          end
+        end
+
+        def model_from_splits(splits)
+          if splits.length == 2
+            splits.first
+          else
+            nil
+          end
+        end
+
+        def operation_from_splits(splits, sql)
+          if splits.length == 2<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#operation_from_splits refers to splits more than self (maybe move it to another class?)                        <a href="active_record_helper.html#L101" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L102" class="js-smell-location">1</a>                  </span>  </li></ul>
+            map_operation(splits[1])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::ActiveRecordHelper#operation_from_splits refers to splits more than self (maybe move it to another class?)                        <a href="active_record_helper.html#L101" class="js-smell-location">0</a>                  <a href="active_record_helper.html#L102" class="js-smell-location">1</a>                  </span>  </li></ul>
+          else
+            TingYun::Instrumentation::Support::Database.parse_operation_from_query(sql)
+          end
+        end
+
+        # These are used primarily to optimize and avoid allocation on well
+        # known operations coming in. Anything not matching the list is fine,
+        # it just needs to get downcased directly for use.
+        OPERATION_NAMES = {
+            &#39;Find&#39; =&gt; &#39;SELECT&#39;,
+            &#39;Load&#39; =&gt; &#39;SELECT&#39;,
+            &#39;Count&#39; =&gt; &#39;SELECT&#39;,
+            &#39;Exists&#39; =&gt; &#39;SELECT&#39;,
+            &#39;Create&#39; =&gt; &#39;INSERT&#39;,
+            &#39;Columns&#39; =&gt; &#39;SELECT&#39;,
+            &#39;Indexes&#39; =&gt; &#39;SELECT&#39;,
+            &#39;Destroy&#39; =&gt; &#39;DELETE&#39;,
+            &#39;Update&#39; =&gt; &#39;UPDATE&#39;,
+            &#39;Save&#39; =&gt; &#39;INSERT&#39;
+        }.freeze unless defined?(OPERATION_NAMES)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="active_record_helper.html#L122" class="js-smell-location">0</a>                  <a href="../../../../test/test_helper.html#L225" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+        def map_operation(raw_operation)
+          direct_op = OPERATION_NAMES[raw_operation]
+          return direct_op if direct_op
+
+          # raw_operation.upcase
+        end
+
+        PRODUCT_NAMES = {
+            &quot;mysql&quot; =&gt; &quot;MySQL&quot;,
+            &quot;mysql2&quot; =&gt; &quot;MySQL&quot;,
+
+            &quot;postgresql&quot; =&gt; &quot;Postgres&quot;,
+
+            &quot;sqlite3&quot; =&gt; &quot;SQLite&quot;,
+
+            # https://rubygems.org/gems/activerecord-jdbcpostgresql-adapter
+            &quot;jdbcmysql&quot; =&gt; &quot;MySQL&quot;,
+
+            # https://rubygems.org/gems/activerecord-jdbcpostgresql-adapter
+            &quot;jdbcpostgresql&quot; =&gt; &quot;Postgres&quot;,
+
+            # https://rubygems.org/gems/activerecord-jdbcsqlite3-adapter
+            &quot;jdbcsqlite3&quot; =&gt; &quot;SQLite&quot;,
+
+            # https://rubygems.org/gems/activerecord-jdbcderby-adapter
+            &quot;derby&quot; =&gt; &quot;Derby&quot;,
+            &quot;jdbcderby&quot; =&gt; &quot;Derby&quot;,
+
+            # https://rubygems.org/gems/activerecord-jdbc-adapter
+            &quot;jdbc&quot; =&gt; &quot;JDBC&quot;,
+
+            # https://rubygems.org/gems/activerecord-jdbcmssql-adapter
+            &quot;jdbcmssql&quot; =&gt; &quot;MSSQL&quot;,
+            &quot;mssql&quot; =&gt; &quot;MSSQL&quot;,
+
+            # https://rubygems.org/gems/activerecord-sqlserver-adapter
+            &quot;sqlserver&quot; =&gt; &quot;MSSQL&quot;,
+
+            # https://rubygems.org/gems/activerecord-odbc-adapter
+            &quot;odbc&quot; =&gt; &quot;ODBC&quot;,
+
+            # https://rubygems.org/gems/activerecord-oracle_enhanced-adapter
+            &quot;oracle_enhanced&quot; =&gt; &quot;Oracle&quot;
+        }.freeze unless defined?(PRODUCT_NAMES)
+
+        DEFAULT_PRODUCT_NAME = &quot;Database&quot;.freeze unless defined?(DEFAULT_PRODUCT_NAME)
+
+        def map_product(adapter_name)
+          PRODUCT_NAMES.fetch(adapter_name, DEFAULT_PRODUCT_NAME)
+        end
+      end
+    end
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Frameworks::Rails</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-29 02:35:25 +0000'>2016-04-29 02:35:25 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      37 complexity
+    </div>
+    <div class="file-stat">
+      6.2 complexity per method
+    </div>
+    <div class="file-stat">
+      7 churn
+    </div>
+    <div class="file-stat">
+      6 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/frameworks/ruby&#39;
+
+module TingYun
+  module Frameworks
+    # noinspection ALL
+    class Rails &lt; TingYun::Frameworks::Ruby
+
+      def env
+        @evn ||= RAILS_ENV.dup
+      end
+
+      def root
+        root = rails_root.to_s.empty? ? super : rails_root.to_s<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::Rails#root calls rails_root.to_s 2 times          </span>  </li></ul>
+      end
+
+      # noinspection Rails3Deprecated,Rails3Deprecated
+      def rails_root
+        RAILS_ROOT if defined?(RAILS_ROOT)
+      end
+
+      def rails_config
+        if defined?(::Rails) &amp;&amp; ::Rails.respond_to?(:configuration)
+          ::Rails.configuration
+        else
+          @config
+        end
+      end
+
+      # In versions of Rails prior to 2.0, the rails config was only available to
+      # the init.rb, so it had to be passed on from there.  This is a best effort to
+      # find a config and use that.
+      def init_config(options = {})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Frameworks::Rails#init_config has approx 6 statements          </span>  </li></ul>
+        @config = options[:config]
+        # Install the dependency detection,
+        if rails_config &amp;&amp; ::Rails.configuration.respond_to?(:after_initialize)
+          rails_config.after_initialize do
+            # This will insure we load all the instrumentation as late as possible.  If the agent
+            # is not enabled, it will load a limited amount of instrumentation.
+            TingYun::Support::LibraryDetection.detect!
+          end
+        end
+
+        if !Agent.config[:&#39;nbs.agent_enabled&#39;]
+          # Might not be running if it does not think mongrel, thin, passenger, etc
+          # is running, if it thinks it&#39;s a rake task, or if the nbs.agent_enabled is false.
+          ::TingYun::Agent.logger.info(&quot;TingYun Agent is unable to run.&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::Rails#init_config calls ::TingYun::Agent.logger 2 times                        <a href="rails.html#L48" class="js-smell-location">0</a>                  <a href="rails.html#L51" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Frameworks::Rails#init_config has the variable name 'e'          </span>  </li></ul>
+        ::TingYun::Agent.logger.error(&quot;Failure during init_config for Rails. Is Rails required in a non-Rails app? Set TING_YUN_FRAMEWORK=ruby to avoid this message.&quot;,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::Rails#init_config calls ::TingYun::Agent.logger 2 times                        <a href="rails.html#L48" class="js-smell-location">0</a>                  <a href="rails.html#L51" class="js-smell-location">1</a>                  </span>  </li></ul>
+                                       &quot;The Ruby agent will continue running, but Rails-specific features may be missing.&quot;,
+                                       e)
+      end
+
+      protected
+
+      def rails_vendor_root
+        File.join(root,&#39;vendor&#39;,&#39;rails&#39;)
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

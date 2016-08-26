@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Agent::Collector::TransactionSampler</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-23 18:28:00 +0800'>2016-08-23 18:28:00 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      148 complexity
+    </div>
+    <div class="file-stat">
+      7.8 complexity per method
+    </div>
+    <div class="file-stat">
+      32 churn
+    </div>
+    <div class="file-stat">
+      19 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent/transaction/transaction_sample_builder&#39;
+require &#39;ting_yun/agent/collector/transaction_sampler/slowest_sample_buffer&#39;
+
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+
+
+module TingYun
+  module Agent
+    module Collector
+      class TransactionSampler<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::TransactionSampler has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::TransactionSampler has prima donna method `harvest!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::TransactionSampler has prima donna method `merge!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::TransactionSampler has prima donna method `reset!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Methods.md" target="_blank">TooManyMethods</a>)      TingYun::Agent::Collector::TransactionSampler has at least 17 methods          </span>  </li></ul>
+
+        attr_accessor :last_sample<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Collector::TransactionSampler#last_sample is a writable attribute          </span>  </li></ul>
+
+
+        def initialize
+          @lock = Mutex.new
+          @sample_buffers = []
+          @sample_buffers &lt;&lt; TingYun::Agent::Collector::TransactionSampler::SlowestSampleBuffer.new
+        end
+
+
+        def notice_push_frame(state, time=Time.now)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::Collector::TransactionSampler takes parameters [state, time] to 3 methods                        <a href="transaction_sampler.html#L24" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L31" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L46" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::TransactionSampler#notice_push_frame doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          builder = state.transaction_sample_builder
+          return unless builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::TransactionSampler tests builder at least 6 times                        <a href="transaction_sampler.html#L26" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L33" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L97" class="js-smell-location">2</a>                  <a href="transaction_sampler.html#L104" class="js-smell-location">3</a>                  <a href="transaction_sampler.html#L117" class="js-smell-location">4</a>                  <a href="transaction_sampler.html#L207" class="js-smell-location">5</a>                  </span>  </li></ul>
+          builder.trace_entry(time.to_f)
+        end
+
+        # Informs the transaction sample builder about the end of a traced frame
+        def notice_pop_frame(state, frame, time = Time.now)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::Collector::TransactionSampler takes parameters [state, time] to 3 methods                        <a href="transaction_sampler.html#L24" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L31" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L46" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::TransactionSampler#notice_pop_frame doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          builder = state.transaction_sample_builder
+          return unless builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::TransactionSampler tests builder at least 6 times                        <a href="transaction_sampler.html#L26" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L33" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L97" class="js-smell-location">2</a>                  <a href="transaction_sampler.html#L104" class="js-smell-location">3</a>                  <a href="transaction_sampler.html#L117" class="js-smell-location">4</a>                  <a href="transaction_sampler.html#L207" class="js-smell-location">5</a>                  </span>  </li></ul>
+          builder.trace_exit(frame, time.to_f)
+        end
+
+
+        def self.on_start_transaction(state, time)
+          if TingYun::Agent.config[:&#39;nbs.action_tracer.enabled&#39;]
+            state.transaction_sample_builder ||= TingYun::Agent::TransactionSampleBuilder.new(time)
+          else
+            state.transaction_sample_builder = nil
+          end
+        end
+
+        def on_finishing_transaction(state, txn, time=Time.now.to_f)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::Collector::TransactionSampler takes parameters [state, time] to 3 methods                        <a href="transaction_sampler.html#L24" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L31" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L46" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::TransactionSampler#on_finishing_transaction has approx 12 statements          </span>  </li></ul>
+          last_builder = state.transaction_sample_builder
+          return unless last_builder &amp;&amp; TingYun::Agent.config[:&#39;nbs.action_tracer.enabled&#39;]
+
+          last_builder.finish_trace(time)
+
+          state.transaction_sample_builder = nil
+
+
+          final_trace = last_builder.trace
+          final_trace.metric_name = txn.best_name
+          final_trace.uri = txn.request_path
+          final_trace.attributes = txn.attributes
+
+
+          @lock.synchronize do
+            @last_sample = final_trace
+
+            store_sample(@last_sample)
+            @last_sample
+          end
+        end
+
+        def store_sample(sample)
+          @sample_buffers.each do |sample_buffer|
+            sample_buffer.store(sample)
+          end
+        end
+
+
+        # Attaches an SQL query on the current transaction trace node.
+        # @param sql [String] the SQL query being recorded
+        # @param config [Object] the driver configuration for the connection
+        # @param duration [Float] number of seconds the query took to execute
+        # @param explainer [Proc] for internal use only - 3rd-party clients must
+        #                         not pass this parameter.
+        # duration{:type =&gt; sec}
+        def notice_sql(sql, config, duration, state=nil, explainer=nil, binds=[], name=&quot;SQL&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::Collector::TransactionSampler#notice_sql has 7 parameters          </span>  </li></ul>
+          # some statements (particularly INSERTS with large BLOBS
+          # may be very large; we should trim them to a maximum usable length
+          state ||= TingYun::Agent::TransactionState.tl_get
+          builder = state.transaction_sample_builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::TransactionSampler#notice_sql refers to state more than self (maybe move it to another class?)                        <a href="transaction_sampler.html#L87" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L88" class="js-smell-location">1</a>                  </span>  </li></ul>
+          if state.sql_recorded?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::TransactionSampler#notice_sql refers to state more than self (maybe move it to another class?)                        <a href="transaction_sampler.html#L87" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L88" class="js-smell-location">1</a>                  </span>  </li></ul>
+            statement = TingYun::Agent::Database::Statement.new(sql, config, explainer, binds, name)
+            action_tracer_segment(builder, statement, duration, :sql)
+          end
+        end
+
+        # duration{:type =&gt; sec}
+        def notice_nosql(key, duration) #THREAD_LOCAL_ACCESS
+          builder = tl_builder
+          return unless builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::TransactionSampler tests builder at least 6 times                        <a href="transaction_sampler.html#L26" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L33" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L97" class="js-smell-location">2</a>                  <a href="transaction_sampler.html#L104" class="js-smell-location">3</a>                  <a href="transaction_sampler.html#L117" class="js-smell-location">4</a>                  <a href="transaction_sampler.html#L207" class="js-smell-location">5</a>                  </span>  </li></ul>
+          action_tracer_segment(builder, key, duration, :key)
+        end
+
+        # duration{:type =&gt; sec}
+        def notice_nosql_statement(statement, duration) #THREAD_LOCAL_ACCESS
+          builder = tl_builder
+          return unless builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::TransactionSampler tests builder at least 6 times                        <a href="transaction_sampler.html#L26" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L33" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L97" class="js-smell-location">2</a>                  <a href="transaction_sampler.html#L104" class="js-smell-location">3</a>                  <a href="transaction_sampler.html#L117" class="js-smell-location">4</a>                  <a href="transaction_sampler.html#L207" class="js-smell-location">5</a>                  </span>  </li></ul>
+          action_tracer_segment(builder, statement, duration, :statement)
+        end
+
+
+
+        MAX_DATA_LENGTH = 16384
+        # This method is used to record metadata into the currently
+        # active node like a sql query, memcache key, or Net::HTTP uri
+        #
+        # duration is milliseconds, float value.
+        # duration{:type =&gt; sec}
+        def action_tracer_segment(builder, message, duration, key)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Collector::TransactionSampler#action_tracer_segment has a flog score of 31          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::Collector::TransactionSampler#action_tracer_segment has 4 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::TransactionSampler#action_tracer_segment has approx 7 statements          </span>  </li></ul>
+          return unless builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::TransactionSampler tests builder at least 6 times                        <a href="transaction_sampler.html#L26" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L33" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L97" class="js-smell-location">2</a>                  <a href="transaction_sampler.html#L104" class="js-smell-location">3</a>                  <a href="transaction_sampler.html#L117" class="js-smell-location">4</a>                  <a href="transaction_sampler.html#L207" class="js-smell-location">5</a>                  </span>  </li></ul>
+          node = builder.current_node
+          if node
+            if key == :sql
+              statement = node[:sql]
+              if statement &amp;&amp; !statement.sql.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::TransactionSampler#action_tracer_segment calls statement.sql 3 times                        <a href="transaction_sampler.html#L122" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L123" class="js-smell-location">1</a>                  </span>  </li></ul>
+                statement.sql = self.class.truncate_message(statement.sql + &quot;\n#{message.sql}&quot;) if statement.sql.length &lt;= MAX_DATA_LENGTH<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::TransactionSampler#action_tracer_segment calls self.class 2 times                        <a href="transaction_sampler.html#L123" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L129" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::TransactionSampler#action_tracer_segment calls statement.sql 3 times                        <a href="transaction_sampler.html#L122" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L123" class="js-smell-location">1</a>                  </span>  </li></ul>
+              else
+                # message is expected to have been pre-truncated by notice_sql
+                node[:sql] =  message
+              end
+            else
+              node[key] = self.class.truncate_message(message)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::TransactionSampler#action_tracer_segment calls self.class 2 times                        <a href="transaction_sampler.html#L123" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L129" class="js-smell-location">1</a>                  </span>  </li></ul>
+            end
+            append_backtrace(node, duration)
+          end
+        end
+
+        # Truncates the message to `MAX_DATA_LENGTH` if needed, and
+        # appends an ellipsis because it makes the trucation clearer in
+        # the UI
+        def self.truncate_message(message)
+          if message.length &gt; (MAX_DATA_LENGTH - 4)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::TransactionSampler#self.truncate_message calls MAX_DATA_LENGTH - 4 2 times                        <a href="transaction_sampler.html#L139" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L140" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::TransactionSampler#self.truncate_message calls message.length 2 times                        <a href="transaction_sampler.html#L139" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L140" class="js-smell-location">1</a>                  </span>  </li></ul>
+            message.slice!(MAX_DATA_LENGTH - 4..message.length)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::TransactionSampler#self.truncate_message calls MAX_DATA_LENGTH - 4 2 times                        <a href="transaction_sampler.html#L139" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L140" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::TransactionSampler#self.truncate_message calls message.length 2 times                        <a href="transaction_sampler.html#L139" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L140" class="js-smell-location">1</a>                  </span>  </li></ul>
+            message &lt;&lt; &#39;...&#39;
+          else
+            message
+          end
+        end
+
+        # Appends a backtrace to a node if that node took longer
+        # than the specified duration
+        def append_backtrace(node, duration)
+          if duration*1000 &gt;= Agent.config[:&#39;nbs.action_tracer.stack_trace_threshold&#39;]
+            trace =  caller.reject! { |t| t.include?(&#39;tingyun_rpm&#39;) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::TransactionSampler#append_backtrace has the variable name 't'          </span>  </li></ul>
+            trace = trace.first(40) if trace.length &gt; 40<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::TransactionSampler#append_backtrace refers to trace more than self (maybe move it to another class?)          </span>  </li></ul>
+            node[:stacktrace] = trace
+          end
+
+        end
+
+        def harvest!
+          return [] unless TingYun::Agent.config[:&#39;nbs.action_tracer.enabled&#39;]
+
+          samples = @lock.synchronize do
+            @last_sample = nil
+            harvest_from_sample_buffers
+          end
+
+          prepare_samples(samples)
+        end
+
+        def harvest_from_sample_buffers
+          result = []
+          @sample_buffers.each { |buffer| result.concat(buffer.harvest_samples) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::TransactionSampler#harvest_from_sample_buffers refers to result more than self (maybe move it to another class?)                        <a href="transaction_sampler.html#L171" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L172" class="js-smell-location">1</a>                  </span>  </li></ul>
+          result.uniq<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Collector::TransactionSampler#harvest_from_sample_buffers refers to result more than self (maybe move it to another class?)                        <a href="transaction_sampler.html#L171" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L172" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+        def prepare_samples(samples)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::TransactionSampler#prepare_samples doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          samples.select do |sample|
+            begin
+              sample.prepare_to_send!
+            rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::TransactionSampler#prepare_samples has the variable name 'e'          </span>  </li></ul>
+
+              TingYun::Agent.logger.error(&#39;Failed to prepare transaction trace. Error: &#39;, e)
+
+              false
+            else
+              true
+            end
+          end
+        end
+
+        def merge!(previous)
+          @lock.synchronize do
+            @sample_buffers.each do |buffer|
+              buffer.store_previous(previous)
+            end
+          end
+        end
+
+        def reset!
+          @lock.synchronize do
+            @sample_buffers.each { |sample| sample.reset! }
+          end
+        end
+
+
+        def add_node_info(params)
+          builder = tl_builder
+          return unless builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::Agent::Collector::TransactionSampler tests builder at least 6 times                        <a href="transaction_sampler.html#L26" class="js-smell-location">0</a>                  <a href="transaction_sampler.html#L33" class="js-smell-location">1</a>                  <a href="transaction_sampler.html#L97" class="js-smell-location">2</a>                  <a href="transaction_sampler.html#L104" class="js-smell-location">3</a>                  <a href="transaction_sampler.html#L117" class="js-smell-location">4</a>                  <a href="transaction_sampler.html#L207" class="js-smell-location">5</a>                  </span>  </li></ul>
+          params.each { |k,v| builder.current_node.instance_variable_set((&#39;@&#39;&lt;&lt;k.to_s).to_sym, v)  }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::TransactionSampler#add_node_info has the variable name 'k'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::TransactionSampler#add_node_info has the variable name 'v'          </span>  </li></ul>
+        end
+
+        def tl_builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::TransactionSampler#tl_builder doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Agent::TransactionState.tl_get.transaction_sample_builder
+        end
+
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

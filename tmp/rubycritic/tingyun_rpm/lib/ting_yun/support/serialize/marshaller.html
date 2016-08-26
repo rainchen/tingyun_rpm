@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Serialize::Marshaller</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-26 15:00:55 +0800'>2016-04-26 15:00:55 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      52 complexity
+    </div>
+    <div class="file-stat">
+      8.7 complexity per method
+    </div>
+    <div class="file-stat">
+      15 churn
+    </div>
+    <div class="file-stat">
+      6 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/support/exception&#39;
+
+module TingYun
+  module Support
+    module Serialize
+      class Marshaller<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::Marshaller has no descriptive comment          </span>  </li></ul>
+        def parsed_error(error)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Serialize::Marshaller#parsed_error has approx 6 statements          </span>  </li></ul>
+          error_code = error[&#39;errorCode&#39;]
+          error_message = error[&#39;errorMessage&#39;]
+          case error_code
+            when 460
+              raise TingYun::Support::Exception::LicenseException.new(&quot;#{error_code}: #{error_message}&quot;)
+            when 461
+              raise TingYun::Support::Exception::InvalidDataTokenException.new(&quot;#{error_code}: #{error_message}&quot;)
+            when 462
+              raise TingYun::Support::Exception::InvalidDataException.new(&quot;#{error_code}: #{error_message}&quot;)
+            when 470
+              raise TingYun::Support::Exception::ExpiredConfigurationException.new(&quot;#{error_code}: #{error_message}&quot;)
+          end
+        end
+
+        def prepare(data, options={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Serialize::Marshaller#prepare has approx 7 statements          </span>  </li></ul>
+          encoder = options[:encoder] || default_encoder
+          if data.respond_to?(:to_collector_array)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#prepare refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L27" class="js-smell-location">0</a>                  <a href="marshaller.html#L28" class="js-smell-location">1</a>                  <a href="marshaller.html#L29" class="js-smell-location">2</a>                  <a href="marshaller.html#L30" class="js-smell-location">3</a>                  <a href="marshaller.html#L31" class="js-smell-location">4</a>                  <a href="marshaller.html#L32" class="js-smell-location">5</a>                  </span>  </li></ul>
+            data.to_collector_array(encoder)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#prepare refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L27" class="js-smell-location">0</a>                  <a href="marshaller.html#L28" class="js-smell-location">1</a>                  <a href="marshaller.html#L29" class="js-smell-location">2</a>                  <a href="marshaller.html#L30" class="js-smell-location">3</a>                  <a href="marshaller.html#L31" class="js-smell-location">4</a>                  <a href="marshaller.html#L32" class="js-smell-location">5</a>                  </span>  </li></ul>
+          elsif data.kind_of?(Array)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#prepare refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L27" class="js-smell-location">0</a>                  <a href="marshaller.html#L28" class="js-smell-location">1</a>                  <a href="marshaller.html#L29" class="js-smell-location">2</a>                  <a href="marshaller.html#L30" class="js-smell-location">3</a>                  <a href="marshaller.html#L31" class="js-smell-location">4</a>                  <a href="marshaller.html#L32" class="js-smell-location">5</a>                  </span>  </li></ul>
+            data.map { |element| prepare(element, options) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#prepare refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L27" class="js-smell-location">0</a>                  <a href="marshaller.html#L28" class="js-smell-location">1</a>                  <a href="marshaller.html#L29" class="js-smell-location">2</a>                  <a href="marshaller.html#L30" class="js-smell-location">3</a>                  <a href="marshaller.html#L31" class="js-smell-location">4</a>                  <a href="marshaller.html#L32" class="js-smell-location">5</a>                  </span>  </li></ul>
+          elsif data.kind_of?(Hash)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#prepare refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L27" class="js-smell-location">0</a>                  <a href="marshaller.html#L28" class="js-smell-location">1</a>                  <a href="marshaller.html#L29" class="js-smell-location">2</a>                  <a href="marshaller.html#L30" class="js-smell-location">3</a>                  <a href="marshaller.html#L31" class="js-smell-location">4</a>                  <a href="marshaller.html#L32" class="js-smell-location">5</a>                  </span>  </li></ul>
+            data.each {|_k,_v| data[_k]=prepare(_v, options)}<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#prepare refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L27" class="js-smell-location">0</a>                  <a href="marshaller.html#L28" class="js-smell-location">1</a>                  <a href="marshaller.html#L29" class="js-smell-location">2</a>                  <a href="marshaller.html#L30" class="js-smell-location">3</a>                  <a href="marshaller.html#L31" class="js-smell-location">4</a>                  <a href="marshaller.html#L32" class="js-smell-location">5</a>                  </span>  </li></ul>
+          else
+            data
+          end
+        end
+
+        def default_encoder
+          Encoders::Identity
+        end
+
+        def self.human_readable?
+          false
+        end
+
+        def return_value_for_testing(data)
+          return_value(data)
+        end
+
+        protected
+
+        def return_value(data)
+          if data.respond_to?(:has_key?)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#return_value refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L53" class="js-smell-location">0</a>                  <a href="marshaller.html#L54" class="js-smell-location">1</a>                  <a href="marshaller.html#L55" class="js-smell-location">2</a>                  <a href="marshaller.html#L56" class="js-smell-location">3</a>                  <a href="marshaller.html#L57" class="js-smell-location">4</a>                  <a href="marshaller.html#L60" class="js-smell-location">5</a>                  </span>  </li></ul>
+            if data.has_key?(&#39;status&#39;) &amp;&amp; data.has_key?(&#39;result&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#return_value refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L53" class="js-smell-location">0</a>                  <a href="marshaller.html#L54" class="js-smell-location">1</a>                  <a href="marshaller.html#L55" class="js-smell-location">2</a>                  <a href="marshaller.html#L56" class="js-smell-location">3</a>                  <a href="marshaller.html#L57" class="js-smell-location">4</a>                  <a href="marshaller.html#L60" class="js-smell-location">5</a>                  </span>  </li></ul>
+              if data[&#39;status&#39;] ==&quot;error&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#return_value refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L53" class="js-smell-location">0</a>                  <a href="marshaller.html#L54" class="js-smell-location">1</a>                  <a href="marshaller.html#L55" class="js-smell-location">2</a>                  <a href="marshaller.html#L56" class="js-smell-location">3</a>                  <a href="marshaller.html#L57" class="js-smell-location">4</a>                  <a href="marshaller.html#L60" class="js-smell-location">5</a>                  </span>  </li></ul>
+                parsed_error(data[&#39;result&#39;])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::Marshaller#return_value calls data['result'] 3 times                        <a href="marshaller.html#L56" class="js-smell-location">0</a>                  <a href="marshaller.html#L57" class="js-smell-location">1</a>                  <a href="marshaller.html#L60" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#return_value refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L53" class="js-smell-location">0</a>                  <a href="marshaller.html#L54" class="js-smell-location">1</a>                  <a href="marshaller.html#L55" class="js-smell-location">2</a>                  <a href="marshaller.html#L56" class="js-smell-location">3</a>                  <a href="marshaller.html#L57" class="js-smell-location">4</a>                  <a href="marshaller.html#L60" class="js-smell-location">5</a>                  </span>  </li></ul>
+              elsif data[&#39;result&#39;][&#39;enabled&#39;] == false<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::Marshaller#return_value calls data['result'] 3 times                        <a href="marshaller.html#L56" class="js-smell-location">0</a>                  <a href="marshaller.html#L57" class="js-smell-location">1</a>                  <a href="marshaller.html#L60" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#return_value refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L53" class="js-smell-location">0</a>                  <a href="marshaller.html#L54" class="js-smell-location">1</a>                  <a href="marshaller.html#L55" class="js-smell-location">2</a>                  <a href="marshaller.html#L56" class="js-smell-location">3</a>                  <a href="marshaller.html#L57" class="js-smell-location">4</a>                  <a href="marshaller.html#L60" class="js-smell-location">5</a>                  </span>  </li></ul>
+                raise TingYun::Support::Exception::AgentEnableException.new(&quot;sorry，the application is unable to use the tingyun service now &quot;)
+              else
+                return data[&#39;result&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::Marshaller#return_value calls data['result'] 3 times                        <a href="marshaller.html#L56" class="js-smell-location">0</a>                  <a href="marshaller.html#L57" class="js-smell-location">1</a>                  <a href="marshaller.html#L60" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::Marshaller#return_value refers to data more than self (maybe move it to another class?)                        <a href="marshaller.html#L53" class="js-smell-location">0</a>                  <a href="marshaller.html#L54" class="js-smell-location">1</a>                  <a href="marshaller.html#L55" class="js-smell-location">2</a>                  <a href="marshaller.html#L56" class="js-smell-location">3</a>                  <a href="marshaller.html#L57" class="js-smell-location">4</a>                  <a href="marshaller.html#L60" class="js-smell-location">5</a>                  </span>  </li></ul>
+              end
+            end
+          end
+          data
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

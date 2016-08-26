@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Support::EventedSubscriber</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-19 08:12:23 +0000'>2016-01-19 08:12:23 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      60 complexity
+    </div>
+    <div class="file-stat">
+      4.3 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      14 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">
+module TingYun
+  module Instrumentation
+    module Support
+      class EventedSubscriber<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Support::EventedSubscriber has no descriptive comment          </span>  </li></ul>
+        def initialize
+          @queue_key = [&#39;TingYun&#39;, self.class.name, object_id].join(&#39;-&#39;)
+        end
+
+        def self.subscribed?
+          # rather than digging through Listener ivars
+          ActiveSupport::Notifications.notifier.instance_variable_get(:@subscribers) \
+            .find{|s| s.instance_variable_get(:@delegate).class == self }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::Support::EventedSubscriber#self.subscribed? has the variable name 's'          </span>  </li></ul>
+        end
+
+        def self.subscribe(pattern)
+          unless subscribed?
+            ActiveSupport::Notifications.subscribe(pattern, new)
+          end
+        end
+
+        def start(name, id, payload)
+          event = ActiveSupport::Notifications::Event.new(name, Time.now, nil, id, payload)
+          push_event(event)
+          event
+        end
+
+        def finish(name, id, payload)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Instrumentation::Support::EventedSubscriber#finish has unused parameter 'name'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Instrumentation::Support::EventedSubscriber#finish has unused parameter 'payload'          </span>  </li></ul>
+          pop_event(id)
+        end
+
+        def log_notification_error(error, name, event_type)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Support::EventedSubscriber#log_notification_error doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          # These are important enough failures that we want the backtraces
+          # logged at error level, hence the explicit log_exception call.
+          TingYun::Agent.logger.error(&quot;Error during #{event_type} callback for event &#39;#{name}&#39;:&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::EventedSubscriber#log_notification_error calls TingYun::Agent.logger 2 times                        <a href="evented_subscriber.html#L35" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L36" class="js-smell-location">1</a>                  </span>  </li></ul>
+          TingYun::Agent.logger.log_exception(:error, error)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::EventedSubscriber#log_notification_error calls TingYun::Agent.logger 2 times                        <a href="evented_subscriber.html#L35" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L36" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+        def push_event(event)
+          parent = event_stack[event.transaction_id].last<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::EventedSubscriber#push_event calls event.transaction_id 2 times                        <a href="evented_subscriber.html#L40" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L45" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::EventedSubscriber#push_event calls event_stack[event.transaction_id] 2 times                        <a href="evented_subscriber.html#L40" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L45" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::EventedSubscriber#push_event refers to event more than self (maybe move it to another class?)                        <a href="evented_subscriber.html#L40" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L41" class="js-smell-location">1</a>                  <a href="evented_subscriber.html#L42" class="js-smell-location">2</a>                  <a href="evented_subscriber.html#L45" class="js-smell-location">3</a>                  </span>  </li></ul>
+          if parent &amp;&amp; event.respond_to?(:parent=)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::EventedSubscriber#push_event refers to event more than self (maybe move it to another class?)                        <a href="evented_subscriber.html#L40" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L41" class="js-smell-location">1</a>                  <a href="evented_subscriber.html#L42" class="js-smell-location">2</a>                  <a href="evented_subscriber.html#L45" class="js-smell-location">3</a>                  </span>  </li></ul>
+            event.parent = parent<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::EventedSubscriber#push_event refers to event more than self (maybe move it to another class?)                        <a href="evented_subscriber.html#L40" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L41" class="js-smell-location">1</a>                  <a href="evented_subscriber.html#L42" class="js-smell-location">2</a>                  <a href="evented_subscriber.html#L45" class="js-smell-location">3</a>                  </span>  </li></ul>
+            parent &lt;&lt; event
+          end
+          event_stack[event.transaction_id].push event<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::EventedSubscriber#push_event calls event.transaction_id 2 times                        <a href="evented_subscriber.html#L40" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L45" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::EventedSubscriber#push_event calls event_stack[event.transaction_id] 2 times                        <a href="evented_subscriber.html#L40" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L45" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Support::EventedSubscriber#push_event refers to event more than self (maybe move it to another class?)                        <a href="evented_subscriber.html#L40" class="js-smell-location">0</a>                  <a href="evented_subscriber.html#L41" class="js-smell-location">1</a>                  <a href="evented_subscriber.html#L42" class="js-smell-location">2</a>                  <a href="evented_subscriber.html#L45" class="js-smell-location">3</a>                  </span>  </li></ul>
+        end
+
+        def pop_event(transaction_id)
+          event = event_stack[transaction_id].pop
+          event.end = Time.now
+          event
+        end
+
+        def event_stack
+          Thread.current[@queue_key] ||= Hash.new {|h,id| h[id] = [] }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::Support::EventedSubscriber#event_stack has the variable name 'h'          </span>  </li></ul>
+        end
+      end
+
+      # Taken from ActiveSupport::Notifications::Event, pasted here
+      # with a couple minor additions so we don&#39;t have a hard
+      # dependency on ActiveSupport::Notifications.
+      #
+      # Represents an intrument event, provides timing and metric
+      # name information useful when recording metrics.
+      class Event<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Instrumentation::Support::Event has at least 6 instance variables          </span>  </li></ul>
+        attr_reader :name, :time, :transaction_id, :payload, :children
+        attr_accessor :end, :parent, :frame<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Instrumentation::Support::Event#end is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Instrumentation::Support::Event#frame is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Instrumentation::Support::Event#parent is a writable attribute          </span>  </li></ul>
+
+        def initialize(name, start, ending, transaction_id, payload, _=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Instrumentation::Support::Event#initialize has 6 parameters          </span>  </li></ul>
+          @name           = name
+          @payload        = payload.dup
+          @time           = start
+          @transaction_id = transaction_id
+          @end            = ending
+          @children       = []
+        end
+
+        def metric_name
+          raise NotImplementedError
+        end
+
+        def duration
+          (self.end - time)*1000
+        end
+
+        def &lt;&lt;(event)
+          @children &lt;&lt; event
+        end
+
+        def parent_of?(event)
+          @children.include? event
+        end
+      end
+    end
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

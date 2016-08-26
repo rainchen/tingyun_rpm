@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Configuration::EnvironmentSourceTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-15 05:37:30 +0000'>2016-07-15 05:37:30 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      81 complexity
+    </div>
+    <div class="file-stat">
+      4.1 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      20 methods
+    </div>
+    <div class="file-stat">
+      70 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require File.expand_path(File.join(File.dirname(__FILE__),&#39;..&#39;,&#39;..&#39;,&#39;test_helper&#39;))
+require &#39;ting_yun/configuration/environment_source&#39;
+require &#39;ting_yun/configuration/default_source&#39;
+
+module TingYun::Configuration
+  class EnvironmentSourceTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Configuration::EnvironmentSourceTest has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Methods.md" target="_blank">TooManyMethods</a>)      TingYun::Configuration::EnvironmentSourceTest has at least 20 methods          </span>  </li></ul>
+
+    def setup
+      @original_env = {}
+      @original_env.replace(ENV)
+      @environment_source = EnvironmentSource.new
+    end
+
+    def teardown
+      ENV.replace(@original_env)
+    end
+
+    def test_environment_strings_are_applied<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::EnvironmentSourceTest#test_environment_strings_are_applied has approx 6 statements          </span>  </li></ul>
+      assert_applied_string &#39;NRCONFIG&#39;, &#39;config_path&#39;
+      assert_applied_string &#39;TING_YUN_LICENSE_KEY&#39;, &#39;license_key&#39;
+      assert_applied_string &#39;TINGYUN_LICENSE_KEY&#39;, &#39;license_key&#39;
+      assert_applied_string &#39;TING_YUN_APP_NAME&#39;, &#39;app_name&#39;
+      assert_applied_string &#39;TINGYUN_APP_NAME&#39;, &#39;app_name&#39;
+      assert_applied_string &#39;TING_YUN_HOST&#39;, &#39;host&#39;
+    end
+
+    def test_environment_fixnums_are_applied
+      assert_applied_fixnum &#39;TING_YUN_PORT&#39;, &#39;port&#39;
+    end
+
+    def test_environment_symbols_are_applied
+      assert_applied_symbol &#39;TING_YUN_DISPATCHER&#39;, &#39;dispatcher&#39;
+      assert_applied_symbol &#39;TINGYUN_DISPATCHER&#39;, &#39;dispatcher&#39;
+      assert_applied_symbol &#39;TING_YUN_FRAMEWORK&#39;, &#39;framework&#39;
+      assert_applied_symbol &#39;TINGYUN_FRAMEWORK&#39;, &#39;framework&#39;
+    end
+
+    def test_set_log_config_from_environment<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="environment_source_test.html#L41" class="js-smell-location">0</a>                  <a href="environment_source_test.html#L48" class="js-smell-location">1</a>                  </span>  </li></ul>
+      ENV[&#39;TING_YUN_LOG&#39;] = &#39;off/in/space.log&#39;
+      source = EnvironmentSource.new
+      assert_equal &#39;off/in&#39;, source[:log_file_path]
+      assert_equal &#39;space.log&#39;, source[:log_file_name]
+    end
+
+    def test_set_log_config_STDOUT_from_environment<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="environment_source_test.html#L41" class="js-smell-location">0</a>                  <a href="environment_source_test.html#L48" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Method-Name.md" target="_blank">UncommunicativeMethodName</a>)      TingYun::Configuration::EnvironmentSourceTest#test_set_log_config_STDOUT_from_environment has the name 'test_set_log_config_STDOUT_from_environment'          </span>  </li></ul>
+      ENV[&#39;TING_YUN_LOG&#39;] = &#39;STDOUT&#39;
+      source = EnvironmentSource.new
+      assert_equal &#39;STDOUT&#39;, source[:log_file_name]
+      assert_equal &#39;STDOUT&#39;, source[:log_file_path]
+    end
+
+    def test_set_values_from_ting_yun_environment_variables<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::EnvironmentSourceTest#test_set_values_from_ting_yun_environment_variables has approx 6 statements          </span>  </li></ul>
+      keys = %w(TING_YUN_LICENSE_KEY TINGYUN_CONFIG_PATH)
+      keys.each { |key| ENV[key] = &#39;skywizards&#39; }
+
+      expected_source = EnvironmentSource.new
+
+      [:license_key, :config_path].each do |key|
+        assert_equal &#39;skywizards&#39;, expected_source[key]
+      end
+    end
+
+
+    def test_set_value_from_environment_variable
+      ENV[&#39;TING_YUN_LICENSE_KEY&#39;] = &#39;super rad&#39;
+      @environment_source.set_value_from_environment_variable(&#39;TING_YUN_LICENSE_KEY&#39;)
+      assert_equal @environment_source[:license_key], &#39;super rad&#39;
+    end
+
+    def test_set_key_by_type_uses_the_default_type
+      ENV[&#39;TING_YUN_TEST&#39;] = &#39;true&#39;
+      @environment_source.set_key_by_type(:&#39;nbs.agent_enabled&#39;, &#39;TING_YUN_TEST&#39;)
+      assert_equal true, @environment_source[:&#39;nbs.agent_enabled&#39;]
+    end
+
+    def test_set_key_with_ting_yun_prefix
+      assert_applied_string(&#39;TING_YUN_LICENSE_KEY&#39;, :license_key)
+    end
+
+    def test_set_key_with_tingyun_prefix
+      assert_applied_string(&#39;TINGYUN_LICENSE_KEY&#39;, :license_key)
+    end
+
+    def test_does_not_set_key_without_ting_yun_related_prefix
+      ENV[&#39;CONFIG_PATH&#39;] = &#39;boom&#39;
+      refute_equal &#39;boom&#39;, EnvironmentSource.new[:config_path]
+    end
+
+    def test_convert_environment_key_to_config_key
+      result = @environment_source.convert_environment_key_to_config_key(&#39;TINGYUN_IS_RAD&#39;)
+      assert_equal :is_rad, result
+    end
+
+    def test_convert_environment_key_to_config_key_respects_aliases
+      assert_applied_boolean(&#39;TINGYUN_NBS.AGENT_ENABLED&#39;, :&#39;nbs.agent_enabled&#39;)
+    end
+
+    def test_convert_environment_key_to_config_key_allows_underscores_as_dots
+      assert_applied_string(&#39;TING_YUN_RUM.SCRIPT&#39;, :&#39;rum.script&#39;)
+    end
+
+
+
+    def assert_applied_string(env_var, config_var)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Configuration::EnvironmentSourceTest takes parameters [config_var, env_var] to 4 methods                        <a href="environment_source_test.html#L107" class="js-smell-location">0</a>                  <a href="environment_source_test.html#L113" class="js-smell-location">1</a>                  <a href="environment_source_test.html#L119" class="js-smell-location">2</a>                  <a href="environment_source_test.html#L125" class="js-smell-location">3</a>                  </span>  </li></ul>
+      ENV[env_var] = &#39;test value&#39;
+      assert_equal &#39;test value&#39;, EnvironmentSource.new[config_var.to_sym]
+      ENV.delete(env_var)
+    end
+
+    def assert_applied_symbol(env_var, config_var)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="environment_source_test.html#L113" class="js-smell-location">0</a>                  <a href="environment_source_test.html#L119" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Configuration::EnvironmentSourceTest takes parameters [config_var, env_var] to 4 methods                        <a href="environment_source_test.html#L107" class="js-smell-location">0</a>                  <a href="environment_source_test.html#L113" class="js-smell-location">1</a>                  <a href="environment_source_test.html#L119" class="js-smell-location">2</a>                  <a href="environment_source_test.html#L125" class="js-smell-location">3</a>                  </span>  </li></ul>
+      ENV[env_var] = &#39;test value&#39;
+      assert_equal :&#39;test value&#39;, EnvironmentSource.new[config_var.to_sym]
+      ENV.delete(env_var)
+    end
+
+    def assert_applied_fixnum(env_var, config_var)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="environment_source_test.html#L113" class="js-smell-location">0</a>                  <a href="environment_source_test.html#L119" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Configuration::EnvironmentSourceTest takes parameters [config_var, env_var] to 4 methods                        <a href="environment_source_test.html#L107" class="js-smell-location">0</a>                  <a href="environment_source_test.html#L113" class="js-smell-location">1</a>                  <a href="environment_source_test.html#L119" class="js-smell-location">2</a>                  <a href="environment_source_test.html#L125" class="js-smell-location">3</a>                  </span>  </li></ul>
+      ENV[env_var] = &#39;3000&#39;
+      assert_equal 3000, EnvironmentSource.new[config_var.to_sym]
+      ENV.delete(env_var)
+    end
+
+    def assert_applied_boolean(env_var, config_var)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Configuration::EnvironmentSourceTest takes parameters [config_var, env_var] to 4 methods                        <a href="environment_source_test.html#L107" class="js-smell-location">0</a>                  <a href="environment_source_test.html#L113" class="js-smell-location">1</a>                  <a href="environment_source_test.html#L119" class="js-smell-location">2</a>                  <a href="environment_source_test.html#L125" class="js-smell-location">3</a>                  </span>  </li></ul>
+      ENV[env_var] = &#39;true&#39;
+      assert_equal true, EnvironmentSource.new[config_var.to_sym]
+      ENV.delete(env_var)
+    end
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

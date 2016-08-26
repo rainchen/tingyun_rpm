@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Frameworks::InstanceMethods</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-03 16:51:31 +0800'>2016-08-03 16:51:31 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      65 complexity
+    </div>
+    <div class="file-stat">
+      8.1 complexity per method
+    </div>
+    <div class="file-stat">
+      8 churn
+    </div>
+    <div class="file-stat">
+      8 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/configuration/manual_source&#39;
+require &#39;ting_yun/configuration/yaml_source&#39;
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/logger/agent_logger&#39;
+require &#39;ting_yun/agent/agent&#39;
+require &#39;ting_yun/frameworks/instrumentation&#39;
+
+module TingYun
+  module Frameworks
+    module InstanceMethods<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Frameworks::InstanceMethods has no descriptive comment          </span>  </li></ul>
+
+      include ::TingYun::Frameworks::Instrumentation
+
+      # The env is the setting used to identify which section of the tingyun.yml
+      # to load.  This defaults to a framework specific value, such as ENV[&#39;RAILS_ENV&#39;]
+      # but can be overridden as long as you set it before calling #init_plugin
+      attr_writer :env<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Frameworks::InstanceMethods#env is a writable attribute          </span>  </li></ul>
+
+      # The local environment contains all the information we report
+      # to the server about what kind of application this is, what
+      # gems and plugins it uses, and many other kinds of
+      # machine-dependent information useful in debugging
+      attr_reader :local_env
+
+      # Initialize the plugin/gem and start the agent.  This does the
+      # necessary configuration based on the framework environment and
+      # determines whether or not to start the agent.  If the agent is
+      # not going to be started then it loads the agent shim which has
+      # stubs for all the external api.
+      #
+      # This may be invoked multiple times, as long as you don&#39;t attempt
+      # to uninstall the agent after it has been started.
+      #
+      # If the plugin is initialized and it determines that the agent is
+      # not enabled, it will skip starting it and install the shim.  But
+      # if you later call this with &lt;tt&gt;agent_enabled =&gt; true&lt;/tt&gt;,
+      # then it will install the real agent and start it.
+      #
+      # What determines whether the agent is launched is the result of
+      # calling nbs.agent_enabled?  This will indicate whether the
+      # instrumentation should/will be installed.  If we&#39;re in a mode
+      # where tracers are not installed then we should not start the
+      # agent.
+      #
+      # Subclasses are not allowed to override, but must implement
+      # init_config({}) which is called one or more times.
+      def init_plugin(options={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Frameworks::InstanceMethods#init_plugin has approx 9 statements          </span>  </li></ul>
+        env = determine_env(options)
+
+        configure_agent(env, options)
+
+        if ::TingYun::Agent.logger.is_startup_logger?
+          ::TingYun::Agent.logger = TingYun::Logger::AgentLogger.new(root, options.delete(:log))
+        end
+
+        environment_name = options.delete(:env) and self.env = environment_name
+
+        init_config(options)
+
+        TingYun::Agent.agent = TingYun::Agent::Agent.instance
+
+        if TingYun::Agent.config[:&#39;nbs.agent_enabled&#39;] &amp;&amp; !TingYun::Agent.agent.started?
+          start_agent
+          install_instrumentation
+        else
+          TingYun::Support::LibraryDetection.detect!
+        end
+
+      end
+
+      def determine_env(options)
+        env = options[:env] || self.env
+        env = env.to_s
+
+        if @started_in_env &amp;&amp; @started_in_env != env
+          TingYun::Agent.logger.error(&quot;Attempted to start agent in #{env.inspect} environment, but agent was already running in #{@started_in_env.inspect}&quot;,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#determine_env calls @started_in_env.inspect 2 times                        <a href="instance_methods.html#L77" class="js-smell-location">0</a>                  <a href="instance_methods.html#L78" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#determine_env calls TingYun::Agent.logger 2 times                        <a href="instance_methods.html#L77" class="js-smell-location">0</a>                  <a href="instance_methods.html#L80" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#determine_env calls env.inspect 3 times                        <a href="instance_methods.html#L77" class="js-smell-location">0</a>                  <a href="instance_methods.html#L80" class="js-smell-location">1</a>                  <a href="instance_methods.html#L81" class="js-smell-location">2</a>                  </span>  </li></ul>
+                             &quot;The agent will continue running in #{@started_in_env.inspect}. To alter this, ensure the desired environment is set before the agent starts.&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#determine_env calls @started_in_env.inspect 2 times                        <a href="instance_methods.html#L77" class="js-smell-location">0</a>                  <a href="instance_methods.html#L78" class="js-smell-location">1</a>                  </span>  </li></ul>
+        else
+          TingYun::Agent.logger.info(&quot;Starting the Ting Yun agent in #{env.inspect} environment.&quot;,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#determine_env calls TingYun::Agent.logger 2 times                        <a href="instance_methods.html#L77" class="js-smell-location">0</a>                  <a href="instance_methods.html#L80" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#determine_env calls env.inspect 3 times                        <a href="instance_methods.html#L77" class="js-smell-location">0</a>                  <a href="instance_methods.html#L80" class="js-smell-location">1</a>                  <a href="instance_methods.html#L81" class="js-smell-location">2</a>                  </span>  </li></ul>
+                            &quot;To prevent agent startup add a TINGYUN_AGENT_ENABLED=false environment variable or modify the #{env.inspect} section of your tingyun.yml.&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#determine_env calls env.inspect 3 times                        <a href="instance_methods.html#L77" class="js-smell-location">0</a>                  <a href="instance_methods.html#L80" class="js-smell-location">1</a>                  <a href="instance_methods.html#L81" class="js-smell-location">2</a>                  </span>  </li></ul>
+        end
+
+        env
+      end
+
+      def configure_agent(env, options)
+        # manual_source
+        TingYun::Agent.config.replace_or_add_config(TingYun::Configuration::ManualSource.new(options)) unless options.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#configure_agent calls TingYun::Agent.config 3 times                        <a href="instance_methods.html#L89" class="js-smell-location">0</a>                  <a href="instance_methods.html#L92" class="js-smell-location">1</a>                  <a href="instance_methods.html#L93" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+        # yaml_source
+        config_file_path = @config_file_override || TingYun::Agent.config[:config_path]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#configure_agent calls TingYun::Agent.config 3 times                        <a href="instance_methods.html#L89" class="js-smell-location">0</a>                  <a href="instance_methods.html#L92" class="js-smell-location">1</a>                  <a href="instance_methods.html#L93" class="js-smell-location">2</a>                  </span>  </li></ul>
+        TingYun::Agent.config.replace_or_add_config(TingYun::Configuration::YamlSource.new(config_file_path,env))<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::InstanceMethods#configure_agent calls TingYun::Agent.config 3 times                        <a href="instance_methods.html#L89" class="js-smell-location">0</a>                  <a href="instance_methods.html#L92" class="js-smell-location">1</a>                  <a href="instance_methods.html#L93" class="js-smell-location">2</a>                  </span>  </li></ul>
+      end
+
+      def start_agent
+        @started_in_env = self.env
+        TingYun::Agent.agent.start
+      end
+
+      def framework<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Frameworks::InstanceMethods#framework doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        Agent.config[:framework]
+      end
+
+      def [](key)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Frameworks::InstanceMethods#[] doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TingYun::Agent.config[key.to_sym]
+      end
+
+      def dispatcher<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Frameworks::InstanceMethods#dispatcher doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TingYun::Agent.config[:dispatcher]
+      end
+
+      def root
+        &#39;.&#39;
+      end
+
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

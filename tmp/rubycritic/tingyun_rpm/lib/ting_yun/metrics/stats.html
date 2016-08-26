@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Metrics::Stats</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-24 17:13:57 +0800'>2016-08-24 17:13:57 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      191 complexity
+    </div>
+    <div class="file-stat">
+      11.9 complexity per method
+    </div>
+    <div class="file-stat">
+      8 churn
+    </div>
+    <div class="file-stat">
+      16 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/support/coerce&#39;
+
+module TingYun
+  module Metrics
+    class Stats<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Metrics::Stats has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Metrics::Stats has at least 6 instance variables          </span>  </li></ul>
+      attr_accessor :call_count<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::Stats#call_count is a writable attribute          </span>  </li></ul>
+      attr_accessor :min_call_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::Stats#min_call_time is a writable attribute          </span>  </li></ul>
+      attr_accessor :max_call_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::Stats#max_call_time is a writable attribute          </span>  </li></ul>
+      attr_accessor :total_call_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::Stats#total_call_time is a writable attribute          </span>  </li></ul>
+      attr_accessor :total_exclusive_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::Stats#total_exclusive_time is a writable attribute          </span>  </li></ul>
+      attr_accessor :sum_of_squares<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::Stats#sum_of_squares is a writable attribute          </span>  </li></ul>
+
+
+      def self.create_from_hash(hash_value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::Stats#self.create_from_hash has approx 8 statements          </span>  </li></ul>
+        stats = Stats.new
+        stats.call_count           = hash_value[:count] if hash_value[:count]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::Stats#self.create_from_hash calls hash_value[:count] 2 times          </span>  </li></ul>
+        stats.total_call_time      = hash_value[:total] if hash_value[:total]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::Stats#self.create_from_hash calls hash_value[:total] 4 times                        <a href="stats.html#L19" class="js-smell-location">0</a>                  <a href="stats.html#L20" class="js-smell-location">1</a>                  </span>  </li></ul>
+        stats.total_exclusive_time = hash_value[:total] if hash_value[:total]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::Stats#self.create_from_hash calls hash_value[:total] 4 times                        <a href="stats.html#L19" class="js-smell-location">0</a>                  <a href="stats.html#L20" class="js-smell-location">1</a>                  </span>  </li></ul>
+        stats.min_call_time        = hash_value[:min] if hash_value[:min]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::Stats#self.create_from_hash calls hash_value[:min] 2 times          </span>  </li></ul>
+        stats.max_call_time        = hash_value[:max] if hash_value[:max]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::Stats#self.create_from_hash calls hash_value[:max] 2 times          </span>  </li></ul>
+        stats.sum_of_squares       = hash_value[:sum_of_squares] if hash_value[:sum_of_squares]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Metrics::Stats#self.create_from_hash calls hash_value[:sum_of_squares] 2 times          </span>  </li></ul>
+        stats
+      end
+
+
+      def initialize
+        reset
+      end
+
+      def reset<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::Stats#reset has approx 6 statements          </span>  </li></ul>
+        @call_count = 0
+        @total_call_time = 0.0
+        @total_exclusive_time = 0.0
+        @min_call_time = 0.0
+        @max_call_time = 0.0
+        @sum_of_squares = 0.0
+      end
+
+      alias_method :apdex_s, :call_count
+      alias_method :apdex_t, :total_call_time
+      alias_method :apdex_f, :total_exclusive_time
+
+
+      def is_reset?
+        call_count == 0 &amp;&amp; total_call_time == 0.0 &amp;&amp; total_exclusive_time == 0.0
+      end
+
+      #self不变
+      def merge(other_stats)
+        stats = self.clone
+        stats.merge!(other_stats)
+      end
+
+      #self变化
+      def merge!(other)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::Stats#merge! has approx 7 statements          </span>  </li></ul>
+        @min_call_time = other.min_call_time if min_time_less?(other)
+        @max_call_time = other.max_call_time if max_time?(other)
+        @total_call_time += other.total_call_time
+        @total_exclusive_time += other.total_exclusive_time
+        @sum_of_squares += other.sum_of_squares
+        @call_count += other.call_count
+        self
+      end
+
+      def to_s
+        &quot;[#{&#39;%2i&#39; % call_count.to_i} calls #{&#39;%.4f&#39; % total_call_time.to_f}s / #{&#39;%.4f&#39; % total_exclusive_time.to_f}s ex]&quot;
+      end
+
+      def to_json(*_)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Metrics::Stats#to_json has the parameter name '_'          </span>  </li></ul>
+        {
+            &#39;call_count&#39; =&gt; call_count.to_i,
+            &#39;min_call_time&#39; =&gt; min_call_time.to_f,
+            &#39;max_call_time&#39; =&gt; max_call_time.to_f,
+            &#39;total_call_time&#39; =&gt; total_call_time.to_f,
+            &#39;total_exclusive_time&#39; =&gt; total_exclusive_time.to_f,
+            &#39;sum_of_squares&#39; =&gt; sum_of_squares.to_f
+        }.to_json(*_)
+      end
+
+
+
+
+
+      def record(value=nil, aux=nil, &amp;blk)
+        if blk<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Metrics::Stats#record is controlled by argument blk          </span>  </li></ul>
+          yield self
+        else
+          case value
+            when Numeric
+              aux ||= value
+              self.record_data_point(value, aux)
+            when :apdex_s, :apdex_t, :apdex_f
+              self.record_apdex(value, aux)
+            when TingYun::Metrics::Stats
+              self.merge!(value)
+          end
+        end
+      end
+
+      def record_apdex(bucket, apdex_t)
+        case bucket<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Metrics::Stats#record_apdex is controlled by argument bucket          </span>  </li></ul>
+          when :apdex_s then @call_count += 1
+          when :apdex_t then @total_call_time += 1
+          when :apdex_f then @total_exclusive_time += 1
+        end
+        if apdex_t
+          @max_call_time = apdex_t
+        else
+          ::TingYun::Agent.logger.warn(&quot;Attempted to set apdex_t to #{apdex_t.inspect}, backtrace = #{caller.join(&quot;\n&quot;)}&quot;)
+        end
+      end
+
+
+      # record a single data point into the statistical gatherer.  The gatherer
+      # will aggregate all data points collected over a specified period and upload
+      # its data to the TingYun server
+      def record_data_point(value, exclusive_time = value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::Stats#record_data_point has approx 7 statements          </span>  </li></ul>
+        @call_count += 1
+        @total_call_time += value
+        @min_call_time = value if value &lt; @min_call_time || @call_count == 1
+        @max_call_time = value if value &gt; @max_call_time
+        @total_exclusive_time += exclusive_time
+
+        @sum_of_squares += (value * value)
+        self
+      end
+
+      alias trace_call record_data_point
+
+      # increments the call_count by one
+      def increment_count(value = 1)
+        @call_count += value
+      end
+
+      def ==(other)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Metrics::Stats#== has a flog score of 25          </span>  </li></ul>
+        other.class == self.class &amp;&amp;
+            (
+            @min_call_time == other.min_call_time &amp;&amp;
+                @max_call_time == other.max_call_time &amp;&amp;
+                @total_call_time == other.total_call_time &amp;&amp;
+                @total_exclusive_time == other.total_exclusive_time &amp;&amp;
+                @sum_of_squares == other.sum_of_squares &amp;&amp;
+                @call_count == other.call_count
+            )
+      end
+
+      include TingYun::Support::Coerce
+
+      def metrics(stat_key)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Metrics::Stats#metrics has a flog score of 31          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Metrics::Stats#metrics has approx 8 statements          </span>  </li></ul>
+        metrics = []
+
+        metrics &lt;&lt; int(call_count, stat_key)
+        if max_call_time != 0.0 #apedx
+          metrics &lt;&lt; float(total_call_time, stat_key)
+          metrics &lt;&lt; float(total_exclusive_time, stat_key)
+          metrics &lt;&lt; float(max_call_time, stat_key)
+        end
+
+        if min_call_time !=0.0 #
+          metrics &lt;&lt; float(min_call_time, stat_key)
+          metrics &lt;&lt; float(sum_of_squares, stat_key)
+        end
+
+        metrics
+      end
+
+      protected
+
+      def min_time_less?(other)
+        (other.min_call_time &lt; min_call_time &amp;&amp; other.call_count &gt; 0) || call_count == 0
+      end
+
+      def max_time?(other)
+        other.max_call_time &gt; max_call_time
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

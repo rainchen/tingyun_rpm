@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Frameworks::Instrumentation</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      32 complexity
+    </div>
+    <div class="file-stat">
+      6.4 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/support/library_detection&#39;
+
+module TingYun
+  module Frameworks
+    # Contains methods that relate to adding and executing files that
+    # contain instrumentation for the Ruby Agent
+
+    module Instrumentation
+
+      # Signals the agent that it&#39;s time to actually load the
+      # instrumentation files. May be overridden by subclasses
+      def install_instrumentation
+        _install_instrumentation
+      end
+
+
+      def add_instrumentation(pattern)
+        if @instrumented
+          load_instrumentation_files pattern
+        else
+          @instrumentation_files &lt;&lt; pattern
+        end
+      end
+
+      # Adds a list of files in Dir.glob format
+      # (e.g. &#39;/app/foo/**/*_instrumentation.rb&#39;)
+      # This requires the files within a rescue block, so that any
+      # errors within instrumentation files do not affect the overall
+      # agent or application in which it runs.
+      def load_instrumentation_files(pattern)
+        Dir.glob(pattern) do |file|
+          begin
+            require file.to_s
+          rescue LoadError =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Frameworks::Instrumentation#load_instrumentation_files has the variable name 'e'          </span>  </li></ul>
+            TingYun::Agent.logger.warn &quot;Error loading instrumentation file &#39;#{file}&#39;:&quot;, e
+          end
+        end
+      end
+
+      def detect_dependencies<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Frameworks::Instrumentation#detect_dependencies doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        LibraryDetection.detect!
+      end
+
+      private
+
+      def _install_instrumentation<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Frameworks::Instrumentation#_install_instrumentation has approx 9 statements          </span>  </li></ul>
+        return if @instrumented
+
+        # instrumentation for the key code points inside rails for monitoring by TingYun.
+        # note this file is loaded only if the tingyun agent is enabled (through config/tingyun.yml)
+        instrumentation_path = File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;instrumentation&#39;))
+        @instrumentation_files &lt;&lt; File.join(instrumentation_path, &#39;*.rb&#39;)
+        @instrumentation_files &lt;&lt; File.join(instrumentation_path, Agent.config[:framework].to_s, &#39;*.rb&#39;)
+        @instrumentation_files.each { |pattern| load_instrumentation_files pattern }
+
+        TingYun::Support::LibraryDetection.detect!
+
+        ::TingYun::Agent.logger.info(&#39;Finished instrumentation&#39;)
+
+        @instrumented = true
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Support::LanguageSupport</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      92 complexity
+    </div>
+    <div class="file-stat">
+      5.4 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      17 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+module TingYun
+  module Support
+    module LanguageSupport<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::LanguageSupport has no descriptive comment          </span>  </li></ul>
+      extend self
+
+      # need to use syck rather than psych when possible
+      def needs_syck?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#needs_syck? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        !LanguageSupport.using_engine?(&#39;jruby&#39;) &amp;&amp;
+            LanguageSupport.using_version?(&#39;1.9.2&#39;)
+      end
+
+      @@forkable = nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Class-Variable.md" target="_blank">ClassVariable</a>)      TingYun::Support::LanguageSupport declares the class variable @@forkable                        <a href="language_support.html#L15" class="js-smell-location">0</a>                  <a href="language_support.html#L19" class="js-smell-location">1</a>                  <a href="language_support.html#L23" class="js-smell-location">2</a>                  <a href="language_support.html#L25" class="js-smell-location">3</a>                  <a href="language_support.html#L28" class="js-smell-location">4</a>                  </span>  </li></ul>
+
+      def can_fork?
+        # this is expensive to check, so we should only check once
+        return @@forkable if @@forkable != nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Class-Variable.md" target="_blank">ClassVariable</a>)      TingYun::Support::LanguageSupport declares the class variable @@forkable                        <a href="language_support.html#L15" class="js-smell-location">0</a>                  <a href="language_support.html#L19" class="js-smell-location">1</a>                  <a href="language_support.html#L23" class="js-smell-location">2</a>                  <a href="language_support.html#L25" class="js-smell-location">3</a>                  <a href="language_support.html#L28" class="js-smell-location">4</a>                  </span>  </li></ul>
+
+        if Process.respond_to?(:fork)
+          # if this is not 1.9.2 or higher, we have to make sure
+          @@forkable = ::RUBY_VERSION &lt; &#39;1.9.2&#39; ? test_forkability : true<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Class-Variable.md" target="_blank">ClassVariable</a>)      TingYun::Support::LanguageSupport declares the class variable @@forkable                        <a href="language_support.html#L15" class="js-smell-location">0</a>                  <a href="language_support.html#L19" class="js-smell-location">1</a>                  <a href="language_support.html#L23" class="js-smell-location">2</a>                  <a href="language_support.html#L25" class="js-smell-location">3</a>                  <a href="language_support.html#L28" class="js-smell-location">4</a>                  </span>  </li></ul>
+        else
+          @@forkable = false<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Class-Variable.md" target="_blank">ClassVariable</a>)      TingYun::Support::LanguageSupport declares the class variable @@forkable                        <a href="language_support.html#L15" class="js-smell-location">0</a>                  <a href="language_support.html#L19" class="js-smell-location">1</a>                  <a href="language_support.html#L23" class="js-smell-location">2</a>                  <a href="language_support.html#L25" class="js-smell-location">3</a>                  <a href="language_support.html#L28" class="js-smell-location">4</a>                  </span>  </li></ul>
+        end
+
+        @@forkable<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Class-Variable.md" target="_blank">ClassVariable</a>)      TingYun::Support::LanguageSupport declares the class variable @@forkable                        <a href="language_support.html#L15" class="js-smell-location">0</a>                  <a href="language_support.html#L19" class="js-smell-location">1</a>                  <a href="language_support.html#L23" class="js-smell-location">2</a>                  <a href="language_support.html#L25" class="js-smell-location">3</a>                  <a href="language_support.html#L28" class="js-smell-location">4</a>                  </span>  </li></ul>
+      end
+
+      def using_engine?(engine)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#using_engine? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if defined?(::RUBY_ENGINE)
+          ::RUBY_ENGINE == engine
+        else
+          engine == &#39;ruby&#39;
+        end
+      end
+
+      def broken_gc?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#broken_gc? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        LanguageSupport.using_version?(&#39;1.8.7&#39;) &amp;&amp;
+            RUBY_PATCHLEVEL &lt; 348 &amp;&amp;
+            !LanguageSupport.using_engine?(&#39;jruby&#39;) &amp;&amp;
+            !LanguageSupport.using_engine?(&#39;rbx&#39;)
+      end
+
+      def with_disabled_gc<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#with_disabled_gc doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if defined?(::GC) &amp;&amp; ::GC.respond_to?(:disable)
+          val = nil
+          begin
+            ::GC.disable
+            val = yield
+          ensure
+            ::GC.enable
+          end
+          val
+        else
+          yield
+        end
+      end
+
+      def with_cautious_gc
+        if broken_gc?
+          with_disabled_gc { yield }
+        else
+          yield
+        end
+      end
+
+      def gc_profiler_usable?
+        if defined?(::GC::Profiler) &amp;&amp; !jruby?
+          true
+        else
+          false
+        end
+      end
+
+      def gc_profiler_enabled?
+        if gc_profiler_usable? &amp;&amp; ::GC::Profiler.enabled? &amp;&amp; !::TingYun::Agent.config[:disable_gc_profiler]
+          true
+        else
+          false
+        end
+      end
+
+      def object_space_usable?
+        if defined?(::JRuby) &amp;&amp; JRuby.respond_to?(:runtime)
+          JRuby.runtime.is_object_space_enabled
+        elsif defined?(::ObjectSpace) &amp;&amp; !rubinius?
+          true
+        else
+          false
+        end
+      end
+
+      def jruby?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#jruby? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        defined?(RUBY_ENGINE) &amp;&amp; RUBY_ENGINE == &#39;jruby&#39;
+      end
+
+      def rubinius?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#rubinius? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        defined?(RUBY_ENGINE) &amp;&amp; RUBY_ENGINE == &#39;rbx&#39;
+      end
+
+      def ree?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#ree? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        defined?(RUBY_DESCRIPTION) &amp;&amp; RUBY_DESCRIPTION =~ /Ruby Enterprise Edition/
+      end
+
+      def using_version?(version)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#using_version? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        numbers = version.split(&#39;.&#39;)
+        numbers == ::RUBY_VERSION.split(&#39;.&#39;)[0, numbers.size]
+      end
+
+      def supports_string_encodings?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#supports_string_encodings? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        RUBY_VERSION &gt;= &#39;1.9.0&#39;
+      end
+
+      def constantize(const_name)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::LanguageSupport#constantize has approx 6 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#constantize doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        const_name.to_s.sub(/\A::/, &#39;&#39;).split(&#39;::&#39;).inject(Object) do |namespace, name|
+          begin
+            result = namespace.const_get(name)
+
+            # const_get looks up the inheritence chain, so if it&#39;s a class
+            # in the constant make sure we found the one in our namespace.
+            #
+            # Can&#39;t help if the constant isn&#39;t a class...
+            if result.is_a?(Module)
+              expected_name = &quot;#{namespace}::#{name}&quot;.gsub(/^Object::/, &quot;&quot;)
+              return unless expected_name == result.to_s
+            end
+
+            result
+          rescue NameError
+            nil
+          end
+        end
+      end
+
+      def test_forkability
+        child = Process.fork { exit! }
+        # calling wait here doesn&#39;t seem like it should necessary, but it seems to
+        # resolve some weird edge cases with resque forking.
+        Process.wait child
+        true
+      rescue NotImplementedError
+        false
+      end
+
+      def bundled_gem?(gem_name)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LanguageSupport#bundled_gem? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        defined?(Bundler) &amp;&amp; Bundler.rubygems.all_specs.map(&amp;:name).include?(gem_name)
+      rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::LanguageSupport#bundled_gem? has the variable name 'e'          </span>  </li></ul>
+        ::TingYun::Agent.logger.info(&quot;Could not determine if third party #{gem_name} gem is installed&quot;, e)
+        false
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

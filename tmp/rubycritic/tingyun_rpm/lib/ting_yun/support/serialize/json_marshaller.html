@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Support::Serialize::JsonMarshaller</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-02-26 06:43:17 +0000'>2016-02-26 06:43:17 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      50 complexity
+    </div>
+    <div class="file-stat">
+      7.1 complexity per method
+    </div>
+    <div class="file-stat">
+      8 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      16 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require &#39;ting_yun/support/serialize/marshaller&#39;
+require &#39;ting_yun/support/serialize/json_wrapper&#39;
+require &#39;ting_yun/support/version_number&#39;
+
+
+module TingYun
+  module Support
+    module Serialize
+      # Marshal collector protocol with JSON when available
+      class JsonMarshaller &lt; Marshaller
+        def initialize
+          TingYun::Agent.logger.debug &quot;Using JSON marshaller (#{JSONWrapper.backend_name})&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::JsonMarshaller#initialize calls JSONWrapper.backend_name 2 times                        <a href="json_marshaller.html#L15" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L17" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::JsonMarshaller#initialize calls TingYun::Agent.logger 2 times                        <a href="json_marshaller.html#L15" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L17" class="js-smell-location">1</a>                  </span>  </li></ul>
+          unless self.class.is_supported?
+            TingYun::Agent.logger.warn &quot;The JSON marshaller in use (#{JSONWrapper.backend_name}) is not recommended. Ensure the &#39;json&#39; gem is available in your application for better performance.&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::JsonMarshaller#initialize calls JSONWrapper.backend_name 2 times                        <a href="json_marshaller.html#L15" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L17" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::JsonMarshaller#initialize calls TingYun::Agent.logger 2 times                        <a href="json_marshaller.html#L15" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L17" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+          warn_for_yajl
+        end
+
+        OK_YAJL_VERSION = TingYun::Support::VersionNumber.new(&quot;1.2.1&quot;)
+
+        def warn_for_yajl
+          if defined?(::Yajl)
+            require &#39;yajl/version&#39;
+            if VersionNumber.new(::Yajl::VERSION) &lt; OK_YAJL_VERSION
+              ::TingYun::Agent.logger.warn &quot;Detected yajl-ruby version #{::Yajl::VERSION} which can cause segfaults with TingYun_rpm&#39;s thread profiling features. We strongly recommend you upgrade to the latest yajl-ruby version available.&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::JsonMarshaller#warn_for_yajl calls ::TingYun::Agent.logger 2 times                        <a href="json_marshaller.html#L28" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L32" class="js-smell-location">1</a>                  </span>  </li></ul>
+            end
+          end
+        rescue =&gt; err
+          ::TingYun::Agent.logger.warn &quot;Failed trying to watch for problematic yajl-ruby version.&quot;, err<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::JsonMarshaller#warn_for_yajl calls ::TingYun::Agent.logger 2 times                        <a href="json_marshaller.html#L28" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L32" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+        def dump(ruby, opts={})
+          prepared = prepare(ruby, opts)
+
+          if opts[:skip_normalization]
+            normalize_encodings = false
+          else
+            normalize_encodings = TingYun::Agent.config[:normalize_json_string_encodings]
+          end
+
+          JSONWrapper.dump(prepared, :normalize =&gt; normalize_encodings)
+        end
+
+        def load(data)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Serialize::JsonMarshaller#load has approx 6 statements          </span>  </li></ul>
+          if data.nil? || data.empty?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::JsonMarshaller#load refers to data more than self (maybe move it to another class?)                        <a href="json_marshaller.html#L48" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L49" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Support::Serialize::JsonMarshaller#load performs a nil-check          </span>  </li></ul>
+            ::TingYun::Agent.logger.error &quot;Empty JSON response from collector: &#39;#{data.inspect}&#39;&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::JsonMarshaller#load calls ::TingYun::Agent.logger 2 times                        <a href="json_marshaller.html#L49" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L55" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Serialize::JsonMarshaller#load refers to data more than self (maybe move it to another class?)                        <a href="json_marshaller.html#L48" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L49" class="js-smell-location">1</a>                  </span>  </li></ul>
+            return nil
+          end
+
+          return_value(JSONWrapper.load(data))
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::JsonMarshaller#load has the variable name 'e'          </span>  </li></ul>
+          ::TingYun::Agent.logger.debug &quot;#{e.class.name} : #{e.message} encountered loading collector response: #{data}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="../../configuration/manager.html#L170" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L55" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Serialize::JsonMarshaller#load calls ::TingYun::Agent.logger 2 times                        <a href="json_marshaller.html#L49" class="js-smell-location">0</a>                  <a href="json_marshaller.html#L55" class="js-smell-location">1</a>                  </span>  </li></ul>
+          raise
+        end
+
+        def format
+          &#39;json&#39;
+        end
+
+        def self.is_supported?
+          JSONWrapper.usable_for_collector_serialization?
+        end
+
+        def self.human_readable?
+          true # for some definitions of &#39;human&#39;
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

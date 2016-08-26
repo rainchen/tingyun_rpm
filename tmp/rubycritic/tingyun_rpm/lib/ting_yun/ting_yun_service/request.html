@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::TingYunService::Request</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      84 complexity
+    </div>
+    <div class="file-stat">
+      16.8 complexity per method
+    </div>
+    <div class="file-stat">
+      9 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      34 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/support/exception&#39;
+
+module TingYun
+  class TingYunService
+    module Request<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::TingYunService::Request has no descriptive comment          </span>  </li></ul>
+
+      #Posts to the specified server, retry every minute if ServerConnectionException
+      def send_request(opts)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::TingYunService::Request#send_request has a flog score of 53          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::TingYunService::Request#send_request has approx 25 statements          </span>  </li></ul>
+        request = Net::HTTP::Post.new(opts[:uri], &#39;CONTENT-ENCODING&#39; =&gt; opts[:encoding], &#39;HOST&#39; =&gt; opts[:collector].name)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls opts[:collector] 3 times                        <a href="request.html#L11" class="js-smell-location">0</a>                  <a href="request.html#L21" class="js-smell-location">1</a>                  <a href="request.html#L28" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls opts[:uri] 3 times                        <a href="request.html#L11" class="js-smell-location">0</a>                  <a href="request.html#L21" class="js-smell-location">1</a>                  <a href="request.html#L28" class="js-smell-location">2</a>                  </span>  </li></ul>
+        request[&#39;user-agent&#39;] = user_agent
+        request.content_type = &quot;application/octet-stream&quot;
+        request.body = opts[:data]
+        response = nil
+        max_attempts = 2
+        attempts = 0
+        begin
+          attempts += 1
+          conn = http_connection
+          TingYun::Agent.logger.debug &quot;Sending request to #{opts[:collector]}#{opts[:uri]}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls TingYun::Agent.logger 3 times                        <a href="request.html#L21" class="js-smell-location">0</a>                  <a href="request.html#L28" class="js-smell-location">1</a>                  <a href="request.html#L34" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls opts[:collector] 3 times                        <a href="request.html#L11" class="js-smell-location">0</a>                  <a href="request.html#L21" class="js-smell-location">1</a>                  <a href="request.html#L28" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls opts[:uri] 3 times                        <a href="request.html#L11" class="js-smell-location">0</a>                  <a href="request.html#L21" class="js-smell-location">1</a>                  <a href="request.html#L28" class="js-smell-location">2</a>                  </span>  </li></ul>
+          TingYun::Support::TimerLib.timeout(@request_timeout) do
+            response = conn.request(request)
+          end
+        rescue *CONNECTION_ERRORS =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::TingYunService::Request#send_request has the variable name 'e'          </span>  </li></ul>
+          close_shared_connection
+          if attempts &lt; max_attempts
+            TingYun::Agent.logger.debug(&quot;Retrying request to #{opts[:collector]}#{opts[:uri]} after #{e}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls TingYun::Agent.logger 3 times                        <a href="request.html#L21" class="js-smell-location">0</a>                  <a href="request.html#L28" class="js-smell-location">1</a>                  <a href="request.html#L34" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls opts[:collector] 3 times                        <a href="request.html#L11" class="js-smell-location">0</a>                  <a href="request.html#L21" class="js-smell-location">1</a>                  <a href="request.html#L28" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls opts[:uri] 3 times                        <a href="request.html#L11" class="js-smell-location">0</a>                  <a href="request.html#L21" class="js-smell-location">1</a>                  <a href="request.html#L28" class="js-smell-location">2</a>                  </span>  </li></ul>
+            retry
+          else
+            raise TingYun::Support::Exception::ServerConnectionException, &quot;Recoverable error talking to #{@collector} after #{attempts} attempts: #{e}&quot;
+          end
+        end
+        TingYun::Agent.logger.debug &quot;Received response, status: #{response.code}, encoding: &#39;#{response[&#39;content-encoding&#39;]}&#39;&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls TingYun::Agent.logger 3 times                        <a href="request.html#L21" class="js-smell-location">0</a>                  <a href="request.html#L28" class="js-smell-location">1</a>                  <a href="request.html#L34" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls response.code 4 times                        <a href="request.html#L34" class="js-smell-location">0</a>                  <a href="request.html#L41" class="js-smell-location">1</a>                  <a href="request.html#L43" class="js-smell-location">2</a>                  <a href="request.html#L49" class="js-smell-location">3</a>                  </span>  </li></ul>
+
+
+        case response
+          when Net::HTTPSuccess
+            true # do nothing
+          when Net::HTTPServiceUnavailable<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="request.html#L40" class="js-smell-location">0</a>                  <a href="request.html#L42" class="js-smell-location">1</a>                  </span>  </li></ul>
+            raise TingYun::Support::Exception::ServerConnectionException, &quot;Service unavailable (#{response.code}): #{response.message}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls response.code 4 times                        <a href="request.html#L34" class="js-smell-location">0</a>                  <a href="request.html#L41" class="js-smell-location">1</a>                  <a href="request.html#L43" class="js-smell-location">2</a>                  <a href="request.html#L49" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls response.message 3 times                        <a href="request.html#L41" class="js-smell-location">0</a>                  <a href="request.html#L43" class="js-smell-location">1</a>                  <a href="request.html#L49" class="js-smell-location">2</a>                  </span>  </li></ul>
+          when Net::HTTPGatewayTimeOut<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="request.html#L40" class="js-smell-location">0</a>                  <a href="request.html#L42" class="js-smell-location">1</a>                  </span>  </li></ul>
+            raise TingYun::Support::Exception::ServerConnectionException, &quot;Gateway timeout (#{response.code}): #{response.message}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls response.code 4 times                        <a href="request.html#L34" class="js-smell-location">0</a>                  <a href="request.html#L41" class="js-smell-location">1</a>                  <a href="request.html#L43" class="js-smell-location">2</a>                  <a href="request.html#L49" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls response.message 3 times                        <a href="request.html#L41" class="js-smell-location">0</a>                  <a href="request.html#L43" class="js-smell-location">1</a>                  <a href="request.html#L49" class="js-smell-location">2</a>                  </span>  </li></ul>
+          when Net::HTTPRequestEntityTooLarge
+            raise TingYun::Support::Exception::UnrecoverableServerException, &#39;413 Request Entity Too Large&#39;
+          when Net::HTTPUnsupportedMediaType
+            raise TingYun::Support::Exception::UnsupportedMediaType, &#39;415 Unsupported Media Type&#39;
+          else
+            raise TingYun::Support::Exception::ServerConnectionException, &quot;Unexpected response from server (#{response.code}): #{response.message}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls response.code 4 times                        <a href="request.html#L34" class="js-smell-location">0</a>                  <a href="request.html#L41" class="js-smell-location">1</a>                  <a href="request.html#L43" class="js-smell-location">2</a>                  <a href="request.html#L49" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#send_request calls response.message 3 times                        <a href="request.html#L41" class="js-smell-location">0</a>                  <a href="request.html#L43" class="js-smell-location">1</a>                  <a href="request.html#L49" class="js-smell-location">2</a>                  </span>  </li></ul>
+        end
+        response
+      end
+
+
+
+      def compress_request_if_needed(data)
+        encoding = &#39;identity&#39;
+        if data.size &gt; 64*1024
+          data = TingYun::Support::Serialize::Encoders::Compressed.encode(data)
+          encoding = &#39;deflate&#39;
+        end
+        check_post_size(data)
+        [data, encoding]
+      end
+
+      def check_post_size(post)
+        return if post.size &lt; TingYun::Agent.config[:post_size_limit]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#check_post_size calls post.size 2 times                        <a href="request.html#L67" class="js-smell-location">0</a>                  <a href="request.html#L68" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::TingYunService::Request#check_post_size refers to post more than self (maybe move it to another class?)                        <a href="request.html#L67" class="js-smell-location">0</a>                  <a href="request.html#L68" class="js-smell-location">1</a>                  </span>  </li></ul>
+        TingYun::Agent.logger.debug &quot;Tried to send too much data: #{post.size} bytes&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService::Request#check_post_size calls post.size 2 times                        <a href="request.html#L67" class="js-smell-location">0</a>                  <a href="request.html#L68" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::TingYunService::Request#check_post_size refers to post more than self (maybe move it to another class?)                        <a href="request.html#L67" class="js-smell-location">0</a>                  <a href="request.html#L68" class="js-smell-location">1</a>                  </span>  </li></ul>
+        raise TingYun::Support::Exception::UnrecoverableServerException.new(&#39;413 Request Entity Too Large&#39;)
+      end
+
+      def user_agent<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::TingYunService::Request#user_agent doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        ruby_description = &#39;&#39;
+        # note the trailing space!
+        ruby_description &lt;&lt; &quot;(ruby #{::RUBY_VERSION} #{::RUBY_PLATFORM}) &quot; if defined?(::RUBY_VERSION) &amp;&amp; defined?(::RUBY_PLATFORM)
+        zlib_version = &#39;&#39;
+        zlib_version &lt;&lt; &quot;zlib/#{Zlib.zlib_version}&quot; if defined?(::Zlib) &amp;&amp; Zlib.respond_to?(:zlib_version)
+        &quot;NBS Newlens Agent/#{TingYun::VERSION::STRING} #{ruby_description}#{zlib_version}&quot;
+      end
+
+      def valid_to_marshal?(data)
+        @marshaller.dump(data)
+        true
+      rescue StandardError, SystemStackError =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::TingYunService::Request#valid_to_marshal? has the variable name 'e'          </span>  </li></ul>
+        TingYun::Agent.logger.warn(&quot;Unable to marshal environment report on connect.&quot;, e)
+        false
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

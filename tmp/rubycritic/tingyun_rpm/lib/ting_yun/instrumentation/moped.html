@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Moped</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-20 18:35:31 +0800'>2016-04-20 18:35:31 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      68 complexity
+    </div>
+    <div class="file-stat">
+      13.6 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/agent/datastore&#39;
+require &#39;ting_yun/agent/datastore/mongo&#39;
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+
+module TingYun
+  module Instrumentation
+    module Moped<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Moped has no descriptive comment          </span>  </li></ul>
+
+      MONGODB = &#39;MongoDB&#39;.freeze
+
+      def self.included(instrumented_class)
+        instrumented_class.class_eval do
+          unless instrumented_class.method_defined?(:log_without_tingyun_instrumentation)
+            alias_method :log_without_tingyun_instrumentation, :logging
+            alias_method :logging, :log_with_tingyun_instrumentation
+          end
+        end
+      end
+
+      def self.instrument
+        ::Moped::Node.class_eval do
+          include ::TingYun::Instrumentation::Moped
+        end
+      end
+
+
+      def log_with_tingyun_instrumentation(operations, &amp;blk)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Moped#log_with_tingyun_instrumentation has approx 6 statements          </span>  </li></ul>
+        operation_name, collection = determine_operation_and_collection(operations.first)
+        operation = TingYun::Agent::Datastore::Mongo.transform_operation(operation_name)
+
+        res = nil
+        TingYun::Agent::Datastore.wrap(MONGODB, operation, collection, method(:record_mongo_duration)) do
+          res = log_without_tingyun_instrumentation(operations, &amp;blk)
+        end
+
+        res
+      end
+
+      def determine_operation_and_collection(operation)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Instrumentation::Moped#determine_operation_and_collection has a flog score of 31          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Moped#determine_operation_and_collection has approx 12 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Moped#determine_operation_and_collection doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        log_statement = operation.log_inspect.encode(&quot;UTF-8&quot;)
+
+        collection = operation.collection if operation.respond_to?(:collection)
+
+        operation_name = log_statement.split[0]
+        if operation_name == &#39;COMMAND&#39; &amp;&amp; log_statement.include?(&quot;:mapreduce&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Moped#determine_operation_and_collection calls operation_name == 'COMMAND' 4 times                        <a href="moped.html#L48" class="js-smell-location">0</a>                  <a href="moped.html#L51" class="js-smell-location">1</a>                  <a href="moped.html#L54" class="js-smell-location">2</a>                  <a href="moped.html#L57" class="js-smell-location">3</a>                  </span>  </li></ul>
+          operation_name = &#39;MAPREDUCE&#39;
+          collection = log_statement[/:mapreduce=&gt;&quot;([^&quot;]+)/,1]
+        elsif operation_name == &#39;COMMAND&#39; &amp;&amp; log_statement.include?(&quot;:count&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Moped#determine_operation_and_collection calls operation_name == 'COMMAND' 4 times                        <a href="moped.html#L48" class="js-smell-location">0</a>                  <a href="moped.html#L51" class="js-smell-location">1</a>                  <a href="moped.html#L54" class="js-smell-location">2</a>                  <a href="moped.html#L57" class="js-smell-location">3</a>                  </span>  </li></ul>
+          operation_name = &#39;COUNT&#39;
+          collection = log_statement[/:count=&gt;&quot;([^&quot;]+)/,1]
+        elsif operation_name == &#39;COMMAND&#39; &amp;&amp; log_statement.include?(&quot;:aggregate&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Moped#determine_operation_and_collection calls operation_name == 'COMMAND' 4 times                        <a href="moped.html#L48" class="js-smell-location">0</a>                  <a href="moped.html#L51" class="js-smell-location">1</a>                  <a href="moped.html#L54" class="js-smell-location">2</a>                  <a href="moped.html#L57" class="js-smell-location">3</a>                  </span>  </li></ul>
+          operation_name = &#39;AGGREGATE&#39;
+          collection = log_statement[/:aggregate=&gt;&quot;([^&quot;]+)/,1]
+        elsif operation_name == &#39;COMMAND&#39; &amp;&amp; log_statement.include?(&quot;:findAndModify&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Moped#determine_operation_and_collection calls operation_name == 'COMMAND' 4 times                        <a href="moped.html#L48" class="js-smell-location">0</a>                  <a href="moped.html#L51" class="js-smell-location">1</a>                  <a href="moped.html#L54" class="js-smell-location">2</a>                  <a href="moped.html#L57" class="js-smell-location">3</a>                  </span>  </li></ul>
+          operation_name = &#39;FIND_AND_MODIFY&#39;
+          collection = log_statement[/:findAndModify=&gt;&quot;([^&quot;]+)/,1]
+        end
+        return operation_name, collection
+      end
+
+      def record_mongo_duration(_1, _2, duration)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Moped#record_mongo_duration doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        state = TingYun::Agent::TransactionState.tl_get
+        unless state.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Moped#record_mongo_duration performs a nil-check          </span>  </li></ul>
+          state.mon_duration += duration * 1000
+        end
+      end
+
+    end
+  end
+end
+
+
+
+
+
+
+
+TingYun::Support::LibraryDetection.defer do
+  named :mongo_moped
+  depends_on do
+    defined?(::Moped)
+  end
+
+  executes do
+    TingYun::Agent.logger.info &#39;Installing Mongo Moped instrumentation&#39;
+  end
+
+  executes do
+    ::TingYun::Instrumentation::Moped.instrument
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

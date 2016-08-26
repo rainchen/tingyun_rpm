@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">ArrayLogDevice</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      30 complexity
+    </div>
+    <div class="file-stat">
+      3.3 complexity per method
+    </div>
+    <div class="file-stat">
+      7 churn
+    </div>
+    <div class="file-stat">
+      9 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.with_array_logger
+class ArrayLogDevice
+  def initialize( array=[] )
+    @array = array
+  end
+  attr_reader :array
+
+  def write( message )
+    @array &lt;&lt; message
+  end
+
+  def close; end
+end
+
+def with_config(config_hash, at_start=true)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      with_config has boolean parameter 'at_start'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      with_config doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+  config = TingYun::Configuration::DottedHash.new(config_hash, true)
+  TingYun::Agent.config.add_config_for_testing(config, at_start)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      with_config calls TingYun::Agent.config 2 times                        <a href="agent_helper.html#L18" class="js-smell-location">0</a>                  <a href="agent_helper.html#L22" class="js-smell-location">1</a>                  </span>  </li></ul>
+  begin
+    yield
+  ensure
+    TingYun::Agent.config.remove_config(config)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      with_config calls TingYun::Agent.config 2 times                        <a href="agent_helper.html#L18" class="js-smell-location">0</a>                  <a href="agent_helper.html#L22" class="js-smell-location">1</a>                  </span>  </li></ul>
+  end
+end
+
+def with_environment(env)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      with_environment has approx 6 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      with_environment doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+  old_env = {}
+  env.each do |key, val|
+    old_env[key] = ENV[key]
+    ENV[key]     = val.to_s
+  end
+  begin
+    yield
+  ensure
+    old_env.each { |key, old_val| ENV[key] = old_val }
+  end
+end
+
+# Need to guard against double-installing this patch because in 1.8.x the same
+# file can be required multiple times under different non-canonicalized paths.
+unless Time.respond_to?(:__original_now)
+  Time.instance_eval do
+    class &lt;&lt; self
+      attr_accessor :__frozen_now<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      #__frozen_now is a writable attribute          </span>  </li></ul>
+      alias_method :__original_now, :now
+
+      def now
+        __frozen_now || __original_now
+      end
+    end
+  end
+end
+
+def freeze_time(now=Time.now)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      freeze_time doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+  Time.__frozen_now = now
+end
+
+def unfreeze_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      unfreeze_time doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+  Time.__frozen_now = nil
+end
+
+def advance_time(seconds)
+  freeze_time(Time.now + seconds)
+end
+</code>
+
+    </div>
+    <script src='../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../assets/javascripts/application.js'></script>
+  </body>
+</html>

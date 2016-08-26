@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Database::Obfuscator::ObfuscationHelpers</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-24 11:19:26 +0800'>2016-08-24 11:19:26 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      45 complexity
+    </div>
+    <div class="file-stat">
+      5.6 complexity per method
+    </div>
+    <div class="file-stat">
+      3 churn
+    </div>
+    <div class="file-stat">
+      8 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+module TingYun
+  module Agent
+    module Database
+
+      #混淆器
+      class Obfuscator<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Database::Obfuscator has no descriptive comment          </span>  </li></ul>
+        include Singleton
+
+        attr_reader :obfuscator
+
+        def initialize
+          reset
+        end
+
+        def reset
+          @obfuscator = method(:default_sql_obfuscator)
+        end
+
+        QUERY_TOO_LARGE_MESSAGE     = &quot;Query too large (over 16k characters) to safely obfuscate&quot;
+        FAILED_TO_OBFUSCATE_MESSAGE = &quot;Failed to obfuscate SQL query - quote characters remained after obfuscation&quot;
+
+        def default_sql_obfuscator(sql)
+          stmt = sql.kind_of?(Statement) ? sql : Statement.new(sql)
+
+          if stmt.sql[-3,3] == &#39;...&#39;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Obfuscator#default_sql_obfuscator calls stmt.sql 2 times                        <a href="obfuscator.html#L27" class="js-smell-location">0</a>                  <a href="obfuscator.html#L31" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Database::Obfuscator#default_sql_obfuscator refers to stmt more than self (maybe move it to another class?)                        <a href="obfuscator.html#L27" class="js-smell-location">0</a>                  <a href="obfuscator.html#L31" class="js-smell-location">1</a>                  </span>  </li></ul>
+            return QUERY_TOO_LARGE_MESSAGE
+          end
+
+          obfuscate(stmt.sql, stmt.adapter).to_s<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Obfuscator#default_sql_obfuscator calls stmt.sql 2 times                        <a href="obfuscator.html#L27" class="js-smell-location">0</a>                  <a href="obfuscator.html#L31" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Database::Obfuscator#default_sql_obfuscator refers to stmt more than self (maybe move it to another class?)                        <a href="obfuscator.html#L27" class="js-smell-location">0</a>                  <a href="obfuscator.html#L31" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+
+
+
+
+
+        module ObfuscationHelpers<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers has no descriptive comment          </span>  </li></ul>
+          COMPONENTS_REGEX_MAP = {
+              :single_quotes =&gt; /&#39;(?:[^&#39;]|&#39;&#39;)*?(?:\\&#39;.*|&#39;(?!&#39;))/,
+              :double_quotes =&gt; /&quot;(?:[^&quot;]|&quot;&quot;)*?(?:\\&quot;.*|&quot;(?!&quot;))/,
+              :dollar_quotes =&gt; /(\$(?!\d)[^$]*?\$).*?(?:\1|$)/,
+              :uuids =&gt; /\{?(?:[0-9a-fA-F]\-*){32}\}?/,
+              :numeric_literals =&gt; /\b-?(?:[0-9]+\.)?[0-9]+([eE][+-]?[0-9]+)?\b/,
+              :boolean_literals =&gt; /\b(?:true|false|null)\b/i,
+              :hexadecimal_literals =&gt; /0x[0-9a-fA-F]+/,
+              :comments =&gt; /(?:#|--).*?(?=\r|\n|$)/i,
+              :multi_line_comments =&gt; /\/\*(?:[^\/]|\/[^*])*?(?:\*\/|\/\*.*)/,
+              :oracle_quoted_strings =&gt; /q&#39;\[.*?(?:\]&#39;|$)|q&#39;\{.*?(?:\}&#39;|$)|q&#39;\&lt;.*?(?:\&gt;&#39;|$)|q&#39;\(.*?(?:\)&#39;|$)/
+          }
+
+          DIALECT_COMPONENTS = {
+              :fallback   =&gt; COMPONENTS_REGEX_MAP.keys,
+              :mysql      =&gt; [:single_quotes, :double_quotes, :numeric_literals, :boolean_literals,
+                              :hexadecimal_literals, :comments, :multi_line_comments],
+              :postgres   =&gt; [:single_quotes, :dollar_quotes, :uuids, :numeric_literals,
+                              :boolean_literals, :comments, :multi_line_comments],
+              :sqlite     =&gt; [:single_quotes, :numeric_literals, :boolean_literals, :hexadecimal_literals,
+                              :comments, :multi_line_comments],
+              :oracle     =&gt; [:single_quotes, :oracle_quoted_strings, :numeric_literals, :comments,
+                              :multi_line_comments],
+              :cassandra  =&gt; [:single_quotes, :uuids, :numeric_literals, :boolean_literals,
+                              :hexadecimal_literals, :comments, :multi_line_comments]
+          }
+
+          # We use these to check whether the query contains any quote characters
+          # after obfuscation. If so, that&#39;s a good indication that the original
+          # query was malformed, and so our obfuscation can&#39;t reliably find
+          # literals. In such a case, we&#39;ll replace the entire query with a
+          # placeholder.
+          CLEANUP_REGEX = {
+              :mysql =&gt; /&#39;|&quot;|\/\*|\*\//,
+              :mysql2 =&gt; /&#39;|&quot;|\/\*|\*\//,
+              :postgres =&gt; /&#39;|\/\*|\*\/|\$(?!\?)/,
+              :sqlite =&gt; /&#39;|\/\*|\*\//,
+              :cassandra =&gt; /&#39;|\/\*|\*\//,
+              :oracle =&gt; /&#39;|\/\*|\*\//,
+              :oracle_enhanced =&gt; /&#39;|\/\*|\*\//
+          }
+
+
+          QUOTED_STRINGS_REGEX = /&#39;(?:[^&#39;]|&#39;&#39;)*&#39;|&quot;(?:[^&quot;]|&quot;&quot;)*&quot;/
+          LABEL_LINE_REGEX     = /^([^:\n]*:\s+).*$/.freeze
+
+
+          def obfuscate_postgres_explain(sql)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers#obfuscate_postgres_explain doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+            sql.gsub!(QUOTED_STRINGS_REGEX) do |match|
+              match.start_with?(&#39;&quot;&#39;) ? match : &#39;?&#39;
+            end
+
+            sql.gsub!(LABEL_LINE_REGEX,   &#39;\1?&#39;)
+            sql
+          end
+
+
+          PLACEHOLDER = &#39;?&#39;.freeze
+          FAILED_TO_OBFUSCATE_MESSAGE = &quot;Failed to obfuscate SQL query - quote characters remained after obfuscation&quot;.freeze
+
+
+
+          def obfuscate_single_quote_literals(sql)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers#obfuscate_single_quote_literals doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+            return sql unless sql =~ COMPONENTS_REGEX_MAP[:single_quotes]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers#obfuscate_single_quote_literals calls COMPONENTS_REGEX_MAP[:single_quotes] 2 times                        <a href="obfuscator.html#L103" class="js-smell-location">0</a>                  <a href="obfuscator.html#L104" class="js-smell-location">1</a>                  </span>  </li></ul>
+            sql.gsub(COMPONENTS_REGEX_MAP[:single_quotes], PLACEHOLDER)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers#obfuscate_single_quote_literals calls COMPONENTS_REGEX_MAP[:single_quotes] 2 times                        <a href="obfuscator.html#L103" class="js-smell-location">0</a>                  <a href="obfuscator.html#L104" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+
+          def self.generate_regex(dialect)
+            components = DIALECT_COMPONENTS[dialect]
+            Regexp.union(components.map{|component| COMPONENTS_REGEX_MAP[component]})
+          end
+
+          MYSQL_COMPONENTS_REGEX = self.generate_regex(:mysql)
+          POSTGRES_COMPONENTS_REGEX = self.generate_regex(:postgres)
+          SQLITE_COMPONENTS_REGEX = self.generate_regex(:sqlite)
+          ORACLE_COMPONENTS_REGEX = self.generate_regex(:oracle)
+          CASSANDRA_COMPONENTS_REGEX = self.generate_regex(:cassandra)
+          FALLBACK_REGEX = self.generate_regex(:fallback)
+
+          def obfuscate(sql, adapter)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers#obfuscate has approx 9 statements          </span>  </li></ul>
+            case adapter
+              when :mysql, :mysql2
+                regex = MYSQL_COMPONENTS_REGEX
+              when :postgres
+                regex = POSTGRES_COMPONENTS_REGEX
+              when :sqlite
+                regex = SQLITE_COMPONENTS_REGEX
+              when :oracle, :oracle_enhanced
+                regex = ORACLE_COMPONENTS_REGEX
+              when :cassandra
+                regex = CASSANDRA_COMPONENTS_REGEX
+              else
+                regex = FALLBACK_REGEX
+            end
+            obfuscated = sql.gsub(regex, PLACEHOLDER)
+            obfuscated = FAILED_TO_OBFUSCATE_MESSAGE if detect_unmatched_pairs(obfuscated, adapter)
+            obfuscated
+          end
+
+          def detect_unmatched_pairs(obfuscated, adapter)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers#detect_unmatched_pairs doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+            if CLEANUP_REGEX[adapter]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers#detect_unmatched_pairs calls CLEANUP_REGEX[adapter] 2 times                        <a href="obfuscator.html#L140" class="js-smell-location">0</a>                  <a href="obfuscator.html#L141" class="js-smell-location">1</a>                  </span>  </li></ul>
+              CLEANUP_REGEX[adapter].match(obfuscated)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Database::Obfuscator::ObfuscationHelpers#detect_unmatched_pairs calls CLEANUP_REGEX[adapter] 2 times                        <a href="obfuscator.html#L140" class="js-smell-location">0</a>                  <a href="obfuscator.html#L141" class="js-smell-location">1</a>                  </span>  </li></ul>
+            else
+              CLEANUP_REGEX[:mysql].match(obfuscated)
+            end
+          end
+        end
+        include ObfuscationHelpers
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Support::MetricTranslator</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-25 06:09:15 +0000'>2016-01-25 06:09:15 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      54 complexity
+    </div>
+    <div class="file-stat">
+      6.8 complexity per method
+    </div>
+    <div class="file-stat">
+      2 churn
+    </div>
+    <div class="file-stat">
+      8 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/agent/datastore/metric_helper&#39;
+require &#39;ting_yun/agent/datastore/mongo&#39;
+
+module TingYun
+  module Instrumentation
+    module Support
+      module MetricTranslator<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Support::MetricTranslator has no descriptive comment          </span>  </li></ul>
+
+        MONGODB = &#39;MongoDB&#39;.freeze
+
+        def self.metrics_for(name, payload)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.metrics_for has approx 10 statements          </span>  </li></ul>
+          payload ||= {}
+
+          return nil  if collection_in_selector?(payload)
+
+          collection = payload[:collection]
+
+          if create_index?(name, payload)
+            collection = self.collection_name_from_index(payload)
+          elsif group?(name, payload)
+            collection = collection_name_from_group_selector(payload)
+          elsif rename_collection?(name, payload)
+            collection = collection_name_from_rename_selector(payload)
+          end
+
+          TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB,
+                                                              TingYun::Agent::Datastore::Mongo.transform_operation(name),
+                                                              collection)
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.metrics_for has the variable name 'e'          </span>  </li></ul>
+          TingYun::Agent.logger.debug(&quot;Failure during Mongo metric generation&quot;, e)
+          nil
+        end
+
+
+        def self.collection_in_selector?(payload)
+          payload[:collection] == &#39;$cmd&#39;
+        end
+
+        def self.create_index?(name, payload)
+          name == :insert &amp;&amp; payload[:collection] == &quot;system.indexes&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.create_index? is controlled by argument name          </span>  </li></ul>
+        end
+
+        def self.group?(name, payload)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.group? has unused parameter 'payload'          </span>  </li></ul>
+          name == :group
+        end
+
+        def self.rename_collection?(name, payload)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.rename_collection? has unused parameter 'payload'          </span>  </li></ul>
+          name == :renameCollection
+        end
+
+        def self.collection_name_from_index(payload)
+          if payload[:documents]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.collection_name_from_index calls payload[:documents] 4 times                        <a href="metric_translator.html#L54" class="js-smell-location">0</a>                  <a href="metric_translator.html#L55" class="js-smell-location">1</a>                  <a href="metric_translator.html#L57" class="js-smell-location">2</a>                  <a href="metric_translator.html#L60" class="js-smell-location">3</a>                  </span>  </li></ul>
+            if payload[:documents].is_a?(Array)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.collection_name_from_index calls payload[:documents] 4 times                        <a href="metric_translator.html#L54" class="js-smell-location">0</a>                  <a href="metric_translator.html#L55" class="js-smell-location">1</a>                  <a href="metric_translator.html#L57" class="js-smell-location">2</a>                  <a href="metric_translator.html#L60" class="js-smell-location">3</a>                  </span>  </li></ul>
+              # mongo gem versions pre 1.10.0
+              document = payload[:documents].first<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.collection_name_from_index calls payload[:documents] 4 times                        <a href="metric_translator.html#L54" class="js-smell-location">0</a>                  <a href="metric_translator.html#L55" class="js-smell-location">1</a>                  <a href="metric_translator.html#L57" class="js-smell-location">2</a>                  <a href="metric_translator.html#L60" class="js-smell-location">3</a>                  </span>  </li></ul>
+            else
+              # mongo gem versions 1.10.0 and later
+              document = payload[:documents]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.collection_name_from_index calls payload[:documents] 4 times                        <a href="metric_translator.html#L54" class="js-smell-location">0</a>                  <a href="metric_translator.html#L55" class="js-smell-location">1</a>                  <a href="metric_translator.html#L57" class="js-smell-location">2</a>                  <a href="metric_translator.html#L60" class="js-smell-location">3</a>                  </span>  </li></ul>
+            end
+
+            if document &amp;&amp; document[:ns]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.collection_name_from_index calls document[:ns] 2 times                        <a href="metric_translator.html#L63" class="js-smell-location">0</a>                  <a href="metric_translator.html#L64" class="js-smell-location">1</a>                  </span>  </li></ul>
+              return document[:ns].split(&#39;.&#39;).last<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Support::MetricTranslator#self.collection_name_from_index calls document[:ns] 2 times                        <a href="metric_translator.html#L63" class="js-smell-location">0</a>                  <a href="metric_translator.html#L64" class="js-smell-location">1</a>                  </span>  </li></ul>
+            end
+          end
+
+          &#39;system.indexes&#39;
+        end
+
+        def self.collection_name_from_group_selector(payload)
+          payload[:selector][&quot;group&quot;][&quot;ns&quot;]
+        end
+
+        def self.collection_name_from_rename_selector(payload)
+          parts = payload[:selector][:renameCollection].split(&#39;.&#39;)
+          parts.shift
+          parts.join(&#39;.&#39;)
+        end
+
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Collector</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-15 03:13:23 +0000'>2016-07-15 03:13:23 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      29 complexity
+    </div>
+    <div class="file-stat">
+      7.3 complexity per method
+    </div>
+    <div class="file-stat">
+      8 churn
+    </div>
+    <div class="file-stat">
+      4 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+
+module TingYun
+  module Support
+    class Collector &lt;  Struct.new :name, :port<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Collector has no descriptive comment          </span>  </li></ul>
+      def to_s; &quot;#{name}:#{port}&quot;; end
+    end
+
+    module CollectorMethods<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::CollectorMethods has no descriptive comment          </span>  </li></ul>
+      def collector
+        @remote_collector ||= collector_from_host
+      end
+
+      def api_collector
+        @api_collector ||= Collector.new(TingYun::Agent.config[:api_host], TingYun::Agent.config[:api_port])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::CollectorMethods#api_collector calls TingYun::Agent.config 2 times          </span>  </li></ul>
+      end
+
+      def collector_from_host(hostname=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::CollectorMethods#collector_from_host doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if hostname.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Support::CollectorMethods#collector_from_host performs a nil-check          </span>  </li></ul>
+          Collector.new(TingYun::Agent.config[:host], TingYun::Agent.config[:port])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::CollectorMethods#collector_from_host calls TingYun::Agent.config 3 times                        <a href="collector.html#L22" class="js-smell-location">0</a>                  <a href="collector.html#L25" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::CollectorMethods#collector_from_host calls TingYun::Agent.config[:port] 2 times                        <a href="collector.html#L22" class="js-smell-location">0</a>                  <a href="collector.html#L25" class="js-smell-location">1</a>                  </span>  </li></ul>
+        else
+          args = hostname.split(&#39;:&#39;)
+          Collector.new(args[0], args[1]||TingYun::Agent.config[:port])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::CollectorMethods#collector_from_host calls TingYun::Agent.config 3 times                        <a href="collector.html#L22" class="js-smell-location">0</a>                  <a href="collector.html#L25" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::CollectorMethods#collector_from_host calls TingYun::Agent.config[:port] 2 times                        <a href="collector.html#L22" class="js-smell-location">0</a>                  <a href="collector.html#L25" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+      end
+
+    end
+
+    extend CollectorMethods
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

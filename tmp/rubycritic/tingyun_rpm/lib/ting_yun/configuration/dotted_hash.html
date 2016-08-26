@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Configuration::DottedHash</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      24 complexity
+    </div>
+    <div class="file-stat">
+      4.8 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+module TingYun
+  module Configuration
+    class DottedHash &lt; ::Hash<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Configuration::DottedHash has no descriptive comment          </span>  </li></ul>
+
+      def self.symbolize(hash)
+        hash.keys.each do |key|
+          hash[key.to_sym] = hash.delete(key)
+        end
+      end
+
+      def initialize(hash, keep_nesting = false)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Configuration::DottedHash#initialize has boolean parameter 'keep_nesting'          </span>  </li></ul>
+        self.merge!(hash) if keep_nesting<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Configuration::DottedHash#initialize is controlled by argument keep_nesting          </span>  </li></ul>
+        self.merge!(dot_flattened(hash))
+
+        DottedHash.symbolize(self)
+      end
+
+      def inspect
+        &quot;#&lt;#{self.class.name}:#{object_id} #{super}&gt;&quot;
+      end
+
+      def to_hash
+        {}.replace(self)
+      end
+
+      protected
+
+      # turns {&#39;a&#39; =&gt; {&#39;b&#39; =&gt; &#39;c&#39;}} into {&#39;a.b&#39; =&gt; &#39;c&#39;}
+      def dot_flattened(nested_hash, names=[], result={})
+        nested_hash.each do |key, val|
+          next if val == nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DottedHash#dot_flattened refers to val more than self (maybe move it to another class?)                        <a href="dotted_hash.html#L34" class="js-smell-location">0</a>                  <a href="dotted_hash.html#L35" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Configuration::DottedHash#dot_flattened performs a nil-check          </span>  </li></ul>
+          if val.respond_to?(:has_key?)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DottedHash#dot_flattened refers to val more than self (maybe move it to another class?)                        <a href="dotted_hash.html#L34" class="js-smell-location">0</a>                  <a href="dotted_hash.html#L35" class="js-smell-location">1</a>                  </span>  </li></ul>
+            dot_flattened(val, names + [key], result)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DottedHash#dot_flattened calls names + [key] 2 times                        <a href="dotted_hash.html#L36" class="js-smell-location">0</a>                  <a href="dotted_hash.html#L38" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DottedHash#dot_flattened refers to names more than self (maybe move it to another class?)                        <a href="dotted_hash.html#L36" class="js-smell-location">0</a>                  <a href="dotted_hash.html#L38" class="js-smell-location">1</a>                  </span>  </li></ul>
+          else
+            result[(names + [key]).join(&#39;.&#39;)] = val<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DottedHash#dot_flattened calls names + [key] 2 times                        <a href="dotted_hash.html#L36" class="js-smell-location">0</a>                  <a href="dotted_hash.html#L38" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DottedHash#dot_flattened refers to names more than self (maybe move it to another class?)                        <a href="dotted_hash.html#L36" class="js-smell-location">0</a>                  <a href="dotted_hash.html#L38" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        end
+        result
+      end
+    end
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

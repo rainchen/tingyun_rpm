@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-17 11:23:01 +0800'>2016-08-17 11:23:01 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      46 complexity
+    </div>
+    <div class="file-stat">
+      3.8 complexity per method
+    </div>
+    <div class="file-stat">
+      18 churn
+    </div>
+    <div class="file-stat">
+      12 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/configuration/manager&#39;
+require &#39;ting_yun/logger/startup_logger&#39;
+require &#39;ting_yun/frameworks&#39;
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+require &#39;ting_yun/agent/transaction&#39;
+require &#39;ting_yun/agent/collector/middle_ware_collector/middle_ware&#39;
+
+
+module TingYun
+  module Agent<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent has no descriptive comment          </span>  </li></ul>
+    extend self
+
+    @agent = nil
+    @logger = nil
+    @config = ::TingYun::Configuration::Manager.new
+
+    attr_reader :config
+
+    UNKNOWN_METRIC = &#39;(unknown)&#39;.freeze
+
+    def agent
+      return @agent if @agent
+      TingYun::Agent.logger.warn(&quot;Agent unavailable as it hasn&#39;t been started.&quot;)
+      nil
+    end
+
+    alias instance agent
+
+    def agent=(new_instance)
+      @agent = new_instance
+    end
+
+
+    def logger
+      @logger || ::TingYun::Logger::StartupLogger.instance
+    end
+
+    def logger=(log)
+      @logger = log
+    end
+
+    def reset_config
+      @config.reset_to_defaults
+    end
+
+
+    # Record a value for the given metric name.
+    #
+    # This method should be used to record event-based metrics such as method
+    # calls that are associated with a specific duration or magnitude.
+    #
+    # +metric_name+ should follow a slash separated path convention. Application
+    # specific metrics should begin with &quot;Custom/&quot;.
+    #
+    # +value+ should be either a single Numeric value representing the duration/
+    # magnitude of the event being recorded, or a Hash containing :count,
+    # :total, :min, :max, and :sum_of_squares keys. The latter form is useful
+    # for recording pre-aggregated metrics collected externally.
+    #
+    # This method is safe to use from any thread.
+    #
+    # @api public
+    def record_metric(metric_name, value) #THREAD_LOCAL_ACCESS
+      return unless agent
+      stats = TingYun::Metrics::Stats.create_from_hash(value) if value.is_a?(Hash)
+      agent.stats_engine.tl_record_unscoped_metrics(metric_name, stats || value)
+    end
+
+    # Manual agent configuration and startup/shutdown
+
+    # Call this to manually start the Agent in situations where the Agent does
+    # not auto-start.
+    #
+    # When the app environment loads, so does the Agent. However, the
+    # Agent will only connect to the service if a web front-end is found. If
+    # you want to selectively monitor ruby processes that don&#39;t use
+    # web plugins, then call this method in your code and the Agent
+    # will fire up and start reporting to the service.
+    #
+    # Options are passed in as overrides for values in the
+    # tingyun.yml, such as app_name.  In addition, the option +log+
+    # will take a logger that will be used instead of the standard
+    # file logger.  The setting for the tingyun.yml section to use
+    # (ie, RAILS_ENV) can be overridden with an :env argument.
+    #
+    # @api public
+    #
+    def manual_start(options={})
+      raise &quot;Options must be a hash&quot; unless Hash === options
+      TingYun::Frameworks.init_start({ :&#39;nbs.agent_enabled&#39; =&gt; true, :sync_startup =&gt; true }.merge(options))
+    end
+
+    # Yield to a block that is run with a database metric name context.  This means
+    # the Database instrumentation will use this for the metric name if it does not
+    # otherwise know about a model.  This is re-entrant.
+    #
+    # @param [String,Class,#to_s] model the DB model class
+    #
+    # @param [String] method the name of the finder method or other method to
+    # identify the operation with.
+    #
+    def with_database_metric_name(model, method = nil, product = nil, &amp;block) #THREAD_LOCAL_ACCESS<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent#with_database_metric_name doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+      if txn = TingYun::Agent::TransactionState.tl_get.current_transaction
+        txn.with_database_metric_name(model, method, product, &amp;block)
+      else
+        yield
+      end
+    end
+
+
+    # Notice the error with the given available options:
+    #
+    # * &lt;tt&gt;:uri&lt;/tt&gt; =&gt; Request path, minus request params or query string
+    # * &lt;tt&gt;:metric&lt;/tt&gt; =&gt; The metric name associated with the transaction
+    # * &lt;tt&gt;:custom_params&lt;/tt&gt; =&gt; Custom parameters
+    #
+    # @api public
+    #
+    def notice_error(exception, options={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent#notice_error doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+      TingYun::Agent::Transaction.notice_error(exception, options)
+      nil # don&#39;t return a noticed error datastructure. it can only hurt.
+    end
+
+    # Register this method as a callback for processes that fork
+    # jobs.
+    #
+    # If the master/parent connects to the agent prior to forking the
+    # agent in the forked process will use that agent_run.  Otherwise
+    # the forked process will establish a new connection with the
+    # server.
+    #
+    # Use this especially when you fork the process to run background
+    # jobs or other work.  If you are doing this with a web dispatcher
+    # that forks worker processes then you will need to force the
+    # agent to reconnect, which it won&#39;t do by default.  Passenger and
+    # Rainbows and Unicorn are already handled, nothing special needed for them.
+    #
+    # Options:
+    # * &lt;tt&gt;:force_reconnect =&gt; true&lt;/tt&gt; to force the spawned process to
+    #   establish a new connection, such as when forking a long running process.
+    #   The default is false--it will only connect to the server if the parent
+    #   had not connected.
+    # * &lt;tt&gt;:keep_retrying =&gt; false&lt;/tt&gt; if we try to initiate a new
+    #   connection, this tells me to only try it once so this method returns
+    #   quickly if there is some kind of latency with the server.
+    #
+    # @api public
+    #
+    def after_fork(options={})
+      agent.after_fork(options) if agent
+    end
+
+
+    # Yield to the block without collecting any metrics or traces in
+    # any of the subsequent calls.  If executed recursively, will keep
+    # track of the first entry point and turn on tracing again after
+    # leaving that block.  This uses the thread local TransactionState.
+    #
+    # @api public
+    #
+    def disable_all_tracing
+      return yield unless agent
+      begin
+        agent.push_trace_execution_flag(false)
+        yield
+      ensure
+        agent.pop_trace_execution_flag
+      end
+    end
+
+
+
+
+    # Shutdown the agent.  Call this before exiting.  Sends any queued data
+    # and kills the background thread.
+    #
+    # @param options [Hash] Unused options Hash, for back compatibility only
+    #
+    # @api public
+    #
+    def shutdown
+      agent.shutdown if agent
+    end
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

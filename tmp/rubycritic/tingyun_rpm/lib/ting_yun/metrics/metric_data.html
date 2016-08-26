@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Metrics::MetricData</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-24 17:13:57 +0800'>2016-08-24 17:13:57 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      60 complexity
+    </div>
+    <div class="file-stat">
+      6.7 complexity per method
+    </div>
+    <div class="file-stat">
+      12 churn
+    </div>
+    <div class="file-stat">
+      9 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+
+
+module TingYun
+  module Metrics
+    class MetricData<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Metrics::MetricData has no descriptive comment          </span>  </li></ul>
+
+      # nil, or a TingYun::Metrics::MetricSpec object if we have no cached ID
+      attr_reader :metric_spec
+      # nil or a cached integer ID for the metric from the collector.
+      attr_accessor :metric_id<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::MetricData#metric_id is a writable attribute          </span>  </li></ul>
+      # the actual statistics object
+      attr_accessor :stats<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Metrics::MetricData#stats is a writable attribute          </span>  </li></ul>
+
+      def initialize(metric_spec, stats, metric_id)
+        @metric_spec = metric_spec
+        @stats = stats
+        @metric_id = metric_id
+      end
+
+      def eql?(o)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Metrics::MetricData#eql? has the parameter name 'o'          </span>  </li></ul>
+        (metric_spec.eql? o.metric_spec) &amp;&amp; (stats.eql? o.stats)
+      end
+
+      def hash
+        metric_spec.hash ^ stats.hash
+      end
+
+      # Serialize with all attributes, but if the metric id is not nil, then don&#39;t send the metric spec
+      def to_json(*a)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Metrics::MetricData#to_json has unused parameter 'a'          </span>  </li></ul>
+        %Q[{&quot;metric_spec&quot;:#{metric_id ? &#39;null&#39; : metric_spec.to_json},&quot;stats&quot;:{&quot;total_exclusive_time&quot;:#{stats.total_exclusive_time},&quot;min_call_time&quot;:#{stats.min_call_time},&quot;call_count&quot;:#{stats.call_count},&quot;sum_of_squares&quot;:#{stats.sum_of_squares},&quot;total_call_time&quot;:#{stats.total_call_time},&quot;max_call_time&quot;:#{stats.max_call_time}},&quot;metric_id&quot;:#{metric_id ? metric_id : &#39;null&#39;}}]
+      end
+
+      def to_s
+        if metric_spec
+          &quot;#{metric_spec.name}(#{metric_spec.scope}): #{stats}&quot;
+        else
+          &quot;#{metric_id}: #{stats}&quot;
+        end
+      end
+
+      def inspect
+        &quot;#&lt;MetricData metric_spec:#{metric_spec.inspect}, stats:#{stats.inspect}, metric_id:#{metric_id.inspect}&gt;&quot;
+      end
+
+
+      def to_collector_array(encoder=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Metrics::MetricData#to_collector_array has unused parameter 'encoder'          </span>  </li></ul>
+        stat_key = metric_id || to_hash
+        [stat_key, metrics(stat_key)]
+      end
+
+      def to_hash
+        metric_spec.to_hash
+      end
+
+      def metrics(stat_key)
+        stats.metrics(stat_key)
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

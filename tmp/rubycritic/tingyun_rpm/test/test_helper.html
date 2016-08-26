@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-15 05:37:30 +0000'>2016-07-15 05:37:30 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      138 complexity
+    </div>
+    <div class="file-stat">
+      9.2 complexity per method
+    </div>
+    <div class="file-stat">
+      7 churn
+    </div>
+    <div class="file-stat">
+      15 methods
+    </div>
+    <div class="file-stat">
+      21 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+
+module TingYun; TEST = true; end unless defined? TingYun::TEST
+ENV[&#39;RAILS_ENV&#39;] = &#39;test&#39;
+TINGYUN_PLUGIN_DIR = File.expand_path(File.join(File.dirname(__FILE__),&quot;..&quot;))
+$LOAD_PATH &lt;&lt; &#39;.&#39;
+$LOAD_PATH &lt;&lt; &#39;../../..&#39;
+$LOAD_PATH &lt;&lt; File.join(TINGYUN_PLUGIN_DIR,&quot;lib&quot;)
+$LOAD_PATH &lt;&lt; File.join(TINGYUN_PLUGIN_DIR,&quot;test&quot;)
+$LOAD_PATH &lt;&lt; File.join(TINGYUN_PLUGIN_DIR,&quot;ui/helpers&quot;)
+$LOAD_PATH.uniq!
+
+require &#39;rubygems&#39;
+require &#39;rake&#39;
+require &#39;pry&#39;
+
+
+require &#39;minitest/autorun&#39;
+require &#39;mocha/setup&#39;
+
+unless defined?(Minitest::Test)
+  Minitest::Test = MiniTest::Unit::TestCase
+end
+
+require &#39;hometown&#39;
+Hometown.watch(::Thread)
+require &#39;agent_helper&#39;
+
+# Set up a watcher for leaking agent threads out of tests.  It&#39;d be nice to
+# disable the threads everywhere, but not all tests have tingyun.yml loaded to
+# us to rely on, so instead we&#39;ll just watch for it.
+class Minitest::Test
+  def before_setup
+    if self.respond_to?(:name)
+      test_method_name = self.name
+    else
+      test_method_name = self.__name__
+    end
+
+     # TingYun::Agent.logger.info(&quot;*** #{self.class}##{test_method_name} **&quot;)
+
+    @__thread_count = ruby_threads.count
+    super
+  end
+
+  def after_teardown<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      Minitest::Test#after_teardown has approx 6 statements          </span>  </li></ul>
+    # unfreeze_time
+
+    threads = ruby_threads
+    if @__thread_count != threads.count<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      Minitest::Test#after_teardown calls threads.count 2 times                        <a href="test_helper.html#L52" class="js-smell-location">0</a>                  <a href="test_helper.html#L58" class="js-smell-location">1</a>                  </span>  </li></ul>
+      backtraces = threads.map do |thread|
+        trace = Hometown.for(thread)
+        trace.backtrace.join(&quot;\n    &quot;)
+      end.join(&quot;\n\n&quot;)
+
+      fail &quot;Thread count changed in this test from #{@__thread_count} to #{threads.count}\n#{backtraces}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      Minitest::Test#after_teardown calls threads.count 2 times                        <a href="test_helper.html#L52" class="js-smell-location">0</a>                  <a href="test_helper.html#L58" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    super
+  end
+
+  # We only want to count threads that were spun up from Ruby (i.e.
+  # Thread.new) JRuby has system threads we don&#39;t care to track.
+  def ruby_threads<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      Minitest::Test#ruby_threads doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+    Thread.list.select { |t| Hometown.for(t) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      Minitest::Test#ruby_threads has the variable name 't'          </span>  </li></ul>
+  end
+end
+
+Dir.glob(&#39;test/helpers/*&#39;).each { |f| require f }
+
+Dir.glob(File.join(TINGYUN_PLUGIN_DIR,&#39;test/helpers/*.rb&#39;)).each do |helper|
+  require helper
+end
+
+# We can speed things up in tests that don&#39;t need to load rails.
+# You can also run the tests in a mode without rails.  Many tests
+# will be skipped.
+if ENV[&quot;NO_RAILS&quot;]
+  puts &quot;Running tests in standalone mode without Rails.&quot;
+  require &#39;tingyun_rpm&#39;
+else
+  begin
+    # require &#39;config/environment&#39;
+    require &#39;tingyun_rpm&#39;
+  rescue LoadError
+    puts &quot;Running tests in standalone mode.&quot;
+
+    require &#39;bundler&#39;
+    Bundler.require
+
+    require &#39;rails/all&#39;
+    require &#39;tingyun_rpm&#39;
+
+    # Bootstrap a basic rails environment for the agent to run in.
+    class MyApp &lt; Rails::Application
+      config.active_support.deprecation = :log
+      config.secret_token = &quot;49837489qkuweoiuoqwehisuakshdjksadhaisdy78o34y138974xyqp9rmye8yrpiokeuioqwzyoiuxftoyqiuxrhm3iou1hrzmjk&quot;
+      config.after_initialize do
+        TingYun::Agent.manual_start
+      end
+    end
+    MyApp.initialize!
+  end
+end
+
+# This is the public method recommended for plugin developers to share our
+# agent helpers. Use it so we don&#39;t accidentally break it.
+# TingYun::Agent.require_test_helper
+
+def default_service(stubbed_method_overrides = {})
+  service = stub
+  stubbed_method_defaults = {
+    :connect =&gt; {},
+    :shutdown =&gt; nil,
+    :agent_id= =&gt; nil,
+    :agent_id =&gt; nil,
+    :collector =&gt; stub_everything,
+    :request_timeout= =&gt;  nil,
+    :metric_data =&gt; nil,
+    :error_data =&gt; nil,
+    :transaction_sample_data =&gt; nil,
+    :sql_trace_data =&gt; nil,
+    :get_agent_commands =&gt; [],
+    :agent_command_results =&gt; nil,
+    :analytic_event_data =&gt; nil,
+    :valid_to_marshal? =&gt; true
+  }
+
+  service.stubs(stubbed_method_defaults.merge(stubbed_method_overrides))
+
+  # When session gets called yield to the given block.
+  service.stubs(:session).yields
+  service
+end
+
+def with_verbose_logging<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      with_verbose_logging has approx 6 statements          </span>  </li></ul>
+  orig_logger = TingYun::Agent.logger
+  $stderr.puts &#39;&#39;, &#39;---&#39;, &#39;&#39;
+  new_logger = TingYun::Agent::AgentLogger.new(&#39;&#39;, Logger.new($stderr) )
+  TingYun::Agent.logger = new_logger
+
+  with_config(:log_level =&gt; &#39;debug&#39;) do
+    yield
+  end
+ensure
+  TingYun::Agent.logger = orig_logger
+end
+
+# Need to be a bit sloppy when testing against the logging--let everything
+# through, but check we (at least) get our particular message we care about
+def expects_logging(level, *with_params)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      expects_logging doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+  ::TingYun::Agent.logger.stubs(level)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      expects_logging calls ::TingYun::Agent.logger 2 times                        <a href="test_helper.html#L154" class="js-smell-location">0</a>                  <a href="test_helper.html#L155" class="js-smell-location">1</a>                  </span>  </li></ul>
+  ::TingYun::Agent.logger.expects(level).with(*with_params).once<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      expects_logging calls ::TingYun::Agent.logger 2 times                        <a href="test_helper.html#L154" class="js-smell-location">0</a>                  <a href="test_helper.html#L155" class="js-smell-location">1</a>                  </span>  </li></ul>
+end
+
+def expects_no_logging(level)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      expects_no_logging doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+  ::TingYun::Agent.logger.expects(level).never
+end
+
+# Sometimes need to test cases where we muddle with the global logger
+# If so, use this method to ensure it gets restored after we&#39;re done
+def without_logger<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      without_logger doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+  logger = ::TingYun::Agent.logger
+  ::TingYun::Agent.logger = nil
+  yield
+ensure
+  ::TingYun::Agent.logger = logger
+end
+
+def fixture_tcp_socket( response )<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      fixture_tcp_socket has approx 12 statements          </span>  </li></ul>
+  # Don&#39;t actually talk to Google.
+  socket = stub(&quot;socket&quot;) do
+    stubs(:closed?).returns(false)
+    stubs(:close)
+    stubs(:setsockopt)
+
+    # Simulate a bunch of socket-ey stuff since Mocha doesn&#39;t really
+    # provide any other way to do it
+    class &lt;&lt; self
+      attr_accessor :response, :write_checker<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      fixture_tcp_socket#response is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      fixture_tcp_socket#write_checker is a writable attribute          </span>  </li></ul>
+    end
+
+    def self.check_write
+      self.write_checker = Proc.new
+    end
+
+    def self.write( buf )
+      self.write_checker.call( buf ) if self.write_checker<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      fixture_tcp_socket calls self.write_checker 2 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      fixture_tcp_socket#self.write calls self.write_checker 2 times          </span>  </li></ul>
+      buf.length
+    end
+
+    def self.sysread( size, buf=&#39;&#39; )
+      @data ||= response.to_s
+      raise EOFError if @data.empty?
+      buf.replace @data.slice!( 0, size )
+      buf
+    end
+    class &lt;&lt; self
+      alias_method :read_nonblock, :sysread
+    end
+
+  end
+
+  socket.response = response
+  TCPSocket.stubs( :open ).returns( socket )
+
+  return socket
+end
+
+def dummy_mysql_explain_result(hash=nil)
+  hash ||= {
+    &#39;Id&#39; =&gt; &#39;1&#39;,
+    &#39;Select Type&#39; =&gt; &#39;SIMPLE&#39;,
+    &#39;Table&#39; =&gt; &#39;sandwiches&#39;,
+    &#39;Type&#39; =&gt; &#39;range&#39;,
+    &#39;Possible Keys&#39; =&gt; &#39;PRIMARY&#39;,
+    &#39;Key&#39; =&gt; &#39;PRIMARY&#39;,
+    &#39;Key Length&#39; =&gt; &#39;4&#39;,
+    &#39;Ref&#39; =&gt; &#39;&#39;,
+    &#39;Rows&#39; =&gt; &#39;1&#39;,
+    &#39;Extra&#39; =&gt; &#39;Using index&#39;
+  }
+  explain_result = mock(&#39;explain result&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="../lib/ting_yun/instrumentation/support/active_record_helper.html#L122" class="js-smell-location">0</a>                  <a href="test_helper.html#L225" class="js-smell-location">1</a>                  </span>  </li></ul>
+  explain_result.stubs(:each_hash).yields(hash)
+  explain_result
+end
+
+module TransactionSampleTestHelper<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TransactionSampleTestHelper has no descriptive comment          </span>  </li></ul>
+  module_function
+  def make_sql_transaction(*sql)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TransactionSampleTestHelper#make_sql_transaction has approx 12 statements          </span>  </li></ul>
+    sampler = nil
+    state = TingYun::Agent::TransactionState.tl_get
+
+    in_transaction(&#39;/path&#39;) do
+      sampler = TingYun::Agent.instance.transaction_sampler
+      sampler.notice_push_frame(state, &quot;a&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#make_sql_transaction refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L238" class="js-smell-location">0</a>                  <a href="test_helper.html#L240" class="js-smell-location">1</a>                  <a href="test_helper.html#L243" class="js-smell-location">2</a>                  <a href="test_helper.html#L246" class="js-smell-location">3</a>                  </span>  </li></ul>
+      explainer = TingYun::Agent::Instrumentation::ActiveRecord::EXPLAINER
+      sql.each {|sql_statement| sampler.notice_sql(sql_statement, {:adapter =&gt; &quot;mysql&quot;}, 0, state, explainer) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#make_sql_transaction refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L238" class="js-smell-location">0</a>                  <a href="test_helper.html#L240" class="js-smell-location">1</a>                  <a href="test_helper.html#L243" class="js-smell-location">2</a>                  <a href="test_helper.html#L246" class="js-smell-location">3</a>                  </span>  </li></ul>
+      sleep 0.02
+      yield if block_given?
+      sampler.notice_pop_frame(state, &quot;a&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#make_sql_transaction refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L238" class="js-smell-location">0</a>                  <a href="test_helper.html#L240" class="js-smell-location">1</a>                  <a href="test_helper.html#L243" class="js-smell-location">2</a>                  <a href="test_helper.html#L246" class="js-smell-location">3</a>                  </span>  </li></ul>
+    end
+
+    return sampler.last_sample<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#make_sql_transaction refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L238" class="js-smell-location">0</a>                  <a href="test_helper.html#L240" class="js-smell-location">1</a>                  <a href="test_helper.html#L243" class="js-smell-location">2</a>                  <a href="test_helper.html#L246" class="js-smell-location">3</a>                  </span>  </li></ul>
+  end
+
+  def run_sample_trace(path=&#39;/path&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TransactionSampleTestHelper#run_sample_trace has approx 14 statements          </span>  </li></ul>
+    sampler = nil
+    state = TingYun::Agent::TransactionState.tl_get
+
+    request = stub(:path =&gt; path)
+
+    in_transaction(&quot;Controller/sandwiches/index&quot;, :request =&gt; request) do
+      sampler = TingYun::Agent.instance.transaction_sampler
+      sampler.notice_sql(&quot;SELECT * FROM sandwiches WHERE bread = &#39;wheat&#39;&quot;, {}, 0, state)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#run_sample_trace refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L257" class="js-smell-location">0</a>                  <a href="test_helper.html#L258" class="js-smell-location">1</a>                  <a href="test_helper.html#L259" class="js-smell-location">2</a>                  <a href="test_helper.html#L261" class="js-smell-location">3</a>                  <a href="test_helper.html#L262" class="js-smell-location">4</a>                  <a href="test_helper.html#L263" class="js-smell-location">5</a>                  <a href="test_helper.html#L264" class="js-smell-location">6</a>                  <a href="test_helper.html#L267" class="js-smell-location">7</a>                  </span>  </li></ul>
+      sampler.notice_push_frame(state, &quot;ab&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#run_sample_trace refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L257" class="js-smell-location">0</a>                  <a href="test_helper.html#L258" class="js-smell-location">1</a>                  <a href="test_helper.html#L259" class="js-smell-location">2</a>                  <a href="test_helper.html#L261" class="js-smell-location">3</a>                  <a href="test_helper.html#L262" class="js-smell-location">4</a>                  <a href="test_helper.html#L263" class="js-smell-location">5</a>                  <a href="test_helper.html#L264" class="js-smell-location">6</a>                  <a href="test_helper.html#L267" class="js-smell-location">7</a>                  </span>  </li></ul>
+      sampler.notice_sql(&quot;SELECT * FROM sandwiches WHERE bread = &#39;white&#39;&quot;, {}, 0, state)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#run_sample_trace refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L257" class="js-smell-location">0</a>                  <a href="test_helper.html#L258" class="js-smell-location">1</a>                  <a href="test_helper.html#L259" class="js-smell-location">2</a>                  <a href="test_helper.html#L261" class="js-smell-location">3</a>                  <a href="test_helper.html#L262" class="js-smell-location">4</a>                  <a href="test_helper.html#L263" class="js-smell-location">5</a>                  <a href="test_helper.html#L264" class="js-smell-location">6</a>                  <a href="test_helper.html#L267" class="js-smell-location">7</a>                  </span>  </li></ul>
+      yield sampler if block_given?
+      sampler.notice_pop_frame(state, &quot;ab&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#run_sample_trace refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L257" class="js-smell-location">0</a>                  <a href="test_helper.html#L258" class="js-smell-location">1</a>                  <a href="test_helper.html#L259" class="js-smell-location">2</a>                  <a href="test_helper.html#L261" class="js-smell-location">3</a>                  <a href="test_helper.html#L262" class="js-smell-location">4</a>                  <a href="test_helper.html#L263" class="js-smell-location">5</a>                  <a href="test_helper.html#L264" class="js-smell-location">6</a>                  <a href="test_helper.html#L267" class="js-smell-location">7</a>                  </span>  </li></ul>
+      sampler.notice_push_frame(state, &quot;lew&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#run_sample_trace refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L257" class="js-smell-location">0</a>                  <a href="test_helper.html#L258" class="js-smell-location">1</a>                  <a href="test_helper.html#L259" class="js-smell-location">2</a>                  <a href="test_helper.html#L261" class="js-smell-location">3</a>                  <a href="test_helper.html#L262" class="js-smell-location">4</a>                  <a href="test_helper.html#L263" class="js-smell-location">5</a>                  <a href="test_helper.html#L264" class="js-smell-location">6</a>                  <a href="test_helper.html#L267" class="js-smell-location">7</a>                  </span>  </li></ul>
+      sampler.notice_sql(&quot;SELECT * FROM sandwiches WHERE bread = &#39;french&#39;&quot;, {}, 0, state)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#run_sample_trace refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L257" class="js-smell-location">0</a>                  <a href="test_helper.html#L258" class="js-smell-location">1</a>                  <a href="test_helper.html#L259" class="js-smell-location">2</a>                  <a href="test_helper.html#L261" class="js-smell-location">3</a>                  <a href="test_helper.html#L262" class="js-smell-location">4</a>                  <a href="test_helper.html#L263" class="js-smell-location">5</a>                  <a href="test_helper.html#L264" class="js-smell-location">6</a>                  <a href="test_helper.html#L267" class="js-smell-location">7</a>                  </span>  </li></ul>
+      sampler.notice_pop_frame(state, &quot;lew&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#run_sample_trace refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L257" class="js-smell-location">0</a>                  <a href="test_helper.html#L258" class="js-smell-location">1</a>                  <a href="test_helper.html#L259" class="js-smell-location">2</a>                  <a href="test_helper.html#L261" class="js-smell-location">3</a>                  <a href="test_helper.html#L262" class="js-smell-location">4</a>                  <a href="test_helper.html#L263" class="js-smell-location">5</a>                  <a href="test_helper.html#L264" class="js-smell-location">6</a>                  <a href="test_helper.html#L267" class="js-smell-location">7</a>                  </span>  </li></ul>
+    end
+
+    return sampler.last_sample<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TransactionSampleTestHelper#run_sample_trace refers to sampler more than self (maybe move it to another class?)                        <a href="test_helper.html#L257" class="js-smell-location">0</a>                  <a href="test_helper.html#L258" class="js-smell-location">1</a>                  <a href="test_helper.html#L259" class="js-smell-location">2</a>                  <a href="test_helper.html#L261" class="js-smell-location">3</a>                  <a href="test_helper.html#L262" class="js-smell-location">4</a>                  <a href="test_helper.html#L263" class="js-smell-location">5</a>                  <a href="test_helper.html#L264" class="js-smell-location">6</a>                  <a href="test_helper.html#L267" class="js-smell-location">7</a>                  </span>  </li></ul>
+  end
+end
+</code>
+
+    </div>
+    <script src='../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../assets/javascripts/application.js'></script>
+  </body>
+</html>

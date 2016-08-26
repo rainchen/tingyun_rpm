@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Mongo</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-22 10:56:07 +0800'>2016-04-22 10:56:07 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      75 complexity
+    </div>
+    <div class="file-stat">
+      7.5 complexity per method
+    </div>
+    <div class="file-stat">
+      16 churn
+    </div>
+    <div class="file-stat">
+      10 methods
+    </div>
+    <div class="file-stat">
+      68 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/instrumentation/support/metric_translator&#39;
+
+module TingYun
+  module Instrumentation
+    module Mongo<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Mongo has no descriptive comment          </span>  </li></ul>
+      extend self
+
+      def install_mongo_instrumentation
+        hook_instrument_methods
+        instrument_save
+        instrument_ensure_index
+      end
+
+      def hook_instrument_methods
+        hook_instrument_method(::Mongo::Collection)
+        hook_instrument_method(::Mongo::Connection)
+        hook_instrument_method(::Mongo::Cursor)
+        hook_instrument_method(::Mongo::CollectionWriter) if defined?(::Mongo::CollectionWriter)
+      end
+
+
+      def hook_instrument_method(target_class)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Mongo#hook_instrument_method has approx 7 statements          </span>  </li></ul>
+        target_class.class_eval do
+          require &#39;ting_yun/agent/method_tracer&#39;
+
+          def record_mongo_duration(duration)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Mongo#hook_instrument_method#record_mongo_duration doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+            state = TingYun::Agent::TransactionState.tl_get
+            unless state.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Mongo#hook_instrument_method performs a nil-check          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Mongo#hook_instrument_method#record_mongo_duration performs a nil-check          </span>  </li></ul>
+              state.mon_duration += duration * 1000
+            end
+          end
+
+          def ting_yun_generate_metrics(operation, payload = nil)
+            payload ||= { :collection =&gt; self.name, :database =&gt; self.db.name }
+            TingYun::Instrumentation::Support::MetricTranslator.metrics_for(operation, payload)
+          end
+
+          def instrument_with_ting_yun_trace(name, payload = {}, &amp;block)
+            metrics = ting_yun_generate_metrics(name, payload)
+
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, payload, method(:record_mongo_duration)) do
+              instrument_without_ting_yun_trace(name, payload, &amp;block)
+            end
+          end
+
+          alias_method :instrument_without_ting_yun_trace, :instrument
+          alias_method :instrument, :instrument_with_ting_yun_trace
+        end
+      end
+
+      def instrument_save<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="mongo.html#L54" class="js-smell-location">0</a>                  <a href="mongo.html#L68" class="js-smell-location">1</a>                  </span>  </li></ul>
+        ::Mongo::Collection.class_eval do
+          def save_with_ting_yun_trace(doc, opts = {}, &amp;block)
+            metrics = ting_yun_generate_metrics(:save)
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, opts, method(:record_mongo_duration)) do
+              save_without_ting_yun_trace(doc, opts, &amp;block)
+            end
+          end
+
+          alias_method :save_without_ting_yun_trace, :save
+          alias_method :save, :save_with_ting_yun_trace
+        end
+      end
+
+      def instrument_ensure_index<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="mongo.html#L54" class="js-smell-location">0</a>                  <a href="mongo.html#L68" class="js-smell-location">1</a>                  </span>  </li></ul>
+        ::Mongo::Collection.class_eval do
+          def ensure_index_with_ting_yun_trace(spec, opts = {}, &amp;block)
+            metrics = ting_yun_generate_metrics(:ensureIndex)
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, opts, method(:record_mongo_duration)) do
+              ensure_index_with_out_ting_yun_trace(spec, opts, &amp;block)
+            end
+          end
+
+          alias_method :ensure_index_with_out_ting_yun_trace, :ensure_index
+          alias_method :ensure_index, :ensure_index_with_ting_yun_trace
+        end
+      end
+    end
+  end
+end
+
+TingYun::Support::LibraryDetection.defer do
+  named :mongo
+
+  depends_on do
+    defined?(::Mongo)
+  end
+
+  depends_on do
+    TingYun::Agent::Datastore::Mongo.supported_version? &amp;&amp; !TingYun::Agent::Datastore::Mongo.unsupported_2x?
+  end
+
+  executes do
+    TingYun::Agent.logger.info &#39;Installing Mongo instrumentation&#39;
+  end
+
+  executes do
+    TingYun::Instrumentation::Mongo.install_mongo_instrumentation
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

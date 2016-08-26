@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Threading::AgentThreadTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      35 complexity
+    </div>
+    <div class="file-stat">
+      5.8 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      6 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require File.expand_path(File.join(File.dirname(__FILE__),&#39;..&#39;,&#39;..&#39;,&#39;..&#39;,&#39;test_helper&#39;))
+require &#39;ting_yun/agent/threading/agent_thread&#39;
+require &#39;ting_yun/agent&#39;
+
+module TingYun::Agent::Threading
+  class AgentThreadTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Threading::AgentThreadTest has no descriptive comment          </span>  </li></ul>
+
+    def test_sets_label
+      t = AgentThread.create(&quot;labelled&quot;) {}<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Threading::AgentThreadTest#test_sets_label has the variable name 't'          </span>  </li></ul>
+      assert_equal &quot;labelled&quot;, t[:TingYun_label]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Threading::AgentThreadTest#test_sets_label refers to t more than self (maybe move it to another class?)                        <a href="agent_thread_test.html#L12" class="js-smell-location">0</a>                  <a href="agent_thread_test.html#L13" class="js-smell-location">1</a>                  </span>  </li></ul>
+      t.join<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Threading::AgentThreadTest#test_sets_label refers to t more than self (maybe move it to another class?)                        <a href="agent_thread_test.html#L12" class="js-smell-location">0</a>                  <a href="agent_thread_test.html#L13" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    def test_runs_block
+      called = false
+
+      t = AgentThread.create(&quot;labelled&quot;) { called = true }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Threading::AgentThreadTest#test_runs_block has the variable name 't'          </span>  </li></ul>
+      t.join
+
+      assert called
+    end
+
+    def test_standard_error_is_caught
+      expects_logging(:error, includes(&quot;exited&quot;), any_parameters)
+
+      t = AgentThread.create(&quot;fail&quot;) { raise &quot;O_o&quot; }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Threading::AgentThreadTest#test_standard_error_is_caught has the variable name 't'          </span>  </li></ul>
+      t.join
+
+      assert_thread_completed(t)
+    end
+
+    def test_exception_is_reraised
+      expects_logging(:error, includes(&quot;exited&quot;), any_parameters)
+
+      assert_raises(Exception) do
+        begin
+          t = AgentThread.create(&quot;fail&quot;) { raise Exception.new }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Threading::AgentThreadTest#test_exception_is_reraised has the variable name 't'          </span>  </li></ul>
+          t.join
+        ensure
+          assert_thread_died_from_exception(t)
+        end
+      end
+    end
+
+
+    def assert_thread_completed(t)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::Threading::AgentThreadTest#assert_thread_completed has the parameter name 't'          </span>  </li></ul>
+      assert_equal false, t.status
+    end
+
+    def assert_thread_died_from_exception(t)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::Threading::AgentThreadTest#assert_thread_died_from_exception has the parameter name 't'          </span>  </li></ul>
+      assert_equal nil, t.status
+    end
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

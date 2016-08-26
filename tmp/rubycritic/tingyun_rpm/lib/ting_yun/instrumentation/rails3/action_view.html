@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Rails3::ActionView</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-19 08:12:36 +0000'>2016-01-19 08:12:36 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      50 complexity
+    </div>
+    <div class="file-stat">
+      10.0 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/agent/method_tracer&#39;
+
+module TingYun
+  module Instrumentation
+    module Rails3<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Module-Name.md" target="_blank">UncommunicativeModuleName</a>)      TingYun::Instrumentation::Rails3 has the name 'Rails3'          </span>  </li></ul>
+      module ActionView<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Rails3::ActionView has no descriptive comment          </span>  </li></ul>
+        extend self
+
+        def template_metric(identifier, options = {})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Rails3::ActionView#template_metric doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          if options[:file]
+            &quot;file&quot;
+          elsif identifier.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Rails3::ActionView#template_metric performs a nil-check          </span>  </li></ul>
+            ::TingYun::Agent::UNKNOWN_METRIC
+          elsif identifier.include? &#39;/&#39; # this is a filepath
+            identifier.split(&#39;/&#39;)[-2..-1].join(&#39;/&#39;)
+          else
+            identifier
+          end
+        end
+        def render_type(file_path)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Rails3::ActionView#render_type doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          file = File.basename(file_path)
+          if file.starts_with?(&#39;_&#39;)
+            return &#39;Partial&#39;
+          else
+            return &#39;Rendering&#39;
+          end
+        end
+      end
+    end
+  end
+end
+
+
+TingYun::Support::LibraryDetection.defer do
+  @name = :rails31_view
+
+  # We can&#39;t be sure that this will work with future versions of Rails 3.
+  # Currently enabled for Rails 3.1 and 3.2
+  depends_on do
+    defined?(::Rails) &amp;&amp; ::Rails::VERSION::MAJOR.to_i == 3 &amp;&amp; ([1,2].member?(::Rails::VERSION::MINOR.to_i))
+  end
+
+  executes do
+    ::TingYun::Agent.logger.info &#39;Installing Rails 3.1/3.2 view instrumentation&#39;
+  end
+
+  executes do
+    ActionView::TemplateRenderer.class_eval do
+      # namespaced helper methods
+
+      def render_with_tingyun(context, options)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      render_with_tingyun has approx 6 statements          </span>  </li></ul>
+        # This is needed for rails 3.2 compatibility
+        @details = extract_details(options) if respond_to? :extract_details, true
+        identifier = determine_template(options) ? determine_template(options).identifier : nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      render_with_tingyun calls determine_template(options) 2 times          </span>  </li></ul>
+        scope_name = &quot;View/#{TingYun::Instrumentation::Rails3::ActionView.template_metric(identifier, options)}/Rendering&quot;
+        TingYun::Agent::MethodTracer.trace_execution_scoped scope_name do
+          render_without_tingyun(context, options)
+        end
+      end
+
+      alias_method :render_without_tingyun, :render
+      alias_method :render, :render_with_tingyun
+    end
+
+    ActionView::PartialRenderer.class_eval do
+
+      def instrument_with_tingyun(name, payload = {}, &amp;block)
+        identifier = payload[:identifier]
+        scope_name = &quot;View/#{TingYun::Instrumentation::Rails3::ActionView.template_metric(identifier)}/Partial&quot;
+        TingYun::Agent::MethodTracer.trace_execution_scoped(scope_name) do
+          instrument_without_tingyun(name, payload, &amp;block)
+        end
+      end
+
+      alias_method :instrument_without_tingyun, :instrument
+      alias_method :instrument, :instrument_with_tingyun
+    end
+  end
+end
+
+
+TingYun::Support::LibraryDetection.defer do
+  @name = :rails30_view
+
+  depends_on do
+    defined?(::Rails) &amp;&amp; ::Rails::VERSION::MAJOR.to_i == 3 &amp;&amp; ::Rails::VERSION::MINOR.to_i == 0
+  end
+
+  executes do
+    ::TingYun::Agent.logger.info &#39;Installing Rails 3.0 view instrumentation&#39;
+  end
+
+  executes do
+    ActionView::Template.class_eval do
+      def render_with_tingyun(*args, &amp;block)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      main#render_with_tingyun has a flog score of 28          </span>  </li></ul>
+        options = if @virtual_path &amp;&amp; @virtual_path.starts_with?(&#39;/&#39;) # file render
+                    {:file =&gt; true }
+                  else
+                    {}
+                  end
+        str = &quot;View/#{TingYun::Instrumentation::Rails3::ActionView.template_metric(@identifier, options)}/#{TingYun::Agent::Instrumentation::Rails3::ActionView.render_type(@identifier)}&quot;
+        TingYun::Agent::MethodTracer.trace_execution_scoped str do
+          render_without_tingyun(*args, &amp;block)
+        end
+      end
+
+      alias_method :render_without_tingyun, :render
+      alias_method :render, :render_with_tingyun
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

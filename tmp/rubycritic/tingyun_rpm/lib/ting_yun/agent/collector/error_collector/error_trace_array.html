@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Collector::ErrorTraceArray</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-29 02:09:40 +0000'>2016-04-29 02:09:40 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      62 complexity
+    </div>
+    <div class="file-stat">
+      7.8 complexity per method
+    </div>
+    <div class="file-stat">
+      9 churn
+    </div>
+    <div class="file-stat">
+      8 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent&#39;
+
+module TingYun
+  module Agent
+    module Collector
+      class ErrorTraceArray<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Collector::ErrorTraceArray has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::ErrorTraceArray has prima donna method `harvest!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::ErrorTraceArray has prima donna method `merge!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Agent::Collector::ErrorTraceArray has prima donna method `reset!`          </span>  </li></ul>
+        def initialize(capacity)
+          @capacity = capacity
+          @lock = Mutex.new
+          @errors = []
+        end
+
+        def enabled?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Collector::ErrorTraceArray#enabled? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          ::TingYun::Agent.config[:&#39;nbs.error_collector.enabled&#39;]
+        end
+
+        def merge!(errors)
+          errors.each do |error|
+            add_to_error_queue(error)
+          end
+        end
+
+
+        def reset!
+          @lock.synchronize do
+            @errors = []
+          end
+        end
+
+
+        # Get the errors currently queued up.  Unsent errors are left
+        # over from a previous unsuccessful attempt to send them to the server.
+        def harvest!
+          @lock.synchronize do
+            errors = @errors
+            @errors = []
+            errors
+          end
+        end
+
+        # Synchronizes adding an error to the error queue, and checks if
+        # the error queue is too long - if so, we drop the error on the
+        # floor after logging a warning.
+        def add_to_error_queue(noticed_error)
+          return unless enabled?
+          @lock.synchronize do
+            if !over_queue_limit?(noticed_error.message) &amp;&amp; !@errors.include?(noticed_error)
+              @errors &lt;&lt; noticed_error
+            end
+          end
+        end
+
+
+        # checks the size of the error queue to make sure we are under
+        # the maximum limit, and logs a warning if we are over the limit.
+        def over_queue_limit?(message)
+          over_limit = (@errors.reject { |err| err.is_internal }.length &gt;= @capacity)
+          if over_limit
+            ::TingYun::Agent.logger.warn(&quot;The error reporting queue has reached #{@capacity}. The error detail for this and subsequent errors will not be transmitted to TingYun  until the queued errors have been sent: #{message}&quot;)
+          end
+          over_limit
+        end
+
+        # see TingYun::Agent::Instance.error_collector.notice_agent_error
+        def notice_agent_error(exception)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Collector::ErrorTraceArray#notice_agent_error has a flog score of 28          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Collector::ErrorTraceArray#notice_agent_error has approx 11 statements          </span>  </li></ul>
+          return unless exception.class &lt; TingYun::Support::Exception::InternalAgentError<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::ErrorTraceArray#notice_agent_error calls exception.class 2 times                        <a href="error_trace_array.html#L68" class="js-smell-location">0</a>                  <a href="error_trace_array.html#L73" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          TingYun::Agent.logger.info(exception)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::ErrorTraceArray#notice_agent_error calls TingYun::Agent.logger 2 times                        <a href="error_trace_array.html#L70" class="js-smell-location">0</a>                  <a href="error_trace_array.html#L81" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          @lock.synchronize do
+            return if @errors.any? { |err| err.exception_class_name == exception.class.name }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::ErrorTraceArray#notice_agent_error calls exception.class 2 times                        <a href="error_trace_array.html#L68" class="js-smell-location">0</a>                  <a href="error_trace_array.html#L73" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+            trace = exception.backtrace || caller.dup
+            noticed_error = TingYun::Agent::Collector::NoticedError.new(&quot;TingYun/AgentError&quot;, exception)
+            noticed_error.stack_trace = trace
+            @errors &lt;&lt; noticed_error
+          end
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Collector::ErrorTraceArray#notice_agent_error has the variable name 'e'          </span>  </li></ul>
+          TingYun::Agent.logger.info(&quot;Unable to capture internal agent error due to an exception:&quot;, e)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Collector::ErrorTraceArray#notice_agent_error calls TingYun::Agent.logger 2 times                        <a href="error_trace_array.html#L70" class="js-smell-location">0</a>                  <a href="error_trace_array.html#L81" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+      end
+    end
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Serialize::JSONWrapper</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      38 complexity
+    </div>
+    <div class="file-stat">
+      4.8 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      8 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require &#39;ting_yun/support/serialize/encoding_normalizer&#39;
+require &#39;ting_yun/support/language_support&#39;
+require &#39;ting_yun/support/hash_extensions&#39;
+
+module TingYun
+  module Support
+    module Serialize
+      class JSONWrapper<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::JSONWrapper has no descriptive comment          </span>  </li></ul>
+        def self.load_native_json<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Serialize::JSONWrapper#self.load_native_json has approx 11 statements          </span>  </li></ul>
+          begin
+            require &#39;json&#39; unless defined?(::JSON)
+
+            # yajl&#39;s replacement methods on ::JSON override both dump and generate.
+            # Because stdlib dump just calls generate, we end up calling into yajl
+            # when we don&#39;t want to. As such, we use generate directly instead of
+            # dump, although we have to fuss with defaults to make that ok.
+            generate_method = ::JSON.method(:generate)
+            if ::JSON.respond_to?(:dump_default_options)
+              options = ::JSON.dump_default_options
+            else
+              # These were the defaults from json 1.1.9 up to 1.6.1
+              options = {:allow_nan =&gt; true, :max_nesting =&gt; false, :quirks_mode =&gt; true}
+            end
+            @dump_method = Proc.new do |obj|
+              generate_method.call(obj, options)
+            end
+
+            @load_method = ::JSON.method(:load)
+            @backend_name = :json
+            return true
+          rescue StandardError, ScriptError =&gt; err
+            TingYun::Agent.logger.debug &quot;%p while loading JSON library: %s&quot; % [err, err.message] if defined?(TingYun::Agent) &amp;&amp; TingYun::Agent.respond_to?(:logger)
+          end
+        end
+
+        def self.load_ok_json
+          require &#39;ting_yun/support/serialize/ok_json&#39;
+          @load_method = OkJson.method(:decode)
+          @dump_method = OkJson.method(:encode)
+          @backend_name = :ok_json
+        end
+
+        load_native_json or load_ok_json
+
+        def self.usable_for_collector_serialization?
+          @backend_name == :json
+        end
+
+        def self.backend_name
+          @backend_name
+        end
+
+        def self.supports_normalization?
+          TingYun::Support::LanguageSupport.supports_string_encodings?
+        end
+
+        def self.dump(object, options={})
+          object = normalize(object) if options[:normalize]
+          # ok_json doesn&#39;t handle symbol keys, so we must stringify them before encoding
+          object = TingYun::Support::HashExtensions.stringify_keys_in_object(object) if backend_name == :ok_json
+          @dump_method.call(object)
+        end
+
+        def self.load(string)
+          @load_method.call(string)
+        end
+
+        def self.normalize(o)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Support::Serialize::JSONWrapper#self.normalize has the parameter name 'o'          </span>  </li></ul>
+          TingYun::Support::Serialize::EncodingNormalizer.normalize_object(o)
+        end
+      end
+    end
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

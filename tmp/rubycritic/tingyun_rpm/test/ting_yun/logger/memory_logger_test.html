@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">MemoryLoggerTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      48 complexity
+    </div>
+    <div class="file-stat">
+      8.0 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      6 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require File.expand_path(File.join(File.dirname(__FILE__),&#39;..&#39;,&#39;..&#39;,&#39;test_helper&#39;))
+require &#39;ting_yun/logger/memory_logger&#39;
+
+class MemoryLoggerTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      MemoryLoggerTest has no descriptive comment          </span>  </li></ul>
+  LEVELS = [:fatal, :error, :warn, :info, :debug]
+
+  def setup
+  	@logger = ::TingYun::Logger::MemoryLogger.new
+  end
+
+  def test_proxies_messages_to_real_logger_on_dump<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      MemoryLoggerTest#test_proxies_messages_to_real_logger_on_dump has approx 9 statements          </span>  </li></ul>
+  	LEVELS.each do |level|
+  		@logger.send(level,&quot;message at #{level}&quot;)
+  	end
+
+	real_logger = mock
+  	real_logger.expects(:fatal).with(&quot;message at fatal&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      MemoryLoggerTest#test_proxies_messages_to_real_logger_on_dump refers to real_logger more than self (maybe move it to another class?)                        <a href="memory_logger_test.html#L17" class="js-smell-location">0</a>                  <a href="memory_logger_test.html#L18" class="js-smell-location">1</a>                  <a href="memory_logger_test.html#L19" class="js-smell-location">2</a>                  <a href="memory_logger_test.html#L20" class="js-smell-location">3</a>                  <a href="memory_logger_test.html#L21" class="js-smell-location">4</a>                  </span>  </li></ul>
+    real_logger.expects(:error).with(&quot;message at error&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      MemoryLoggerTest#test_proxies_messages_to_real_logger_on_dump refers to real_logger more than self (maybe move it to another class?)                        <a href="memory_logger_test.html#L17" class="js-smell-location">0</a>                  <a href="memory_logger_test.html#L18" class="js-smell-location">1</a>                  <a href="memory_logger_test.html#L19" class="js-smell-location">2</a>                  <a href="memory_logger_test.html#L20" class="js-smell-location">3</a>                  <a href="memory_logger_test.html#L21" class="js-smell-location">4</a>                  </span>  </li></ul>
+    real_logger.expects(:warn).with(&quot;message at warn&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      MemoryLoggerTest#test_proxies_messages_to_real_logger_on_dump refers to real_logger more than self (maybe move it to another class?)                        <a href="memory_logger_test.html#L17" class="js-smell-location">0</a>                  <a href="memory_logger_test.html#L18" class="js-smell-location">1</a>                  <a href="memory_logger_test.html#L19" class="js-smell-location">2</a>                  <a href="memory_logger_test.html#L20" class="js-smell-location">3</a>                  <a href="memory_logger_test.html#L21" class="js-smell-location">4</a>                  </span>  </li></ul>
+    real_logger.expects(:info).with(&quot;message at info&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      MemoryLoggerTest#test_proxies_messages_to_real_logger_on_dump refers to real_logger more than self (maybe move it to another class?)                        <a href="memory_logger_test.html#L17" class="js-smell-location">0</a>                  <a href="memory_logger_test.html#L18" class="js-smell-location">1</a>                  <a href="memory_logger_test.html#L19" class="js-smell-location">2</a>                  <a href="memory_logger_test.html#L20" class="js-smell-location">3</a>                  <a href="memory_logger_test.html#L21" class="js-smell-location">4</a>                  </span>  </li></ul>
+    real_logger.expects(:debug).with(&quot;message at debug&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      MemoryLoggerTest#test_proxies_messages_to_real_logger_on_dump refers to real_logger more than self (maybe move it to another class?)                        <a href="memory_logger_test.html#L17" class="js-smell-location">0</a>                  <a href="memory_logger_test.html#L18" class="js-smell-location">1</a>                  <a href="memory_logger_test.html#L19" class="js-smell-location">2</a>                  <a href="memory_logger_test.html#L20" class="js-smell-location">3</a>                  <a href="memory_logger_test.html#L21" class="js-smell-location">4</a>                  </span>  </li></ul>
+
+    @logger.dump(real_logger)
+  end
+
+  def test_proxies_multiple_messages_with_a_single_call
+    @logger.info(&#39;a&#39;, &#39;b&#39;, &#39;c&#39;)
+
+    real_logger = mock
+    real_logger.expects(:info).with(&#39;a&#39;, &#39;b&#39;, &#39;c&#39;)
+
+    @logger.dump(real_logger)
+  end
+
+  def test_proxies_message_blocks<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      MemoryLoggerTest#test_proxies_message_blocks has approx 7 statements          </span>  </li></ul>
+    called = false
+    @logger.info(&#39;a&#39;) do  
+   	  called = true
+   	end
+
+    real_logger = mock
+    real_logger.expects(:info).yields
+
+    @logger.dump(real_logger)
+    assert called
+  end
+
+  def test_proxies_through_calls_to_log_exception
+    e = Exception.new<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      MemoryLoggerTest#test_proxies_through_calls_to_log_exception has the variable name 'e'          </span>  </li></ul>
+    @logger.log_exception(:fatal, e, :error)
+
+    real_logger = stub
+    real_logger.expects(:log_exception).with(:fatal, e, :error)
+
+    @logger.dump(real_logger)
+  end
+
+  def test_log_once
+    @logger.log_once(:debug, :once, &quot;Once&quot;)
+    @logger.log_once(:debug, :once, &quot;Twice?&quot;)
+
+    real_logger = stub
+    real_logger.expects(:debug).once
+
+    @logger.dump(real_logger)
+  end
+
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Coerce</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-02-17 14:31:23 +0800'>2016-02-17 14:31:23 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      54 complexity
+    </div>
+    <div class="file-stat">
+      9.0 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      6 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/agent&#39;
+
+module TingYun
+  module Support
+    # We really don&#39;t want to send bad values to the collector, and it doesn&#39;t
+    # accept types like Rational that have occasionally slipped into our data.
+    #
+    # These methods are intended to safely coerce things into the form we want,
+    # to provide documentation of expected types on to_collector_array methods,
+    # and to log failures if totally invalid data gets into outgoing data
+    module Coerce
+      module_function
+
+      def int(value, context=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Support::Coerce takes parameters [context, value] to 6 methods                        <a href="coerce.html#L15" class="js-smell-location">0</a>                  <a href="coerce.html#L22" class="js-smell-location">1</a>                  <a href="coerce.html#L30" class="js-smell-location">2</a>                  <a href="coerce.html#L39" class="js-smell-location">3</a>                  <a href="coerce.html#L55" class="js-smell-location">4</a>                  <a href="coerce.html#L79" class="js-smell-location">5</a>                  </span>  </li></ul>
+        Integer(value)
+      rescue =&gt; error
+        log_failure(value, Integer, context, error)
+        0
+      end
+
+      def int_or_nil(value, context=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Support::Coerce takes parameters [context, value] to 6 methods                        <a href="coerce.html#L15" class="js-smell-location">0</a>                  <a href="coerce.html#L22" class="js-smell-location">1</a>                  <a href="coerce.html#L30" class="js-smell-location">2</a>                  <a href="coerce.html#L39" class="js-smell-location">3</a>                  <a href="coerce.html#L55" class="js-smell-location">4</a>                  <a href="coerce.html#L79" class="js-smell-location">5</a>                  </span>  </li></ul>
+        return nil if value.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Support::Coerce#int_or_nil performs a nil-check          </span>  </li></ul>
+        Integer(value)
+      rescue =&gt; error
+        log_failure(value, Integer, context, error)
+        nil
+      end
+
+      def float(value, context=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Support::Coerce takes parameters [context, value] to 6 methods                        <a href="coerce.html#L15" class="js-smell-location">0</a>                  <a href="coerce.html#L22" class="js-smell-location">1</a>                  <a href="coerce.html#L30" class="js-smell-location">2</a>                  <a href="coerce.html#L39" class="js-smell-location">3</a>                  <a href="coerce.html#L55" class="js-smell-location">4</a>                  <a href="coerce.html#L79" class="js-smell-location">5</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Coerce#float has approx 6 statements          </span>  </li></ul>
+        result = Float(value)
+        raise &quot;Value #{result.inspect} is not finite.&quot; unless result.finite?
+        result
+      rescue =&gt; error
+        log_failure(value, Float, context, error)
+        0.0
+      end
+
+      def string(value, context=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Support::Coerce takes parameters [context, value] to 6 methods                        <a href="coerce.html#L15" class="js-smell-location">0</a>                  <a href="coerce.html#L22" class="js-smell-location">1</a>                  <a href="coerce.html#L30" class="js-smell-location">2</a>                  <a href="coerce.html#L39" class="js-smell-location">3</a>                  <a href="coerce.html#L55" class="js-smell-location">4</a>                  <a href="coerce.html#L79" class="js-smell-location">5</a>                  </span>  </li></ul>
+        return value if value.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Support::Coerce#string performs a nil-check          </span>  </li></ul>
+        String(value)
+      rescue =&gt; error
+        log_failure(value.class, String, context, error)
+        &quot;&quot;
+      end
+
+      # Convert a hash into a format acceptable to be included with Transaction
+      # event data.
+      #
+      # We accept a hash and will return a new hash where all of the keys
+      # have been converted to strings.  As values we only allow Strings,
+      # Floats, Integers. Symbols are also allowed but are converted to strings.
+      # Any values of other type (e.g. Hash, Array, any other class) are
+      # discarded. Their keys are also removed from the results hash.
+      def event_params(value, context=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Support::Coerce#event_params has a flog score of 27          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Support::Coerce takes parameters [context, value] to 6 methods                        <a href="coerce.html#L15" class="js-smell-location">0</a>                  <a href="coerce.html#L22" class="js-smell-location">1</a>                  <a href="coerce.html#L30" class="js-smell-location">2</a>                  <a href="coerce.html#L39" class="js-smell-location">3</a>                  <a href="coerce.html#L55" class="js-smell-location">4</a>                  <a href="coerce.html#L79" class="js-smell-location">5</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Coerce#event_params has approx 10 statements          </span>  </li></ul>
+        unless value.is_a? Hash<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to value more than self (maybe move it to another class?)                        <a href="coerce.html#L56" class="js-smell-location">0</a>                  <a href="coerce.html#L57" class="js-smell-location">1</a>                  <a href="coerce.html#L59" class="js-smell-location">2</a>                  <a href="coerce.html#L75" class="js-smell-location">3</a>                  </span>  </li></ul>
+          raise ArgumentError, &quot;Expected Hash but got #{value.class}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Coerce#event_params calls value.class 2 times                        <a href="coerce.html#L57" class="js-smell-location">0</a>                  <a href="coerce.html#L75" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to value more than self (maybe move it to another class?)                        <a href="coerce.html#L56" class="js-smell-location">0</a>                  <a href="coerce.html#L57" class="js-smell-location">1</a>                  <a href="coerce.html#L59" class="js-smell-location">2</a>                  <a href="coerce.html#L75" class="js-smell-location">3</a>                  </span>  </li></ul>
+        end
+        value.inject({}) do |memo, (key, val)|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to value more than self (maybe move it to another class?)                        <a href="coerce.html#L56" class="js-smell-location">0</a>                  <a href="coerce.html#L57" class="js-smell-location">1</a>                  <a href="coerce.html#L59" class="js-smell-location">2</a>                  <a href="coerce.html#L75" class="js-smell-location">3</a>                  </span>  </li></ul>
+          case val
+            when String, Integer, TrueClass, FalseClass
+              memo[key.to_s] = val<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Coerce#event_params calls key.to_s 4 times                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Coerce#event_params calls memo[key.to_s] = val 2 times                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to key more than self (maybe move it to another class?)                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to memo more than self (maybe move it to another class?)                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li></ul>
+            when Float
+              if val.finite?
+                memo[key.to_s] = val<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Coerce#event_params calls key.to_s 4 times                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Coerce#event_params calls memo[key.to_s] = val 2 times                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to key more than self (maybe move it to another class?)                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to memo more than self (maybe move it to another class?)                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li></ul>
+              else
+                memo[key.to_s] = nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Coerce#event_params calls key.to_s 4 times                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to key more than self (maybe move it to another class?)                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to memo more than self (maybe move it to another class?)                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li></ul>
+              end
+            when Symbol
+              memo[key.to_s] = val.to_s<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Coerce#event_params calls key.to_s 4 times                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to key more than self (maybe move it to another class?)                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to memo more than self (maybe move it to another class?)                        <a href="coerce.html#L62" class="js-smell-location">0</a>                  <a href="coerce.html#L65" class="js-smell-location">1</a>                  <a href="coerce.html#L67" class="js-smell-location">2</a>                  <a href="coerce.html#L70" class="js-smell-location">3</a>                  </span>  </li></ul>
+          end
+          memo
+        end
+      rescue =&gt; error
+        log_failure(value.class, &#39;valid event params&#39;, context, error)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::Coerce#event_params calls value.class 2 times                        <a href="coerce.html#L57" class="js-smell-location">0</a>                  <a href="coerce.html#L75" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::Coerce#event_params refers to value more than self (maybe move it to another class?)                        <a href="coerce.html#L56" class="js-smell-location">0</a>                  <a href="coerce.html#L57" class="js-smell-location">1</a>                  <a href="coerce.html#L59" class="js-smell-location">2</a>                  <a href="coerce.html#L75" class="js-smell-location">3</a>                  </span>  </li></ul>
+        {}
+      end
+
+      def log_failure(value, type, context, error)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Support::Coerce takes parameters [context, value] to 6 methods                        <a href="coerce.html#L15" class="js-smell-location">0</a>                  <a href="coerce.html#L22" class="js-smell-location">1</a>                  <a href="coerce.html#L30" class="js-smell-location">2</a>                  <a href="coerce.html#L39" class="js-smell-location">3</a>                  <a href="coerce.html#L55" class="js-smell-location">4</a>                  <a href="coerce.html#L79" class="js-smell-location">5</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Support::Coerce#log_failure has 4 parameters          </span>  </li></ul>
+        msg = &quot;Unable to convert &#39;#{value}&#39; to #{type}&quot;
+        msg += &quot; in context &#39;#{context}&#39;&quot; if context
+        TingYun::Agent.logger.warn(msg, error)
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

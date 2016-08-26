@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Serialize::EncodingNormalizerTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      68 complexity
+    </div>
+    <div class="file-stat">
+      9.7 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;..&#39;, &#39;test_helper&#39;))
+require &#39;ting_yun/support/serialize/encoding_normalizer&#39;
+
+module TingYun::Support::Serialize
+  class EncodingNormalizerTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::EncodingNormalizerTest has no descriptive comment          </span>  </li></ul>
+    EncodingNormalizer = TingYun::Support::Serialize::EncodingNormalizer
+
+    def test_normalize_object_converts_symbol_values_to_strings
+      result = EncodingNormalizer.normalize_object([:foo, :bar])
+      assert_equal([&#39;foo&#39;, &#39;bar&#39;], result)
+    end
+
+    def test_normalize_object_converts_symbols_in_hash_to_strings
+      result = EncodingNormalizer.normalize_object({:key =&gt; :value})
+      assert_equal({&#39;key&#39; =&gt; &#39;value&#39;}, result)
+    end
+
+    if TingYun::Support::LanguageSupport.supports_string_encodings?
+      def test_normalize_string_returns_input_if_correctly_encoded_utf8<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Method-Name.md" target="_blank">UncommunicativeMethodName</a>)      TingYun::Support::Serialize::EncodingNormalizerTest#test_normalize_string_returns_input_if_correctly_encoded_utf8 has the name 'test_normalize_string_returns_input_if_correctly_encoded_utf8'          </span>  </li></ul>
+        string = &quot;i want a pony&quot;
+        result = EncodingNormalizer.normalize_string(string)
+        assert_same(string, result)
+        assert_equal(Encoding.find(&#39;UTF-8&#39;), result.encoding)
+      end
+
+      def test_normalize_string_returns_munged_copy_if_ascii_8bit
+        string = (0..255).to_a.pack(&quot;C*&quot;)
+        result = EncodingNormalizer.normalize_string(string)
+        refute_same(string, result)
+        assert_equal(Encoding.find(&#39;ISO-8859-1&#39;), result.encoding)
+        assert_equal(string, result.dup.force_encoding(&#39;ASCII-8BIT&#39;))
+      end
+
+      def test_normalize_string_returns_munged_copy_if_invalid_utf8<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Method-Name.md" target="_blank">UncommunicativeMethodName</a>)      TingYun::Support::Serialize::EncodingNormalizerTest#test_normalize_string_returns_munged_copy_if_invalid_utf8 has the name 'test_normalize_string_returns_munged_copy_if_invalid_utf8'          </span>  </li></ul>
+        string = (0..255).to_a.pack(&quot;C*&quot;).force_encoding(&#39;UTF-8&#39;)
+        result = EncodingNormalizer.normalize_string(string)
+        refute_same(result, string)
+        assert_equal(Encoding.find(&#39;ISO-8859-1&#39;), result.encoding)
+        assert_equal(string, result.dup.force_encoding(&#39;UTF-8&#39;))
+      end
+
+      def test_normalize_string_returns_munged_copy_if_other_convertible_encoding
+        string = &quot;i want a pony&quot;.encode(&#39;UTF-16LE&#39;)
+        result = EncodingNormalizer.normalize_string(string)
+        refute_same(result, string)
+        assert_equal(Encoding.find(&#39;UTF-8&#39;), result.encoding)
+        assert_equal(string, result.encode(&#39;UTF-16LE&#39;))
+      end
+
+      def test_normalize_string_returns_munged_copy_if_other_non_convertible_enocding<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Serialize::EncodingNormalizerTest#test_normalize_string_returns_munged_copy_if_other_non_convertible_enocding has approx 6 statements          </span>  </li></ul>
+        # Attempting to convert from UTF-7 to UTF-8 in Ruby will raise an
+        # Encoding::ConverterNotFoundError, which is what we&#39;re trying to
+        # replicate for this test case.
+        # The following UTF-7 string decodes to &#39;Jyväskylä&#39;, a city in Finland
+        string = &quot;Jyv+AOQ-skyl+AOQ-&quot;.force_encoding(&quot;UTF-7&quot;)
+        assert string.valid_encoding?
+        result = EncodingNormalizer.normalize_string(string)
+        refute_same(result, string)
+        assert_equal(Encoding.find(&#39;ISO-8859-1&#39;), result.encoding)
+        assert_equal(&#39;Jyv+AOQ-skyl+AOQ-&#39;.force_encoding(&#39;ISO-8859-1&#39;), result)
+      end
+
+    end
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

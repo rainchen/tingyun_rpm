@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Transaction::Exceptions</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-18 18:33:26 +0800'>2016-08-18 18:33:26 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      14 complexity
+    </div>
+    <div class="file-stat">
+      3.5 complexity per method
+    </div>
+    <div class="file-stat">
+      1 churn
+    </div>
+    <div class="file-stat">
+      4 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+module TingYun
+  module Agent
+    class Transaction
+      class Exceptions<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Transaction::Exceptions has no descriptive comment          </span>  </li></ul>
+        attr_accessor :exceptions<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Exceptions#exceptions is a writable attribute          </span>  </li></ul>
+
+        def initialize
+          @exceptions = {}
+        end
+
+        def record_exceptions(uri, port, metric_name, attributes)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::Transaction::Exceptions#record_exceptions has 4 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Transaction::Exceptions#record_exceptions has approx 6 statements          </span>  </li></ul>
+          unless @exceptions.empty?
+            @exceptions.each do |exception, options|
+
+              options[:uri]           ||= uri<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Exceptions#record_exceptions refers to options more than self (maybe move it to another class?)                        <a href="exceptions.html#L17" class="js-smell-location">0</a>                  <a href="exceptions.html#L18" class="js-smell-location">1</a>                  <a href="exceptions.html#L19" class="js-smell-location">2</a>                  <a href="exceptions.html#L20" class="js-smell-location">3</a>                  </span>  </li></ul>
+              options[:port]            = port<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Exceptions#record_exceptions refers to options more than self (maybe move it to another class?)                        <a href="exceptions.html#L17" class="js-smell-location">0</a>                  <a href="exceptions.html#L18" class="js-smell-location">1</a>                  <a href="exceptions.html#L19" class="js-smell-location">2</a>                  <a href="exceptions.html#L20" class="js-smell-location">3</a>                  </span>  </li></ul>
+              options[:metric_name]     = metric_name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Exceptions#record_exceptions refers to options more than self (maybe move it to another class?)                        <a href="exceptions.html#L17" class="js-smell-location">0</a>                  <a href="exceptions.html#L18" class="js-smell-location">1</a>                  <a href="exceptions.html#L19" class="js-smell-location">2</a>                  <a href="exceptions.html#L20" class="js-smell-location">3</a>                  </span>  </li></ul>
+              options[:attributes]      = attributes<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Exceptions#record_exceptions refers to options more than self (maybe move it to another class?)                        <a href="exceptions.html#L17" class="js-smell-location">0</a>                  <a href="exceptions.html#L18" class="js-smell-location">1</a>                  <a href="exceptions.html#L19" class="js-smell-location">2</a>                  <a href="exceptions.html#L20" class="js-smell-location">3</a>                  </span>  </li></ul>
+
+              ::TingYun::Agent.instance.error_collector.notice_error(exception, options)
+            end
+          end
+        end
+
+        # Do not call this.  Invoke the class method instead.
+        def notice_error(error, options={}) # :nodoc:
+          if @exceptions[error]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Exceptions#notice_error calls @exceptions[error] 2 times                        <a href="exceptions.html#L29" class="js-smell-location">0</a>                  <a href="exceptions.html#L30" class="js-smell-location">1</a>                  </span>  </li></ul>
+            @exceptions[error].merge! options<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Transaction::Exceptions#notice_error calls @exceptions[error] 2 times                        <a href="exceptions.html#L29" class="js-smell-location">0</a>                  <a href="exceptions.html#L30" class="js-smell-location">1</a>                  </span>  </li></ul>
+          else
+            @exceptions[error] = options
+          end
+        end
+
+        #collector error
+        def had_error?
+          if @exceptions.empty?
+            return false
+          else
+            return true
+          end
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

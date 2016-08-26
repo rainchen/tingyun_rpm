@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Transaction::RequestAttributes</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-19 11:32:48 +0800'>2016-08-19 11:32:48 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      67 complexity
+    </div>
+    <div class="file-stat">
+      7.4 complexity per method
+    </div>
+    <div class="file-stat">
+      24 churn
+    </div>
+    <div class="file-stat">
+      9 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/support/http_clients/uri_util&#39;
+
+module TingYun
+  module Agent
+    class Transaction
+      class RequestAttributes<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Transaction::RequestAttributes has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::Transaction::RequestAttributes has at least 10 instance variables          </span>  </li></ul>
+
+        attr_reader :request_path, :referer, :accept, :content_length, :host,
+                    :port, :user_agent, :request_method, :header, :cookie
+
+        HTTP_ACCEPT_HEADER_KEY = &#39;HTTP_ACCEPT&#39;.freeze
+
+        def initialize request
+          @header = request.env
+          @request_path = path_from_request request
+          @referer = referer_from_request request
+          @accept = attribute_from_env request, HTTP_ACCEPT_HEADER_KEY
+          @content_length = content_length_from_request request
+          @host = attribute_from_request request, :host
+          @port = port_from_request request
+          @user_agent = attribute_from_request request, :user_agent
+          @request_method = attribute_from_request request, :request_method
+          @cookie = set_cookie(request)
+        end
+
+        def assign_agent_attributes(attributes)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Transaction::RequestAttributes#assign_agent_attributes has approx 8 statements          </span>  </li></ul>
+          attributes.add_agent_attribute :request_path, request_path
+          attributes.add_agent_attribute :referer, referer
+          attributes.add_agent_attribute :accept, accept
+          attributes.add_agent_attribute :contentLength, content_length
+          attributes.add_agent_attribute :host, host
+          attributes.add_agent_attribute :port, port
+          attributes.add_agent_attribute :userAgent, user_agent
+          attributes.add_agent_attribute :method, request_method
+        end
+
+
+        private
+
+        # Make a safe attempt to get the referer from a request object, generally successful when
+        # it&#39;s a Rack request.
+
+        def referer_from_request request
+          if referer = attribute_from_request(request, :referer)
+            TingYun::Agent::HTTPClients::URIUtil.strip_query_string referer.to_s
+          end
+        end
+
+        ROOT_PATH = &quot;/&quot;.freeze
+
+        def path_from_request request
+          path = attribute_from_request(request, :path) || &#39;&#39;
+          path = TingYun::Agent::HTTPClients::URIUtil.strip_query_string(path)
+          path.empty? ? ROOT_PATH : path
+        end
+
+        def content_length_from_request request
+          if content_length = attribute_from_request(request, :content_length)
+            content_length.to_i
+          end
+        end
+
+        def port_from_request request
+          if port = attribute_from_request(request, :port)
+            port.to_i
+          end
+        end
+
+        def attribute_from_request request, attribute_method<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Transaction::RequestAttributes#attribute_from_request doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          if request.respond_to? attribute_method
+            request.send(attribute_method)
+          end
+        end
+
+        def attribute_from_env request, key
+          if env = attribute_from_request(request, :env)
+            env[key]
+          end
+        end
+
+        def set_cookie(request)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Transaction::RequestAttributes#set_cookie has approx 6 statements          </span>  </li></ul>
+          cookie = {}
+          _c = attribute_from_env(request, &#39;HTTP_COOKIE&#39;)
+          _c.split(/\s*;\s*/).each do |i|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Transaction::RequestAttributes#set_cookie has the variable name 'i'          </span>  </li></ul>
+            _k, _v = i.split(&#39;=&#39;)
+            if _k &amp;&amp; _v
+              cookie[_k] = _v
+            end
+          end if _c
+          cookie
+        end
+
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

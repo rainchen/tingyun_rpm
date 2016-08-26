@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::InstanceMethods::ContainerDataManager</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-17 18:23:05 +0800'>2016-08-17 18:23:05 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      59 complexity
+    </div>
+    <div class="file-stat">
+      4.5 complexity per method
+    </div>
+    <div class="file-stat">
+      13 churn
+    </div>
+    <div class="file-stat">
+      13 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/support/exception&#39;
+require &#39;ting_yun/agent/collector/stats_engine&#39;
+require &#39;ting_yun/agent/collector/error_collector&#39;
+
+require &#39;ting_yun/agent/collector/transaction_sampler&#39;
+
+require &#39;ting_yun/agent/collector/sql_sampler&#39;
+
+
+module TingYun
+  module Agent
+    module InstanceMethods
+      module ContainerDataManager<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager has no descriptive comment          </span>  </li></ul>
+
+
+        attr_reader :stats_engine, :error_collector, :transaction_sampler, :sql_sampler, :middleware
+
+
+        def drop_buffered_data
+          @stats_engine.reset!
+          @transaction_sampler.reset!
+          @sql_sampler.reset!
+          @error_collector.reset!
+        end
+
+        def reset_objects_with_locks
+          init_containers
+        end
+
+
+        def init_containers
+          @stats_engine = TingYun::Agent::Collector::StatsEngine.new
+          @error_collector = TingYun::Agent::Collector::ErrorCollector.new
+          @transaction_sampler = TingYun::Agent::Collector::TransactionSampler.new
+          @sql_sampler = TingYun::Agent::Collector::SqlSampler.new
+          @middleware = TingYun::Agent::Collector::MiddleWareCollector.new(@events)
+        end
+
+        def container_for_endpoint(endpoint)
+          case endpoint<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#container_for_endpoint is controlled by argument endpoint          </span>  </li></ul>
+            when :metric_data then
+              @stats_engine
+            # type code here
+          end
+        end
+
+        def transmit_data<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#transmit_data has approx 8 statements          </span>  </li></ul>
+          ::TingYun::Agent.logger.debug(&#39;Sending data to Ting Yun Service&#39;)
+
+          @events.notify(:middleware_harvest)
+          @service.session do # use http keep-alive
+            harvest_and_send_errors
+            harvest_and_send_external_errors
+            harvest_and_send_timeslice_data
+            harvest_and_send_transaction_traces
+            harvest_and_send_slowest_sql
+          end
+        end
+
+        def harvest_and_send_timeslice_data
+          harvest_and_send_from_container(@stats_engine, :metric_data)
+        end
+
+        def harvest_and_send_errors
+          harvest_and_send_from_container(@error_collector.error_trace_array, :error_data)
+        end
+
+        def harvest_and_send_external_errors
+          harvest_and_send_from_container(@error_collector.external_error_array, :external_error_data)
+        end
+
+
+        def harvest_and_send_transaction_traces
+          harvest_and_send_from_container(@transaction_sampler, :action_trace_data)
+
+        end
+
+        def harvest_and_send_slowest_sql
+          harvest_and_send_from_container(@sql_sampler, :sql_trace)
+
+        end
+
+        # Harvests data from the given container, sends it to the named endpoint
+        # on the service, and automatically merges back in upon a recoverable
+        # failure.
+        #
+        # The given container should respond to:
+        #
+        #  #harvest!
+        #    returns an enumerable collection of data items to be sent to the
+        #    collector.
+        #
+        #  #reset!
+        #    drop any stored data and reset to a clean state.
+        #
+        #  #merge!(items)
+        #    merge the given items back into the internal buffer of the
+        #    container, so that they may be harvested again later.
+        #
+        def harvest_and_send_from_container(container, endpoint)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager takes parameters [container, endpoint] to 3 methods                        <a href="container_data_manager.html#L101" class="js-smell-location">0</a>                  <a href="container_data_manager.html#L106" class="js-smell-location">1</a>                  <a href="container_data_manager.html#L121" class="js-smell-location">2</a>                  </span>  </li></ul>
+          items = harvest_from_container(container, endpoint)
+          send_data_to_endpoint(endpoint, items, container)
+        end
+
+        def harvest_from_container(container, endpoint)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager takes parameters [container, endpoint] to 3 methods                        <a href="container_data_manager.html#L101" class="js-smell-location">0</a>                  <a href="container_data_manager.html#L106" class="js-smell-location">1</a>                  <a href="container_data_manager.html#L121" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#harvest_from_container has approx 7 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#harvest_from_container doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          items =[]
+          begin
+             if TingYun::Agent.config[:&#39;nbs.agent_enabled&#39;]
+               items = container.harvest!
+             else
+               container.reset!<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#harvest_from_container calls container.reset! 2 times                        <a href="container_data_manager.html#L112" class="js-smell-location">0</a>                  <a href="container_data_manager.html#L116" class="js-smell-location">1</a>                  </span>  </li></ul>
+             end
+          rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#harvest_from_container has the variable name 'e'          </span>  </li></ul>
+            TingYun::Agent.logger.error(&quot;Failed to harvest #{endpoint} data, resetting. Error: &quot;, e)
+            container.reset!<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#harvest_from_container calls container.reset! 2 times                        <a href="container_data_manager.html#L112" class="js-smell-location">0</a>                  <a href="container_data_manager.html#L116" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+          items
+        end
+
+        def send_data_to_endpoint(endpoint, items, container)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Data-Clump.md" target="_blank">DataClump</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager takes parameters [container, endpoint] to 3 methods                        <a href="container_data_manager.html#L101" class="js-smell-location">0</a>                  <a href="container_data_manager.html#L106" class="js-smell-location">1</a>                  <a href="container_data_manager.html#L121" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#send_data_to_endpoint has unused parameter 'container'          </span>  </li></ul>
+          TingYun::Agent.logger.info(&quot;Sending #{items.size} items to #{endpoint}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#send_data_to_endpoint calls TingYun::Agent.logger 2 times                        <a href="container_data_manager.html#L122" class="js-smell-location">0</a>                  <a href="container_data_manager.html#L126" class="js-smell-location">1</a>                  </span>  </li></ul>
+          begin
+            @service.send(endpoint, items)
+          rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#send_data_to_endpoint has the variable name 'e'          </span>  </li></ul>
+            TingYun::Agent.logger.info(&quot;Unable to send #{endpoint} data, will try again later. Error: &quot;, e)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::ContainerDataManager#send_data_to_endpoint calls TingYun::Agent.logger 2 times                        <a href="container_data_manager.html#L122" class="js-smell-location">0</a>                  <a href="container_data_manager.html#L126" class="js-smell-location">1</a>                  </span>  </li></ul>
+            # container.merge!(items)
+            raise
+          ensure
+            items = nil #  to GC
+          end
+
+
+        end
+
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

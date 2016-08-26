@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::InstanceMethods::StartWorkerThread</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-05 17:11:52 +0800'>2016-04-05 17:11:52 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      24 complexity
+    </div>
+    <div class="file-stat">
+      8.0 complexity per method
+    </div>
+    <div class="file-stat">
+      10 churn
+    </div>
+    <div class="file-stat">
+      3 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/agent/threading/agent_thread&#39;
+require &#39;ting_yun/agent/event/event_loop&#39;
+
+module TingYun
+  module Agent
+    module InstanceMethods
+      module StartWorkerThread<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::InstanceMethods::StartWorkerThread has no descriptive comment          </span>  </li></ul>
+        def  start_worker_thread(connection_options={})
+          TingYun::Agent.logger.debug &quot;Creating Ruby Agent worker thread.&quot;
+          @worker_thread = TingYun::Agent::Threading::AgentThread.create(&#39;Worker Loop&#39;) do
+            deferred_work!(connection_options)
+          end
+        end
+
+        # This is the method that is run in a new thread in order to
+        # background the harvesting and sending of data during the
+        # normal operation of the agent.
+        #
+        # Takes connection options that determine how we should
+        # connect to the server, and loops endlessly - typically we
+        # never return from this method unless we&#39;re shutting down
+        # the agent
+        def deferred_work!(connection_options)
+          catch_errors do
+            TingYun::Agent.disable_all_tracing do
+              connect!(connection_options)
+              if connected?
+                create_and_run_event_loop
+              else
+                TingYun::Agent.logger.debug &quot;No connection.  Worker thread ending.&quot;
+              end
+            end
+          end
+        end
+
+        def create_and_run_event_loop
+          @event_loop = TingYun::Agent::Event::EventLoop.new
+
+          @event_loop.on(:report_data) do
+            transmit_data
+          end
+          @event_loop.fire_every(Agent.config[:data_report_period], :report_data)
+
+          @event_loop.run
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

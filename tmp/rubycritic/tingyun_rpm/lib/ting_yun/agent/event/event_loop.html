@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Agent::Event::EventLoop::Timer</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-29 02:35:26 +0000'>2016-04-29 02:35:26 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      146 complexity
+    </div>
+    <div class="file-stat">
+      5.6 complexity per method
+    </div>
+    <div class="file-stat">
+      10 churn
+    </div>
+    <div class="file-stat">
+      26 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/support/exception&#39;
+
+
+module TingYun
+  module Agent
+    module Event
+      class EventLoop<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Event::EventLoop has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::Event::EventLoop has at least 6 instance variables          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Methods.md" target="_blank">TooManyMethods</a>)      TingYun::Agent::Event::EventLoop has at least 18 methods          </span>  </li></ul>
+        class Timer<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Event::EventLoop::Timer has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::Event::EventLoop::Timer has at least 6 instance variables          </span>  </li></ul>
+          attr_reader :next_fire_time, :event, :interval, :last_fired_at
+
+          def initialize(interval, event, repeat=false)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Agent::Event::EventLoop::Timer#initialize has boolean parameter 'repeat'          </span>  </li></ul>
+            @interval      = interval
+            @event         = event
+            @repeat        = repeat
+            @started_at    = Time.now
+            @last_fired_at = nil
+            reschedule
+          end
+
+          def reschedule
+            @next_fire_time = calculate_next_fire_time
+          end
+
+          def advance(amount)
+            @next_fire_time -= amount
+          end
+
+          def last_interval_start
+            @last_fired_at || @started_at
+          end
+
+          def calculate_next_fire_time
+            now = Time.now
+            return now if @interval == 0
+            fire_time = @last_fired_at || now
+            while fire_time &lt;= now
+              fire_time += @interval
+            end
+            fire_time
+          end
+
+          def set_fired_time
+            @last_fired_at = Time.now
+          end
+
+          def due?(now=Time.now)
+            now &gt;= @next_fire_time
+          end
+
+          def finished?
+            !@repeat &amp;&amp; @last_fired_at
+          end
+        end
+
+        def initialize
+          @self_pipe_rd, @self_pipe_wr = IO.pipe
+          @event_queue = Queue.new
+          @stopped     = false
+          @timers      = {}
+
+          @subscriptions = Hash.new { |h,k| h[k] = [] }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Event::EventLoop#initialize has the variable name 'h'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Event::EventLoop#initialize has the variable name 'k'          </span>  </li></ul>
+          @subscriptions[:__add_timer] &lt;&lt; Proc.new { |t| set_timer(t) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Event::EventLoop#initialize has the variable name 't'          </span>  </li></ul>
+          @subscriptions[:__add_event] &lt;&lt; Proc.new { |e, blk| @subscriptions[e] &lt;&lt; blk }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Event::EventLoop#initialize has the variable name 'e'          </span>  </li></ul>
+        end
+
+        def set_timer(timer)
+          existing_timer = @timers[timer.event]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoop#set_timer calls timer.event 2 times                        <a href="event_loop.html#L69" class="js-smell-location">0</a>                  <a href="event_loop.html#L76" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          if existing_timer
+            elapsed_interval = Time.now - existing_timer.last_interval_start
+            timer.advance(elapsed_interval)
+          end
+
+          @timers[timer.event] = timer<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoop#set_timer calls timer.event 2 times                        <a href="event_loop.html#L69" class="js-smell-location">0</a>                  <a href="event_loop.html#L76" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          fire_timer(timer)
+        end
+
+        def next_timeout
+          return nil if @timers.empty?
+          timeout = @timers.values.map(&amp;:next_fire_time).min - Time.now
+          timeout &lt; 0 ? 0 : timeout
+        end
+
+        def stopped?
+          @stopped
+        end
+
+        def stop
+          @stopped = true
+          wakeup
+        end
+
+        def run
+          ::TingYun::Agent.logger.debug &quot;Running event loop&quot;
+          while !stopped?
+            run_once
+          end
+        end
+
+        def run_once(nonblock=false)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Agent::Event::EventLoop#run_once has boolean parameter 'nonblock'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoop#run_once has approx 6 statements          </span>  </li></ul>
+          wait_to_run(nonblock)
+
+          prune_timers
+          fire_timers
+
+          until @event_queue.empty?
+            evt, args = @event_queue.pop
+            dispatch_event(evt, args)
+            reschedule_timer_for_event(evt)
+          end
+        end
+
+        def wait_to_run(nonblock)
+          timeout = nonblock ? 0 : next_timeout<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::Event::EventLoop#wait_to_run is controlled by argument nonblock          </span>  </li></ul>
+          ready = IO.select([@self_pipe_rd], nil, nil, timeout)
+
+          if ready &amp;&amp; ready[0] &amp;&amp; ready[0][0] &amp;&amp; ready[0][0] == @self_pipe_rd<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoop#wait_to_run calls ready[0] 3 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoop#wait_to_run calls ready[0][0] 2 times          </span>  </li></ul>
+            @self_pipe_rd.read(1)
+          end
+        end
+
+        def fire_timers
+          @timers.each do |event, timer|
+            fire_timer(timer)
+          end
+        end
+
+        def fire_timer(timer)
+          if timer.due?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Event::EventLoop#fire_timer refers to timer more than self (maybe move it to another class?)                        <a href="event_loop.html#L132" class="js-smell-location">0</a>                  <a href="event_loop.html#L133" class="js-smell-location">1</a>                  <a href="event_loop.html#L134" class="js-smell-location">2</a>                  </span>  </li></ul>
+            @event_queue &lt;&lt; [timer.event]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Event::EventLoop#fire_timer refers to timer more than self (maybe move it to another class?)                        <a href="event_loop.html#L132" class="js-smell-location">0</a>                  <a href="event_loop.html#L133" class="js-smell-location">1</a>                  <a href="event_loop.html#L134" class="js-smell-location">2</a>                  </span>  </li></ul>
+            timer.set_fired_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Event::EventLoop#fire_timer refers to timer more than self (maybe move it to another class?)                        <a href="event_loop.html#L132" class="js-smell-location">0</a>                  <a href="event_loop.html#L133" class="js-smell-location">1</a>                  <a href="event_loop.html#L134" class="js-smell-location">2</a>                  </span>  </li></ul>
+          end
+        end
+
+        def prune_timers
+          @timers.delete_if { |e, t| t.finished? }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Event::EventLoop#prune_timers has the variable name 'e'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Event::EventLoop#prune_timers has the variable name 't'          </span>  </li></ul>
+        end
+
+        def dispatch_event(event, args)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoop#dispatch_event has approx 8 statements          </span>  </li></ul>
+          TingYun::Agent.logger.debug(&quot;EventLoop: Dispatching event &#39;#{event}&#39; with #{@subscriptions[event].size} callback(s).&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoop#dispatch_event calls @subscriptions[event] 2 times                        <a href="event_loop.html#L143" class="js-smell-location">0</a>                  <a href="event_loop.html#L146" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          errors = []
+          @subscriptions[event].each do |s|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoop#dispatch_event calls @subscriptions[event] 2 times                        <a href="event_loop.html#L143" class="js-smell-location">0</a>                  <a href="event_loop.html#L146" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Event::EventLoop#dispatch_event has the variable name 's'          </span>  </li></ul>
+            begin
+              s.call(*args)
+            rescue TingYun::Support::Exception::ExpiredConfigurationException, TingYun::Support::Exception::InvalidDataTokenException, TingYun::Support::Exception::InvalidDataException
+              raise
+            rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Event::EventLoop#dispatch_event has the variable name 'e'          </span>  </li></ul>
+              errors &lt;&lt; e
+            end
+          end
+
+          if !errors.empty?
+            ::TingYun::Agent.logger.error &quot;#{errors.size} error(s) running task for event &#39;#{event}&#39; in Agent Event Loop:&quot;, *errors
+          end
+        end
+
+        def reschedule_timer_for_event(e)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::Event::EventLoop#reschedule_timer_for_event has the parameter name 'e'          </span>  </li></ul>
+          @timers[e].reschedule if @timers[e]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoop#reschedule_timer_for_event calls @timers[e] 2 times          </span>  </li></ul>
+        end
+
+        def on(event, &amp;blk)
+          fire(:__add_event, event, blk)
+        end
+
+        def fire(event, *args)
+          @event_queue &lt;&lt; [event, args]
+          wakeup
+        end
+
+        def fire_every(interval, event)
+          ::TingYun::Agent.logger.debug &quot;Firing event #{event} every #{interval} seconds.&quot;
+          fire(:__add_timer, Timer.new(interval, event, true))
+        end
+
+        def fire_after(interval, event)
+          ::TingYun::Agent.logger.debug &quot;Firing event #{event} after #{interval} seconds.&quot;
+          fire(:__add_timer, Timer.new(interval, event, false))
+        end
+
+        def wakeup
+          begin
+            @self_pipe_wr.write_nonblock &#39;.&#39;
+          rescue Errno::EAGAIN
+            ::TingYun::Agent.logger.debug &quot;Failed to wakeup event loop&quot;
+          end
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Agent::TransactionState</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-24 17:13:57 +0800'>2016-08-24 17:13:57 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      104 complexity
+    </div>
+    <div class="file-stat">
+      6.5 complexity per method
+    </div>
+    <div class="file-stat">
+      23 churn
+    </div>
+    <div class="file-stat">
+      16 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require &#39;ting_yun/agent/transaction/traced_method_stack&#39;
+module TingYun
+  module Agent
+
+    # This is THE location to store thread local information during a transaction
+    # Need a new piece of data? Add a method here, NOT a new thread local variable.
+    class TransactionState<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Agent::TransactionState has at least 17 instance variables          </span>  </li></ul>
+
+      # Request data
+      attr_accessor :transaction_sample_builder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#transaction_sample_builder is a writable attribute          </span>  </li></ul>
+      attr_reader   :current_transaction, :traced_method_stack
+      # Sql Sampler Transaction Data
+      attr_accessor :sql_sampler_transaction_data,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#sql_sampler_transaction_data is a writable attribute          </span>  </li></ul>
+                    :client_transaction_id,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#client_transaction_id is a writable attribute          </span>  </li></ul>
+                    :client_tingyun_id_secret,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#client_tingyun_id_secret is a writable attribute          </span>  </li></ul>
+                    :client_req_id,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#client_req_id is a writable attribute          </span>  </li></ul>
+                    :sql_duration,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#sql_duration is a writable attribute          </span>  </li></ul>
+                    :external_duration,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#external_duration is a writable attribute          </span>  </li></ul>
+                    :web_duration,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#web_duration is a writable attribute          </span>  </li></ul>
+                    :queue_duration,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#queue_duration is a writable attribute          </span>  </li></ul>
+                    :rds_duration,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#rds_duration is a writable attribute          </span>  </li></ul>
+                    :mc_duration,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#mc_duration is a writable attribute          </span>  </li></ul>
+                    :mon_duration,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#mon_duration is a writable attribute          </span>  </li></ul>
+                    :thrift_return_data<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#thrift_return_data is a writable attribute          </span>  </li></ul>
+
+
+
+
+
+
+
+      def self.tl_get
+        tl_state_for(Thread.current)
+      end
+
+      # This method should only be used by TransactionState for access to the
+      # current thread&#39;s state or to provide read-only accessors for other threads
+      #
+      # If ever exposed, this requires additional synchronization
+      def self.tl_state_for(thread)
+        state = thread[:tingyun_transaction_state]
+
+        if state.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Agent::TransactionState#self.tl_state_for performs a nil-check          </span>  </li></ul>
+          state = TransactionState.new
+          thread[:tingyun_transaction_state] = state
+        end
+
+        state
+      end
+
+      def initialize
+        @untraced = []
+        @current_transaction = nil
+        @traced_method_stack = TingYun::Agent::TracedMethodStack.new
+        @sql_duration = 0
+        @external_duration = 0
+        @web_duration = 0
+        @queue_duration = 0
+        @rds_duration = 0
+        @mc_duration = 0
+        @mon_duration = 0
+      end
+
+      # This starts the timer for the transaction.
+      def reset(transaction=nil)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::TransactionState#reset has approx 6 statements          </span>  </li></ul>
+        # We purposefully don&#39;t reset @untraced, @record_tt and @record_sql
+        # since those are managed by TingYun::Agent.disable_* calls explicitly
+        # and (more importantly) outside the scope of a transaction
+        @current_transaction = transaction
+        @traced_method_stack.clear
+        @transaction_sample_builder = nil
+        @sql_sampler_transaction_data = nil
+        @cross_tx_data = nil
+        @thrift_return_data = nil
+      end
+
+      # TT&#39;s and SQL
+      attr_accessor :record_tt, :record_sql<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#record_sql is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#record_tt is a writable attribute          </span>  </li></ul>
+      attr_accessor :untraced<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TransactionState#untraced is a writable attribute          </span>  </li></ul>
+
+      def push_traced(should_trace)
+        @untraced &lt;&lt; should_trace
+      end
+
+      def pop_traced
+        @untraced.pop if @untraced
+      end
+
+      def execution_traced?
+        @untraced.nil? || @untraced.last != false<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Agent::TransactionState#execution_traced? performs a nil-check          </span>  </li></ul>
+      end
+
+      def sql_recorded?
+        @record_sql != false
+      end
+
+      def transaction_traced?
+        @record_tt != false
+      end
+
+      def request_guid
+        return nil unless current_transaction
+        current_transaction.guid
+      end
+
+      def init_sql_transaction(obj)
+        @sql_sampler_transaction_data = obj
+      end
+
+      def self.process_thrift_data(data)
+        state = tl_state_for
+        state.thrift_return_data = data
+        ::TingYun::Agent.instance.transaction_sampler.tl_builder.set_txId_and_txData(state.request_guid, data)
+      end
+
+      def save_referring_transaction_info(data)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::TransactionState#save_referring_transaction_info has approx 6 statements          </span>  </li></ul>
+        data = Array(data)
+        @client_tingyun_id_secret = data.shift
+        data.each do |e|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::TransactionState#save_referring_transaction_info has the variable name 'e'          </span>  </li></ul>
+          if m = e.match(/x=/)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::TransactionState#save_referring_transaction_info has the variable name 'm'                        <a href="transaction_state.html#L122" class="js-smell-location">0</a>                  <a href="transaction_state.html#L125" class="js-smell-location">1</a>                  </span>  </li></ul>
+            @client_transaction_id = m.post_match<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TransactionState#save_referring_transaction_info calls m.post_match 2 times                        <a href="transaction_state.html#L123" class="js-smell-location">0</a>                  <a href="transaction_state.html#L126" class="js-smell-location">1</a>                  </span>  </li></ul>
+            @transaction_sample_builder.set_trace_id(@client_transaction_id)
+          elsif m = e.match(/r=/)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::TransactionState#save_referring_transaction_info has the variable name 'm'                        <a href="transaction_state.html#L122" class="js-smell-location">0</a>                  <a href="transaction_state.html#L125" class="js-smell-location">1</a>                  </span>  </li></ul>
+            @client_req_id = m.post_match<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TransactionState#save_referring_transaction_info calls m.post_match 2 times                        <a href="transaction_state.html#L123" class="js-smell-location">0</a>                  <a href="transaction_state.html#L126" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        end
+      end
+
+      def same_account?
+        server_info = TingYun::Agent.config[:tingyunIdSecret].split(&#39;|&#39;)
+        client_info = (@client_tingyun_id_secret || &#39;&#39;).split(&#39;|&#39;)
+        if server_info[0] &amp;&amp; !server_info[0].empty? &amp;&amp; server_info[0] == client_info[0]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TransactionState#same_account? calls server_info[0] 3 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::TransactionState#same_account? refers to server_info more than self (maybe move it to another class?)          </span>  </li></ul>
+          return true
+        else
+          return false
+        end
+      end
+
+      def execute_duration
+        web_duration - queue_duration - sql_duration - external_duration - rds_duration - mc_duration - mon_duration
+      end
+
+      def slow_action_tracer?
+        return web_duration &gt; TingYun::Agent.config[:&#39;nbs.action_tracer.action_threshold&#39;]
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

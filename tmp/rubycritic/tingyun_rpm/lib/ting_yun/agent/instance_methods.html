@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::InstanceMethods</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-25 11:18:31 +0800'>2016-04-25 11:18:31 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      11 complexity
+    </div>
+    <div class="file-stat">
+      2.8 complexity per method
+    </div>
+    <div class="file-stat">
+      13 churn
+    </div>
+    <div class="file-stat">
+      4 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/agent/instance_methods/start&#39;
+require &#39;ting_yun/agent/instance_methods/connect&#39;
+require &#39;ting_yun/agent/instance_methods/start_worker_thread&#39;
+require &#39;ting_yun/agent/instance_methods/container_data_manager&#39;
+
+module TingYun
+  module Agent
+    module InstanceMethods<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::InstanceMethods has no descriptive comment          </span>  </li></ul>
+
+      include Start
+      include Connect
+      include ContainerDataManager
+      include StartWorkerThread
+
+
+
+      def reset_to_default_configuration<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods#reset_to_default_configuration doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TingYun::Agent.config.remove_config_type(:manual)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods#reset_to_default_configuration calls TingYun::Agent.config 2 times                        <a href="instance_methods.html#L20" class="js-smell-location">0</a>                  <a href="instance_methods.html#L21" class="js-smell-location">1</a>                  </span>  </li></ul>
+        TingYun::Agent.config.remove_config_type(:server)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods#reset_to_default_configuration calls TingYun::Agent.config 2 times                        <a href="instance_methods.html#L20" class="js-smell-location">0</a>                  <a href="instance_methods.html#L21" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+
+      def stop_event_loop
+        @event_loop.stop if @event_loop
+      end
+
+
+      def push_trace_execution_flag(flag =false)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Agent::InstanceMethods#push_trace_execution_flag has boolean parameter 'flag'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods#push_trace_execution_flag doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TransactionState.tl_get.push_traced(flag)
+      end
+
+      def pop_trace_execution_flag<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods#pop_trace_execution_flag doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TransactionState.tl_get.pop_traced
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

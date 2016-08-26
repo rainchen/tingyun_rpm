@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Agent::Event::EventLoopTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      158 complexity
+    </div>
+    <div class="file-stat">
+      13.2 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      12 methods
+    </div>
+    <div class="file-stat">
+      74 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+require File.expand_path(File.join(File.dirname(__FILE__),&#39;..&#39;,&#39;..&#39;,&#39;..&#39;,&#39;test_helper&#39;))
+require &#39;ting_yun/agent/event/event_loop&#39;
+
+module TingYun::Agent::Event
+  class EventLoopTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Event::EventLoopTest has no descriptive comment          </span>  </li></ul>
+
+    def setup
+      @loop = TingYun::Agent::Event::EventLoop.new
+    end
+
+
+    def test_fire_after<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="event_loop_test.html#L14" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L33" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_after has approx 12 statements          </span>  </li></ul>
+      call_count = 0
+
+      @loop.on(:event) { call_count += 1 }
+      @loop.fire_after(3, :event)
+
+      @loop.run_once(true)
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_after calls assert_equal(0, call_count) 2 times                        <a href="event_loop_test.html#L21" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L24" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(1)
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_after calls assert_equal(0, call_count) 2 times                        <a href="event_loop_test.html#L21" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L24" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(2)
+      assert_equal(1, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_after calls assert_equal(1, call_count) 2 times                        <a href="event_loop_test.html#L27" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L30" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(5)
+      assert_equal(1, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_after calls assert_equal(1, call_count) 2 times                        <a href="event_loop_test.html#L27" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L30" class="js-smell-location">1</a>                  </span>  </li></ul>
+    end
+
+    def test_fire_every<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="event_loop_test.html#L14" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L33" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_every has approx 12 statements          </span>  </li></ul>
+      call_count = 0
+
+      @loop.on(:event) do
+        call_count += 1
+      end
+
+      @loop.fire_every(3, :event)
+
+      @loop.run_once(true)
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_every calls assert_equal(0, call_count) 2 times                        <a href="event_loop_test.html#L43" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L46" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(2)
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_every calls assert_equal(0, call_count) 2 times                        <a href="event_loop_test.html#L43" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L46" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(1)
+      assert_equal(1, call_count)
+
+      advance_loop(4)
+      assert_equal(2, call_count)
+    end
+
+    def test_fire_resets_associated_timers<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_resets_associated_timers has approx 12 statements          </span>  </li></ul>
+      call_count = 0
+
+      @loop.on(:event) { call_count += 1 }
+      @loop.fire_every(10, :event)
+
+      advance_loop(5)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_resets_associated_timers calls advance_loop(5) 3 times                        <a href="event_loop_test.html#L61" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L66" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L69" class="js-smell-location">2</a>                  </span>  </li></ul>
+      @loop.fire(:event)
+      @loop.run_once(true)
+      assert_equal(1, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_resets_associated_timers calls assert_equal(1, call_count) 2 times                        <a href="event_loop_test.html#L64" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L67" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(5)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_resets_associated_timers calls advance_loop(5) 3 times                        <a href="event_loop_test.html#L61" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L66" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L69" class="js-smell-location">2</a>                  </span>  </li></ul>
+      assert_equal(1, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_resets_associated_timers calls assert_equal(1, call_count) 2 times                        <a href="event_loop_test.html#L64" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L67" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(5)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_fire_resets_associated_timers calls advance_loop(5) 3 times                        <a href="event_loop_test.html#L61" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L66" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L69" class="js-smell-location">2</a>                  </span>  </li></ul>
+      assert_equal(2, call_count)
+    end
+
+    def test_adjust_period_larger<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_larger has approx 14 statements          </span>  </li></ul>
+      call_count = 0
+      @loop.on(:e) { call_count += 1 }
+
+      @loop.fire_every(10, :e)
+      @loop.run_once(true)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_larger calls @loop.run_once(true) 2 times                        <a href="event_loop_test.html#L78" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L84" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(9)
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_larger calls assert_equal(0, call_count) 3 times                        <a href="event_loop_test.html#L81" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L85" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L88" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+      @loop.fire_every(15, :e)
+      @loop.run_once(true)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_larger calls @loop.run_once(true) 2 times                        <a href="event_loop_test.html#L78" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L84" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_larger calls assert_equal(0, call_count) 3 times                        <a href="event_loop_test.html#L81" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L85" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L88" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+      advance_loop(1)
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_larger calls assert_equal(0, call_count) 3 times                        <a href="event_loop_test.html#L81" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L85" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L88" class="js-smell-location">2</a>                  </span>  </li></ul>
+
+      advance_loop(5)
+      assert_equal(1, call_count)
+    end
+
+    def test_adjust_period_smaller<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller has approx 15 statements          </span>  </li></ul>
+      call_count = 0
+      @loop.on(:e) { call_count += 1 }
+      @loop.fire_every(10, :e)
+
+      @loop.run_once(true)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller calls @loop.run_once(true) 2 times                        <a href="event_loop_test.html#L99" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L106" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller calls assert_equal(0, call_count) 2 times                        <a href="event_loop_test.html#L100" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L103" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(5)
+      assert_equal(0, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller calls assert_equal(0, call_count) 2 times                        <a href="event_loop_test.html#L100" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L103" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      @loop.fire_every(2, :e)
+      @loop.run_once(true)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller calls @loop.run_once(true) 2 times                        <a href="event_loop_test.html#L99" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L106" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal(1, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller calls assert_equal(1, call_count) 2 times                        <a href="event_loop_test.html#L107" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L110" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller calls advance_loop(1) 2 times                        <a href="event_loop_test.html#L109" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L112" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal(1, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller calls assert_equal(1, call_count) 2 times                        <a href="event_loop_test.html#L107" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L110" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_adjust_period_smaller calls advance_loop(1) 2 times                        <a href="event_loop_test.html#L109" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L112" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal(2, call_count)
+    end
+
+
+    def test_on<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_on has approx 6 statements          </span>  </li></ul>
+      call_count = 0
+      @loop.on(:evt) do
+        call_count += 1
+      end
+      @loop.fire(:evt)
+      @loop.run_once(true)
+      assert_equal(1, call_count)
+    end
+
+    def test_on_with_payload<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_on_with_payload has approx 6 statements          </span>  </li></ul>
+      call_count = 0
+      @loop.on(:evt) do |amount|
+        call_count += amount
+      end
+      @loop.fire(:evt, 42)
+      @loop.run_once(true)
+      assert_equal(42, call_count)
+    end
+
+    def test_manual_fire_resets_timers<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_manual_fire_resets_timers has approx 13 statements          </span>  </li></ul>
+      call_count = 0
+      @loop.on(:e) { call_count += 1 }
+      @loop.fire_every(4, :e)
+
+      advance_loop(3)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_manual_fire_resets_timers calls advance_loop(3) 2 times                        <a href="event_loop_test.html#L142" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L149" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal(0, call_count)
+
+      @loop.fire(:e)
+      @loop.run_once(true)
+      assert_equal(1, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_manual_fire_resets_timers calls assert_equal(1, call_count) 2 times                        <a href="event_loop_test.html#L147" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L150" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(3)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_manual_fire_resets_timers calls advance_loop(3) 2 times                        <a href="event_loop_test.html#L142" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L149" class="js-smell-location">1</a>                  </span>  </li></ul>
+      assert_equal(1, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_manual_fire_resets_timers calls assert_equal(1, call_count) 2 times                        <a href="event_loop_test.html#L147" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L150" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(1)
+      assert_equal(2, call_count)
+    end
+
+    def test_exceptions_do_not_exit_loop<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_exceptions_do_not_exit_loop has approx 10 statements          </span>  </li></ul>
+      call_count = 0
+      @loop.on(:e) { raise StandardError.new }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_exceptions_do_not_exit_loop calls @loop.on(:e) 3 times                        <a href="event_loop_test.html#L158" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L159" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L160" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_exceptions_do_not_exit_loop calls @loop.on(:e) { raise StandardError.new } 2 times                        <a href="event_loop_test.html#L158" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L160" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_exceptions_do_not_exit_loop calls raise StandardError.new 2 times                        <a href="event_loop_test.html#L158" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L160" class="js-smell-location">1</a>                  </span>  </li></ul>
+      @loop.on(:e) { call_count += 1 }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_exceptions_do_not_exit_loop calls @loop.on(:e) 3 times                        <a href="event_loop_test.html#L158" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L159" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L160" class="js-smell-location">2</a>                  </span>  </li></ul>
+      @loop.on(:e) { raise StandardError.new }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_exceptions_do_not_exit_loop calls @loop.on(:e) 3 times                        <a href="event_loop_test.html#L158" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L159" class="js-smell-location">1</a>                  <a href="event_loop_test.html#L160" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_exceptions_do_not_exit_loop calls @loop.on(:e) { raise StandardError.new } 2 times                        <a href="event_loop_test.html#L158" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L160" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_exceptions_do_not_exit_loop calls raise StandardError.new 2 times                        <a href="event_loop_test.html#L158" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L160" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      @loop.fire(:e)
+
+      @loop.run_once(true)
+      assert_equal(1, call_count)
+    end
+
+    def test_timer_period_reset_from_event<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::Event::EventLoopTest#test_timer_period_reset_from_event has a flog score of 28          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::Event::EventLoopTest#test_timer_period_reset_from_event has approx 21 statements          </span>  </li></ul>
+      call_count = 0
+      @loop.on(:e           ) { call_count += 1          }
+      @loop.on(:reset_period) { @loop.fire_every(30, :e) }
+
+      @loop.fire_every( 5, :e           )
+      @loop.fire_after(31, :reset_period)
+
+      advance_loop(3)  # total time 3
+      assert_equal(0, call_count)
+
+      advance_loop(2)  # total time 5
+      assert_equal(1, call_count)
+
+      advance_loop(5)  # total time 10
+      assert_equal(2, call_count)
+
+      advance_loop(20)  # total time 30
+      assert_equal(6, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_timer_period_reset_from_event calls assert_equal(6, call_count) 2 times                        <a href="event_loop_test.html#L186" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L189" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(29)  # total time 59
+      assert_equal(6, call_count)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::Event::EventLoopTest#test_timer_period_reset_from_event calls assert_equal(6, call_count) 2 times                        <a href="event_loop_test.html#L186" class="js-smell-location">0</a>                  <a href="event_loop_test.html#L189" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+      advance_loop(1)  # total time 60
+      assert_equal(7, call_count)
+
+      advance_loop(60)  # total time 120
+      assert_equal(9, call_count)
+    end
+
+    def advance_loop(n)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::Event::EventLoopTest#advance_loop has the parameter name 'n'          </span>  </li></ul>
+      n.times do
+        advance_time(1)
+        @loop.run_once(true)
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

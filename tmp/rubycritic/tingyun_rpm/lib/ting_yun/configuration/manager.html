@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Configuration::Manager</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-24 17:13:57 +0800'>2016-08-24 17:13:57 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      162 complexity
+    </div>
+    <div class="file-stat">
+      8.1 complexity per method
+    </div>
+    <div class="file-stat">
+      12 churn
+    </div>
+    <div class="file-stat">
+      20 methods
+    </div>
+    <div class="file-stat">
+      16 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/configuration/default_source&#39;
+require &#39;ting_yun/configuration/environment_source&#39;
+require &#39;ting_yun/configuration/yaml_source&#39;
+require &#39;ting_yun/configuration/server_source&#39;
+require &#39;ting_yun/configuration/manual_source&#39;
+
+
+module TingYun
+  module Configuration
+    class Manager<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Configuration::Manager has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Configuration::Manager has at least 7 instance variables          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Methods.md" target="_blank">TooManyMethods</a>)      TingYun::Configuration::Manager has at least 20 methods          </span>  </li></ul>
+
+      def initialize
+        reset_to_defaults
+      end
+
+      def [](key)
+        @cache[key]
+      end
+
+      def has_key?(key)
+        @cache.has_key?(key)
+      end
+
+      def keys
+        @cache.keys
+      end
+
+      def app_names<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::Manager#app_names doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        if TingYun::Agent.config[:&#39;nbs.auto_app_naming&#39;]
+          begin
+          [::TingYun::Frameworks.framework.root.split(&#39;/&#39;).last]
+          rescue
+            ::TingYun::Configuration.get_name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::Manager#app_names calls ::TingYun::Configuration.get_name 2 times                        <a href="manager.html#L35" class="js-smell-location">0</a>                  <a href="manager.html#L38" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        else
+          ::TingYun::Configuration.get_name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::Manager#app_names calls ::TingYun::Configuration.get_name 2 times                        <a href="manager.html#L35" class="js-smell-location">0</a>                  <a href="manager.html#L38" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+
+      end
+
+      def reset_to_defaults<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::Manager#reset_to_defaults has approx 7 statements          </span>  </li></ul>
+        @default_source = DefaultSource.new
+        @environment_source = EnvironmentSource.new
+        @yaml_source = nil
+        @server_source  = nil
+        @manual_source = nil
+        # @callbacks = Hash.new {|hash,key| hash[key] =[]}#存放需要merge本地和服务端配置的info&#39;
+
+        @configs_for_testing = []
+
+        reset_cache
+      end
+
+      def reset_cache
+        @cache = Hash.new { |hash, key| hash[key] = self.fetch(key) }
+      end
+
+      def fetch(key)
+        config_stack.each do |config|
+          next unless config
+          accessor = key.to_sym
+
+          if config.has_key?(accessor)
+            return evaluate_procs(config[accessor]) #if it&#39;s proc
+          end
+        end
+        nil
+      end
+
+      def evaluate_procs(value)
+        if value.respond_to?(:call)
+          instance_eval(&amp;value)
+        else
+          value
+        end
+      end
+
+      def add_config_for_testing(source, level=0)
+        raise &#39;Invalid config type for testing&#39; unless [Hash, DottedHash].include?(source.class)
+        @configs_for_testing &lt;&lt; [source.freeze, level]
+        reset_cache
+        log_config(:add, source)
+      end
+
+      def remove_config_type(sym)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::Manager#remove_config_type has approx 6 statements          </span>  </li></ul>
+        source = case sym<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Configuration::Manager#remove_config_type is controlled by argument sym          </span>  </li></ul>
+                   when :environment then   @environment_source
+                   when :server      then   @server_source
+                   when :manual      then   @manual_source
+                   when :yaml        then   @yaml_source
+                   when :default     then   @default_source
+                 end
+        remove_config(source)
+      end
+
+
+      def remove_config(source)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::Manager#remove_config has approx 9 statements          </span>  </li></ul>
+        case source
+          when YamlSource         then  @yaml_source          = nil
+          when DefaultSource      then  @default_source       = nil
+          when EnvironmentSource  then  @environment_source   = nil
+          when ManualSource       then  @manual_source        = nil
+          when ServerSource       then  @server_source        = nil
+          else
+            @configs_for_testing.delete_if { |src, lvl| src == source }
+        end
+
+        reset_cache
+
+        #invoke_callbacks(:remove,source)
+
+        log_config(:remove, source)
+
+      end
+
+      def replace_or_add_config(source)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::Manager#replace_or_add_config has approx 11 statements          </span>  </li></ul>
+        source.freeze
+
+        was_finished = finished_configuring?
+
+        case source
+          when YamlSource        then   @yaml_source          = source
+          when DefaultSource     then   @default_source       = source
+          when EnvironmentSource then   @environment_source   = source
+          when ServerSource      then   @server_source        = source
+          when ManualSource      then   @manual_source        = source
+          else
+            TingYun::Agent.logger.warn(&quot;Invalid config format; config will be ignored: #{source}&quot;)
+        end
+        reset_cache
+
+        log_config(:add, source)
+
+        TingYun::Agent.instance.events.notify(:finished_configuring) if !was_finished &amp;&amp; finished_configuring?
+      end
+
+
+      def finished_configuring?
+        !@server_source.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Configuration::Manager#finished_configuring? performs a nil-check          </span>  </li></ul>
+      end
+
+
+      def source(key)
+        config_stack.each do |config|
+          if config.respond_to?(key.to_sym) || config.has_key?(key.to_sym)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::Manager#source calls key.to_sym 2 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::Manager#source refers to config more than self (maybe move it to another class?)          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::Manager#source refers to key more than self (maybe move it to another class?)          </span>  </li></ul>
+            return config
+          end
+        end
+      end
+
+      def log_config(direction, source)
+        # Just generating this log message (specifically calling
+        # flattened.inspect) is expensive enough that we don&#39;t want to do it
+        # unless we&#39;re actually going to be logging the message based on our
+        # current log level.
+        ::TingYun::Agent.logger.debug do
+          &quot;Updating config (#{direction}) from #{source.class}. Results: #{flattened.inspect}&quot;
+        end
+      end
+
+      def flattened<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Configuration::Manager#flattened has a flog score of 35          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::Manager#flattened has approx 9 statements          </span>  </li></ul>
+        config_stack.reverse.inject({}) do |flat, layer|
+          thawed_layer = layer.to_hash.dup
+          thawed_layer.each do |k, v|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::Manager#flattened refers to thawed_layer more than self (maybe move it to another class?)                        <a href="manager.html#L166" class="js-smell-location">0</a>                  <a href="manager.html#L168" class="js-smell-location">1</a>                  <a href="manager.html#L171" class="js-smell-location">2</a>                  <a href="manager.html#L173" class="js-smell-location">3</a>                  <a href="manager.html#L175" class="js-smell-location">4</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nested-Iterators.md" target="_blank">NestedIterators</a>)      TingYun::Configuration::Manager#flattened contains iterators nested 2 deep          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::Manager#flattened has the variable name 'k'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::Manager#flattened has the variable name 'v'          </span>  </li></ul>
+            begin
+              thawed_layer[k] = instance_eval(&amp;v) if v.respond_to?(:call)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::Manager#flattened refers to thawed_layer more than self (maybe move it to another class?)                        <a href="manager.html#L166" class="js-smell-location">0</a>                  <a href="manager.html#L168" class="js-smell-location">1</a>                  <a href="manager.html#L171" class="js-smell-location">2</a>                  <a href="manager.html#L173" class="js-smell-location">3</a>                  <a href="manager.html#L175" class="js-smell-location">4</a>                  </span>  </li></ul>
+            rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::Manager#flattened has the variable name 'e'          </span>  </li></ul>
+              ::TingYun::Agent.logger.debug(&quot;#{e.class.name} : #{e.message} - when accessing config key #{k}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="manager.html#L170" class="js-smell-location">0</a>                  <a href="../support/serialize/json_marshaller.html#L55" class="js-smell-location">1</a>                  </span>  </li></ul>
+              thawed_layer[k] = nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::Manager#flattened refers to thawed_layer more than self (maybe move it to another class?)                        <a href="manager.html#L166" class="js-smell-location">0</a>                  <a href="manager.html#L168" class="js-smell-location">1</a>                  <a href="manager.html#L171" class="js-smell-location">2</a>                  <a href="manager.html#L173" class="js-smell-location">3</a>                  <a href="manager.html#L175" class="js-smell-location">4</a>                  </span>  </li></ul>
+            end
+            thawed_layer.delete(:config)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::Manager#flattened refers to thawed_layer more than self (maybe move it to another class?)                        <a href="manager.html#L166" class="js-smell-location">0</a>                  <a href="manager.html#L168" class="js-smell-location">1</a>                  <a href="manager.html#L171" class="js-smell-location">2</a>                  <a href="manager.html#L173" class="js-smell-location">3</a>                  <a href="manager.html#L175" class="js-smell-location">4</a>                  </span>  </li></ul>
+          end
+          flat.merge(thawed_layer.to_hash)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::Manager#flattened refers to thawed_layer more than self (maybe move it to another class?)                        <a href="manager.html#L166" class="js-smell-location">0</a>                  <a href="manager.html#L168" class="js-smell-location">1</a>                  <a href="manager.html#L171" class="js-smell-location">2</a>                  <a href="manager.html#L173" class="js-smell-location">3</a>                  <a href="manager.html#L175" class="js-smell-location">4</a>                  </span>  </li></ul>
+        end
+      end
+
+      def config_classes_for_testing
+        config_stack.map(&amp;:class)
+      end
+
+
+
+
+      def to_collector_hash
+        DottedHash.new(flattened).to_hash.delete_if do |k, v|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::Manager#to_collector_hash has the variable name 'k'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Configuration::Manager#to_collector_hash has the variable name 'v'          </span>  </li></ul>
+          default = DEFAULTS[k]
+          if default
+            default[:exclude_from_reported_settings]
+          else
+            # In our tests, we add totally bogus configs, because testing.
+            # In those cases, there will be no default. So we&#39;ll just let
+            # them through.
+            false
+          end
+        end
+      end
+
+      private
+
+      def config_stack<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::Manager#config_stack has approx 6 statements          </span>  </li></ul>
+        stack = [@environment_source, @server_source, @manual_source, @yaml_source, @default_source]
+
+        stack.compact!
+        @configs_for_testing.each do |config, at_start|
+          if at_start
+            stack.insert(0, config)
+          else
+            stack.push(config)
+          end
+        end
+
+        stack
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

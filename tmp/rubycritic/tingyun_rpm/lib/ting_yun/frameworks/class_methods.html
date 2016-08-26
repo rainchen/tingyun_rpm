@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Frameworks::ClassMethods</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      27 complexity
+    </div>
+    <div class="file-stat">
+      5.4 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/support/local_environment&#39;
+require &#39;ting_yun/frameworks&#39;
+
+
+module TingYun
+  module Frameworks
+    module ClassMethods<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Frameworks::ClassMethods has no descriptive comment          </span>  </li></ul>
+      def instance
+        framework = TingYun::Agent.config[:framework]
+        if framework == :test
+          @instance ||= load_test_framework
+        else
+          @instance ||= load_framework_class(framework).new(local_env)
+        end
+
+      end
+
+      def load_test_framework
+        config = File.expand_path(File.join(&#39;..&#39;,&#39;..&#39;, &#39;test&#39;,&#39;config&#39;,&#39;tingyun.yml&#39;), __FILE__)
+        require &#39;config/test&#39;
+        TingYun::Frameworks::Test.new(local_env, config)
+      end
+
+
+      def load_framework_class(framework)
+        begin
+          require &#39;ting_yun/frameworks/&#39; + framework.to_s<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::ClassMethods#load_framework_class calls framework.to_s 2 times                        <a href="class_methods.html#L29" class="js-smell-location">0</a>                  <a href="class_methods.html#L33" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Frameworks::ClassMethods#load_framework_class refers to framework more than self (maybe move it to another class?)                        <a href="class_methods.html#L29" class="js-smell-location">0</a>                  <a href="class_methods.html#L33" class="js-smell-location">1</a>                  </span>  </li></ul>
+        rescue LoadError
+          #to avoid error
+        end
+        TingYun::Frameworks.const_get(framework.to_s.capitalize)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Frameworks::ClassMethods#load_framework_class calls framework.to_s 2 times                        <a href="class_methods.html#L29" class="js-smell-location">0</a>                  <a href="class_methods.html#L33" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Frameworks::ClassMethods#load_framework_class refers to framework more than self (maybe move it to another class?)                        <a href="class_methods.html#L29" class="js-smell-location">0</a>                  <a href="class_methods.html#L33" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+
+      def local_env
+        @local_env ||= TingYun::Support::LocalEnvironment.new
+      end
+
+      # clear out memoized Framework and LocalEnv instances
+      def reset
+        @instance = nil
+        @local_env = nil
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

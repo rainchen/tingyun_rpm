@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">Rake::Task</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-17 17:58:31 +0800'>2016-08-17 17:58:31 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      59 complexity
+    </div>
+    <div class="file-stat">
+      5.9 complexity per method
+    </div>
+    <div class="file-stat">
+      8 churn
+    </div>
+    <div class="file-stat">
+      10 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+TingYun::Support::LibraryDetection.defer do
+
+  named :rake
+
+  depends_on do
+    defined?(::Rake)&amp;&amp;
+        !::TingYun::Agent.config[:&#39;disable_rake&#39;] &amp;&amp;
+        ::TingYun::Agent.config[:&#39;rake.tasks&#39;].any? &amp;&amp;
+        ::TingYun::Agent::Instrumentation::RakeInstrumentation.supported_version?
+  end
+
+  executes do
+    ::TingYun::Agent.logger.info &#39;Installing deferred Rake instrumentation&#39;
+  end
+
+  executes do
+    module Rake
+      class Task<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      Rake::Task has no descriptive comment          </span>  </li></ul>
+        alias_method :invoke_without_tingyun, :invoke
+        def invoke(*args)
+          unless TingYun::Agent::Instrumentation::RakeInstrumentation.should_trace? name
+            return invoke_without_tingyun(*args)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      Rake::Task#invoke calls invoke_without_tingyun(*args) 2 times                        <a href="rake.html#L24" class="js-smell-location">0</a>                  <a href="rake.html#L31" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+
+          TingYun::Agent::Instrumentation::RakeInstrumentation.before_invoke_transaction(self)
+
+          state = TingYun::Agent::TransactionState.tl_get
+          TingYun::Agent::Transaction.wrap(state, &quot;BackgroundAction/Rake/invoke/#{name}&quot;, :rake)  do
+            invoke_without_tingyun(*args)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      Rake::Task#invoke calls invoke_without_tingyun(*args) 2 times                        <a href="rake.html#L24" class="js-smell-location">0</a>                  <a href="rake.html#L31" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        end
+      end
+    end
+  end
+end
+
+module TingYun
+  module Agent
+    module Instrumentation
+      module RakeInstrumentation<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Instrumentation::RakeInstrumentation has no descriptive comment          </span>  </li></ul>
+
+        def self.supported_version?
+          ::TingYun::Support::VersionNumber.new(::Rake::VERSION) &gt;= ::TingYun::Support::VersionNumber.new(&quot;10.0.0&quot;)
+        end
+
+        def self.before_invoke_transaction(task)
+          ensure_at_exit
+
+          if task.application.options.always_multitask
+            instrument_invoke_prerequisites_concurrently(task)
+          else
+            instrument_execute_on_prereqs(task)
+          end
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::Instrumentation::RakeInstrumentation#self.before_invoke_transaction has the variable name 'e'          </span>  </li></ul>
+          TingYun::Agent.logger.error(&quot;Error during Rake task invoke&quot;, e)
+        end
+
+        def self.should_trace? name
+          TingYun::Agent.config[:&#39;rake.tasks&#39;].any? do |task|
+            task == name
+          end
+        end
+
+        def self.ensure_at_exit
+          return if @installed_at_exit
+
+          at_exit do
+            # The agent&#39;s default at_exit might not default to installing, but
+            # if we are running an instrumented rake task, we always want it.
+            TingYun::Agent.shutdown
+          end
+
+          @installed_at_exit = true
+        end
+
+        def self.instrument_execute_on_prereqs(task)
+          task.prerequisite_tasks.each do |child_task|
+            instrument_execute(child_task)
+          end
+        end
+
+        def self.instrument_execute(task)
+          return if task.instance_variable_get(:@__tingyun_instrumented_execute)
+
+          task.instance_variable_set(:@__tingyun_instrumented_execute, true)
+          task.instance_eval do
+            def execute(*args, &amp;block)
+              TingYun::Agent::MethodTracer.trace_execution_scoped(&quot;Rake/execute/#{self.name}&quot;) do
+                super
+              end
+            end
+          end
+
+          instrument_execute_on_prereqs(task)
+        end
+
+        def self.instrument_invoke_prerequisites_concurrently(task)
+          task.instance_eval do
+            def invoke_prerequisites_concurrently(*_)
+              TingYun::Agent::MethodTracer.trace_execution_scoped(&quot;Rake/execute/multitask&quot;) do
+                super
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+ end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

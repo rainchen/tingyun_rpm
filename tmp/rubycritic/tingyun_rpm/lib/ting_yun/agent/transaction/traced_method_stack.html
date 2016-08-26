@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::TracedMethodFrame</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-02-17 14:31:23 +0800'>2016-02-17 14:31:23 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      52 complexity
+    </div>
+    <div class="file-stat">
+      5.2 complexity per method
+    </div>
+    <div class="file-stat">
+      2 churn
+    </div>
+    <div class="file-stat">
+      10 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+module TingYun
+  module Agent
+    class TracedMethodFrame<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::TracedMethodFrame has no descriptive comment          </span>  </li></ul>
+      attr_reader :tag
+      attr_accessor :name, :start_time, :children_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TracedMethodFrame#children_time is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TracedMethodFrame#name is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::TracedMethodFrame#start_time is a writable attribute          </span>  </li></ul>
+      def initialize(tag, start_time)
+        @tag = tag
+        @start_time = start_time
+        @children_time = 0
+      end
+    end
+
+    class TracedMethodStack<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::TracedMethodStack has no descriptive comment          </span>  </li></ul>
+      def initialize
+        @stack = []
+      end
+
+      def push_frame(state, tag, time = Time.now.to_f)
+        transaction_sampler.notice_push_frame(state, time) if sampler_enabled?
+        frame = TracedMethodFrame.new(tag, time)
+        @stack.push frame
+        frame
+      end
+
+      def pop_frame(state, expected_frame, name, time, deduct_call_time_from_parent=true)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Agent::TracedMethodStack#pop_frame has boolean parameter 'deduct_call_time_from_parent'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::TracedMethodStack#pop_frame has 5 parameters          </span>  </li></ul>
+        frame = fetch_matching_frame(expected_frame)
+        note_children_time(frame, time, deduct_call_time_from_parent)
+        transaction_sampler.notice_pop_frame(state, name, time) if sampler_enabled?
+        frame.name = name
+        frame
+      end
+
+      def fetch_matching_frame(expected_frame)
+        while frame = @stack.pop
+          if frame == expected_frame
+            return frame
+          else
+            TingYun::Agent.logger.info(&quot;Unexpected frame in traced method stack: #{frame.inspect} expected to be #{expected_frame.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TracedMethodStack#fetch_matching_frame calls TingYun::Agent.logger 2 times                        <a href="traced_method_stack.html#L40" class="js-smell-location">0</a>                  <a href="traced_method_stack.html#L41" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TracedMethodStack#fetch_matching_frame calls expected_frame.inspect 2 times                        <a href="traced_method_stack.html#L40" class="js-smell-location">0</a>                  <a href="traced_method_stack.html#L47" class="js-smell-location">1</a>                  </span>  </li></ul>
+            TingYun::Agent.logger.debug do<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TracedMethodStack#fetch_matching_frame calls TingYun::Agent.logger 2 times                        <a href="traced_method_stack.html#L40" class="js-smell-location">0</a>                  <a href="traced_method_stack.html#L41" class="js-smell-location">1</a>                  </span>  </li></ul>
+              [&quot;Backtrace for unexpected frame: &quot;, caller.join(&quot;\n&quot;)]
+            end
+          end
+        end
+
+        raise &quot;Frame not found in blame stack: #{expected_frame.inspect}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TracedMethodStack#fetch_matching_frame calls expected_frame.inspect 2 times                        <a href="traced_method_stack.html#L40" class="js-smell-location">0</a>                  <a href="traced_method_stack.html#L47" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+
+      def note_children_time(frame, time, deduct_call_time_from_parent)
+        if !@stack.empty?
+          if deduct_call_time_from_parent<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::TracedMethodStack#note_children_time is controlled by argument deduct_call_time_from_parent          </span>  </li></ul>
+            @stack.last.children_time += (time - frame.start_time)*1000<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TracedMethodStack#note_children_time calls @stack.last 2 times                        <a href="traced_method_stack.html#L53" class="js-smell-location">0</a>                  <a href="traced_method_stack.html#L55" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TracedMethodStack#note_children_time calls @stack.last.children_time 2 times                        <a href="traced_method_stack.html#L53" class="js-smell-location">0</a>                  <a href="traced_method_stack.html#L55" class="js-smell-location">1</a>                  </span>  </li></ul>
+          else
+            @stack.last.children_time += frame.children_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TracedMethodStack#note_children_time calls @stack.last 2 times                        <a href="traced_method_stack.html#L53" class="js-smell-location">0</a>                  <a href="traced_method_stack.html#L55" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::TracedMethodStack#note_children_time calls @stack.last.children_time 2 times                        <a href="traced_method_stack.html#L53" class="js-smell-location">0</a>                  <a href="traced_method_stack.html#L55" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        end
+      end
+
+
+      def sampler_enabled?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::TracedMethodStack#sampler_enabled? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TingYun::Agent.config[:&#39;nbs.action_tracer.enabled&#39;]
+      end
+
+
+
+      def transaction_sampler<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::TracedMethodStack#transaction_sampler doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TingYun::Agent.instance.transaction_sampler
+      end
+
+      def clear
+        @stack.clear
+      end
+
+      def empty?
+        @stack.empty?
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::TingYunService</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-20 10:23:07 +0800'>2016-07-20 10:23:07 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      76 complexity
+    </div>
+    <div class="file-stat">
+      12.7 complexity per method
+    </div>
+    <div class="file-stat">
+      28 churn
+    </div>
+    <div class="file-stat">
+      6 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+
+require &#39;ting_yun/agent&#39;
+require &#39;zlib&#39;
+require &#39;ting_yun/ting_yun_service/http&#39;
+require &#39;ting_yun/support/collector&#39;
+require &#39;ting_yun/support/serialize/encodes&#39;
+require &#39;ting_yun/support/timer_lib&#39;
+require &#39;ting_yun/support/exception&#39;
+require &#39;ting_yun/support/serialize/json_marshaller&#39;
+require &#39;ting_yun/ting_yun_service/upload_service&#39;
+require &#39;ting_yun/version&#39;
+
+module TingYun
+  class TingYunService<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::TingYunService has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::TingYunService has at least 8 instance variables          </span>  </li></ul>
+    include Http
+    include UploadService
+
+    CONNECTION_ERRORS = [Timeout::Error, EOFError, SystemCallError, SocketError].freeze
+
+    PROTOCOL_VERSION = 1
+
+
+    attr_accessor :request_timeout,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::TingYunService#request_timeout is a writable attribute          </span>  </li></ul>
+                  :appSessionKey,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::TingYunService#appSessionKey is a writable attribute          </span>  </li></ul>
+                  :data_version,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::TingYunService#data_version is a writable attribute          </span>  </li></ul>
+                  :metric_id_cache,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::TingYunService#metric_id_cache is a writable attribute          </span>  </li></ul>
+                  :applicationId,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::TingYunService#applicationId is a writable attribute          </span>  </li></ul>
+                  :ssl_cert_store,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::TingYunService#ssl_cert_store is a writable attribute          </span>  </li></ul>
+                  :shared_tcp_connection<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::TingYunService#shared_tcp_connection is a writable attribute          </span>  </li></ul>
+
+    def initialize(license_key=nil,collector=TingYun::Support.collector)
+
+      @license_key = license_key || TingYun::Agent.config[:&#39;license_key&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::TingYunService#initialize is controlled by argument license_key          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#initialize calls TingYun::Agent.config 2 times                        <a href="ting_yun_service.html#L36" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L37" class="js-smell-location">1</a>                  </span>  </li></ul>
+      @request_timeout = TingYun::Agent.config[:timeout]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#initialize calls TingYun::Agent.config 2 times                        <a href="ting_yun_service.html#L36" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L37" class="js-smell-location">1</a>                  </span>  </li></ul>
+      @collector = collector
+      @data_version = TingYun::VERSION::STRING
+      @marshaller =TingYun::Support::Serialize::JsonMarshaller.new
+      @metric_id_cache = {}
+    end
+
+    def connect(settings={})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::TingYunService#connect has approx 6 statements          </span>  </li></ul>
+      if host = get_redirect_host
+        @collector = TingYun::Support.collector_from_host(host)
+      end
+      response = invoke_remote(:initAgentApp, [settings])
+      TingYun::Agent.logger.info(&quot;initAgentApp response: #{response}&quot;) if TingYun::Agent.config[:&#39;nbs.audit_mode&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::TingYunService tests TingYun::Agent.config[:'nbs.audit_mode'] at least 4 times                        <a href="ting_yun_service.html#L49" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L85" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">3</a>                  </span>  </li></ul>
+      @applicationId = response[&#39;applicationId&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::TingYunService has the variable name '@applicationId'                        <a href="ting_yun_service.html#L50" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L60" class="js-smell-location">1</a>                  </span>  </li></ul>
+      @appSessionKey = response[&#39;appSessionKey&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::TingYunService has the variable name '@appSessionKey'                        <a href="ting_yun_service.html#L51" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L61" class="js-smell-location">1</a>                  </span>  </li></ul>
+      response
+    end
+
+    def get_redirect_host
+      invoke_remote(:getRedirectHost)
+    end
+
+    def force_restart
+      @applicationId = nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::TingYunService has the variable name '@applicationId'                        <a href="ting_yun_service.html#L50" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L60" class="js-smell-location">1</a>                  </span>  </li></ul>
+      @appSessionKey = nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::TingYunService has the variable name '@appSessionKey'                        <a href="ting_yun_service.html#L51" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L61" class="js-smell-location">1</a>                  </span>  </li></ul>
+      @metric_id_cache = {}
+      close_shared_connection
+    end
+
+
+    # send a message via post to the actual server. This attempts
+    # to automatically compress the data via zlib if it is large
+    # enough to be worth compressing, and handles any errors the
+    # server may return
+
+    # private
+
+    def invoke_remote(method, payload=[], options = {})<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::TingYunService#invoke_remote has a flog score of 39          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::TingYunService#invoke_remote has approx 16 statements          </span>  </li></ul>
+
+      data = nil
+      payload = payload[0]  if method == :initAgentApp
+      begin
+        data = @marshaller.dump(payload, options)
+      rescue StandardError, SystemStackError =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::TingYunService#invoke_remote has the variable name 'e'          </span>  </li></ul>
+        handle_serialization_error(method, e)
+      end
+      # serialize_finish_time = Time.now
+
+      if TingYun::Agent.config[:&#39;nbs.audit_mode&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.config 3 times                        <a href="ting_yun_service.html#L85" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.config[:'nbs.audit_mode'] 3 times                        <a href="ting_yun_service.html#L85" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::TingYunService tests TingYun::Agent.config[:'nbs.audit_mode'] at least 4 times                        <a href="ting_yun_service.html#L49" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L85" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">3</a>                  </span>  </li></ul>
+        TingYun::Agent.logger.info(&quot;the prepare data: #{data}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.logger 5 times                        <a href="ting_yun_service.html#L86" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L88" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L103" class="js-smell-location">3</a>                  <a href="ting_yun_service.html#L105" class="js-smell-location">4</a>                  </span>  </li></ul>
+      else
+        TingYun::Agent.logger.info(&quot;prepare to send data&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.logger 5 times                        <a href="ting_yun_service.html#L86" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L88" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L103" class="js-smell-location">3</a>                  <a href="ting_yun_service.html#L105" class="js-smell-location">4</a>                  </span>  </li></ul>
+      end
+
+      data, encoding = compress_request_if_needed(data)
+      # size = data.size
+
+      uri = remote_method_uri(method)
+      full_uri = &quot;#{@collector}#{uri}&quot;
+      TingYun::Agent.logger.info(&quot;url: #{full_uri}&quot;) if TingYun::Agent.config[:&#39;nbs.audit_mode&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.config 3 times                        <a href="ting_yun_service.html#L85" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.config[:'nbs.audit_mode'] 3 times                        <a href="ting_yun_service.html#L85" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.logger 5 times                        <a href="ting_yun_service.html#L86" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L88" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L103" class="js-smell-location">3</a>                  <a href="ting_yun_service.html#L105" class="js-smell-location">4</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::TingYunService tests TingYun::Agent.config[:'nbs.audit_mode'] at least 4 times                        <a href="ting_yun_service.html#L49" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L85" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">3</a>                  </span>  </li></ul>
+      response = send_request(:data      =&gt; data,
+                              :uri       =&gt; uri,
+                              :encoding  =&gt; encoding,
+                              :collector =&gt; @collector)
+
+      if TingYun::Agent.config[:&#39;nbs.audit_mode&#39;]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.config 3 times                        <a href="ting_yun_service.html#L85" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.config[:'nbs.audit_mode'] 3 times                        <a href="ting_yun_service.html#L85" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Repeated-Conditional.md" target="_blank">RepeatedConditional</a>)      TingYun::TingYunService tests TingYun::Agent.config[:'nbs.audit_mode'] at least 4 times                        <a href="ting_yun_service.html#L49" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L85" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L102" class="js-smell-location">3</a>                  </span>  </li></ul>
+        TingYun::Agent.logger.info(&quot;the return data: #{response.body}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.logger 5 times                        <a href="ting_yun_service.html#L86" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L88" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L103" class="js-smell-location">3</a>                  <a href="ting_yun_service.html#L105" class="js-smell-location">4</a>                  </span>  </li></ul>
+      else
+        TingYun::Agent.logger.info(&quot;the send-process end&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::TingYunService#invoke_remote calls TingYun::Agent.logger 5 times                        <a href="ting_yun_service.html#L86" class="js-smell-location">0</a>                  <a href="ting_yun_service.html#L88" class="js-smell-location">1</a>                  <a href="ting_yun_service.html#L96" class="js-smell-location">2</a>                  <a href="ting_yun_service.html#L103" class="js-smell-location">3</a>                  <a href="ting_yun_service.html#L105" class="js-smell-location">4</a>                  </span>  </li></ul>
+      end
+      @marshaller.load(decompress_response(response))
+    ensure
+      # take the initiative to GC
+      payload = nil
+      data = nil
+    end
+
+    def handle_serialization_error(method, e)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::TingYunService#handle_serialization_error has the parameter name 'e'          </span>  </li></ul>
+      msg = &quot;Failed to serialize #{method} data using #{@marshaller.class.to_s}: #{e.inspect}&quot;
+      error = TingYun::Support::Exception::SerializationError.new(msg)
+      error.set_backtrace(e.backtrace)
+      raise error
+    end
+
+
+
+
+
+
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

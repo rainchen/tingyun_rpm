@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::Transaction::Apdex</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-19 17:13:59 +0800'>2016-08-19 17:13:59 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      30 complexity
+    </div>
+    <div class="file-stat">
+      6.0 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/support/helper&#39;
+module TingYun
+  module Agent
+
+    class Transaction
+      class Apdex<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::Transaction::Apdex has no descriptive comment          </span>  </li></ul>
+        APDEX_TXN_METRIC_PREFIX = &#39;Apdex/&#39;.freeze
+
+        attr_accessor :apdex_start, :transaction_start_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Apdex#apdex_start is a writable attribute          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::Transaction::Apdex#transaction_start_time is a writable attribute          </span>  </li></ul>
+
+        def initialize(start, transaction_start)
+          @apdex_start = start || Time.now<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::Transaction::Apdex#initialize is controlled by argument start          </span>  </li></ul>
+          @transaction_start_time = transaction_start
+        end
+
+        def record_apdex(metric_name, end_time, failed)
+          total_duration = TingYun::Helper.time_to_millis(end_time - apdex_start)
+          if TingYun::Agent::Transaction.recording_web_transaction?
+            record_apdex_metrics(APDEX_TXN_METRIC_PREFIX, total_duration, TingYun::Agent.config[:apdex_t], metric_name, failed)
+          end
+        end
+
+        def record_apdex_metrics(transaction_prefix, total_duration, current_apdex_t, metric_name, failed)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::Transaction::Apdex#record_apdex_metrics has 5 parameters          </span>  </li></ul>
+          return unless current_apdex_t
+          return unless metric_name.start_with?(CONTROLLER_PREFIX)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Apdex#record_apdex_metrics refers to metric_name more than self (maybe move it to another class?)                        <a href="apdex.html#L26" class="js-smell-location">0</a>                  <a href="apdex.html#L29" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+          apdex_bucket_global = apdex_bucket(total_duration, failed, current_apdex_t)
+          txn_apdex_metric = metric_name.sub(/^[^\/]+\//, transaction_prefix)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::Transaction::Apdex#record_apdex_metrics refers to metric_name more than self (maybe move it to another class?)                        <a href="apdex.html#L26" class="js-smell-location">0</a>                  <a href="apdex.html#L29" class="js-smell-location">1</a>                  </span>  </li></ul>
+          ::TingYun::Agent::Transaction.metrics.record_unscoped(txn_apdex_metric, apdex_bucket_global, current_apdex_t)
+        end
+
+
+        def apdex_bucket(duration, failed, apdex_t)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::Transaction::Apdex#apdex_bucket doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          case
+            when failed
+              :apdex_f
+            when duration &lt;= apdex_t
+              :apdex_s
+            when duration &lt;= 4 * apdex_t
+              :apdex_t
+            else
+              :apdex_f
+          end
+        end
+
+        def queue_time
+          TingYun::Helper.time_to_millis(transaction_start_time - apdex_start)
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

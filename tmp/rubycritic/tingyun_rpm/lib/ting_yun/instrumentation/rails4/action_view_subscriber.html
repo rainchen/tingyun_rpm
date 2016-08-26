@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::Rails4::ActionViewSubscriber</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 05:25:54 +0000'>2016-01-12 05:25:54 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      89 complexity
+    </div>
+    <div class="file-stat">
+      12.7 complexity per method
+    </div>
+    <div class="file-stat">
+      3 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+
+require &#39;ting_yun/instrumentation/support/evented_subscriber&#39;
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+require &#39;ting_yun/agent&#39;
+
+module TingYun
+  module Instrumentation
+    module Rails4<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Module-Name.md" target="_blank">UncommunicativeModuleName</a>)      TingYun::Instrumentation::Rails4 has the name 'Rails4'          </span>  </li></ul>
+      class ActionViewSubscriber &lt; TingYun::Instrumentation::Support::EventedSubscriber<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber has no descriptive comment          </span>  </li></ul>
+
+        def start(name, id, payload) #THREAD_LOCAL_ACCESS<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#start has approx 7 statements          </span>  </li></ul>
+          event = RenderEvent.new(name, Time.now, nil, id, payload)
+          push_event(event)
+
+          state = TingYun::Agent::TransactionState.tl_get
+
+          if event.recordable?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#start refers to event more than self (maybe move it to another class?)                        <a href="action_view_subscriber.html#L19" class="js-smell-location">0</a>                  <a href="action_view_subscriber.html#L21" class="js-smell-location">1</a>                  </span>  </li></ul>
+            stack = state.traced_method_stack
+            event.frame = stack.push_frame(state, :action_view, event.time)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#start refers to event more than self (maybe move it to another class?)                        <a href="action_view_subscriber.html#L19" class="js-smell-location">0</a>                  <a href="action_view_subscriber.html#L21" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#start has the variable name 'e'          </span>  </li></ul>
+          log_notification_error(e, name, &#39;start&#39;)
+        end
+
+        def finish(name, id, payload) #THREAD_LOCAL_ACCESS<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#finish has approx 7 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Unused-Parameters.md" target="_blank">UnusedParameters</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#finish has unused parameter 'payload'          </span>  </li></ul>
+          event = pop_event(id)
+
+          state = TingYun::Agent::TransactionState.tl_get
+
+          if event.recordable?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#finish refers to event more than self (maybe move it to another class?)                        <a href="action_view_subscriber.html#L32" class="js-smell-location">0</a>                  <a href="action_view_subscriber.html#L34" class="js-smell-location">1</a>                  </span>  </li></ul>
+            stack = state.traced_method_stack
+            frame = stack.pop_frame(state, event.frame, event.metric_name, event.end)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#finish refers to event more than self (maybe move it to another class?)                        <a href="action_view_subscriber.html#L32" class="js-smell-location">0</a>                  <a href="action_view_subscriber.html#L34" class="js-smell-location">1</a>                  </span>  </li></ul>
+            record_metrics(event, frame)
+          end
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#finish has the variable name 'e'          </span>  </li></ul>
+          log_notification_error(e, name, &#39;finish&#39;)
+        end
+
+        def record_metrics(event, frame)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#record_metrics doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          exclusive = event.duration - frame.children_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#record_metrics calls event.duration 2 times                        <a href="action_view_subscriber.html#L42" class="js-smell-location">0</a>                  <a href="action_view_subscriber.html#L44" class="js-smell-location">1</a>                  </span>  </li></ul>
+          TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
+              event.metric_name, nil, event.duration, exclusive)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::ActionViewSubscriber#record_metrics calls event.duration 2 times                        <a href="action_view_subscriber.html#L42" class="js-smell-location">0</a>                  <a href="action_view_subscriber.html#L44" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      end
+
+      class RenderEvent &lt; TingYun::Instrumentation::Support::Event<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::Rails4::RenderEvent has no descriptive comment          </span>  </li></ul>
+
+        def recordable?
+          name[0] == &#39;!&#39; ||
+              metric_name == &#39;View/text template/Rendering&#39; ||
+              metric_name == &quot;View/#{::TingYun::Agent::UNKNOWN_METRIC}/Partial&quot;
+        end
+
+        def metric_name
+          if parent &amp;&amp; (payload[:virtual_path] ||<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::RenderEvent#metric_name calls payload[:virtual_path] 2 times                        <a href="action_view_subscriber.html#L57" class="js-smell-location">0</a>                  <a href="action_view_subscriber.html#L61" class="js-smell-location">1</a>                  </span>  </li></ul>
+              (parent.payload[:identifier] =~ /template$/))
+            return parent.metric_name
+          elsif payload.key?(:virtual_path)
+            identifier = payload[:virtual_path]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Instrumentation::Rails4::RenderEvent#metric_name calls payload[:virtual_path] 2 times                        <a href="action_view_subscriber.html#L57" class="js-smell-location">0</a>                  <a href="action_view_subscriber.html#L61" class="js-smell-location">1</a>                  </span>  </li></ul>
+          else
+            identifier = payload[:identifier]
+          end
+
+          # memoize
+          @metric_name ||= &quot;View/#{metric_path(identifier)}/#{metric_action(name)}&quot;
+          @metric_name
+        end
+
+        def metric_path(identifier)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Instrumentation::Rails4::RenderEvent#metric_path doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          if identifier == nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::Rails4::RenderEvent#metric_path performs a nil-check          </span>  </li></ul>
+            &#39;file&#39;
+          elsif identifier =~ /template$/
+            identifier
+          elsif (parts = identifier.split(&#39;/&#39;)).size &gt; 1
+            parts[-2..-1].join(&#39;/&#39;)
+          else
+            ::TingYun::Agent::UNKNOWN_METRIC
+          end
+        end
+
+        def metric_action(name)
+          case name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Instrumentation::Rails4::RenderEvent#metric_action is controlled by argument name          </span>  </li></ul>
+            when /render_template.action_view$/ then
+              &#39;Rendering&#39;
+            when &#39;render_partial.action_view&#39; then
+              &#39;Partial&#39;
+            when &#39;render_collection.action_view&#39; then
+              &#39;Partial&#39;
+          end
+        end
+      end
+    end
+  end
+end
+
+TingYun::Support::LibraryDetection.defer do
+  @name = :rails4_view
+
+  depends_on do
+    defined?(::Rails) &amp;&amp; ::Rails::VERSION::MAJOR.to_i == 4
+  end
+
+  depends_on do
+    !TingYun::Agent.config[:disable_view_instrumentation] &amp;&amp;
+        !TingYun::Instrumentation::Rails4::ActionViewSubscriber.subscribed?
+  end
+
+  executes do
+    TingYun::Agent.logger.info &#39;Installing Rails 4 view instrumentation&#39;
+  end
+
+  executes do
+    TingYun::Instrumentation::Rails4::ActionViewSubscriber.subscribe(/render_.+\.action_view$/)
+  end
+end
+#
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

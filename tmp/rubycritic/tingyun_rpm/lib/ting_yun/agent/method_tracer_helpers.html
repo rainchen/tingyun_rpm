@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::MethodTracerHelpers</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-21 17:17:28 +0800'>2016-04-21 17:17:28 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      70 complexity
+    </div>
+    <div class="file-stat">
+      14.0 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/agent&#39;
+require &#39;ting_yun/agent/transaction/transaction_state&#39;
+
+module TingYun
+  module Agent
+    module MethodTracerHelpers<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::MethodTracerHelpers has no descriptive comment          </span>  </li></ul>
+
+      extend self
+
+      def log_errors(code_area)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::MethodTracerHelpers#log_errors doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        yield
+      rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::MethodTracerHelpers#log_errors has the variable name 'e'          </span>  </li></ul>
+        ::TingYun::Agent.logger.error(&quot;Caught exception in #{code_area}.&quot;, e)
+        ::TingYun::Agent.notice_error(e, method: code_area, path: &quot;ting_yun/agent/method_tracer_helpers&quot;)
+      end
+
+      def trace_execution_scoped_header(state, t0)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_header has the parameter name 't0'          </span>  </li></ul>
+        log_errors(:trace_execution_scoped_header) do
+          stack = state.traced_method_stack
+          stack.push_frame(state, :method_tracer, t0)
+        end
+      end
+
+      def trace_execution_scoped_footer(state, t0, first_name, metric_names, expected_frame, options, t1=Time.now.to_f)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer has a flog score of 33          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer has 7 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer has approx 10 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer has the parameter name 't0'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer has the parameter name 't1'          </span>  </li></ul>
+        log_errors(:trace_execution_scoped_footer) do
+          if expected_frame
+            stack = state.traced_method_stack
+            create_metrics = options.has_key?(:metric) ? options[:metric] : true
+            frame = stack.pop_frame(state, expected_frame, first_name, t1, create_metrics)
+
+            if create_metrics
+              duration = (t1 - t0)*1000
+              exclusive = duration - frame.children_time<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer calls frame.children_time 2 times                        <a href="method_tracer_helpers.html#L34" class="js-smell-location">0</a>                  <a href="method_tracer_helpers.html#L41" class="js-smell-location">1</a>                  </span>  </li></ul>
+              if duration &lt; 0
+                ::TingYun::Agent.logger.log_once(:warn, &quot;metric_duration_negative:#{first_name}&quot;,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer calls ::TingYun::Agent.logger 2 times                        <a href="method_tracer_helpers.html#L36" class="js-smell-location">0</a>                  <a href="method_tracer_helpers.html#L40" class="js-smell-location">1</a>                  </span>  </li></ul>
+                                                 &quot;Metric #{first_name} has negative duration: #{duration} ms&quot;)
+              end
+              if exclusive &lt; 0
+                ::TingYun::Agent.logger.log_once(:warn, &quot;metric_exclusive_negative:#{first_name}&quot;,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer calls ::TingYun::Agent.logger 2 times                        <a href="method_tracer_helpers.html#L36" class="js-smell-location">0</a>                  <a href="method_tracer_helpers.html#L40" class="js-smell-location">1</a>                  </span>  </li></ul>
+                                                 &quot;Metric #{first_name} has negative exclusive time: duration = #{duration} ms, child_time = #{frame.children_time}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped_footer calls frame.children_time 2 times                        <a href="method_tracer_helpers.html#L34" class="js-smell-location">0</a>                  <a href="method_tracer_helpers.html#L41" class="js-smell-location">1</a>                  </span>  </li></ul>
+              end
+              record_metrics(state, first_name, metric_names, duration, exclusive, options)
+            end
+          end
+        end
+      end
+
+      def record_metrics(state, first_name, other_names, duration, exclusive, options)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Long-Parameter-List.md" target="_blank">LongParameterList</a>)      TingYun::Agent::MethodTracerHelpers#record_metrics has 6 parameters          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::MethodTracerHelpers#record_metrics has approx 6 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::MethodTracerHelpers#record_metrics doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        record_scoped_metric = options.has_key?(:scoped_metric) ? options[:scoped_metric] : true
+        stat_engine = TingYun::Agent.instance.stats_engine
+        if record_scoped_metric
+          stat_engine.record_scoped_and_unscoped_metrics(state, first_name, other_names, duration, exclusive)
+        else
+          metrics = [first_name].concat(other_names)
+          stat_engine.record_unscoped_metrics(state, metrics, duration, exclusive)
+        end
+      end
+
+      def  trace_execution_scoped(metric_names, options={}, callback = nil) #THREAD_LOCAL_ACCESS<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped has approx 9 statements          </span>  </li></ul>
+        state = TingYun::Agent::TransactionState.tl_get
+
+        metric_names = Array(metric_names)
+        first_name   = metric_names.shift
+        return yield unless first_name
+
+        start_time = Time.now.to_f<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped calls Time.now 2 times                        <a href="method_tracer_helpers.html#L67" class="js-smell-location">0</a>                  <a href="method_tracer_helpers.html#L73" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped calls Time.now.to_f 2 times                        <a href="method_tracer_helpers.html#L67" class="js-smell-location">0</a>                  <a href="method_tracer_helpers.html#L73" class="js-smell-location">1</a>                  </span>  </li></ul>
+        expected_scope = trace_execution_scoped_header(state, start_time)
+
+        begin
+          yield
+        ensure
+          elapsed_time = (Time.now.to_f - start_time)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped calls Time.now 2 times                        <a href="method_tracer_helpers.html#L67" class="js-smell-location">0</a>                  <a href="method_tracer_helpers.html#L73" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::MethodTracerHelpers#trace_execution_scoped calls Time.now.to_f 2 times                        <a href="method_tracer_helpers.html#L67" class="js-smell-location">0</a>                  <a href="method_tracer_helpers.html#L73" class="js-smell-location">1</a>                  </span>  </li></ul>
+          if callback
+            callback.call(elapsed_time)
+          end
+          trace_execution_scoped_footer(state, start_time, first_name, metric_names, expected_scope, options)
+        end
+      end
+
+
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

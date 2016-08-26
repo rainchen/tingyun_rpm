@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Support::LocalEnvironment</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-21 17:07:26 +0800'>2016-07-21 17:07:26 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      110 complexity
+    </div>
+    <div class="file-stat">
+      5.0 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      22 methods
+    </div>
+    <div class="file-stat">
+      52 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+module TingYun
+  module Support
+    class LocalEnvironment<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::LocalEnvironment has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Methods.md" target="_blank">TooManyMethods</a>)      TingYun::Support::LocalEnvironment has at least 21 methods          </span>  </li></ul>
+
+      def discovered_dispatcher
+        discover_dispatcher unless @discovered_dispatcher
+        @discovered_dispatcher
+      end
+
+      def initialize
+        # Extend self with any any submodules of LocalEnvironment.  These can override
+        # the discover methods to discover new framworks and dispatchers.
+        TingYun::Support::LocalEnvironment.constants.each do | const |
+          mod = TingYun::Support::LocalEnvironment.const_get const
+          self.extend mod if mod.instance_of? Module
+        end
+        @discovered_dispatcher = nil
+        discover_dispatcher
+      end
+
+      # Runs through all the objects in ObjectSpace to find the first one that
+      # match the provided class
+      def self.find_class_in_object_space(klass)
+        if TingYun::Support::LanguageSupport.object_space_usable?
+          ObjectSpace.each_object(klass) do |x|<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::LocalEnvironment#self.find_class_in_object_space has the variable name 'x'          </span>  </li></ul>
+            return x
+          end
+        end
+        return nil
+      end
+
+
+      private
+
+      def discover_dispatcher
+        dispatchers = %w[
+        passenger
+        torquebox
+        trinidad
+        glassfish
+        resque
+        sidekiq
+        delayed_job
+        puma
+        thin
+        mongrel
+        litespeed
+        webrick
+        fastcgi
+        rainbows
+        unicorn
+      ]
+        while dispatchers.any? &amp;&amp; !@discovered_dispatcher
+          send &#39;check_for_&#39;+(dispatchers.shift)
+        end
+      end
+
+
+      def check_for_torquebox
+        return unless defined?(::JRuby) &amp;&amp;
+            ( org.torquebox::TorqueBox rescue nil)
+        @discovered_dispatcher = :torquebox
+      end
+
+      def check_for_glassfish
+        return unless defined?(::JRuby) &amp;&amp;
+            (((com.sun.grizzly.jruby.rack.DefaultRackApplicationFactory rescue nil) &amp;&amp;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_glassfish calls com.sun 2 times                        <a href="local_environment.html#L70" class="js-smell-location">0</a>                  <a href="local_environment.html#L71" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_glassfish calls com.sun.grizzly 2 times                        <a href="local_environment.html#L70" class="js-smell-location">0</a>                  <a href="local_environment.html#L71" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_glassfish calls com.sun.grizzly.jruby 2 times                        <a href="local_environment.html#L70" class="js-smell-location">0</a>                  <a href="local_environment.html#L71" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_glassfish calls com.sun.grizzly.jruby.rack 2 times                        <a href="local_environment.html#L70" class="js-smell-location">0</a>                  <a href="local_environment.html#L71" class="js-smell-location">1</a>                  </span>  </li></ul>
+                defined?(com::sun::grizzly::jruby::rack::DefaultRackApplicationFactory)) ||<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_glassfish calls com.sun 2 times                        <a href="local_environment.html#L70" class="js-smell-location">0</a>                  <a href="local_environment.html#L71" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_glassfish calls com.sun.grizzly 2 times                        <a href="local_environment.html#L70" class="js-smell-location">0</a>                  <a href="local_environment.html#L71" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_glassfish calls com.sun.grizzly.jruby 2 times                        <a href="local_environment.html#L70" class="js-smell-location">0</a>                  <a href="local_environment.html#L71" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_glassfish calls com.sun.grizzly.jruby.rack 2 times                        <a href="local_environment.html#L70" class="js-smell-location">0</a>                  <a href="local_environment.html#L71" class="js-smell-location">1</a>                  </span>  </li></ul>
+                (jruby_rack? &amp;&amp; defined?(::GlassFish::Server)))
+        @discovered_dispatcher = :glassfish
+      end
+
+      def check_for_trinidad
+        return unless defined?(::JRuby) &amp;&amp; jruby_rack? &amp;&amp; defined?(::Trinidad::Server)
+        @discovered_dispatcher = :trinidad
+      end
+
+      def jruby_rack?
+        defined?(JRuby::Rack::VERSION)
+      end
+
+      def check_for_webrick<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="local_environment.html#L85" class="js-smell-location">0</a>                  <a href="local_environment.html#L92" class="js-smell-location">1</a>                  </span>  </li></ul>
+        return unless defined?(::WEBrick) &amp;&amp; defined?(::WEBrick::VERSION)
+        @discovered_dispatcher = :webrick
+      end
+
+      def check_for_fastcgi
+        return unless defined?(::FCGI)
+        @discovered_dispatcher = :fastcgi<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flay/" target="_blank">DuplicateCode</a>)      Similar code found in 2 nodes                        <a href="local_environment.html#L85" class="js-smell-location">0</a>                  <a href="local_environment.html#L92" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+
+      # this case covers starting by mongrel_rails
+      def check_for_mongrel
+        return unless defined?(::Mongrel) &amp;&amp; defined?(::Mongrel::HttpServer)
+        @discovered_dispatcher = :mongrel
+      end
+
+      def check_for_unicorn
+        if (defined?(::Unicorn) &amp;&amp; defined?(::Unicorn::HttpServer)) &amp;&amp; TingYun::Support::LanguageSupport.object_space_usable?
+          _v = TingYun::Support::LocalEnvironment.find_class_in_object_space(::Unicorn::HttpServer)
+          @discovered_dispatcher = :unicorn if _v
+        end
+      end
+
+      def check_for_rainbows
+        if (defined?(::Rainbows) &amp;&amp; defined?(::Rainbows::HttpServer)) &amp;&amp; TingYun::Support::LanguageSupport.object_space_usable?
+          _v = TingYun::Support::LocalEnvironment.find_class_in_object_space(::Rainbows::HttpServer)
+          @discovered_dispatcher = :rainbows if _v
+        end
+      end
+
+      def check_for_puma
+        if defined?(::Puma) &amp;&amp; File.basename($0) == &#39;puma&#39;
+          @discovered_dispatcher = :puma
+        end
+      end
+
+      def check_for_delayed_job
+        if $0 =~ /delayed_job$/ || (File.basename($0) == &#39;rake&#39; &amp;&amp; ARGV.include?(&#39;jobs:work&#39;))
+          @discovered_dispatcher = :delayed_job
+        end
+      end
+
+      def check_for_resque<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::LocalEnvironment#check_for_resque has approx 6 statements          </span>  </li></ul>
+        has_queue              = ENV[&#39;QUEUE&#39;] || ENV[&#39;QUEUES&#39;]
+        resque_rake            = executable == &#39;rake&#39; &amp;&amp; ARGV.include?(&#39;resque:work&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_resque calls executable == 'rake' 2 times                        <a href="local_environment.html#L129" class="js-smell-location">0</a>                  <a href="local_environment.html#L130" class="js-smell-location">1</a>                  </span>  </li></ul>
+        resque_pool_rake       = executable == &#39;rake&#39; &amp;&amp; ARGV.include?(&#39;resque:pool&#39;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::LocalEnvironment#check_for_resque calls executable == 'rake' 2 times                        <a href="local_environment.html#L129" class="js-smell-location">0</a>                  <a href="local_environment.html#L130" class="js-smell-location">1</a>                  </span>  </li></ul>
+        resque_pool_executable = executable == &#39;resque-pool&#39; &amp;&amp; defined?(::Resque::Pool)
+
+        using_resque = defined?(::Resque) &amp;&amp;
+            (has_queue &amp;&amp; resque_rake) ||
+            (resque_pool_executable || resque_pool_rake)
+
+        @discovered_dispatcher = :resque if using_resque
+      end
+
+      def check_for_sidekiq
+        if defined?(::Sidekiq) &amp;&amp; File.basename($0) == &#39;sidekiq&#39;
+          @discovered_dispatcher = :sidekiq
+        end
+      end
+
+      def check_for_thin
+        if defined?(::Thin) &amp;&amp; defined?(::Thin::Server)
+          # If ObjectSpace is available, use it to search for a Thin::Server
+          # instance. Otherwise, just the presence of the constant is sufficient.
+          if TingYun::Support::LanguageSupport.object_space_usable?
+            ObjectSpace.each_object(Thin::Server) do |thin_dispatcher|
+              @discovered_dispatcher = :thin
+            end
+          else
+            @discovered_dispatcher = :thin
+          end
+        end
+      end
+
+      def check_for_litespeed
+        if caller.pop =~ /fcgi-bin\/RailsRunner\.rb/
+          @discovered_dispatcher = :litespeed
+        end
+      end
+
+      def check_for_passenger
+        if defined?(::PhusionPassenger)
+          @discovered_dispatcher = :passenger
+        end
+      end
+
+      public
+      # outputs a human-readable description
+      def to_s
+        s = &quot;LocalEnvironment[&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::LocalEnvironment#to_s has the variable name 's'          </span>  </li></ul>
+        s &lt;&lt; &quot;;dispatcher=#{@discovered_dispatcher}&quot; if @discovered_dispatcher
+        s &lt;&lt; &quot;]&quot;
+      end
+
+      def executable<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Support::LocalEnvironment#executable doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        File.basename($0)
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

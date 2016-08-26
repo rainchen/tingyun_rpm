@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-c circled-text circle">
+    C
+  </span>
+  <h2 class="file-name">TingYun::Logger::AgentLogger</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-22 18:12:24 +0800'>2016-08-22 18:12:24 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      131 complexity
+    </div>
+    <div class="file-stat">
+      6.2 complexity per method
+    </div>
+    <div class="file-stat">
+      12 churn
+    </div>
+    <div class="file-stat">
+      21 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require &#39;thread&#39;
+require &#39;logger&#39;
+require &#39;ting_yun/logger/log_once&#39;
+require &#39;ting_yun/logger/memory_logger&#39;
+require &#39;ting_yun/support/hostname&#39;
+require &#39;ting_yun/logger/null_logger&#39;
+
+
+module TingYun
+  module Logger
+    class AgentLogger<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Logger::AgentLogger has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Logger::AgentLogger has prima donna method `set_log_format!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Prima-Donna-Method.md" target="_blank">PrimaDonnaMethod</a>)      TingYun::Logger::AgentLogger has prima donna method `set_log_level!`          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Logger::AgentLogger has at least 5 instance variables          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Methods.md" target="_blank">TooManyMethods</a>)      TingYun::Logger::AgentLogger has at least 20 methods          </span>  </li></ul>
+      include LogOnce
+
+      def initialize(root = &quot;&quot;, override_logger=nil)
+        @already_logged_lock = Mutex.new
+        clear_already_logged
+        create_log(root, override_logger)
+        set_log_level!
+        set_log_format!
+
+        gather_startup_logs
+      end
+
+      def fatal(*msgs, &amp;blk)
+        format_and_send(:fatal, msgs, &amp;blk)
+      end
+
+      def error(*msgs, &amp;blk)
+        format_and_send(:error, msgs, &amp;blk)
+      end
+
+      def warn(*msgs, &amp;blk)
+        format_and_send(:warn, msgs, &amp;blk)
+      end
+
+      def info(*msgs, &amp;blk)
+        format_and_send(:info, msgs, &amp;blk)
+      end
+
+      def debug(*msgs, &amp;blk)
+        format_and_send(:debug, msgs, &amp;blk)
+      end
+
+      def is_startup_logger?
+        @log.is_a?(NullLogger)
+      end
+
+      # Use this when you want to log an exception with explicit control over
+      # the log level that the backtrace is logged at. If you just want the
+      # default behavior of backtraces logged at debug, use one of the methods
+      # above and pass an Exception as one of the args.
+      def log_exception(level, e, backtrace_level=level)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Logger::AgentLogger#log_exception has the parameter name 'e'          </span>  </li></ul>
+        @log.send(level, &quot;%p: %s&quot; % [e.class, e.message])
+        @log.send(backtrace_level) do
+          backtrace = backtrace_from_exception(e)
+          if backtrace
+            &quot;Debugging backtrace:\n&quot; + backtrace.join(&quot;\n  &quot;)
+          else
+            &quot;No backtrace available.&quot;
+          end
+        end
+      end
+
+      def log_formatter=(formatter)
+        @log.formatter = formatter
+      end
+
+      private
+
+      def backtrace_from_exception(e)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Logger::AgentLogger#backtrace_from_exception has the parameter name 'e'          </span>  </li></ul>
+        # We&#39;ve seen that often the backtrace on a SystemStackError is bunk
+        # so massage the caller instead at a known depth.
+        #
+        # Tests keep us honest about minmum method depth our log calls add.
+        return caller.drop(5) if e.is_a?(SystemStackError)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Logger::AgentLogger#backtrace_from_exception refers to e more than self (maybe move it to another class?)                        <a href="agent_logger.html#L78" class="js-smell-location">0</a>                  <a href="agent_logger.html#L80" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+        e.backtrace<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Logger::AgentLogger#backtrace_from_exception refers to e more than self (maybe move it to another class?)                        <a href="agent_logger.html#L78" class="js-smell-location">0</a>                  <a href="agent_logger.html#L80" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+
+      # Allows for passing exception.rb in explicitly, which format with backtrace
+      def format_and_send(level, *msgs, &amp;block)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Logger::AgentLogger#format_and_send has approx 7 statements          </span>  </li></ul>
+        check_log_file
+        if block
+          if @log.send(&quot;#{level}?&quot;)
+            msgs = Array(block.call)
+          else
+            msgs = []
+          end
+        end
+
+        msgs.flatten.each do |item|
+          case item
+            when Exception then
+              log_exception(level, item, :debug)
+            else
+              @log.send(level, item)
+          end
+        end
+        nil
+      end
+
+      def check_log_file
+        unless File.exist? @file_path
+          begin
+            @log = ::Logger.new(@file_path)
+            set_log_format!
+          rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Logger::AgentLogger#check_log_file has the variable name 'e'          </span>  </li></ul>
+            @log = ::Logger.new(STDOUT)
+            warn(&quot;check_log_file:  Failed creating logger for file #{@file_path}, using standard out for logging.&quot;, e)
+          end
+        end
+      end
+
+      def create_log(root, override_logger)
+        if !override_logger.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Logger::AgentLogger#create_log performs a nil-check          </span>  </li></ul>
+          @log = override_logger
+        elsif ::TingYun::Agent.config[:&#39;nbs.agent_enabled&#39;] == false
+          create_null_logger
+        else
+          if wants_stdout?
+            @log = ::Logger.new(STDOUT)
+          else
+            create_log_to_file(root)
+          end
+        end
+      end
+
+      def create_log_to_file(root)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Logger::AgentLogger#create_log_to_file has approx 8 statements          </span>  </li></ul>
+        path = find_or_create_file_path(::TingYun::Agent.config[:agent_log_file_path], root)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Logger::AgentLogger#create_log_to_file calls ::TingYun::Agent.config 3 times                        <a href="agent_logger.html#L132" class="js-smell-location">0</a>                  <a href="agent_logger.html#L135" class="js-smell-location">1</a>                  <a href="agent_logger.html#L137" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Logger::AgentLogger#create_log_to_file calls ::TingYun::Agent.config[:agent_log_file_path] 2 times                        <a href="agent_logger.html#L132" class="js-smell-location">0</a>                  <a href="agent_logger.html#L135" class="js-smell-location">1</a>                  </span>  </li></ul>
+        if path.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Logger::AgentLogger#create_log_to_file performs a nil-check          </span>  </li></ul>
+          @log = ::Logger.new(STDOUT)
+          warn(&quot;Error creating log directory #{::TingYun::Agent.config[:agent_log_file_path]}, using standard out for logging.&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Logger::AgentLogger#create_log_to_file calls ::TingYun::Agent.config 3 times                        <a href="agent_logger.html#L132" class="js-smell-location">0</a>                  <a href="agent_logger.html#L135" class="js-smell-location">1</a>                  <a href="agent_logger.html#L137" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Logger::AgentLogger#create_log_to_file calls ::TingYun::Agent.config[:agent_log_file_path] 2 times                        <a href="agent_logger.html#L132" class="js-smell-location">0</a>                  <a href="agent_logger.html#L135" class="js-smell-location">1</a>                  </span>  </li></ul>
+        else
+          @file_path = &quot;#{path}/#{::TingYun::Agent.config[:agent_log_file_name]}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Logger::AgentLogger#create_log_to_file calls ::TingYun::Agent.config 3 times                        <a href="agent_logger.html#L132" class="js-smell-location">0</a>                  <a href="agent_logger.html#L135" class="js-smell-location">1</a>                  <a href="agent_logger.html#L137" class="js-smell-location">2</a>                  </span>  </li></ul>
+          begin
+            @log = ::Logger.new(@file_path)
+          rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Logger::AgentLogger#create_log_to_file has the variable name 'e'          </span>  </li></ul>
+            @log = ::Logger.new(STDOUT)
+            warn(&quot;Failed creating logger for file #{@file_path}, using standard out for logging.&quot;, e)
+          end
+        end
+      end
+
+      def create_null_logger
+        @log = ::TingYun::Logger::NullLogger.new
+      end
+
+      def wants_stdout?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Logger::AgentLogger#wants_stdout? doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        ::TingYun::Agent.config[:agent_log_file_name].upcase == &quot;STDOUT&quot;
+      end
+
+      def find_or_create_file_path(path_setting, root)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Logger::AgentLogger#find_or_create_file_path doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        for abs_path in [File.expand_path(path_setting),
+                         File.expand_path(File.join(root, path_setting))] do
+          if File.directory?(abs_path) || (Dir.mkdir(abs_path) rescue nil)
+            return abs_path[%r{^(.*?)/?$}]
+          end
+        end
+        nil
+      end
+
+      def set_log_level!
+        @log.level = AgentLogger.log_level_for(::TingYun::Agent.config[:agent_log_level])
+      end
+
+      LOG_LEVELS = {
+          &quot;debug&quot; =&gt; ::Logger::DEBUG,
+          &quot;info&quot; =&gt; ::Logger::INFO,
+          &quot;warn&quot; =&gt; ::Logger::WARN,
+          &quot;error&quot; =&gt; ::Logger::ERROR,
+          &quot;fatal&quot; =&gt; ::Logger::FATAL,
+      }
+
+      def self.log_level_for(level)
+        LOG_LEVELS.fetch(level.to_s.downcase, ::Logger::INFO)
+      end
+
+      def set_log_format!
+        @hostname = TingYun::Support::Hostname.get
+        @prefix = wants_stdout? ? &#39;** [TingYun]&#39; : &#39;&#39;
+        @log.formatter = Proc.new do |severity, timestamp, progname, msg|
+          &quot;#{@prefix}[#{timestamp.strftime(&quot;%m/%d/%y %H:%M:%S %z&quot;)} #{@hostname} (#{$$})] #{severity} : #{msg}\n&quot;
+        end
+      end
+
+      #send the statup log info from memory to the agent log
+      def gather_startup_logs
+        StartupLogger.instance.dump(self)
+      end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

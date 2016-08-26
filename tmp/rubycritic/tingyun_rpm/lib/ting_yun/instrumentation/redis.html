@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">Redis</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-06-21 07:24:35 +0000'>2016-06-21 07:24:35 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      42 complexity
+    </div>
+    <div class="file-stat">
+      10.5 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      4 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+
+
+TingYun::Support::LibraryDetection.defer do
+  named :redis
+
+  depends_on do
+    defined?(::Redis)
+  end
+
+
+  executes do
+    TingYun::Agent.logger.info &#39;Installing Redis Instrumentation&#39;
+    require &#39;ting_yun/agent/transaction/transaction_state&#39;
+  end
+
+  executes do
+    require &#39;ting_yun/agent/datastore&#39;
+
+    ::Redis::Client.class_eval do
+
+      def record_redis_duration(_1, _2, duration)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      record_redis_duration doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        state = TingYun::Agent::TransactionState.tl_get
+        unless state.nil?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      record_redis_duration performs a nil-check          </span>  </li></ul>
+          state.rds_duration += duration * 1000
+        end
+      end
+
+      call_method = ::Redis::Client.new.respond_to?(:call) ? :call : :raw_call_command
+
+      def call_with_tingyun_trace(*args, &amp;blk)
+        operation = args[0].is_a?(Array) ? args[0][0] : args[0]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      call_with_tingyun_trace calls args[0] 3 times          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      call_with_tingyun_trace refers to args more than self (maybe move it to another class?)          </span>  </li></ul>
+
+        TingYun::Agent::Datastore.wrap(&quot;Redis&quot;, operation, nil, method(:record_redis_duration)) do
+          call_without_tingyun_trace(*args, &amp;blk)
+        end
+      end
+
+      alias_method :call_without_tingyun_trace, call_method
+      alias_method call_method, :call_with_tingyun_trace
+
+
+      if public_method_defined? :call_pipelined
+        def call_pipelined_with_tingyun_trace(*args, &amp;block)
+          pipeline = args[0]
+          operation = pipeline.is_a?(::Redis::Pipeline::Multi) ? &#39;multi&#39; : &#39;pipeline&#39;
+
+          TingYun::Agent::Datastore.wrap(&quot;Redis&quot;, operation, nil, method(:record_redis_duration)) do
+            call_pipelined_without_tingyun_trace(*args, &amp;block)
+          end
+        end
+
+        alias_method :call_pipelined_without_tingyun_trace, :call_pipelined
+        alias_method :call_pipelined, :call_pipelined_with_tingyun_trace
+      end
+
+      if public_method_defined? :connect
+
+        alias_method :connect_without_tingyun, :connect
+
+        def connect(*args, &amp;block)
+          TingYun::Agent::Datastore.wrap(&quot;Redis&quot;, &quot;connect&quot;, nil, method(:record_redis_duration)) do
+            connect_without_tingyun(*args, &amp;block)
+          end
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

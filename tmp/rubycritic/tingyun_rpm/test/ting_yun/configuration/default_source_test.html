@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Configuration::DefaultSourceTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      109 complexity
+    </div>
+    <div class="file-stat">
+      8.4 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      13 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require File.expand_path(File.join(File.dirname(__FILE__),&#39;..&#39;,&#39;..&#39;,&#39;test_helper&#39;))
+require &#39;ting_yun/configuration/default_source&#39;
+
+module TingYun::Configuration
+  class DefaultSourceTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Configuration::DefaultSourceTest has no descriptive comment          </span>  </li></ul>
+
+    def setup
+      @default_source = DefaultSource.new
+      @defaults = ::TingYun::Configuration::DEFAULTS
+    end
+
+    def test_agent_enable
+       @defaults[:&#39;nbs.agent_enabled&#39;]
+    end
+
+    def test_default_values_have_a_public_setting
+      @defaults.each do |config_setting, config_value|
+        refute_nil config_value[:public], &quot;Config setting: #{config_setting}&quot;
+      end
+    end
+
+    def test_default_values_have_types
+      @defaults.each do |config_setting, config_value|
+        refute_nil config_value[:type], &quot;Config setting: #{config_setting}&quot;
+      end
+    end
+
+    def test_default_values_have_descriptions
+      @defaults.each do |config_setting, config_value|
+        refute_nil config_value[:description]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DefaultSourceTest#test_default_values_have_descriptions calls config_value[:description] 2 times                        <a href="default_source_test.html#L33" class="js-smell-location">0</a>                  <a href="default_source_test.html#L34" class="js-smell-location">1</a>                  </span>  </li></ul>
+        assert config_value[:description].length &gt; 0, &quot;Config setting: #{config_setting}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DefaultSourceTest#test_default_values_have_descriptions calls config_value[:description] 2 times                        <a href="default_source_test.html#L33" class="js-smell-location">0</a>                  <a href="default_source_test.html#L34" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+    end
+
+    def test_declared_types_match_default_values<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::DefaultSourceTest#test_declared_types_match_default_values has approx 6 statements          </span>  </li></ul>
+      ::TingYun::Frameworks.framework.local_env.stubs(:discovered_dispatcher).returns(:unicorn)
+
+      @default_source.keys.each do |key|
+        actual_type = get_config_value_class(fetch_config_value(key))
+        expected_type = @defaults[key][:type]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DefaultSourceTest#test_declared_types_match_default_values calls @defaults[key] 2 times                        <a href="default_source_test.html#L43" class="js-smell-location">0</a>                  <a href="default_source_test.html#L45" class="js-smell-location">1</a>                  </span>  </li></ul>
+
+        if @defaults[key][:allow_nil]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DefaultSourceTest#test_declared_types_match_default_values calls @defaults[key] 2 times                        <a href="default_source_test.html#L43" class="js-smell-location">0</a>                  <a href="default_source_test.html#L45" class="js-smell-location">1</a>                  </span>  </li></ul>
+          assert [NilClass, expected_type].include?(actual_type), &quot;Default value for #{key} should be NilClass or #{expected_type}, is #{actual_type}.&quot;
+        else
+          assert_equal expected_type, actual_type, &quot;Default value for #{key} should be #{expected_type}, is #{actual_type}.&quot;
+        end
+      end
+    end
+
+    def test_default_values_maps_keys_to_their_default_values
+      default_values = @default_source.default_values
+
+      @defaults.each do |key, value|
+        assert_equal value[:default], default_values[key]
+      end
+    end
+    
+    def fetch_config_value(key)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value has approx 7 statements          </span>  </li></ul>
+      accessor = key.to_sym
+      config = @default_source
+
+      if config.has_key?(accessor)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value refers to config more than self (maybe move it to another class?)                        <a href="default_source_test.html#L65" class="js-smell-location">0</a>                  <a href="default_source_test.html#L66" class="js-smell-location">1</a>                  <a href="default_source_test.html#L67" class="js-smell-location">2</a>                  <a href="default_source_test.html#L70" class="js-smell-location">3</a>                  <a href="default_source_test.html#L75" class="js-smell-location">4</a>                  </span>  </li></ul>
+        if config[accessor].respond_to?(:call)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value calls config[accessor] 3 times                        <a href="default_source_test.html#L66" class="js-smell-location">0</a>                  <a href="default_source_test.html#L67" class="js-smell-location">1</a>                  <a href="default_source_test.html#L75" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value refers to config more than self (maybe move it to another class?)                        <a href="default_source_test.html#L65" class="js-smell-location">0</a>                  <a href="default_source_test.html#L66" class="js-smell-location">1</a>                  <a href="default_source_test.html#L67" class="js-smell-location">2</a>                  <a href="default_source_test.html#L70" class="js-smell-location">3</a>                  <a href="default_source_test.html#L75" class="js-smell-location">4</a>                  </span>  </li></ul>
+            value = config[accessor]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value calls config[accessor] 3 times                        <a href="default_source_test.html#L66" class="js-smell-location">0</a>                  <a href="default_source_test.html#L67" class="js-smell-location">1</a>                  <a href="default_source_test.html#L75" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value refers to config more than self (maybe move it to another class?)                        <a href="default_source_test.html#L65" class="js-smell-location">0</a>                  <a href="default_source_test.html#L66" class="js-smell-location">1</a>                  <a href="default_source_test.html#L67" class="js-smell-location">2</a>                  <a href="default_source_test.html#L70" class="js-smell-location">3</a>                  <a href="default_source_test.html#L75" class="js-smell-location">4</a>                  </span>  </li></ul>
+
+            while value.respond_to?(:call)
+              value = config.instance_eval(&amp;value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value refers to config more than self (maybe move it to another class?)                        <a href="default_source_test.html#L65" class="js-smell-location">0</a>                  <a href="default_source_test.html#L66" class="js-smell-location">1</a>                  <a href="default_source_test.html#L67" class="js-smell-location">2</a>                  <a href="default_source_test.html#L70" class="js-smell-location">3</a>                  <a href="default_source_test.html#L75" class="js-smell-location">4</a>                  </span>  </li></ul>
+            end
+
+            return value
+        else
+          return  config[accessor]<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value calls config[accessor] 3 times                        <a href="default_source_test.html#L66" class="js-smell-location">0</a>                  <a href="default_source_test.html#L67" class="js-smell-location">1</a>                  <a href="default_source_test.html#L75" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Configuration::DefaultSourceTest#fetch_config_value refers to config more than self (maybe move it to another class?)                        <a href="default_source_test.html#L65" class="js-smell-location">0</a>                  <a href="default_source_test.html#L66" class="js-smell-location">1</a>                  <a href="default_source_test.html#L67" class="js-smell-location">2</a>                  <a href="default_source_test.html#L70" class="js-smell-location">3</a>                  <a href="default_source_test.html#L75" class="js-smell-location">4</a>                  </span>  </li></ul>
+        end
+      end
+      nil
+    end
+
+    def get_config_value_class(value)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Configuration::DefaultSourceTest#get_config_value_class doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+      type = value.class
+
+      if type == TrueClass || type == FalseClass
+        Boolean
+      else
+        type
+      end
+    end
+
+    def test_framework_is_test
+      assert_equal :test, DefaultSource.framework.call
+    end
+
+    def test_config_search_paths_with_home
+      with_environment(&quot;HOME&quot; =&gt; &quot;/home&quot;) do
+        paths = DefaultSource.config_search_paths.call()
+        assert_includes paths, &quot;/home/.tingyun/tingyun.yml&quot;
+        assert_includes paths, &quot;/home/tingyun.yml&quot;
+      end
+    end
+
+    def test_config_search_path_in_warbler
+      with_environment(&quot;GEM_HOME&quot; =&gt; &quot;/some/path.jar!&quot;) do
+        assert_includes DefaultSource.config_search_paths.call(), &quot;/some/path.jar!/path/config/tingyun.yml&quot;
+      end
+    end
+
+    def test_all_settings_specify_whether_they_are_allowed_from_server<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Configuration::DefaultSourceTest#test_all_settings_specify_whether_they_are_allowed_from_server has approx 7 statements          </span>  </li></ul>
+      unspecified_keys = []
+      bad_value_keys = []
+
+      @defaults.each do |key, spec|
+        if !spec.has_key?(:allowed_from_server)
+          unspecified_keys &lt;&lt; key
+        end
+
+        if ![true, false].include?(spec[:allowed_from_server])
+          bad_value_keys &lt;&lt; key
+        end
+
+        assert unspecified_keys.empty?, &quot;The following keys did not specify a value for :allowed_from_server: #{unspecified_keys.join(&#39;, &#39;)}&quot;
+        assert bad_value_keys.empty?, &quot;The following keys had incorrect :allowed_from_server values (only true or false are allowed): #{bad_value_keys.join(&#39;, &#39;)}&quot;
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

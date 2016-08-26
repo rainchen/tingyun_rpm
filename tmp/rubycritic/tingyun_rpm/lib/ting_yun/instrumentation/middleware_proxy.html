@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Instrumentation::MiddlewareProxy</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-19 08:12:23 +0000'>2016-01-19 08:12:23 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      31 complexity
+    </div>
+    <div class="file-stat">
+      3.9 complexity per method
+    </div>
+    <div class="file-stat">
+      3 churn
+    </div>
+    <div class="file-stat">
+      8 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+require &#39;ting_yun/instrumentation/middleware_tracing&#39;
+require &#39;ting_yun/instrumentation/support/transaction_namer&#39;
+
+module TingYun
+  module Instrumentation
+    class MiddlewareProxy<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Instrumentation::MiddlewareProxy has no descriptive comment          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Instance-Variables.md" target="_blank">TooManyInstanceVariables</a>)      TingYun::Instrumentation::MiddlewareProxy has at least 6 instance variables          </span>  </li></ul>
+      include TingYun::Instrumentation::MiddlewareTracing
+
+
+
+      def self.is_sinatra_app?(target)
+        defined?(::Sinatra::Base) &amp;&amp; target.kind_of?(::Sinatra::Base)
+      end
+
+      def self.needs_wrapping?(target)
+        (
+        !target.respond_to?(:_nr_has_middleware_tracing) &amp;&amp;
+            !is_sinatra_app?(target)
+        )
+      end
+
+      def self.wrap(target, is_app=false)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Instrumentation::MiddlewareProxy#self.wrap has boolean parameter 'is_app'          </span>  </li></ul>
+        if needs_wrapping?(target)
+          self.new(target, is_app)
+        else
+          target
+        end
+      end
+
+
+      attr_reader :target, :category, :transaction_options
+
+      def initialize(target, is_app=false)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Instrumentation::MiddlewareProxy#initialize has boolean parameter 'is_app'          </span>  </li></ul>
+        @target            = target
+        @is_app            = is_app
+        @category          = determine_category
+        @target_class_name = determine_class_name
+        @transaction_name  = &quot;#{determine_prefix}#{@target_class_name}/call&quot;
+        @transaction_options  = {
+            :transaction_name =&gt; @transaction_name
+        }
+      end
+
+
+      def determine_category
+        if @is_app
+          :rack
+        else
+          :middleware
+        end
+      end
+
+      def determine_prefix
+        TingYun::Instrumentation::Support::TransactionNamer.prefix_for_category(nil,@category)
+      end
+
+      def determine_class_name
+        clazz = class_for_target
+
+        name = clazz.name<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::MiddlewareProxy#determine_class_name refers to clazz more than self (maybe move it to another class?)                        <a href="middleware_proxy.html#L61" class="js-smell-location">0</a>                  <a href="middleware_proxy.html#L62" class="js-smell-location">1</a>                  </span>  </li></ul>
+        name = clazz.superclass.name if name.nil? || name == &quot;&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::MiddlewareProxy#determine_class_name refers to clazz more than self (maybe move it to another class?)                        <a href="middleware_proxy.html#L61" class="js-smell-location">0</a>                  <a href="middleware_proxy.html#L62" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Instrumentation::MiddlewareProxy#determine_class_name refers to name more than self (maybe move it to another class?)          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Instrumentation::MiddlewareProxy#determine_class_name performs a nil-check          </span>  </li></ul>
+        name
+      end
+
+      def class_for_target
+        if @target.is_a?(Class)
+          @target
+        else
+          @target.class
+        end
+      end
+
+    end
+  end
+end
+
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::VersionNumber</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-01-12 03:53:45 +0000'>2016-01-12 03:53:45 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      50 complexity
+    </div>
+    <div class="file-stat">
+      5.6 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      9 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+
+module TingYun
+  module Support
+    class VersionNumber<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::VersionNumber has no descriptive comment          </span>  </li></ul>
+
+      include Comparable
+
+      attr_reader :parts
+
+      def initialize(version_string)
+        version_string ||= &#39;1.0.0&#39;
+        @parts = version_string.split(&#39;.&#39;).map { |n| n =~ /^\d+$/ ? n.to_i : n }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Support::VersionNumber#initialize refers to n more than self (maybe move it to another class?)          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumber#initialize has the variable name 'n'          </span>  </li></ul>
+      end
+
+      def major_version;
+        @parts[0];
+      end
+
+      def minor_version;
+        @parts[1];
+      end
+
+      def tiny_version;
+        @parts[2];
+      end
+
+      def &lt;=&gt;(other)
+        other = self.class.new(other) if other.is_a? String<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#<=> calls self.class 2 times                        <a href="version_number.html#L29" class="js-smell-location">0</a>                  <a href="version_number.html#L30" class="js-smell-location">1</a>                  </span>  </li></ul>
+        self.class.compare(self.parts, other.parts)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#<=> calls self.class 2 times                        <a href="version_number.html#L29" class="js-smell-location">0</a>                  <a href="version_number.html#L30" class="js-smell-location">1</a>                  </span>  </li></ul>
+      end
+
+      def to_s
+        @parts.join(&quot;.&quot;)
+      end
+
+      def hash
+        @parts.hash
+      end
+
+      def eql? other
+        (self &lt;=&gt; other) == 0
+      end
+
+      private
+
+      def self.compare(parts1, parts2)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="http://docs.seattlerb.org/flog/" target="_blank">HighComplexity</a>)      TingYun::Support::VersionNumber::compare has a flog score of 30          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::VersionNumber#self.compare has approx 10 statements          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Support::VersionNumber#self.compare has the parameter name 'parts1'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Parameter-Name.md" target="_blank">UncommunicativeParameterName</a>)      TingYun::Support::VersionNumber#self.compare has the parameter name 'parts2'          </span>  </li></ul>
+        a, b = parts1.first, parts2.first<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumber#self.compare has the variable name 'a'          </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::VersionNumber#self.compare has the variable name 'b'          </span>  </li></ul>
+        case
+          when a.nil? &amp;&amp; b.nil? then<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls a.nil? 2 times                        <a href="version_number.html#L50" class="js-smell-location">0</a>                  <a href="version_number.html#L52" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls b.nil? 2 times                        <a href="version_number.html#L50" class="js-smell-location">0</a>                  <a href="version_number.html#L54" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Support::VersionNumber#self.compare performs a nil-check          </span>  </li></ul>
+            0
+          when a.nil? then<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls a.nil? 2 times                        <a href="version_number.html#L50" class="js-smell-location">0</a>                  <a href="version_number.html#L52" class="js-smell-location">1</a>                  </span>  </li></ul>
+            b.is_a?(Fixnum) ? -1 : 1<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls b.is_a?(Fixnum) 2 times                        <a href="version_number.html#L53" class="js-smell-location">0</a>                  <a href="version_number.html#L59" class="js-smell-location">1</a>                  </span>  </li></ul>
+          when b.nil? then<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls b.nil? 2 times                        <a href="version_number.html#L50" class="js-smell-location">0</a>                  <a href="version_number.html#L54" class="js-smell-location">1</a>                  </span>  </li></ul>
+            -compare(parts2, parts1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls -compare(parts2, parts1) 2 times                        <a href="version_number.html#L55" class="js-smell-location">0</a>                  <a href="version_number.html#L61" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls compare(parts2, parts1) 2 times                        <a href="version_number.html#L55" class="js-smell-location">0</a>                  <a href="version_number.html#L61" class="js-smell-location">1</a>                  </span>  </li></ul>
+          when a.to_s == b.to_s then
+            compare(parts1[1..-1], parts2[1..-1])
+          when a.is_a?(String) then
+            b.is_a?(Fixnum) ? -1 : (a &lt;=&gt; b)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls a <=> b 2 times                        <a href="version_number.html#L59" class="js-smell-location">0</a>                  <a href="version_number.html#L63" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls b.is_a?(Fixnum) 2 times                        <a href="version_number.html#L53" class="js-smell-location">0</a>                  <a href="version_number.html#L59" class="js-smell-location">1</a>                  </span>  </li></ul>
+          when b.is_a?(String) then
+            -compare(parts2, parts1)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls -compare(parts2, parts1) 2 times                        <a href="version_number.html#L55" class="js-smell-location">0</a>                  <a href="version_number.html#L61" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls compare(parts2, parts1) 2 times                        <a href="version_number.html#L55" class="js-smell-location">0</a>                  <a href="version_number.html#L61" class="js-smell-location">1</a>                  </span>  </li></ul>
+          else # they are both fixnums, not nil
+            a &lt;=&gt; b<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Support::VersionNumber#self.compare calls a <=> b 2 times                        <a href="version_number.html#L59" class="js-smell-location">0</a>                  <a href="version_number.html#L63" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+      end
+
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

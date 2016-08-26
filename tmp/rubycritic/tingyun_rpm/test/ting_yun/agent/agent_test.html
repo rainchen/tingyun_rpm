@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Agent::AgentTest</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-03 16:51:31 +0800'>2016-08-03 16:51:31 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      10 complexity
+    </div>
+    <div class="file-stat">
+      2.5 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      4 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+
+require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;test_helper&#39;))
+require &quot;ting_yun/agent/agent&quot;
+require &quot;ting_yun/configuration/manager&quot;
+require &#39;ting_yun/agent/class_methods&#39;
+require &#39;ting_yun/support/collector&#39;
+require &#39;ting_yun/environment_report&#39;
+
+module TingYun
+  module Agent
+    class AgentTest &lt; MiniTest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::AgentTest has no descriptive comment          </span>  </li></ul>
+      def setup
+         @agent = TingYun::Agent::Agent.instance
+      end
+
+      def teardown<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::AgentTest#teardown doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        TingYun::Agent.config.reset_to_defaults
+      end
+
+      def test_class_methods<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::AgentTest#test_class_methods doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+        [:config,:logger,:instance].each do |method|
+          ::TingYun::Agent::Agent.must_respond_to(method)
+        end
+      end
+
+      def test_agent_should_singleton
+        agent1 = ::TingYun::Agent::Agent.instance<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::AgentTest#test_agent_should_singleton calls ::TingYun::Agent::Agent.instance 2 times                        <a href="agent_test.html#L29" class="js-smell-location">0</a>                  <a href="agent_test.html#L30" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::AgentTest#test_agent_should_singleton has the variable name 'agent1'          </span>  </li></ul>
+        agent2 = ::TingYun::Agent::Agent.instance<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::AgentTest#test_agent_should_singleton calls ::TingYun::Agent::Agent.instance 2 times                        <a href="agent_test.html#L29" class="js-smell-location">0</a>                  <a href="agent_test.html#L30" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::AgentTest#test_agent_should_singleton has the variable name 'agent2'          </span>  </li></ul>
+        assert_equal agent1, agent2
+      end
+
+      # def test_env
+      #   with_config(:ssl=&gt; false) do
+      #     collector = TingYun::Support::Collector.new(&#39;redirect.networkbench.com&#39;, 80)
+      #     @agent.service = TingYun::TingYunService.new(&#39;888-888-888&#39;,collector)
+      #     @agent.generate_environment_report
+      #     @agent.connect_to_server
+      #
+      #   end
+      # end
+
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

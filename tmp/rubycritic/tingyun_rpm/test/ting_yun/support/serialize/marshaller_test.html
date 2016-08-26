@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-a circled-text circle">
+    A
+  </span>
+  <h2 class="file-name">TingYun::Support::Serialize::MarshallerTest::ReverseEncoder</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-07-15 05:37:30 +0000'>2016-07-15 05:37:30 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      23 complexity
+    </div>
+    <div class="file-stat">
+      3.3 complexity per method
+    </div>
+    <div class="file-stat">
+      6 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require File.expand_path(File.join(File.dirname(__FILE__), &#39;..&#39;, &#39;..&#39;, &#39;..&#39;, &#39;test_helper&#39;))
+
+
+require &#39;ting_yun/support/serialize/marshaller&#39;
+require &#39;ting_yun/support/serialize/encodes&#39;
+require &#39;ting_yun/support/exception&#39;
+
+module TingYun::Support::Serialize
+  class MarshallerTest &lt; Minitest::Test<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::MarshallerTest has no descriptive comment          </span>  </li></ul>
+
+    def setup
+      @marshaller = TingYun::Support::Serialize::Marshaller.new
+    end
+
+
+    def test_marshaller_obeys_requested_encoder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Support::Serialize::MarshallerTest#test_marshaller_obeys_requested_encoder has approx 9 statements          </span>  </li></ul>
+      dummy = [&#39;hello there&#39;]
+      def dummy.to_collector_array(encoder)
+        self.map { |x| encoder.encode(x) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::MarshallerTest#test_marshaller_obeys_requested_encoder#dummy.to_collector_array has the variable name 'x'          </span>  </li></ul>
+      end
+      identity_encoder = TingYun::Support::Serialize::Encoders::Identity
+
+      prepared = @marshaller.prepare(dummy, :encoder =&gt; identity_encoder)
+
+      assert_equal(dummy, prepared)
+
+      prepared = @marshaller.prepare(dummy, :encoder =&gt; ReverseEncoder)
+      decoded = prepared.map { |x| x.reverse }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::MarshallerTest#test_marshaller_obeys_requested_encoder has the variable name 'x'          </span>  </li></ul>
+      assert_equal(dummy, decoded)
+    end
+
+    def test_marshaller_prepare_passes_on_options
+      inner_array = [&#39;abcd&#39;]
+      def inner_array.to_collector_array(encoder)
+        self.map { |x| encoder.encode(x) }<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Support::Serialize::MarshallerTest#test_marshaller_prepare_passes_on_options#inner_array.to_collector_array has the variable name 'x'          </span>  </li></ul>
+      end
+      dummy = [[inner_array]]
+      prepared = @marshaller.prepare(dummy, :encoder =&gt; ReverseEncoder)
+      assert_equal([[[&#39;dcba&#39;]]], prepared)
+    end
+
+
+
+    def test_return_value_data_and_return_value
+      assert &#39;return_value&#39;, @marshaller.return_value_for_testing({&#39;return_value&#39; =&gt; &#39;return_value&#39;})
+    end
+
+
+    module ReverseEncoder<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Support::Serialize::MarshallerTest::ReverseEncoder has no descriptive comment          </span>  </li></ul>
+      def self.encode(data)
+        data.reverse
+      end
+    end
+
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

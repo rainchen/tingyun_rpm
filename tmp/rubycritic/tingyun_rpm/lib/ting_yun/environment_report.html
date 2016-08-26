@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::EnvironmentReport</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-04-29 02:35:37 +0000'>2016-04-29 02:35:37 +0000</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      115 complexity
+    </div>
+    <div class="file-stat">
+      16.4 complexity per method
+    </div>
+    <div class="file-stat">
+      9 churn
+    </div>
+    <div class="file-stat">
+      7 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/support/system_info&#39;
+
+module TingYun
+  # The EnvironmentReport is responsible for analyzing the application&#39;s
+  # environment and generating the data for the Environment Report in TINGYUN
+  #
+  # It contains useful system information like Ruby version, OS, loaded gems,
+  # etc.
+  #
+  # Additional logic can be registered by using the EnvironmentReport.report_on
+  # hook.
+  class EnvironmentReport
+
+    # This is the main interface for registering logic that should be included
+    # in the Environment Report. For example:
+    #
+    # EnvironmentReport.report_on &quot;Day of week&quot; do
+    #   Time.now.strftime(&quot;%A&quot;)
+    # end
+    #
+    # The passed blocks will be run in EnvironmentReport instances on #initialize.
+    #
+    # Errors raised in passed blocks will be handled and logged at debug, so it
+    # is safe to report on things that may not work in certain environments.
+    #
+    # The blocks should only return strings or arrays full of strings.  Falsey
+    # values will be ignored.
+    def self.report_on(key, &amp;block)
+      registered_reporters[key] = block
+    end
+
+    def self.registered_reporters
+      @registered_reporters ||= Hash.new
+    end
+
+    # allow the logic to be swapped out in tests
+    def self.registered_reporters=(logic)
+      @registered_reporters = logic
+    end
+
+    # register reporting logic
+    ####################################
+    report_on(&#39;Gems&#39;) do
+      begin
+       (Bundler.rubygems.all_specs.map { |gem| &quot;#{gem.name}(#{gem.version})&quot; }).join(&#39;,&#39;)
+      rescue
+        # There are certain rubygem, bundler, rails combinations (e.g. gem
+        # 1.6.2, rails 2.3, bundler 1.2.3) where the code above throws an error
+        # in bundler because of rails monkey patching gem.  The below does work
+        # though so try it if the above fails.
+        Bundler.load.specs.map do |spec|
+          version = (spec.respond_to?(:version) &amp;&amp; spec.version)
+          spec.name + (version ? &quot;(#{version})&quot; : &quot;&quot;)
+        end.join(&#39;,&#39;)
+      end
+    end
+    report_on(&#39;Plugin List&#39;) { ::Rails.configuration.plugins.to_a.join(&#39;,&#39;)}
+    report_on(&#39;Ruby version&#39;) { RUBY_VERSION }
+    report_on(&#39;Ruby description&#39;) { RUBY_DESCRIPTION }
+    report_on(&#39;Ruby platform&#39;) { RUBY_PLATFORM }
+    report_on(&#39;Ruby patchlevel&#39;) { RUBY_PATCHLEVEL.to_s }
+    report_on(&#39;JRuby version&#39;) { JRUBY_VERSION }
+    report_on(&#39;Java VM version&#39;) { ENV_JAVA[&#39;java.vm.version&#39;] }
+    report_on(&#39;Logical Processors&#39;) { ::TingYun::Support::SystemInfo.num_logical_processors }
+    report_on(&#39;Physical Cores&#39;) { ::TingYun::Support::SystemInfo.num_physical_cores }
+    report_on(&#39;os_arch&#39;) { ::TingYun::Support::SystemInfo.processor_arch }
+    report_on(&#39;os_version&#39;) { ::TingYun::Support::SystemInfo.os_version }
+    report_on(&#39;kernel&#39;) { ::TingYun::Support::SystemInfo.ruby_os_identifier }
+    report_on(&#39;Database adapter&#39;) do
+      ActiveRecord::Base.configurations[::TingYun::Frameworks.framework.env][&#39;adapter&#39;]
+    end
+    report_on(&#39;Framework&#39;) { TingYun::Agent.config[:framework].to_s }
+    report_on(&#39;Dispatcher&#39;) { TingYun::Agent.config[:dispatcher].to_s }
+    report_on(&#39;Environment&#39;) { ::TingYun::Frameworks.framework.env }
+    report_on(&#39;Rails version&#39;) { ::Rails::VERSION::STRING }
+    report_on(&#39;Rails threadsafe&#39;) do
+      ::Rails.configuration.action_controller.allow_concurrency
+    end
+    report_on(&#39;Rails Env&#39;) do
+      if defined? ::Rails and ::Rails.respond_to?(:env)
+        ::Rails.env.to_s
+      else
+        ENV[&#39;RAILS_ENV&#39;]
+      end
+    end
+    report_on(&#39;OpenSSL version&#39;) { ::OpenSSL::OPENSSL_VERSION }
+    # end reporting logic
+    ####################################
+
+
+    attr_reader :data
+    # Generate the report based on the class level logic.
+    def initialize
+      @data = self.class.registered_reporters.inject(Hash.new) do |data, (key, logic)|
+        begin
+          value = logic.call
+          if value
+            data[key] = value
+          else
+            ::TingYun::Agent.logger.debug(&quot;EnvironmentReport ignoring value for #{key.inspect} which came back falsey: #{value.inspect}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::EnvironmentReport#initialize calls ::TingYun::Agent.logger 2 times                        <a href="environment_report.html#L102" class="js-smell-location">0</a>                  <a href="environment_report.html#L105" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::EnvironmentReport#initialize calls key.inspect 2 times                        <a href="environment_report.html#L102" class="js-smell-location">0</a>                  <a href="environment_report.html#L105" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::EnvironmentReport#initialize has the variable name 'e'          </span>  </li></ul>
+          ::TingYun::Agent.logger.debug(&quot;EnvironmentReport failed to retrieve value for #{key.inspect}: #{e}&quot;)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::EnvironmentReport#initialize calls ::TingYun::Agent.logger 2 times                        <a href="environment_report.html#L102" class="js-smell-location">0</a>                  <a href="environment_report.html#L105" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::EnvironmentReport#initialize calls key.inspect 2 times                        <a href="environment_report.html#L102" class="js-smell-location">0</a>                  <a href="environment_report.html#L105" class="js-smell-location">1</a>                  </span>  </li></ul>
+        end
+        data
+      end
+    end
+
+    def [](key)
+      @data[key]
+    end
+
+    def []=(key, value)
+      @data[key] = value
+    end
+
+    def to_a
+      @data.to_a
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

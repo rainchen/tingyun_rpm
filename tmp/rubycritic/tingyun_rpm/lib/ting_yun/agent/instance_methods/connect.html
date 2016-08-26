@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <div class="container">
+        <h1 class="logo"><a href="../../../../../overview.html" class="logo-link">RubyCritic</a></h1>
+        <nav class="project-nav">
+          <a href="../../../../../overview.html" class="project-nav-item">Overview</a>
+          <a href="../../../../../code_index.html" class="project-nav-item">Code</a>
+          <a href="../../../../../smells_index.html" class="project-nav-item">Smells</a>
+        </nav>
+      </div>
+    </header>
+    <div class="container">
+      <div class="file-header group rated">
+  <span class="rating rating-b circled-text circle">
+    B
+  </span>
+  <h2 class="file-name">TingYun::Agent::InstanceMethods::Connect</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2016-08-22 15:24:39 +0800'>2016-08-22 15:24:39 +0800</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      92 complexity
+    </div>
+    <div class="file-stat">
+      5.1 complexity per method
+    </div>
+    <div class="file-stat">
+      17 churn
+    </div>
+    <div class="file-stat">
+      18 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code"># encoding: utf-8
+# This file is distributed under Ting Yun&#39;s license terms.
+require &#39;ting_yun/support/exception&#39;
+require &#39;ting_yun/support/hostname&#39;
+require &#39;ting_yun/configuration/server_source&#39;
+require &#39;ting_yun/agent/instance_methods/handle_errors&#39;
+require &#39;ting_yun/environment_report&#39;
+
+
+module TingYun
+  module Agent
+    module InstanceMethods
+      module Connect<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Irresponsible-Module.md" target="_blank">IrresponsibleModule</a>)      TingYun::Agent::InstanceMethods::Connect has no descriptive comment          </span>  </li></ul>
+
+        include HandleErrors
+
+        # number of attempts we&#39;ve made to contact the server
+        attr_accessor :connect_attempts<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Attribute.md" target="_blank">Attribute</a>)      TingYun::Agent::InstanceMethods::Connect#connect_attempts is a writable attribute          </span>  </li></ul>
+
+        # Disconnect just sets connected to false, which prevents
+        # the agent from trying to connect again
+        def disconnect
+          @connect_state = :disconnected
+          true
+        end
+
+        def connected?
+          @connect_state == :connected
+        end
+
+        def disconnected?
+          @connect_state == :disconnected
+        end
+
+        # Don&#39;t connect if we&#39;re already connected, or if we tried to connect
+        # and were rejected with prejudice because of a license issue, unless
+        # we&#39;re forced to by force_reconnect.
+        def should_connect?(force=false)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Boolean-Parameter.md" target="_blank">BooleanParameter</a>)      TingYun::Agent::InstanceMethods::Connect#should_connect? has boolean parameter 'force'          </span>  </li></ul>
+          force || (!connected? &amp;&amp; !disconnected?)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Control-Parameter.md" target="_blank">ControlParameter</a>)      TingYun::Agent::InstanceMethods::Connect#should_connect? is controlled by argument force          </span>  </li></ul>
+        end
+
+        # Retry period is a minute for each failed attempt that
+        # we&#39;ve made. This should probably do some sort of sane TCP
+        # backoff to prevent hammering the server, but a minute for
+        # each attempt seems to work reasonably well.
+        def connect_retry_period
+          [600, connect_attempts * 60].min
+        end
+
+        def note_connect_failure
+          self.connect_attempts += 1
+        end
+
+        def generate_environment_report
+          @environment_report = environment_for_connect
+        end
+
+        # We&#39;ve seen objects in the environment report (Rails.env in
+        # particular) that can&#39;t seralize to JSON. Cope with that here and
+        # clear out so downstream code doesn&#39;t have to check again.
+        def sanitize_environment_report
+          if !@service.valid_to_marshal?(@environment_report)
+            @environment_report = {}
+          end
+        end
+
+
+        # Checks whether we should send environment info, and if so,
+        # returns the snapshot from the local environment.
+        # Generating the EnvironmentReport has the potential to trigger
+        # require calls in Rails environments, so this method should only
+        # be called synchronously from on the main thread.
+        def environment_for_connect<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Connect#environment_for_connect doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          ::TingYun::Agent.config[:send_environment_info] ? TingYun::EnvironmentReport.new.data : {}
+        end
+
+
+        # Initializes the hash of settings that we send to the
+        # server. Returns a literal hash containing the options
+        def connect_settings
+          sanitize_environment_report
+          settings = {
+              :pid =&gt; $$,
+              :port =&gt; ::TingYun::Agent.config[:port],<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#connect_settings calls ::TingYun::Agent.config 3 times                        <a href="connect.html#L84" class="js-smell-location">0</a>                  <a href="connect.html#L86" class="js-smell-location">1</a>                  <a href="connect.html#L90" class="js-smell-location">2</a>                  </span>  </li></ul>
+              :host =&gt; local_host,
+              :appName =&gt; ::TingYun::Agent.config.app_names,<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#connect_settings calls ::TingYun::Agent.config 3 times                        <a href="connect.html#L84" class="js-smell-location">0</a>                  <a href="connect.html#L86" class="js-smell-location">1</a>                  <a href="connect.html#L90" class="js-smell-location">2</a>                  </span>  </li></ul>
+              :language =&gt; &#39;Ruby&#39;,
+              :agentVersion =&gt; ::TingYun::VERSION::STRING,
+              :env =&gt; @environment_report,
+              :config =&gt; ::TingYun::Agent.config.to_collector_hash<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#connect_settings calls ::TingYun::Agent.config 3 times                        <a href="connect.html#L84" class="js-smell-location">0</a>                  <a href="connect.html#L86" class="js-smell-location">1</a>                  <a href="connect.html#L90" class="js-smell-location">2</a>                  </span>  </li></ul>
+          }
+          settings
+        end
+
+        def local_host<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Connect#local_host doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          TingYun::Support::Hostname.get
+        end
+
+        # Returns connect data passed back from the server
+        def connect_to_server
+          @service.connect(connect_settings)
+        end
+
+        #merge server config
+        def query_server_for_configuration
+          finish_setup(connect_to_server)
+        end
+
+        # * &lt;tt&gt;:keep_retrying =&gt; false&lt;/tt&gt; to only try to connect once, and
+        #   return with the connection set to nil.  This ensures we may try again
+        #   later (default true).
+        # * &lt;tt&gt;force_reconnect =&gt; true&lt;/tt&gt; if you want to establish a new connection
+        #   to the server before running the worker loop.  This means you get a separate
+        #   agent run and Ting Yun sees it as a separate instance (default is false).
+        def catch_errors<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Too-Many-Statements.md" target="_blank">TooManyStatements</a>)      TingYun::Agent::InstanceMethods::Connect#catch_errors has approx 11 statements          </span>  </li></ul>
+          yield
+
+        rescue TingYun::Support::Exception::ExpiredConfigurationException =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::Connect#catch_errors has the variable name 'e'                        <a href="connect.html#L118" class="js-smell-location">0</a>                  <a href="connect.html#L121" class="js-smell-location">1</a>                  <a href="connect.html#L124" class="js-smell-location">2</a>                  <a href="connect.html#L126" class="js-smell-location">3</a>                  </span>  </li></ul>
+          handle_force_restart(e)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#catch_errors calls handle_force_restart(e) 3 times                        <a href="connect.html#L119" class="js-smell-location">0</a>                  <a href="connect.html#L122" class="js-smell-location">1</a>                  <a href="connect.html#L125" class="js-smell-location">2</a>                  </span>  </li></ul>
+          retry
+        rescue TingYun::Support::Exception::InvalidDataTokenException =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::Connect#catch_errors has the variable name 'e'                        <a href="connect.html#L118" class="js-smell-location">0</a>                  <a href="connect.html#L121" class="js-smell-location">1</a>                  <a href="connect.html#L124" class="js-smell-location">2</a>                  <a href="connect.html#L126" class="js-smell-location">3</a>                  </span>  </li></ul>
+          handle_force_restart(e)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#catch_errors calls handle_force_restart(e) 3 times                        <a href="connect.html#L119" class="js-smell-location">0</a>                  <a href="connect.html#L122" class="js-smell-location">1</a>                  <a href="connect.html#L125" class="js-smell-location">2</a>                  </span>  </li></ul>
+          retry
+        rescue TingYun::Support::Exception::InvalidDataException =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::Connect#catch_errors has the variable name 'e'                        <a href="connect.html#L118" class="js-smell-location">0</a>                  <a href="connect.html#L121" class="js-smell-location">1</a>                  <a href="connect.html#L124" class="js-smell-location">2</a>                  <a href="connect.html#L126" class="js-smell-location">3</a>                  </span>  </li></ul>
+          handle_force_restart(e)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#catch_errors calls handle_force_restart(e) 3 times                        <a href="connect.html#L119" class="js-smell-location">0</a>                  <a href="connect.html#L122" class="js-smell-location">1</a>                  <a href="connect.html#L125" class="js-smell-location">2</a>                  </span>  </li></ul>
+        rescue =&gt; e<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Uncommunicative-Variable-Name.md" target="_blank">UncommunicativeVariableName</a>)      TingYun::Agent::InstanceMethods::Connect#catch_errors has the variable name 'e'                        <a href="connect.html#L118" class="js-smell-location">0</a>                  <a href="connect.html#L121" class="js-smell-location">1</a>                  <a href="connect.html#L124" class="js-smell-location">2</a>                  <a href="connect.html#L126" class="js-smell-location">3</a>                  </span>  </li></ul>
+          handle_other_error(e)
+        end
+
+        # Takes a hash of configuration data returned from the
+        # server and uses it to set local variables and to
+        # initialize various parts of the agent that are configured
+        # separately.
+        #
+        def finish_setup(config_data)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Connect#finish_setup doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          return if config_data == nil<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Nil-Check.md" target="_blank">NilCheck</a>)      TingYun::Agent::InstanceMethods::Connect#finish_setup performs a nil-check          </span>  </li></ul>
+
+          if config_data[&#39;config&#39;]
+            ::TingYun::Agent.logger.debug &quot;Using config from server&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#finish_setup calls ::TingYun::Agent.logger 2 times                        <a href="connect.html#L139" class="js-smell-location">0</a>                  <a href="connect.html#L141" class="js-smell-location">1</a>                  </span>  </li></ul>
+          end
+          ::TingYun::Agent.logger.debug &quot;Server provided config: #{config_data.inspect}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#finish_setup calls ::TingYun::Agent.logger 2 times                        <a href="connect.html#L139" class="js-smell-location">0</a>                  <a href="connect.html#L141" class="js-smell-location">1</a>                  </span>  </li></ul>
+          server_config = TingYun::Configuration::ServerSource.new(config_data)
+          ::TingYun::Agent.config.replace_or_add_config(server_config)
+          #log_connection!(config_data)
+        end
+
+        def log_connection!(config_data)
+          ::TingYun::Agent.logger.debug &quot;Connected to TingYun Service at #{@service.collector.name}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#log_connection! calls ::TingYun::Agent.logger 3 times                        <a href="connect.html#L148" class="js-smell-location">0</a>                  <a href="connect.html#L149" class="js-smell-location">1</a>                  <a href="connect.html#L150" class="js-smell-location">2</a>                  </span>  </li></ul>
+          ::TingYun::Agent.logger.debug &quot;Application Run       = #{@service.applicationId}.&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#log_connection! calls ::TingYun::Agent.logger 3 times                        <a href="connect.html#L148" class="js-smell-location">0</a>                  <a href="connect.html#L149" class="js-smell-location">1</a>                  <a href="connect.html#L150" class="js-smell-location">2</a>                  </span>  </li></ul>
+          ::TingYun::Agent.logger.debug &quot;Connection data = #{config_data.inspect}&quot;<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#log_connection! calls ::TingYun::Agent.logger 3 times                        <a href="connect.html#L148" class="js-smell-location">0</a>                  <a href="connect.html#L149" class="js-smell-location">1</a>                  <a href="connect.html#L150" class="js-smell-location">2</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::InstanceMethods::Connect#log_connection! refers to config_data more than self (maybe move it to another class?)                        <a href="connect.html#L150" class="js-smell-location">0</a>                  <a href="connect.html#L151" class="js-smell-location">1</a>                  <a href="connect.html#L152" class="js-smell-location">2</a>                  </span>  </li></ul>
+          if config_data[&#39;messages&#39;] &amp;&amp; config_data[&#39;messages&#39;].any?<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#log_connection! calls config_data['messages'] 3 times                        <a href="connect.html#L151" class="js-smell-location">0</a>                  <a href="connect.html#L152" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::InstanceMethods::Connect#log_connection! refers to config_data more than self (maybe move it to another class?)                        <a href="connect.html#L150" class="js-smell-location">0</a>                  <a href="connect.html#L151" class="js-smell-location">1</a>                  <a href="connect.html#L152" class="js-smell-location">2</a>                  </span>  </li></ul>
+            log_collector_messages(config_data[&#39;messages&#39;])<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Duplicate-Method-Call.md" target="_blank">DuplicateMethodCall</a>)      TingYun::Agent::InstanceMethods::Connect#log_connection! calls config_data['messages'] 3 times                        <a href="connect.html#L151" class="js-smell-location">0</a>                  <a href="connect.html#L152" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Feature-Envy.md" target="_blank">FeatureEnvy</a>)      TingYun::Agent::InstanceMethods::Connect#log_connection! refers to config_data more than self (maybe move it to another class?)                        <a href="connect.html#L150" class="js-smell-location">0</a>                  <a href="connect.html#L151" class="js-smell-location">1</a>                  <a href="connect.html#L152" class="js-smell-location">2</a>                  </span>  </li></ul>
+          end
+        end
+
+        def log_collector_messages(messages)<ul class="nocode smells js-smells">  <li class="smell ">    <span class="description">      (<a href="https://github.com/troessner/reek/blob/master/docs/Utility-Function.md" target="_blank">UtilityFunction</a>)      TingYun::Agent::InstanceMethods::Connect#log_collector_messages doesn't depend on instance state (maybe move it to another class?)          </span>  </li></ul>
+          messages.each do |message|
+            ::TingYun::Agent.logger.send(message[&#39;level&#39;].downcase, message[&#39;message&#39;])
+          end
+        end
+
+        def connect_in_sync
+          TingYun::Agent.disable_all_tracing { connect!(:keep_retrying =&gt; false) }
+        end
+      end
+    end
+  end
+end
+</code>
+
+    </div>
+    <script src='../../../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.tablesorter.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../../../assets/javascripts/application.js'></script>
+  </body>
+</html>
