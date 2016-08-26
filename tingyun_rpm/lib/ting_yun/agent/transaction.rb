@@ -8,12 +8,19 @@ require 'ting_yun/agent/transaction/request_attributes'
 require 'ting_yun/agent/transaction/attributes'
 require 'ting_yun/agent/transaction/exceptions'
 require 'ting_yun/agent/transaction/apdex'
+require 'ting_yun/agent/transaction/class_method'
+require 'ting_yun/agent/transaction/instance_method'
 
 
 module TingYun
   module Agent
     # web transaction
     class Transaction
+
+      include TingYun::Agent::Transaction::InstanceMethod
+
+      extend TingYun::Agent::Transaction::ClassMethod
+
 
 
 
@@ -26,7 +33,7 @@ module TingYun
       MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
       GRAPE_PREFIX = 'Grape/'.freeze
       RAKE_PREFIX = 'Rake'.freeze
-      WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware, :thrift].freeze
+
       EMPTY_SUMMARY_METRICS = [].freeze
       MIDDLEWARE_SUMMARY_METRICS = ['Middleware/all'.freeze].freeze
 
@@ -96,26 +103,6 @@ module TingYun
         freeze_name_and_execute if @default_name.start_with?(RAKE_TRANSACTION_PREFIX)
       end
 
-      def create_nested_frame(state, category, options)
-        @has_children = true
-        frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
-        name_last_frame(options[:transaction_name])
-
-        set_default_transaction_name(options[:transaction_name], category)
-      end
-
-
-      def set_default_transaction_name(name, category)
-        if @frozen_name
-          TingYun::Agent.logger.warn("Attempted to rename transaction to '#{name}' after transaction name was already frozen as '#{@frozen_name}'.")
-          return
-        end
-        if influences_transaction_name?(category)
-          @default_name = name
-          @category = category if category
-        end
-      end
-
 
 
 
@@ -166,219 +153,6 @@ module TingYun
 
 
         TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
-      end
-
-
-      def record_summary_metrics(outermost_node_name,end_time)
-        unless @frozen_name == outermost_node_name
-          @metrics.record_unscoped(@frozen_name, TingYun::Helper.time_to_millis(end_time.to_f - start_time.to_f))
-        end
-      end
-
-      def assign_agent_attributes
-
-        @attributes.add_agent_attribute(:threadName,  "pid-#{$$}");
-
-        if @request_attributes
-          @request_attributes.assign_agent_attributes @attributes
-        end
-
-      end
-
-
-      # This transaction-local hash may be used as temprory storage by
-      # instrumentation that needs to pass data from one instrumentation point
-      # to another.
-      #
-      # For example, if both A and B are instrumented, and A calls B
-      # but some piece of state needed by the instrumentation at B is only
-      # available at A, the instrumentation at A may write into the hash, call
-      # through, and then remove the key afterwards, allowing the
-      # instrumentation at B to read the value in between.
-      #
-      # Keys should be symbols, and care should be taken to not generate key
-      # names dynamically, and to ensure that keys are removed upon return from
-      # the method that creates them.
-      #
-      def instrumentation_state
-        @instrumentation_state ||= {}
-      end
-
-      def with_database_metric_name(model, method, product=nil)
-        previous = self.instrumentation_state[:datastore_override]
-        model_name = case model
-                       when Class
-                         model.name
-                       when String
-                         model
-                       else
-                         model.to_s
-                     end
-        self.instrumentation_state[:datastore_override] = [method, model_name, product]
-        yield
-      ensure
-        self.instrumentation_state[:datastore_override] = previous
-      end
-
-      def freeze_name_and_execute
-        unless @frozen_name
-          @frozen_name = best_name
-        end
-
-        yield if block_given?
-      end
-
-
-      def name_last_frame(name)
-        frame_stack.last.name = name
-      end
-
-      def influences_transaction_name?(category)
-        !category || frame_stack.size == 1 || similar_category?(category)
-      end
-
-      def web_category?(category)
-        WEB_TRANSACTION_CATEGORIES.include?(category)
-      end
-
-      def similar_category?(category)
-        web_category?(@category) == web_category?(category)
-      end
-
-
-      def best_name
-        @frozen_name || @default_name || ::TingYun::Agent::UNKNOWN_METRIC
-      end
-
-
-      def self.wrap(state, name, category, options = {})
-        Transaction.start(state, category, options.merge(:transaction_name => name))
-
-        begin
-          # We shouldn't raise from Transaction.start, but only wrap the yield
-          # to be absolutely sure we don't report agent problems as app errors
-          yield
-        rescue => e
-          Transaction.notice_error(e)
-          raise e
-        ensure
-          Transaction.stop(state)
-        end
-      end
-
-
-      def self.start(state, category, options)
-        category ||= :controller
-        txn = state.current_transaction
-        options[:client_transaction_id] = state.client_transaction_id
-        if txn
-          txn.create_nested_frame(state, category, options)
-        else
-          txn = start_new_transaction(state, category, options)
-        end
-
-        # merge params every step into here
-        txn.attributes.merge_request_parameters(options[:filtered_params])
-
-        txn
-      rescue => e
-        TingYun::Agent.logger.error("Exception during Transaction.start", e)
-      end
-
-      def self.start_new_transaction(state, category, options)
-        txn = Transaction.new(category, options)
-        state.reset(txn)
-        txn.start(state)
-        txn
-      end
-
-      def self.nested_transaction_name(name)
-        if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(RAKE_TRANSACTION_PREFIX)
-          "#{SUBTRANSACTION_PREFIX}#{name}"
-        else
-          name
-        end
-      end
-
-
-      def self.stop(state, end_time = Time.now)
-
-        txn = state.current_transaction
-
-        unless txn
-          TingYun::Agent.logger.error("Failed during Transaction.stop because there is no current transaction")
-          return
-        end
-
-        nested_frame = txn.frame_stack.pop
-
-        if txn.frame_stack.empty?
-          txn.stop(state, end_time, nested_frame)
-          state.reset
-        else
-          nested_name = nested_transaction_name(nested_frame.name)
-
-          if nested_name.start_with?(MIDDLEWARE_PREFIX)
-            summary_metrics = MIDDLEWARE_SUMMARY_METRICS
-          else
-            summary_metrics = EMPTY_SUMMARY_METRICS
-          end
-
-          TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
-              state,
-              nested_frame.start_time.to_f,
-              nested_name,
-              summary_metrics,
-              nested_frame,
-              NESTED_TRACE_STOP_OPTIONS,
-              end_time.to_f)
-
-        end
-
-        :transaction_stopped
-      rescue => e
-        state.reset
-        TingYun::Agent.logger.error("Exception during Transaction.stop", e)
-        nil
-      end
-
-
-      # See TingYun::Agent.notice_error for options and commentary
-      def self.notice_error(e, options={})
-        state = TingYun::Agent::TransactionState.tl_get
-        txn = state.current_transaction
-        if txn
-          txn.exceptions.notice_error(e, options)
-        elsif TingYun::Agent.instance
-          TingYun::Agent.instance.error_collector.notice_error(e, options)
-        end
-      end
-
-      def self.recording_web_transaction? #THREAD_LOCAL_ACCESS
-        txn = tl_current
-        txn && txn.web_category?(txn.category)
-      end
-
-      def self.tl_current
-        TingYun::Agent::TransactionState.tl_get.current_transaction
-      end
-
-      def self.metrics
-        txn = tl_current
-        txn && txn.metrics
-      end
-
-      HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
-      GUID_LENGTH = 16
-
-      # generate a random 64 bit uuid
-      private
-      def generate_guid
-        guid = ''
-        GUID_LENGTH.times do
-          guid << HEX_DIGITS[rand(16)]
-        end
-        guid
       end
 
     end

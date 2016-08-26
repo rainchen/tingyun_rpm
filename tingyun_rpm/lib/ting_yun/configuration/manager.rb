@@ -5,7 +5,7 @@ require 'ting_yun/configuration/environment_source'
 require 'ting_yun/configuration/yaml_source'
 require 'ting_yun/configuration/server_source'
 require 'ting_yun/configuration/manual_source'
-
+require 'ting_yun/configuration'
 
 module TingYun
   module Configuration

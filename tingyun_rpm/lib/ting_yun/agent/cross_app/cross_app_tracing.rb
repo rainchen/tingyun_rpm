@@ -67,7 +67,7 @@ module TingYun
             node_name = metrics.pop
             scoped_metric = metrics.pop
 
-            stats_engine.record_scoped_and_unscoped_metrics(state, scoped_metric, metrics, duration)
+            ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, scoped_metric, metrics, duration)
 
             if node
               node.name = node_name
@@ -85,18 +85,25 @@ module TingYun
       end
 
 
-
       def add_transaction_trace_info(request, response, cross_app)
         state = TingYun::Agent::TransactionState.tl_get
-        transaction_sampler.add_node_info(:uri => TingYun::Agent::HTTPClients::URIUtil.filter_uri(request.uri))
+        ::TingYun::Agent::Collector::TransactionSampler.add_node_info(:uri => TingYun::Agent::HTTPClients::URIUtil.filter_uri(request.uri))
         if cross_app
-          transaction_sampler.tl_builder.set_txId_and_txData(state.client_transaction_id || state.request_guid,
+          ::TingYun::Agent::Collector::TransactionSampler.tl_builder.set_txId_and_txData(state.client_transaction_id || state.request_guid,
                                                              TingYun::Support::Serialize::JSONWrapper.load(response[TY_DATA_HEADER].gsub("'",'"')))
         end
       end
 
+
       def metrics_for(request, response, cross_app)
-        metrics = common_metrics(request)
+
+        metrics = [ "External/NULL/ALL" ]
+
+        if TingYun::Agent::Transaction.recording_web_transaction?
+          metrics << "External/NULL/AllWeb"
+        else
+          metrics << "External/NULL/AllBackground"
+        end
 
         if cross_app
           begin
@@ -114,17 +121,6 @@ module TingYun
         return metrics
       end
 
-      def common_metrics(request)
-        metrics = [ "External/NULL/ALL" ]
-
-        if TingYun::Agent::Transaction.recording_web_transaction?
-          metrics << "External/NULL/AllWeb"
-        else
-          metrics << "External/NULL/AllBackground"
-        end
-
-        return metrics
-      end
 
       def metrics_for_regular_request( request )
         metrics = []
@@ -134,29 +130,11 @@ module TingYun
         return metrics
       end
 
-      def stats_engine
-        ::TingYun::Agent.instance.stats_engine
-      end
-
-      def transaction_sampler
-        ::TingYun::Agent::Collector::TransactionSampler
-      end
-
 
       def cross_app_enabled?
-        valid_tingyun_secret_id? && web_action_tracer_enabled? && cross_application_tracer_enabled?
-      end
-
-      def web_action_tracer_enabled?
-        TingYun::Agent.config[:'nbs.action_tracer.enabled']
-      end
-
-      def cross_application_tracer_enabled?
-        TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
-      end
-
-      def valid_tingyun_secret_id?
-        TingYun::Agent.config[:tingyunIdSecret] && TingYun::Agent.config[:tingyunIdSecret].size > 0
+        TingYun::Agent.config[:tingyunIdSecret] && TingYun::Agent.config[:tingyunIdSecret].size > 0 &&
+            TingYun::Agent.config[:'nbs.action_tracer.enabled'] &&
+            TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
       end
 
       # Inject the X-Process header into the outgoing +request+.
