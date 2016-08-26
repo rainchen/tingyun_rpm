@@ -8,7 +8,7 @@ module TingYun
       class TransactionSampler
         class SlowestSampleBuffer < TransactionSampleBufferBase
 
-          CAPACITY = 1
+          CAPACITY = 20
 
           def capacity
             CAPACITY
