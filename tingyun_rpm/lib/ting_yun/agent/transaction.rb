@@ -96,7 +96,7 @@ module TingYun
 
         ::TingYun::Agent::Collector::TransactionSampler.on_start_transaction(state, start_time)
         ::TingYun::Agent::Collector::SqlSampler.on_start_transaction(state, request_path)
-        ::TingYun::Agent.instance.events.notify(:start_transaction)
+        ::TingYun::Agent.instance.events.notify(:start_transaction) # Dispatcher调用
 
         frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
         name_last_frame @default_name
