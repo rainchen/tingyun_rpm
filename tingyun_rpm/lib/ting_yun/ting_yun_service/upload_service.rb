@@ -22,15 +22,12 @@ module TingYun
 
       def metric_data(stats_hash)
 
-        timeslice_start = stats_hash.started_at
-        timeslice_end = stats_hash.harvested_at || Time.now
-
         action_array, adpex_array, general_array, components_array, errors_array = build_metric_data_array(stats_hash)
 
         upload_data = {
             :type => 'perfMetrics',
-            :timeFrom => timeslice_start.to_i,
-            :timeTo => timeslice_end.to_i,
+            :timeFrom => stats_hash.started_at.to_i,
+            :timeTo => stats_hash.harvested_at.to_i || Time.now.to_i,
             :interval => 60,
             :actions => action_array,
             :apdex => adpex_array,

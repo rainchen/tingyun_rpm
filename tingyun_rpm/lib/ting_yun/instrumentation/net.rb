@@ -34,10 +34,9 @@ TingYun::Support::LibraryDetection.defer do
       class << self
         def get_response_with_tingyun(uri_or_host, path = nil, port = nil, &block)
           begin
-            get_response_without_tingyun(uri_or_host, path = nil, port = nil, &block)
+            get_response_without_tingyun(uri_or_host, path , port , &block)
           rescue => e
-            klass = "External/#{uri_or_host.to_s.gsub('/','%2F')}/net%2Fhttp"
-            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,klass)
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{uri_or_host.to_s.gsub('/','%2F')}/net%2Fhttp")
             raise e
           end
         end
@@ -48,13 +47,13 @@ TingYun::Support::LibraryDetection.defer do
           begin
             start_without_tingyun(address, *arg, &block)
           rescue => e
-            klass = "External/#{address.to_s.gsub('/','%2F')}/net%2Fhttp"
-            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e,klass)
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{address.to_s.gsub('/','%2F')}/net%2Fhttp")
             raise e
           end
         end
         alias :start_without_tingyun :start
         alias :start :start_with_tingyun
+
       end
     end
   end

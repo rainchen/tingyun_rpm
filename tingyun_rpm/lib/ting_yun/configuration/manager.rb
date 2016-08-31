@@ -37,7 +37,6 @@ module TingYun
         else
           ::TingYun::Configuration.get_name
         end
-
       end
 
       def reset_to_defaults

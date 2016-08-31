@@ -109,7 +109,7 @@ module TingYun
         end
 
         class StatsHashLookupError < TingYun::Support::Exception::InternalAgentError
-          def initialize(original_error, hash, metric_spec)
+          def initialize(original_error, metric_spec)
             super("Lookup error in StatsHash: #{original_error.class}: #{original_error.message}. Falling back adding #{metric_spec.inspect}")
           end
         end
@@ -157,7 +157,7 @@ module TingYun
           # This only happen in the case of a corrupted default_proc
           # Side-step it manually, notice the issue, and carry on....
           ::TingYun::Agent.instance.error_collector. \
-          notice_agent_error(StatsHashLookupError.new(error, hash, key))
+          notice_agent_error(StatsHashLookupError.new(error, key))
           stats = TingYun::Metrics::Stats.new
           hash[key] = stats
           # Try to restore the default_proc so we won't continually trip the error
