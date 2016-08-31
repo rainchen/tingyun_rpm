@@ -7,7 +7,7 @@ module TingYun
       class TransactionSampler
         class TransactionSampleBufferBase
 
-          SINGLE_BUFFER_MAX = 20
+          SINGLE_BUFFER_MAX = 1000
           NO_SAMPLES = [].freeze
 
           def initialize
