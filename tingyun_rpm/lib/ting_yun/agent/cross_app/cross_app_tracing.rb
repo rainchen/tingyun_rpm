@@ -82,7 +82,7 @@ module TingYun
         end
       rescue => err
         TingYun::Agent.logger.error "Uncaught exception while finishing an HTTP request trace", err
-
+        raise
       end
 
 
@@ -173,7 +173,8 @@ module TingYun
         request[TY_ID_HEADER] = "#{cross_app_id};c=1;x=#{txn_guid}"
 
       rescue TingYun::Agent::CrossAppTracing::Error => err
-        TingYun::Agent.logger.debug "Not injecting x-process header", err
+        TingYun::Agent.logger.error "Not injecting x-process header", err
+        raise
       end
 
       # Returns +true+ if Cross Application Tracing is enabled, and the given +response+
