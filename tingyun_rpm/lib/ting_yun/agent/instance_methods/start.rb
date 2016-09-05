@@ -11,8 +11,11 @@ module TingYun
 
         # Check to see if the agent should start, returning +true+ if it should.
         # should hava the vaild app_name, unstart-state and able to start
+        # The agent is disabled when it is not force enabled by the
+        # 'nbs.agent_enabled' option (e.g. in a manual start), or
+        # enabled normally through the configuration file
         def agent_should_start?
-          return false if already_started? || disabled?
+          return false if already_started? || !TingYun::Agent.config[:'nbs.agent_enabled']
           unless app_name_configured?
             TingYun::Agent.logger.error "No application name configured.",
                                "The Agent cannot start without at least one. Please check your ",
@@ -36,12 +39,6 @@ module TingYun
           end
         end
 
-        # The agent is disabled when it is not force enabled by the
-        # 'nbs.agent_enabled' option (e.g. in a manual start), or
-        # enabled normally through the configuration file
-        def disabled?
-          !TingYun::Agent.config[:'nbs.agent_enabled']
-        end
 
         def log_startup
           log_environment
@@ -70,13 +67,6 @@ module TingYun
           TingYun::Agent.logger.info "Application: #{TingYun::Agent.config.app_names.join(", ")}"
         end
 
-        def sinatra_app?
-          (
-          defined?(Sinatra::Application) &&
-              Sinatra::Application.respond_to?(:run) &&
-              Sinatra::Application.run?
-          )
-        end
 
         # Classy logging of the agent version and the current pid,
         # so we can disambiguate processes in the log file and make
