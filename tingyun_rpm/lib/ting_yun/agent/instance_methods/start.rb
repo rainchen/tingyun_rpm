@@ -41,79 +41,25 @@ module TingYun
 
 
         def log_startup
-          log_environment
-          log_dispatcher
-          log_app_name
-        end
-
-        def log_environment
-          Agent.logger.info "Environment: #{::TingYun::Frameworks.framework.env}"
-        end
-
-        # Logs the dispatcher to the log file to assist with
-        # debugging. When no debugger is present, logs this fact to
-        # assist with proper dispatcher detection
-        def log_dispatcher
-          dispatcher_name = TingYun::Agent.config[:dispatcher].to_s
-
-          if dispatcher_name.empty?
+          Agent.logger.info "Environment: #{::TingYun::Frameworks.framework.env}" # log_environment
+          if TingYun::Agent.config[:dispatcher].to_s.empty?
             TingYun::Agent.logger.info 'No known dispatcher detected.'
           else
             TingYun::Agent.logger.info "Dispatcher: #{dispatcher_name}"
-          end
-        end
-
-        def log_app_name
-          TingYun::Agent.logger.info "Application: #{TingYun::Agent.config.app_names.join(", ")}"
+          end # log_dispatcher
+          TingYun::Agent.logger.info "Application: #{TingYun::Agent.config.app_names.join(", ")}" # log_app_name
         end
 
 
-        # Classy logging of the agent version and the current pid,
-        # so we can disambiguate processes in the log file and make
-        # sure they're running a reasonable version
-        def log_version_and_pid
-          TingYun::Agent.logger.debug "Ting Yun Ruby Agent #{TingYun::VERSION::STRING} Initialized: pid = #{$$}"
-        end
-
-        # Warn the user if they have configured their agent not to
-        # send data, that way we can see this clearly in the log file
-        def monitoring?
-          if TingYun::Agent.config[:monitor_mode]
-            true
-          else
-            TingYun::Agent.logger.warn('Agent configured not to send data in this environment.')
-            false
-          end
-        end
-
-        # Tell the user when the license key is missing so they can
-        # fix it by adding it to the file
-        def has_license_key?
+        # A correct license key exists and is of the proper length
+        def has_correct_license_key?
           if TingYun::Agent.config[:license_key] && TingYun::Agent.config[:license_key].length > 0
             true
           else
             TingYun::Agent.logger.warn("No license key found. " +
-                                  "This often means your tingyun.yml file was not found, or it lacks a section for the running environment,'#{::TingYun::Frameworks.framework.env}'. You may also want to try linting your tingyun.yml to ensure it is valid YML.")
+                                           "This often means your tingyun.yml file was not found, or it lacks a section for the running environment,'#{::TingYun::Frameworks.framework.env}'. You may also want to try linting your tingyun.yml to ensure it is valid YML.")
             false
           end
-        end
-
-        # A license key is an arbitrary 40 character string,
-        # usually looks something like a SHA1 hash
-        def correct_license_length
-          key = TingYun::Agent.config[:license_key]
-
-          if key.length > 0
-            true
-          else
-            TingYun::Agent.logger.error("Invalid license key: #{key}")
-            false
-          end
-        end
-
-        # A correct license key exists and is of the proper length
-        def has_correct_license_key?
-          has_license_key? && correct_license_length
         end
 
         # Logs the configured application names
@@ -139,7 +85,7 @@ module TingYun
         # setting up the worker thread and the exit handler to shut
         # down the agent
         def check_config_and_start_agent
-          return unless monitoring? && has_correct_license_key?
+          return unless  has_correct_license_key?
           return if is_using_forking_dispatcher?
           setup_and_start_agent
         end
@@ -153,7 +99,7 @@ module TingYun
           @dispatcher.mark_started
           generate_environment_report
           install_exit_handler
-          cpu_and_memory
+          @middleware.load_samplers # cpu and memory load
 
           if TingYun::Agent.config[:sync_startup]
             connect_in_sync
@@ -189,9 +135,7 @@ module TingYun
           end
 
           return if !needs_restart ||
-              !Agent.config[:'nbs.agent_enabled'] ||
-              !Agent.config[:monitor_mode] ||
-              disconnected?
+              !Agent.config[:'nbs.agent_enabled'] || disconnected?
 
           ::TingYun::Agent.logger.debug "Starting the worker thread in #{Process.pid} (parent #{Process.ppid}) after forking."
 
@@ -202,9 +146,6 @@ module TingYun
           setup_and_start_agent(options)
         end
 
-        def cpu_and_memory
-          @middleware.load_samplers
-        end
 
       end
     end

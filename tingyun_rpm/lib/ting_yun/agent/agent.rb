@@ -52,7 +52,7 @@ module TingYun
         return unless agent_should_start?
         log_startup
         check_config_and_start_agent
-        log_version_and_pid
+        TingYun::Agent.logger.debug "Ting Yun Ruby Agent #{TingYun::VERSION::STRING} Initialized: pid = #{$$}" # log_version_and_pid
       end
 
       # Attempt a graceful shutdown of the agent, flushing any remaining
