@@ -59,22 +59,12 @@ module TingYun
             elapsed_time = (Time.now - t0).to_f
             state.sql_duration = elapsed_time * 1000
 
-            transaction_sampler.notice_sql(sql, @config, elapsed_time, state, EXPLAINER)
-            sql_sampler.notice_sql(sql, scoped_metric, @config, elapsed_time, state, EXPLAINER)
+            ::TingYun::Agent::Collector::TransactionSampler.notice_sql(sql, @config, elapsed_time, state, EXPLAINER)
+            ::TingYun::Agent::Collector::SqlSampler.notice_sql(sql, scoped_metric, @config, elapsed_time, state, EXPLAINER)
           end
 
         end
       end
-
-      def transaction_sampler
-        ::TingYun::Agent::Collector::TransactionSampler
-      end
-
-      def sql_sampler
-        ::TingYun::Agent::Collector::SqlSampler
-      end
-
-
     end
   end
 end
