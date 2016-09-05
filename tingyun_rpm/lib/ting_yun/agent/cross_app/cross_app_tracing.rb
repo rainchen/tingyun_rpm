@@ -39,7 +39,6 @@ module TingYun
         rescue => e
           klass = "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
           handle_error(e, klass)
-          raise e
         ensure
           finish_trace(state, t0, node, request, response)
         end
@@ -145,9 +144,6 @@ module TingYun
         txn_guid = state.client_transaction_id || state.request_guid
         state.transaction_sample_builder.set_trace_id(txn_guid)
         request[TY_ID_HEADER] = "#{cross_app_id};c=1;x=#{txn_guid}"
-
-      rescue TingYun::Agent::CrossAppTracing::Error => err
-        TingYun::Agent.logger.debug "Not injecting x-process header", err
       end
 
       # Returns +true+ if Cross Application Tracing is enabled, and the given +response+
