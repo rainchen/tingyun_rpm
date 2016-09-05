@@ -10,8 +10,7 @@ module TingYun
 
       def install_mongo_instrumentation
         hook_instrument_methods
-        instrument_save
-        instrument_ensure_index
+        instrument
       end
 
       def hook_instrument_methods
@@ -51,25 +50,19 @@ module TingYun
         end
       end
 
-      def instrument_save
+      def instrument
         ::Mongo::Collection.class_eval do
           def save_with_tingyun(doc, opts = {}, &block)
-            metrics = tingyun_generate_metrics(:save)
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, opts, method(:record_mongo_duration)) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(tingyun_generate_metrics(:save), opts, method(:record_mongo_duration)) do
               save_without_tingyun(doc, opts, &block)
             end
           end
 
           alias_method :save_without_tingyun, :save
           alias_method :save, :save_with_tingyun
-        end
-      end
 
-      def instrument_ensure_index
-        ::Mongo::Collection.class_eval do
           def ensure_index_with_tingyun(spec, opts = {}, &block)
-            metrics = tingyun_generate_metrics(:ensureIndex)
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, opts, method(:record_mongo_duration)) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(tingyun_generate_metrics(:ensureIndex), opts, method(:record_mongo_duration)) do
               ensure_index_without_tingyun(spec, opts, &block)
             end
           end
@@ -78,6 +71,7 @@ module TingYun
           alias_method :ensure_index, :ensure_index_with_tingyun
         end
       end
+
     end
   end
 end
