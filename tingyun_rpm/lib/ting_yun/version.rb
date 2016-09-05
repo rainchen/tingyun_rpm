@@ -10,8 +10,10 @@ module TingYun
 
     TINY = 4
 
+    TINY2 = 1
 
-    STRING = [MAJOR, MINOR, TINY].compact.join('.')
+
+    STRING = [MAJOR, MINOR, TINY, TINY2].compact.join('.')
 
   end
 end
