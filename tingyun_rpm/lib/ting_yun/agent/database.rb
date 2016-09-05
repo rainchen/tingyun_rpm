@@ -21,7 +21,21 @@ module TingYun
         return statement.explain || {"dialect"=> nil, "keys"=>[], "values"=>[]}
       end
 
-
+      def explain_plan(statement)
+        connection = get_connection(statement.config) do
+          ::ActiveRecord::Base.send("#{statement.config[:adapter]}_connection",
+                                    statement.config)
+        end
+        if connection
+          if connection.respond_to?(:exec_query)
+            return connection.exec_query("EXPLAIN #{statement.sql}",
+                                         "Explain #{statement.name}",
+                                         statement.binds)
+          elsif connection.respond_to?(:execute)
+            return connection.execute("EXPLAIN #{statement.sql}")
+          end
+        end
+      end
 
 
       def obfuscate_sql(sql)

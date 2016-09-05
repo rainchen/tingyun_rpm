@@ -5,6 +5,7 @@ require 'ting_yun/instrumentation/support/active_record_helper'
 require 'ting_yun/support/helper'
 require 'ting_yun/agent/collector/transaction_sampler'
 require 'ting_yun/agent/collector/sql_sampler'
+require 'ting_yun/agent/database'
 
 module TingYun
   module Instrumentation
@@ -15,7 +16,7 @@ module TingYun
         def initialize
           # We cache this in an instance variable to avoid re-calling method
           # on each query.
-          @explainer = method(:get_explain_plan)
+          @explainer = method(TingYun::Agent::Database.explain_plan)
           super
         end
 
@@ -38,17 +39,6 @@ module TingYun
           log_notification_error(e, name, 'finish')
         end
 
-        def get_explain_plan(statement)
-          connection = TingYun::Agent::Database.get_connection(statement.config) do
-            ::ActiveRecord::Base.send("#{statement.config[:adapter]}_connection",
-                                      statement.config)
-          end
-          if connection && connection.respond_to?(:exec_query)
-            return connection.exec_query("EXPLAIN #{statement.sql}",
-                                         "Explain #{statement.name}",
-                                         statement.binds)
-          end
-        end
 
         def notice_sql(state, event, config, metric)
           stack  = state.traced_method_stack

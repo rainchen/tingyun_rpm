@@ -5,20 +5,13 @@ require 'ting_yun/support/helper'
 require 'ting_yun/agent/method_tracer'
 require 'ting_yun/agent/collector/transaction_sampler'
 require 'ting_yun/agent/collector/sql_sampler'
+require 'ting_yun/agent/database'
 
 module TingYun
   module Instrumentation
     module ActiveRecord
 
-      EXPLAINER = lambda do |statement|
-        connection = TingYun::Agent::Database.get_connection(statement.config) do
-          ::ActiveRecord::Base.send("#{statement.config[:adapter]}_connection",
-                                    statement.config)
-        end
-        if connection && connection.respond_to?(:execute)
-          return connection.execute("EXPLAIN #{statement.sql}")
-        end
-      end
+      EXPLAINER =  method(TingYun::Agent::Database.explain_plan)
 
       def self.included(instrumented_class)
         instrumented_class.class_eval do
