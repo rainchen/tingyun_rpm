@@ -257,7 +257,7 @@ TingYun::Support::LibraryDetection.defer do
             @oprot.write_string(data)
             @oprot.write_field_end
           rescue => e
-            TingYun::Agent.logger.error("Failed to thrift send_message_args_with_tingyun : ", e)
+            #TingYun::Agent.logger.error("Failed to thrift send_message_args_with_tingyun : ", e)
           ensure
             send_message_args_without_tingyun(args_class, args)
           end
@@ -279,7 +279,7 @@ TingYun::Support::LibraryDetection.defer do
           node = stack.push_frame(state,:thrift,t0)
           operations[tag][:node] = node
         rescue => e
-          TingYun::Agent.logger.error("Failed to thrift send_message_with_tingyun : ", e)
+          #TingYun::Agent.logger.error("Failed to thrift send_message_with_tingyun : ", e)
         ensure
           send_message_without_tingyun(name, args_class, args)
         end
@@ -300,7 +300,7 @@ TingYun::Support::LibraryDetection.defer do
           TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, duration)
           result
         rescue => e
-          TingYun::Agent.logger.error("Failed to thrift send_oneway_message_with_tingyun : ", e)
+          #TingYun::Agent.logger.error("Failed to thrift send_oneway_message_with_tingyun : ", e)
           return send_oneway_message_without_tingyun(name, args_class, args)
         end
 
@@ -340,7 +340,7 @@ TingYun::Support::LibraryDetection.defer do
 
           result
         rescue => e
-          TingYun::Agent.logger.error("Failed to thrift receive_message_with_tingyun : ", e)
+          #TingYun::Agent.logger.error("Failed to thrift receive_message_with_tingyun : ", e)
           return  receive_message_without_tingyun(result_klass)
         end
       end
