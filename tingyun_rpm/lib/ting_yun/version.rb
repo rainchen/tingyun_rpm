@@ -10,7 +10,7 @@ module TingYun
 
     TINY = 4
 
-    BETA = 1
+    BETA = 2
 
 
     STRING = [MAJOR, MINOR, TINY, BETA].compact.join('.')
