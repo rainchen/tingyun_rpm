@@ -9,7 +9,17 @@ module TingYun
     def initialize(app)
       @app = app
       @category = :middleware
+      @target   = self
+      @transaction_options = {
+          :transaction_name => build_transaction_name
+      }
     end
+
+    def build_transaction_name
+      prefix = ::TingYun::Instrumentation::Support::TransactionNamer.prefix_for_category(nil, @category)
+      "#{prefix}#{self.class.name}/call"
+    end
+
 
 
   end
