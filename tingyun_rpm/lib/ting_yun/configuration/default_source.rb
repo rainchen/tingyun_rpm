@@ -289,7 +289,7 @@ module TingYun
         },
         :'nbs.rum.enabled' => {
             :default => false,
-            :public => false,
+            :public => true,
             :type => Boolean,
             :allowed_from_server => true,
             :description => 'Enable or disable page load timing (sometimes referred to as real user monitoring or RUM).'
@@ -297,10 +297,18 @@ module TingYun
         :'nbs.rum.script' => {
             :default => nil,
             :allow_nil => true,
-            :public => false,
+            :public => true,
             :type => String,
             :allowed_from_server => true,
             :description => 'RUM Script URI'
+        },
+        :'nbs.rum.mix.enabled' => {
+            :default => false,
+            :allow_nil => false,
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => '混合嵌码'
         },
         :'nbs.rum.sample_ratio' => {
             :default => 1,
