@@ -11,7 +11,11 @@ module TingYun
   module Instrumentation
     module ActiveRecord
 
-      EXPLAINER =  method(TingYun::Agent::Database.explain_plan)
+      EXPLAINER = method(:explain_plan)
+
+      def self.explain_plan(statement)
+        TingYun::Agent::Database.explain_plan(statement)
+      end
 
       def self.included(instrumented_class)
         instrumented_class.class_eval do

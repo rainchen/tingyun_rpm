@@ -42,7 +42,8 @@ module TingYun
 
         def log_startup
           Agent.logger.info "Environment: #{::TingYun::Frameworks.framework.env}" # log_environment
-          if TingYun::Agent.config[:dispatcher].to_s.empty?
+          dispatcher_name = TingYun::Agent.config[:dispatcher].to_s
+          if dispatcher_name.empty?
             TingYun::Agent.logger.info 'No known dispatcher detected.'
           else
             TingYun::Agent.logger.info "Dispatcher: #{dispatcher_name}"
