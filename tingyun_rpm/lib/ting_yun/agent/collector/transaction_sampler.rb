@@ -67,7 +67,7 @@ module TingYun
           return unless last_builder && TingYun::Agent.config[:'nbs.action_tracer.enabled']
 
           last_builder.finish_trace(time)
-          
+
           final_trace = last_builder.trace
           final_trace.metric_name = txn.best_name
           final_trace.uri = txn.request_path
