@@ -11,6 +11,7 @@ module TingYun
     TINY = 5
 
 
+
     STRING = [MAJOR, MINOR, TINY].compact.join('.')
 
   end

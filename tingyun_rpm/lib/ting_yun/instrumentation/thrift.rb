@@ -164,7 +164,6 @@ TingYun::Support::LibraryDetection.defer do
 
       include TingYun::Instrumentation::ThriftHelper
 
-
       def send_message_args_with_tingyun(args_class, args = {})
         begin
           state = TingYun::Agent::TransactionState.tl_get
@@ -260,6 +259,7 @@ TingYun::Support::LibraryDetection.defer do
 
           result
         rescue => e
+
           TingYun::Agent.logger.debug("Failed to thrift receive_message_with_tingyun : ", e)
           return  receive_message_without_tingyun(result_klass)
         end
