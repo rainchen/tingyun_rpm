@@ -1,4 +1,5 @@
 # encoding: utf-8
+require 'ting_yun/support/serialize/json_wrapper'
 
 module TingYun
   module Instrumentation
@@ -43,8 +44,9 @@ module TingYun
               :n => state.current_transaction.best_name ,
               :a => state.web_duration || 0,
               :q => "",
-              :tid => ""
+              :tid => state.trace_id
           }
+          TingYun::Support::Serialize::JSONWrapper.dump(data)
         end
 
       end

@@ -106,8 +106,8 @@ module TingYun
       end
 
       def trace_id
-        return nil unless current_transaction
-        state.transaction_sample_builder.trace.guid
+        return nil unless transaction_sample_builder
+        transaction_sample_builder.trace.guid
       end
 
 
