@@ -15,7 +15,9 @@ module TingYun
           return '' unless insert_js?(state)
 
           bt_config = browser_timing_config(state)
-
+        rescue => e
+          ::TingYun::Agent.logger.debug "Failure during RUM browser_timing_header construction", e
+          ''
         end
 
         def rum_enable?
