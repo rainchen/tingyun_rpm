@@ -16,8 +16,12 @@ module TingYun
         def initialize
           # We cache this in an instance variable to avoid re-calling method
           # on each query.
-          @explainer = method(TingYun::Agent::Database.explain_plan)
+          @explainer = method(:explain_plan)
           super
+        end
+
+        def explain_plan(statement)
+          TingYun::Agent::Database.explain_plan(statement)
         end
 
         def start(name, id, payload) #THREAD_LOCAL_ACCESS
