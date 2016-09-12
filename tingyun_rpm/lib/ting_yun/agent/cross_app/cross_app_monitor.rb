@@ -24,18 +24,15 @@ module TingYun
       #   :after_call will write our response headers/metrics and clean up the thread
       def register_event_listeners(events)
         TingYun::Agent.logger.debug("Wiring up Cross Application Tracing to events after finished configuring")
+        state = TingYun::Agent::TransactionState.tl_get
 
         events.subscribe(:before_call) do |env| #THREAD_LOCAL_ACCESS
           if cross_app_enabled?
-            state = TingYun::Agent::TransactionState.tl_get
             save_referring_transaction_info(state, env)  unless env[TY_ID_HEADER].nil?
           end
         end
 
         events.subscribe(:after_call) do |_status_code, headers, _body| #THREAD_LOCAL_ACCESS
-          state = TingYun::Agent::TransactionState.tl_get
-          state.queue_duration = state.current_transaction.queue_time * 1000
-          state.web_duration = (Time.now - state.current_transaction.start_time) * 1000
           insert_response_header(state, headers)
         end
 
@@ -95,37 +92,33 @@ module TingYun
       end
 
       def build_payload(state)
+        timings = state.timings
+
         payload = {
             :id => TingYun::Agent.config[:tingyunIdSecret].split('|')[1],
-            :action => state.current_transaction.best_name,
-            :trId => state.transaction_sample_builder.trace.guid,
+            :action => timings.transaction_name_or_unknown,
+            :trId => timings.trace_id,
             :time => {
-                :duration => state.web_duration,
-                :qu => state.queue_duration,
-                :db => state.sql_duration,
-                :ex => state.external_duration,
-                :rds => state.rds_duration,
-                :mc => state.mc_duration,
-                :mon => state.mon_duration,
-                :code => execute_duration(state)
+                :duration => timings.app_time_in_seconds,
+                :qu => timings.queue_time_in_millis,
+                :db => timings.sql_duration,
+                :ex => timings.external_duration,
+                :rds => timings.rds_duration,
+                :mc => timings.mc_duration || 0,
+                :mon => timings.mon_duration,
+                :code => timings.app_execute_duration
             }
         }
-        payload[:tr] = 1 if slow_action_tracer?(state)
+        payload[:tr] = 1 if slow_action_tracer?(timings)
         payload[:r] = state.client_req_id unless state.client_req_id.nil?
         payload
       end
 
-      def slow_action_tracer?(state)
-        if state.web_duration > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
-          return true
-        else
-          return false
-        end
+      def slow_action_tracer?(timings)
+        timings.app_time_in_seconds > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
       end
 
-      def execute_duration(state)
-        state.web_duration - state.queue_duration - state.sql_duration - state.external_duration - state.rds_duration - state.mc_duration - state.mon_duration
-      end
+
     end
   end
 end

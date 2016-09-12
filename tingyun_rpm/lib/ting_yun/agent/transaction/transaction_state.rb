@@ -16,13 +16,6 @@ module TingYun
                     :client_transaction_id,
                     :client_tingyun_id_secret,
                     :client_req_id,
-                    :sql_duration,
-                    :external_duration,
-                    :web_duration,
-                    :queue_duration,
-                    :rds_duration,
-                    :mc_duration,
-                    :mon_duration,
                     :thrift_return_data
 
 
@@ -54,13 +47,6 @@ module TingYun
         @untraced = []
         @current_transaction = nil
         @traced_method_stack = TingYun::Agent::TracedMethodStack.new
-        @sql_duration = 0
-        @external_duration = 0
-        @web_duration = 0
-        @queue_duration = 0
-        @rds_duration = 0
-        @mc_duration = 0
-        @mon_duration = 0
       end
 
       # This starts the timer for the transaction.
@@ -74,6 +60,7 @@ module TingYun
         @sql_sampler_transaction_data = nil
         @cross_tx_data = nil
         @thrift_return_data = nil
+        @timings = nil
       end
 
       # TT's and SQL
@@ -105,10 +92,31 @@ module TingYun
         current_transaction.guid
       end
 
-      def trace_id
-        return nil unless transaction_sample_builder
-        transaction_sample_builder.trace.guid
+      class Timings <  Struct.new :sql_duration, :external_duration, :rds_duration, :mc_duration, :mon_duration; end
+
+
+      def timings
+        @timings ||= TransactionTimings.new(transaction_queue_time, transaction_start_time, transaction_name, trace_id, Timings.new)
       end
+
+      def transaction_start_time
+        current_transaction.nil? ? 0.0 : current_transaction.start_time
+      end
+
+      def transaction_queue_time
+        current_transaction.nil? ? 0.0 : current_transaction.queue_time
+      end
+
+      def transaction_name
+        current_transaction.nil? ? nil : current_transaction.best_name
+      end
+
+      def trace_id
+        transaction_sample_builder.nil? ? nil : transaction_sample_builder.trace.guid
+      end
+
+
+
 
 
     end

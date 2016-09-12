@@ -49,7 +49,7 @@ module TingYun
 
         def notice_sql(state, event, config, metric)
           stack  = state.traced_method_stack
-          state.sql_duration = event.duration
+          state.timings.sql_duration = event.duration
           # enter transaction trace node
           frame = stack.push_frame(state, :active_record, event.time)
 

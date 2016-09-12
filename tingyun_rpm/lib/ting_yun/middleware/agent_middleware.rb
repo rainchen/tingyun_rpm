@@ -6,6 +6,8 @@ module TingYun
 
     include TingYun::Instrumentation::MiddlewareTracing
 
+    attr_reader :transaction_options, :category, :target
+
     def initialize(app)
       @app = app
       @category = :middleware

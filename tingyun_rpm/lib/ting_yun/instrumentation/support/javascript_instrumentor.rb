@@ -4,9 +4,9 @@ require 'ting_yun/support/serialize/json_wrapper'
 module TingYun
   module Instrumentation
     module Support
-      class JavascriptInstrument
+      module JavascriptInstrument
 
-
+        module_function
 
         def browser_timing_header #THREAD_LOCAL_ACCESS
           return '' unless rum_enable? # unsupport insert script
@@ -41,12 +41,14 @@ module TingYun
 
 
         def browser_timing_config(state)
+          timings = state.timings
+
           data = {
               :id => TingYun::Agent.config[:tingyunIdSecret],
-              :n => state.current_transaction.best_name ,
-              :a => state.web_duration || 0,
-              :q => "",
-              :tid => state.trace_id
+              :n => timings.transaction_name_or_unknown ,
+              :a => timings.app_time_in_millis,
+              :q => timings.queue_time_in_millis,
+              :tid => timings.trace_id
           }
           TingYun::Support::Serialize::JSONWrapper.dump(data)
         end

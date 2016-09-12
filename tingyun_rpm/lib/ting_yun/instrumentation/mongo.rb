@@ -29,7 +29,7 @@ module TingYun
           def record_mongo_duration(duration)
             state = TingYun::Agent::TransactionState.tl_get
             unless state.nil?
-              state.mon_duration += duration * 1000
+              state.timings.mon_duration += duration * 1000
             end
           end
 
