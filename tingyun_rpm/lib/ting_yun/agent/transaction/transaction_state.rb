@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'ting_yun/agent/transaction/traced_method_stack'
+require 'ting_yun/agent/transaction/transaction_timings'
 module TingYun
   module Agent
 
@@ -96,7 +97,7 @@ module TingYun
 
 
       def timings
-        @timings ||= TransactionTimings.new(transaction_queue_time, transaction_start_time, transaction_name, trace_id, Timings.new)
+        @timings ||= TingYun::Agent::TransactionTimings.new(transaction_queue_time, transaction_start_time, transaction_name, trace_id, Timings.new)
       end
 
       def transaction_start_time

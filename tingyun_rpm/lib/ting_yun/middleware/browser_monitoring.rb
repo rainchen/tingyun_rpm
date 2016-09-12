@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'ting_yun/middleware/agent_middleware'
+require 'ting_yun/instrumentation/support/javascript_instrumentor'
 
 
 module TingYun
@@ -25,7 +26,7 @@ module TingYun
     def traced_call(env)
       result = @app.call(env)   # [status, headers, response]
 
-      js_to_inject = TingYun::Agent.browser_timing_header
+      js_to_inject = TingYun::Instrumentation::Support::JavascriptInstrument.browser_timing_header
 
       if (js_to_inject != '') && should_instrument?(env, result[0], result[1])
         response_string = auto_instrument_source(result[2], js_to_inject)
