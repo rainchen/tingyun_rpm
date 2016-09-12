@@ -56,9 +56,18 @@ module TingYun
               :q => timings.queue_time_in_millis,
               :tid => timings.trace_id
           }
-          TingYun::Support::Serialize::JSONWrapper.dump(data)
+          json = TingYun::Support::Serialize::JSONWrapper.dump(data)
 
-          html_safe_if_needed(data)
+          return mix_way(json)
+        end
+
+
+        def mix_way(json)
+          if TingYun::Agent.config[:"nbs.browser.mix.enabled"]
+            html_safe_if_needed("<script>(function(w){(w._ty_rum || (w._ty_rum = {})).agent = #{json};})(window);</script>")
+          else
+            html_safe_if_needed("<script>ty_rum=#{json};</script>")
+          end
         end
 
         def html_safe_if_needed(string)
@@ -82,6 +91,8 @@ module TingYun
           last_brace = script.rindex(GT) if script
           last_brace
         end
+
+
 
       end
     end
