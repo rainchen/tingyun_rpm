@@ -88,7 +88,7 @@ module TingYun
              string(exception_class_name),
              string(message),
              count_error,
-             string(request_uri),
+             string(request_uri || metric_name),
              encoder.encode(error_params)
             ]
           end

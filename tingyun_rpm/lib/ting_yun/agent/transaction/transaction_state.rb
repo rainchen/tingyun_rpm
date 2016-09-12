@@ -129,7 +129,7 @@ module TingYun
       end
 
       def transaction_queue_time
-        current_transaction.nil? ? 0.0 : current_transaction.queue_time
+        current_transaction.nil? ? 0.0 : current_transaction.apdex.queue_time
       end
 
       def transaction_name
