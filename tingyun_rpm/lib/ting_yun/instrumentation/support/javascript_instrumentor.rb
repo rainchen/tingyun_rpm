@@ -6,6 +6,8 @@ module TingYun
     module Support
       module JavascriptInstrument
 
+        GT = "}".freeze
+
         module_function
 
         def browser_timing_header #THREAD_LOCAL_ACCESS
@@ -15,6 +17,10 @@ module TingYun
           return '' unless insert_js?(state)
 
           bt_config = browser_timing_config(state)
+
+          return '' if bt_config.empty?
+
+          browser_instrument(bt_config)
         rescue => e
           ::TingYun::Agent.logger.debug "Failure during RUM browser_timing_header construction", e
           ''
@@ -51,6 +57,30 @@ module TingYun
               :tid => timings.trace_id
           }
           TingYun::Support::Serialize::JSONWrapper.dump(data)
+
+          html_safe_if_needed(data)
+        end
+
+        def html_safe_if_needed(string)
+          string = string.html_safe if string.respond_to?(:html_safe)
+          string
+        end
+
+        def browser_instrument(js)
+          script = TingYun::Agent.config[:'nbs.rum.script']
+          last_brace = script.rindex(GT) if script
+          if last_brace
+            script = script[0..last_brace-1] <<
+                js <<
+                script[last_brace..-1]
+          end
+          script
+        end
+
+        def find_brace_end
+          script = TingYun::Agent.config[:'nbs.rum.script']
+          last_brace = script.rindex(GT) if script
+          last_brace
         end
 
       end
