@@ -20,7 +20,11 @@ module TingYun
 
           return '' if bt_config.empty?
 
-          browser_instrument(bt_config)
+          if TingYun::Agent.config[:"nbs.browser.mix.enabled"]
+            html_safe_if_needed("<script>(function(w){(w._ty_rum || (w._ty_rum = {})).agent = #{bt_config};})(window);</script>")
+          else
+            html_safe_if_needed("<script>#{browser_instrument("ty_rum=#{bt_config}")}</script>")
+          end
         rescue => e
           ::TingYun::Agent.logger.debug "Failure during RUM browser_timing_header construction", e
           ''
@@ -45,7 +49,6 @@ module TingYun
           end
         end
 
-
         def browser_timing_config(state)
           timings = state.timings
 
@@ -56,18 +59,7 @@ module TingYun
               :q => timings.queue_time_in_millis,
               :tid => timings.trace_id
           }
-          json = TingYun::Support::Serialize::JSONWrapper.dump(data)
-
-          return mix_way(json)
-        end
-
-
-        def mix_way(json)
-          if TingYun::Agent.config[:"nbs.browser.mix.enabled"]
-            html_safe_if_needed("<script>(function(w){(w._ty_rum || (w._ty_rum = {})).agent = #{json};})(window);</script>")
-          else
-            html_safe_if_needed("<script>ty_rum=#{json};</script>")
-          end
+          TingYun::Support::Serialize::JSONWrapper.dump(data)
         end
 
         def html_safe_if_needed(string)
