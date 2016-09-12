@@ -46,11 +46,26 @@ module TingYun
           # Might not be running if it does not think mongrel, thin, passenger, etc
           # is running, if it thinks it's a rake task, or if the nbs.agent_enabled is false.
           ::TingYun::Agent.logger.info("TingYun Agent is unable to run.")
+        else
+          install_browser_monitoring(rails_config)
         end
       rescue => e
         ::TingYun::Agent.logger.error("Failure during init_config for Rails. Is Rails required in a non-Rails app? Set TING_YUN_FRAMEWORK=ruby to avoid this message.",
                                        "The Ruby agent will continue running, but Rails-specific features may be missing.",
                                        e)
+      end
+
+      def install_browser_monitoring(config)
+        return if @browser_monitoring_installed
+        @browser_monitoring_installed = true
+        return if config.nil? || !config.respond_to?(:middleware)
+        begin
+          require 'ting_yun/middleware/browser_monitoring'
+          config.middleware.use TingYun::BrowserMonitoring
+          ::TingYun::Agent.logger.debug("Installed TingYun Browser Monitoring middleware")
+        rescue => e
+          ::TingYun::Agent.logger.error("Error installing TingYun Browser Monitoring middleware", e)
+        end
       end
 
       protected

@@ -44,9 +44,6 @@ module TingYun
           end
         end
 
-        def queue_time
-          TingYun::Helper.time_to_millis(transaction_start_time - apdex_start)
-        end
       end
     end
   end
