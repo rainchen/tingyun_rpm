@@ -62,7 +62,7 @@ module TingYun
           TingYun::Agent::Transaction.start(state, category, build_transaction_options(env, first_middleware))
           events.notify(:before_call, env) if first_middleware
 
-          result = target.call(env)
+          result = (target == self) ? traced_call(env) : target.call(env)
 
           if first_middleware
             capture_http_response_code(state, result)
