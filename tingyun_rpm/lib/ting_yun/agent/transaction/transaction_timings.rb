@@ -22,7 +22,11 @@ module TingYun
 
       extend Forwardable
 
-      def_delegators :@timings, :sql_duration, :external_duration, :rds_duration, :mc_duration, :mon_duration
+      def_delegators :@timings, :sql_duration, :sql_duration= ,
+                     :external_duration, :external_duration=,
+                     :rds_duration, :rds_duration=,
+                     :mc_duration, :mc_duration=,
+                     :mon_duration, :mon_duration=
 
       def transaction_name_or_unknown
         transaction_name || ::TingYun::Agent::UNKNOWN_METRIC
