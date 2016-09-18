@@ -60,8 +60,7 @@ module TingYun
           TingYun::Support::LibraryDetection.detect!
           ::Rack::Builder._nr_deferred_detection_ran = true
         end
-
-        result = to_app_without_tingyun
+        to_app_without_tingyun
       end
     end
   end
