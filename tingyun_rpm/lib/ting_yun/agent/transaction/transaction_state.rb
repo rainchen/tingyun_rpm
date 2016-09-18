@@ -92,7 +92,7 @@ module TingYun
         return nil unless current_transaction
         current_transaction.guid
       end
-      
+
 
       def timings
         @timings ||= TingYun::Agent::TransactionTimings.new(transaction_queue_time, transaction_start_time, transaction_name, trace_id)
