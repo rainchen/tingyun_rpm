@@ -53,7 +53,7 @@ module TingYun
 
         begin
           if first_middleware
-            events.notify(:before_call, env)
+            events.notify(:cross_app_before_call, env)
           end
           TingYun::Agent::Transaction.start(state, category, build_transaction_options(env, first_middleware))
 
@@ -63,7 +63,7 @@ module TingYun
           if first_middleware
             capture_http_response_code(state, result)
             capture_response_content_type(state, result)
-            events.notify(:after_call, result)
+            events.notify(:cross_app_after_call, result)
           end
 
           result
