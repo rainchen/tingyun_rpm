@@ -53,8 +53,8 @@ module TingYun
                     :request_attributes
 
 
-      def initialize(category, options)
-        @guid = options[:client_transaction_id] || generate_guid
+      def initialize(category, client_transaction_id, options)
+        @guid = client_transaction_id || generate_guid
         @has_children = false
         @category = category
         @exceptions = {}
@@ -105,7 +105,6 @@ module TingYun
       def self.start(state, category, options)
         category ||= :controller
         txn = state.current_transaction
-        options[:client_transaction_id] = state.client_transaction_id
         if txn
           txn.create_nested_frame(state, category, options)
         else
@@ -121,7 +120,7 @@ module TingYun
       end
 
       def self.start_new_transaction(state, category, options)
-        txn = Transaction.new(category, options)
+        txn = Transaction.new(category, state.client_transaction_id, options)
         state.reset(txn)
         txn.start(state)
         txn
