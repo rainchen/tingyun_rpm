@@ -6,14 +6,16 @@ module TingYun
   module Agent
     class TransactionTimings
 
-      def initialize(queue_time_in_seconds, start_time_in_seconds, transaction_name, trace_id, timings)
+      class Timings <  Struct.new :sql_duration, :external_duration, :rds_duration, :mc_duration, :mon_duration; end
+
+      def initialize(queue_time_in_seconds, start_time_in_seconds, transaction_name, trace_id)
         @now = Time.now.to_f
         @queue_time_in_seconds = clamp_to_positive(queue_time_in_seconds.to_f)
         @start_time_in_seconds = clamp_to_positive(start_time_in_seconds.to_f)
 
         @transaction_name = transaction_name
         @trace_id = trace_id
-        @timings = timings
+        @timings = TingYun::Agent::TransactionTimings::Timings.new
       end
 
 
