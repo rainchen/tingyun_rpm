@@ -31,7 +31,7 @@ module TingYun
         end
 
         def rum_enable?
-           TingYun::Agent.config[:'nbs.rum.enabled']
+           TingYun::Agent.config[:'nbs.rum.enabled'] and false
         end
 
         def insert_js?(state)
