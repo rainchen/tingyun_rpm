@@ -117,11 +117,8 @@ module TingYun
         end
       end
 
-      class Timings <  Struct.new :sql_duration, :external_duration, :rds_duration, :mc_duration, :mon_duration; end
-
-
       def timings
-        @timings ||= TingYun::Agent::TransactionTimings.new(transaction_queue_time, transaction_start_time, transaction_name, trace_id, Timings.new)
+        @timings ||= TingYun::Agent::TransactionTimings.new(transaction_queue_time, transaction_start_time, transaction_name, trace_id)
       end
 
       def transaction_start_time
