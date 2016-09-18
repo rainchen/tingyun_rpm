@@ -463,7 +463,7 @@ module TingYun
             :public => false,
             :type => Fixnum,
             :allowed_from_server => false,
-            :description => 'Port for the New Relic API host.'
+            :description => 'Port for the TingYun  API host.'
         },
         :disable_middleware_instrumentation => {
             :default => false,

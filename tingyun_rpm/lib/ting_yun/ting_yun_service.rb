@@ -31,11 +31,10 @@ module TingYun
                   :ssl_cert_store,
                   :shared_tcp_connection
 
-    def initialize(license_key=nil,collector=TingYun::Support.collector)
+    def initialize(license_key=nil)
 
       @license_key = license_key || TingYun::Agent.config[:'license_key']
       @request_timeout = TingYun::Agent.config[:timeout]
-      @collector = collector
       @data_version = TingYun::VERSION::STRING
       @marshaller =TingYun::Support::Serialize::JsonMarshaller.new
       @metric_id_cache = {}
@@ -53,6 +52,7 @@ module TingYun
     end
 
     def get_redirect_host
+      @collector=TingYun::Support.collector
       invoke_remote(:getRedirectHost)
     end
 
