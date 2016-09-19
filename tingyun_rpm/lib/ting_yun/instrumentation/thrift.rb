@@ -141,7 +141,6 @@ TingYun::Support::LibraryDetection.defer do
             return  unless state.execution_traced?
             cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
                 raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
-
             tingyun_id = "#{cross_app_id};c=1;x=#{state.request_guid}"
 
             data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
