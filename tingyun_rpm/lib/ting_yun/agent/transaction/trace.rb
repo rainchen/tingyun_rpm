@@ -11,10 +11,12 @@ module TingYun
         attr_accessor :root_node, :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished, :tx_id
 
         def initialize(start_time)
+          state = TingYun::Agent::TransactionState.tl_get
           @start_time = start_time
           @node_count = 0
           @prepared = false
           @guid = generate_guid
+          @tx_id = state.client_transaction_id || state.request_guid
         end
 
         def create_node(time_since_start, metric_name = nil)
