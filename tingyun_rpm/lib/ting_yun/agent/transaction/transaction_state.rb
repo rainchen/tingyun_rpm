@@ -110,7 +110,6 @@ module TingYun
         data.each do |e|
           if m = e.match(/x=/)
             @client_transaction_id = m.post_match
-            @transaction_sample_builder.set_trace_id(@client_transaction_id)
           elsif m = e.match(/r=/)
             @client_req_id = m.post_match
           end

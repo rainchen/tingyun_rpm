@@ -60,7 +60,8 @@ module TingYun
                   :start_time
 
 
-      def initialize(category, options)
+
+      def initialize(category, client_transaction_id, options)
         @start_time = Time.now
 
         @exceptions = TingYun::Agent::Transaction::Exceptions.new
@@ -71,7 +72,7 @@ module TingYun
         @has_children = false
         @category = category
 
-        @guid = options[:client_transaction_id] || generate_guid
+        @guid = client_transaction_id || generate_guid
         @frame_stack = []
         @frozen_name = nil
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
@@ -90,6 +91,7 @@ module TingYun
       def request_port
         @request_attributes && @request_attributes.port
       end
+
 
       def start(state)
         return if !state.execution_traced?

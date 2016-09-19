@@ -41,24 +41,28 @@ TingYun::Support::LibraryDetection.defer do
 
       include TingYun::Instrumentation::ThriftHelper
 
-      def send_message_args_with_tingyun(args_class, args = {})
-        begin
-          state = TingYun::Agent::TransactionState.tl_get
-          return  unless state.execution_traced?
-          cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
-              raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
-          state.transaction_sample_builder.set_trace_id(state.request_guid)
 
-          data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => "#{cross_app_id};c=1;x=#{state.request_guid}")
-          @oprot.write_field_begin("TingyunField", 11, 6)
-          @oprot.write_string(data)
-          @oprot.write_field_end
-        rescue => e
-          TingYun::Agent.logger.debug("Failed to thrift send_message_args_with_tingyun : ", e)
-        ensure
-          send_message_args_without_tingyun(args_class, args)
+      def send_message_args_with_tingyun(args_class, args = {})
+          begin
+            state = TingYun::Agent::TransactionState.tl_get
+            return  unless state.execution_traced?
+            cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+                raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+            txn_guid = state.request_guid
+            tingyun_id = "#{cross_app_id};c=1;x=#{txn_guid}"
+
+            data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
+            @oprot.write_field_begin("TingyunField", 11, 6)
+            @oprot.write_string(data)
+            @oprot.write_field_end
+          rescue => e
+            TingYun::Agent.logger.error("Failed to thrift send_message_args_with_tingyun : ", e)
+          ensure
+            send_message_args_without_tingyun(args_class, args)
+          end
+
         end
-      end
+
 
       alias :send_message_args_without_tingyun :send_message_args
       alias :send_message_args  :send_message_args_with_tingyun

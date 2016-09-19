@@ -26,14 +26,14 @@ module TingYun
         TingYun::Agent.logger.debug("Wiring up Cross Application Tracing to events after finished configuring")
         state = TingYun::Agent::TransactionState.tl_get
 
-        events.subscribe(:before_call) do |env| #THREAD_LOCAL_ACCESS
+        events.subscribe(:cross_app_before_call) do |env| #THREAD_LOCAL_ACCESS
           if TingYun::Agent::CrossAppTracing.cross_app_enabled?
             state = TingYun::Agent::TransactionState.tl_get
             state.save_referring_transaction_info(env[TY_ID_HEADER].split(';')) if env[TY_ID_HEADER]
           end
         end
 
-        events.subscribe(:after_call) do |_status_code, headers, _body| #THREAD_LOCAL_ACCESS
+        events.subscribe(:cross_app_after_call) do |_status_code, headers, _body| #THREAD_LOCAL_ACCESS
           insert_response_header(state, headers)
         end
 
