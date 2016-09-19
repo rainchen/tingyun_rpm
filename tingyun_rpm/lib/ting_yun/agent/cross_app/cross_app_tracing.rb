@@ -168,8 +168,7 @@ module TingYun
         cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
             raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
 
-        txn_guid =  state.client_transaction_id || state.request_guid
-        request[TY_ID_HEADER] = "#{cross_app_id};c=1;x=#{txn_guid}"
+        request[TY_ID_HEADER] = "#{cross_app_id};c=1;x=#{state.request_guid}"
       end
 
       # Returns +true+ if Cross Application Tracing is enabled, and the given +response+
