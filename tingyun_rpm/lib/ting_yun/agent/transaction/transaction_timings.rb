@@ -15,7 +15,7 @@ module TingYun
 
         @transaction_name = transaction_name
         @trace_id = trace_id
-        @timings = TingYun::Agent::TransactionTimings::Timings.new
+        @timings = TingYun::Agent::TransactionTimings::Timings.new(0.0,0.0,0.0,0.0,0.0)
       end
 
 
@@ -55,7 +55,7 @@ module TingYun
       end
 
       def app_execute_duration
-        app_time_in_millis - queue_time_in_millis - (sql_duration||0 ) - (external_duration||0) - (rds_duration||0) - (mon_duration||0) - (mc_duration||0)
+        app_time_in_millis - queue_time_in_millis - sql_duration - external_duration - rds_duration - mon_duration - mc_duration
       end
 
       # Helpers
