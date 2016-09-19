@@ -19,12 +19,12 @@ module TingYun
         register_event_listeners(events)
       end
 
+
       # Expected sequence of events:
       #   :before_call will save our cross application request id to the thread
       #   :after_call will write our response headers/metrics and clean up the thread
       def register_event_listeners(events)
         TingYun::Agent.logger.debug("Wiring up Cross Application Tracing to events after finished configuring")
-        state = TingYun::Agent::TransactionState.tl_get
 
         events.subscribe(:cross_app_before_call) do |env| #THREAD_LOCAL_ACCESS
           if TingYun::Agent::CrossAppTracing.cross_app_enabled?
@@ -34,13 +34,14 @@ module TingYun
         end
 
         events.subscribe(:cross_app_after_call) do |_status_code, headers, _body| #THREAD_LOCAL_ACCESS
-          insert_response_header(state, headers)
+          insert_response_header(headers)
         end
 
       end
 
 
-      def insert_response_header(state, response_headers)
+      def insert_response_header(response_headers)
+        state = TingYun::Agent::TransactionState.tl_get
         if state.same_account?
           txn = state.current_transaction
           if txn
