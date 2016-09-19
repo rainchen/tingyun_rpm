@@ -12,6 +12,7 @@ module TingYun
     module Coerce
       module_function
 
+
       def int(value, context=nil)
         Integer(value)
       rescue => error
