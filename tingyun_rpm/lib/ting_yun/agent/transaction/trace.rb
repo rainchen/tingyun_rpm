@@ -16,7 +16,7 @@ module TingYun
           @node_count = 0
           @prepared = false
           @guid = generate_guid
-          @tx_id = state.client_transaction_id || state.request_guid
+          @tx_id = state.request_guid
         end
 
         def create_node(time_since_start, metric_name = nil)
@@ -48,7 +48,7 @@ module TingYun
               TingYun::Helper.correctly_encoded(metric_name)|| '',
               TingYun::Helper.correctly_encoded(uri||metric_name||''),
               encoder.encode(trace_tree),
-              tx_id || '',
+              tx_id,
               guid
           ]
         end
