@@ -23,7 +23,7 @@ TingYun::Support::LibraryDetection.defer do
       def record_redis_duration(_1, _2, duration)
         state = TingYun::Agent::TransactionState.tl_get
         if state
-          state.timings.rds_duration =  (state.timings.rds_duration || 0) + duration * 1000
+          state.timings.rds_duration = state.timings.rds_duration + duration * 1000
         end
       end
 

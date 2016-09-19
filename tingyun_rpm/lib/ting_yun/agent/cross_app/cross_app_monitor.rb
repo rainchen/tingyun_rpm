@@ -67,7 +67,7 @@ module TingYun
             :db => timings.sql_duration,
             :ex => timings.external_duration,
             :rds => timings.rds_duration,
-            :mc => timings.mc_duration || 0,
+            :mc => timings.mc_duration,
             :mon => timings.mon_duration,
             :code => timings.app_execute_duration
           }
