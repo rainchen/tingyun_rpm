@@ -109,7 +109,7 @@ module TingYun
         end
 
         def start_new_transaction(state, category, options)
-          txn = Transaction.new(category, options)
+          txn = Transaction.new(category, state.client_transaction_id, options)
           state.reset(txn)
           txn.start(state)
           txn
