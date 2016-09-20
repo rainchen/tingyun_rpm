@@ -28,7 +28,8 @@ module TingYun
                   :data_version,
                   :metric_id_cache,
                   :applicationId,
-                  :ssl_cert_store
+                  :ssl_cert_store,
+                  :shared_tcp_connection
 
 
     def initialize(license_key=nil)
