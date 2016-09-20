@@ -64,8 +64,9 @@ module TingYun
       end
 
       def check_post_size(post)
-        return if post.size < TingYun::Agent.config[:post_size_limit]
-        TingYun::Agent.logger.debug "Tried to send too much data: #{post.size} bytes"
+        size = post.size
+        return if size < TingYun::Agent.config[:post_size_limit]
+        TingYun::Agent.logger.debug "Tried to send too much data: #{size} bytes"
         raise TingYun::Support::Exception::UnrecoverableServerException.new('413 Request Entity Too Large')
       end
 
@@ -81,8 +82,8 @@ module TingYun
       def valid_to_marshal?(data)
         @marshaller.dump(data)
         true
-      rescue StandardError, SystemStackError => e
-        TingYun::Agent.logger.warn("Unable to marshal environment report on connect.", e)
+      rescue StandardError, SystemStackError => error
+        TingYun::Agent.logger.warn("Unable to marshal environment report on connect.", error)
         false
       end
     end
