@@ -23,13 +23,12 @@ module TingYun
     PROTOCOL_VERSION = 1
 
 
-    attr_accessor :request_timeout,
+    attr_reader :request_timeout,
                   :appSessionKey,
                   :data_version,
                   :metric_id_cache,
-                  :applicationId,
-                  :ssl_cert_store,
-                  :shared_tcp_connection
+                  :applicationId
+
 
     def initialize(license_key=nil)
 
