@@ -27,7 +27,8 @@ module TingYun
                   :appSessionKey,
                   :data_version,
                   :metric_id_cache,
-                  :applicationId
+                  :applicationId,
+                  :ssl_cert_store
 
 
     def initialize(license_key=nil)

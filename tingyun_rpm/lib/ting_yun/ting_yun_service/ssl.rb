@@ -7,8 +7,6 @@ module TingYun
   class TingYunService
     module Ssl
 
-      attr_accessor :ssl_cert_store
-
       def setup_connection_for_ssl(conn)
         # Jruby 1.6.8 requires a gem for full ssl support and will throw
         # an error when use_ssl=(true) is called and jruby-openssl isn't
