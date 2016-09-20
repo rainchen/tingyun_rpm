@@ -23,7 +23,7 @@ module TingYun
     PROTOCOL_VERSION = 1
 
 
-    attr_reader :request_timeout,
+    attr_accessor :request_timeout,
                   :appSessionKey,
                   :data_version,
                   :metric_id_cache,
