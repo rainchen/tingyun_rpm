@@ -12,7 +12,7 @@ module TingYun
     module Collector
       class NoticedError
 
-        attr_accessor :request_uri, :request_port, :file_name, :line_number,
+        attr_accessor :request_uri, :request_port,
                       :stack_trace, :attributes_from_notice_error, :attributes,
                       :count_error
 

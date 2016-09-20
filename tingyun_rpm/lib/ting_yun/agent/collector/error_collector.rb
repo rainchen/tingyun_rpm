@@ -109,8 +109,6 @@ module TingYun
           noticed_error.request_port = options.delete(:port) || EMPTY_STRING
           noticed_error.attributes  = options.delete(:attributes) || EMPTY_STRING
 
-          noticed_error.file_name   = sense_method(exception, :file_name)
-          noticed_error.line_number = sense_method(exception, :line_number)
           noticed_error.stack_trace = extract_stack_trace(exception)
 
           noticed_error.attributes_from_notice_error = options.delete(:custom_params) || {}
