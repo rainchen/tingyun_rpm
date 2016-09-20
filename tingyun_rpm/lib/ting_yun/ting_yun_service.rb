@@ -85,8 +85,7 @@ module TingYun
       full_uri = "#{@collector}#{uri}"
 
       if audit_mode?
-        TingYun::Agent.logger.info("the prepare data: #{data}")
-        TingYun::Agent.logger.info("url: #{full_uri}")
+        TingYun::Agent.logger.info("the prepare data: #{data} to url: #{full_uri}")
       else
         TingYun::Agent.logger.info("prepare to send data")
       end
