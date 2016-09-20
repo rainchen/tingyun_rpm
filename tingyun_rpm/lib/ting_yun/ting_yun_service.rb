@@ -81,25 +81,24 @@ module TingYun
         handle_serialization_error(method, e)
       end
       # serialize_finish_time = Time.now
+      uri = remote_method_uri(method)
+      full_uri = "#{@collector}#{uri}"
 
-      if TingYun::Agent.config[:'nbs.audit_mode']
+      if audit_mode?
         TingYun::Agent.logger.info("the prepare data: #{data}")
+        TingYun::Agent.logger.info("url: #{full_uri}")
       else
         TingYun::Agent.logger.info("prepare to send data")
       end
 
       data, encoding = compress_request_if_needed(data)
-      # size = data.size
 
-      uri = remote_method_uri(method)
-      full_uri = "#{@collector}#{uri}"
-      TingYun::Agent.logger.info("url: #{full_uri}") if TingYun::Agent.config[:'nbs.audit_mode']
       response = send_request(:data      => data,
                               :uri       => uri,
                               :encoding  => encoding,
                               :collector => @collector)
 
-      if TingYun::Agent.config[:'nbs.audit_mode']
+      if audit_mode?
         TingYun::Agent.logger.info("the return data: #{response.body}")
       else
         TingYun::Agent.logger.info("the send-process end")
@@ -109,6 +108,10 @@ module TingYun
       # take the initiative to GC
       payload = nil
       data = nil
+    end
+
+    def audit_mode?
+      TingYun::Agent.config[:'nbs.audit_mode']
     end
 
     def handle_serialization_error(method, e)
