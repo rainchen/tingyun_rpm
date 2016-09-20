@@ -303,7 +303,7 @@ module TingYun
             :allowed_from_server => true,
             :description => 'RUM Script URI'
         },
-        :'nbs.rum.mix.enabled' => {
+        :'nbs.rum.mix_enabled' => {
             :default => false,
             :allow_nil => false,
             :public => true,

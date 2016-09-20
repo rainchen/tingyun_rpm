@@ -20,7 +20,7 @@ module TingYun
 
           return '' if bt_config.empty?
 
-          if TingYun::Agent.config[:"nbs.rum.mix_enabled"]
+          if TingYun::Agent.config[:'nbs.rum.mix_enabled']
             html_safe_if_needed("<script>(function(w){(w._ty_rum || (w._ty_rum = {})).agent = #{bt_config};})(window);</script>")
           else
             html_safe_if_needed("<script>#{browser_instrument("ty_rum=#{bt_config}")}</script>")
