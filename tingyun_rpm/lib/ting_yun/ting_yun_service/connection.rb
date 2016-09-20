@@ -8,6 +8,9 @@ module TingYun
       # Return a Net::HTTP connection object to make a call to the collector.
       # We'll reuse the same handle for cases where we're using keep-alive, or
       # otherwise create a new one.
+
+      attr_reader :shared_tcp_connection
+
       def http_connection
         if @in_session
           establish_shared_connection
