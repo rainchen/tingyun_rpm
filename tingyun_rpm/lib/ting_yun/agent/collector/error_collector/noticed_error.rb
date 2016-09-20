@@ -64,15 +64,11 @@ module TingYun
 
 
         def ==(other)
-          if other.respond_to?(:metric_name) && other.respond_to?(:message)
-           if metric_name == other.metric_name && message == other.message
-             @count_error = count_error + 1
-             return true
-           else
-             return false
-           end
+          if metric_name == other.metric_name && message == other.message
+           @count_error = count_error + 1
+           return true
           else
-            return false
+           return false
           end
         end
 
