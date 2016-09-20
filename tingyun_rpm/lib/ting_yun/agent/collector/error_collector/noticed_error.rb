@@ -12,13 +12,15 @@ module TingYun
     module Collector
       class NoticedError
 
-        attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
-                      :request_uri, :request_port, :file_name, :line_number,
+        attr_accessor :request_uri, :request_port, :file_name, :line_number,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :thread_name, :is_external_error, :external_metric_name, :code, :trace
+                      :count_error
 
+        attr_reader :code, :trace, :external_metric_name,
+                    :is_external_error, :metric_name,
+                    :exception_id, :is_internal, :timestamp,
+                    :exception_class_name, :message
 
-        attr_reader :exception_id, :is_internal
 
 
         def initialize(metric_name, exception, timestamp = Time.now)
@@ -72,7 +74,7 @@ module TingYun
         include TingYun::Support::Coerce
 
         def to_collector_array(encoder)
-          if  is_external_error
+          if is_external_error
             [timestamp.to_i,
              string(external_metric_name),
              int(code),

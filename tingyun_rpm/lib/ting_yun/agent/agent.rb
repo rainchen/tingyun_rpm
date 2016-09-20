@@ -87,12 +87,12 @@ module TingYun
         query_server_for_configuration
         @connected_pid = $$
         @connect_state = :connected
-      rescue TingYun::Support::Exception::LicenseException => e
-        handle_license_error(e)
-      rescue TingYun::Support::Exception::UnrecoverableAgentException => e
-        handle_unrecoverable_agent_error(e)
-      rescue StandardError, Timeout::Error, TingYun::Support::Exception::ServerConnectionException, TingYun::Support::Exception::AgentEnableException => e
-        log_error(e)
+      rescue TingYun::Support::Exception::LicenseException => error
+        handle_license_error(error)
+      rescue TingYun::Support::Exception::UnrecoverableAgentException => error
+        handle_unrecoverable_agent_error(error)
+      rescue StandardError, Timeout::Error, TingYun::Support::Exception::ServerConnectionException, TingYun::Support::Exception::AgentEnableException => error
+        log_error(error)
         if TingYun::Agent.config[:keep_retrying]
           note_connect_failure
           ::TingYun::Agent.logger.info "Will re-attempt in 60 seconds"
@@ -101,8 +101,8 @@ module TingYun
         else
           disconnect
         end
-      rescue Exception => e
-        ::TingYun::Agent.logger.error "Exception of unexpected type during Agent#connect():", e
+      rescue Exception => error
+        ::TingYun::Agent.logger.error "Exception of unexpected type during Agent#connect():", error
         raise
       end
 
@@ -110,7 +110,7 @@ module TingYun
       def install_exit_handler
         TingYun::Agent.logger.debug("Installing at_exit handler")
         at_exit do
-          if need_exit_code_workaround?
+          if defined?(RUBY_ENGINE) && RUBY_ENGINE == "ruby" && RUBY_VERSION.match(/^1\.9/)
             exit_status = $!.status if $!.is_a?(SystemExit)
             shutdown
             exit exit_status if exit_status
@@ -120,9 +120,6 @@ module TingYun
         end
       end
 
-      def need_exit_code_workaround?
-        defined?(RUBY_ENGINE) && RUBY_ENGINE == "ruby" && RUBY_VERSION.match(/^1\.9/)
-      end
 
       def untraced_graceful_disconnect
         begin
@@ -131,8 +128,8 @@ module TingYun
               transmit_data
             end
           end
-        rescue => e
-          ::TingYun::Agent.logger.error e
+        rescue => error
+          ::TingYun::Agent.logger.error error
         end
       end
 
