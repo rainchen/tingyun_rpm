@@ -46,16 +46,11 @@ module TingYun
             return if elapsed < 1 # Causing some kind of math underflow
 
             usertime = t.utime - @last_utime
-            # systemtime = t.stime - @last_stime
 
-            # record_systemtime(systemtime) if systemtime >= 0
-            record_usertime(usertime) if usertime >= 0
-
-            # Calculate the true utilization by taking cpu times and dividing by
-            # elapsed time X processor_count.
-
-            record_user_util((usertime * 100) / (elapsed * @processor_count))
-            # record_system_util(systemtime / (elapsed * @processor_count))
+            if usertime >= 0
+              record_usertime(usertime)
+              record_user_util((usertime * 100) / (elapsed * @processor_count))
+            end
           end
           @last_utime = t.utime
           @last_stime = t.stime
