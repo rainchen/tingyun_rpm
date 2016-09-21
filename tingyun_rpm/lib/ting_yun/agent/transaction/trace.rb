@@ -17,6 +17,7 @@ module TingYun
           @prepared = false
           @guid = generate_guid
           @tx_id = state.request_guid
+          @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")
         end
 
         def create_node(time_since_start, metric_name = nil)
