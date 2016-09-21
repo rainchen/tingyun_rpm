@@ -12,30 +12,20 @@ module TingYun
     module Collector
       class NoticedError
 
-        attr_accessor :request_uri, :request_port,
+        attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
+                      :request_uri, :request_port,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error
+                      :count_error, :thread_name, :is_external_error, :external_metric_name, :code, :trace
 
-        attr_reader :code, :trace, :external_metric_name,
-                    :is_external_error, :metric_name,
-                    :is_internal, :timestamp,
-                    :exception_class_name, :message
 
-        class Request < Struct :request_uri, :request_port, :attributes; end
+        attr_reader :exception_id, :is_internal
 
-        class Exception < Struct :code, :trace, :stack_trace, :external_metric_name, :exception_class_name, :message,:is_internal; end
 
-        EMPTY_STRING = ''.freeze
-
-        def initialize(metric_name = EMPTY_STRING, exception, timestamp = Time.now, options={})
-          @metric_name = metric_name
-          @request = Request.new(options.delete(:uri) || EMPTY_STRING, options.delete(:port) || EMPTY_STRING, options.delete(:attributes) || EMPTY_STRING)
-          noticed_error.request_uri =
-          noticed_error.request_port =
-          noticed_error.attributes  =
+        def initialize(metric_name, exception, timestamp = Time.now)
           @stack_trace = []
           @count_error = 1
-
+          @exception_id = exception.object_id
+          @metric_name = metric_name
           @timestamp = timestamp
           @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
           @external_metric_name = exception.instance_variable_get :@tingyun_klass
@@ -70,19 +60,26 @@ module TingYun
           @message = @message[0..4095] if @message.length > 4096
         end
 
+
         def ==(other)
-          if metric_name == other.metric_name && message == other.message
-           @count_error = count_error + 1
-           return true
+          if other.respond_to?(:exception_id)
+            if exception_id == other.exception_id
+              return true
+            elsif metric_name == other.metric_name && message == other.message
+              @count_error = count_error + 1
+              return true
+            else
+              return false
+            end
           else
-           return false
+            return false
           end
         end
 
         include TingYun::Support::Coerce
 
         def to_collector_array(encoder)
-          if is_external_error
+          if  is_external_error
             [timestamp.to_i,
              string(external_metric_name),
              int(code),
@@ -98,23 +95,23 @@ module TingYun
              string(exception_class_name),
              string(message),
              count_error,
-             string(request_uri || metric_name),
+             string(request_uri),
              encoder.encode(error_params)
             ]
           end
         end
 
         def error_params
-         hash = {
+          hash = {
               :params => custom_params
           }
-         if is_external_error
-           hash[:stacktrace] = trace
-         else
-           hash[:stacktrace] = stack_trace
-           hash[:requestParams] = request_params
-         end
-         hash
+          if is_external_error
+            hash[:stacktrace] = trace
+          else
+            hash[:stacktrace] = stack_trace
+            hash[:requestParams] = request_params
+          end
+          hash
         end
 
         def custom_params
