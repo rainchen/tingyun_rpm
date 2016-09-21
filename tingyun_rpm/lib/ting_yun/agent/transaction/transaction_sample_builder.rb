@@ -31,6 +31,7 @@ module TingYun
       def initialize(time=Time.now)
         @trace = TingYun::Agent::Transaction::Trace.new(time.to_f)
         @trace_start = time.to_f
+
       end
 
       def trace_entry(time)

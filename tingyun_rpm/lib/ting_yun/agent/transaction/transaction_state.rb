@@ -101,7 +101,8 @@ module TingYun
       def self.process_thrift_data(data)
         state = tl_get
         state.thrift_return_data = data
-        state.transaction_sample_builder.set_txId_and_txData(state.request_guid, data)
+        builder = state.transaction_sample_builder
+        builder.set_txId_and_txData(state.request_guid, data) if builder
       end
 
       def save_referring_transaction_info(data)

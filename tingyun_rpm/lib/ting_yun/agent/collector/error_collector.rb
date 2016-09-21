@@ -104,10 +104,8 @@ module TingYun
         def create_noticed_error(exception, options)
           error_metric = options.delete(:metric_name) || EMPTY_STRING
 
-          noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
-          noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING
-          noticed_error.request_port = options.delete(:port) || EMPTY_STRING
-          noticed_error.attributes  = options.delete(:attributes) || EMPTY_STRING
+          noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception, Time.now, options)
+
 
           noticed_error.stack_trace = extract_stack_trace(exception)
 

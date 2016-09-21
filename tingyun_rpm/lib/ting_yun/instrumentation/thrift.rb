@@ -132,7 +132,7 @@ TingYun::Support::LibraryDetection.defer do
           )
           if node
             node.name = node_name
-            ::TingYun::Agent.instance.transaction_sampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
+            ::TingYun::Agent::Collector::TransactionSampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")
             stack = state.traced_method_stack
             stack.pop_frame(state, node, node_name, t1)
           end

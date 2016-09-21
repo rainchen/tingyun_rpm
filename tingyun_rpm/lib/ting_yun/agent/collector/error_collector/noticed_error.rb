@@ -18,16 +18,24 @@ module TingYun
 
         attr_reader :code, :trace, :external_metric_name,
                     :is_external_error, :metric_name,
-                    :exception_id, :is_internal, :timestamp,
+                    :is_internal, :timestamp,
                     :exception_class_name, :message
 
+        class Request < Struct :request_uri, :request_port, :attributes; end
 
+        class Exception < Struct :code, :trace, :stack_trace, :external_metric_name, :exception_class_name, :message,:is_internal; end
 
-        def initialize(metric_name, exception, timestamp = Time.now)
+        EMPTY_STRING = ''.freeze
+
+        def initialize(metric_name = EMPTY_STRING, exception, timestamp = Time.now, options={})
+          @metric_name = metric_name
+          @request = Request.new(options.delete(:uri) || EMPTY_STRING, options.delete(:port) || EMPTY_STRING, options.delete(:attributes) || EMPTY_STRING)
+          noticed_error.request_uri =
+          noticed_error.request_port =
+          noticed_error.attributes  =
           @stack_trace = []
           @count_error = 1
-          @exception_id = exception.object_id
-          @metric_name = metric_name
+
           @timestamp = timestamp
           @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
           @external_metric_name = exception.instance_variable_get :@tingyun_klass
@@ -61,7 +69,6 @@ module TingYun
           # overhead across the wire
           @message = @message[0..4095] if @message.length > 4096
         end
-
 
         def ==(other)
           if metric_name == other.metric_name && message == other.message
