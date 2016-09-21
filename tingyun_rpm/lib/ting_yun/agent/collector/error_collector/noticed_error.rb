@@ -17,7 +17,6 @@ module TingYun
                       :stack_trace, :attributes_from_notice_error, :attributes,
                       :count_error, :thread_name, :is_external_error, :external_metric_name, :code, :trace
 
-
         attr_reader :exception_id, :is_internal
 
 
@@ -62,15 +61,11 @@ module TingYun
 
 
         def ==(other)
-          if other.respond_to?(:exception_id)
-            if exception_id == other.exception_id
-              return true
-            elsif metric_name == other.metric_name && message == other.message
-              @count_error = count_error + 1
-              return true
-            else
-              return false
-            end
+          return true if other.respond_to?(:exception_id) && exception_id == other.exception_id
+
+          if metric_name == other.metric_name && message == other.message
+            @count_error = count_error + 1
+            return true
           else
             return false
           end
