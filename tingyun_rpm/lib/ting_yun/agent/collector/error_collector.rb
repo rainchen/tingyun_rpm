@@ -73,7 +73,7 @@ module TingYun
           tag_exception(exception)
           state = ::TingYun::Agent::TransactionState.tl_get
           increment_error_count(state)
-          noticed_error = create_noticed_error(exception, options)
+          noticed_error = TingYun::Agent::Collector::NoticedError.create(exception, options)
           if noticed_error.is_external_error
             external_error_array.add_to_error_queue(noticed_error)
           else
@@ -99,26 +99,7 @@ module TingYun
           end
         end
 
-        EMPTY_STRING = ''.freeze
 
-        def create_noticed_error(exception, options)
-          error_metric = options.delete(:metric_name) || EMPTY_STRING
-
-          noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
-          noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING
-          noticed_error.request_port = options.delete(:port)
-          noticed_error.attributes  = options.delete(:attributes)
-
-          noticed_error.stack_trace = extract_stack_trace(exception)
-
-          noticed_error.attributes_from_notice_error = options.delete(:custom_params) || {}
-
-          # Any options that are passed to notice_error which aren't known keys
-          # get treated as custom attributes, so merge them into that hash.
-          noticed_error.attributes_from_notice_error.merge!(options)
-
-          noticed_error
-        end
 
         def skip_notice_error?(exception)
           exception_tagged?(exception)

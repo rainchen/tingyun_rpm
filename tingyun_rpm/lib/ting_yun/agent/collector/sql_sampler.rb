@@ -47,13 +47,12 @@ module TingYun
           state ||= TingYun::Agent::TransactionState.tl_get
           data = state.sql_sampler_transaction_data
           return unless data
-
-          if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold'] && state.sql_recorded?
-            if duration*1000 > TingYun::Agent.config[:'nbs.action_tracer.stack_trace_threshold']
+          threshold = duration*1000
+          if threshold > TingYun::Agent.config[:'nbs.action_tracer.slow_sql_threshold'] && state.sql_recorded?
+            backtrace = ''
+            if threshold > TingYun::Agent.config[:'nbs.action_tracer.stack_trace_threshold']
               backtrace = caller.reject! { |t| t.include?('tingyun_rpm') }
               backtrace = backtrace.first(20).join("\n")
-            else
-              backtrace = ''
             end
             statement = TingYun::Agent::Database::Statement.new(sql, config, explainer, binds, name)
             data.sql_data << ::TingYun::Agent::Collector::SlowSql.new(statement, metric_name, duration, start_time, backtrace)
@@ -72,9 +71,10 @@ module TingYun
         end
 
         def save_slow_sql(data)
-          if data.sql_data.size > 0
+          size = data.sql_data.size
+          if size > 0
             @samples_lock.synchronize do
-              ::TingYun::Agent.logger.debug "Examining #{data.sql_data.size} slow transaction sql statement(s)"
+              ::TingYun::Agent.logger.debug "Examining #{size} slow transaction sql statement(s)"
               save data
             end
           end
