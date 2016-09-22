@@ -45,10 +45,10 @@ module TingYun
           [
               @start_time.round,
               duration,
-              TingYun::Helper.correctly_encoded(attributes[:metric_name]|| EMPTY_STRING),
-              TingYun::Helper.correctly_encoded(attributes[:request_path]||attributes[:metric_name]|| EMPTY_STRING),
+              TingYun::Helper.correctly_encoded(attributes.agent_attributes[:metric_name]|| EMPTY_STRING),
+              TingYun::Helper.correctly_encoded(attributes.agent_attributes[:request_path]||attributes.agent_attributes[:metric_name]|| EMPTY_STRING),
               encoder.encode(trace_tree),
-              attributes[:tx_id],
+              attributes.agent_attributes[:tx_id],
               guid
           ]
         end
