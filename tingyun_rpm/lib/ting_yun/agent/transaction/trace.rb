@@ -8,15 +8,13 @@ module TingYun
     class Transaction
       class Trace
 
-        attr_accessor :root_node, :node_count, :threshold, :metric_name, :uri, :guid, :attributes, :start_time, :finished, :tx_id
+        attr_accessor :root_node, :node_count, :threshold, :guid, :attributes, :start_time, :finished
 
         def initialize(start_time)
-          state = TingYun::Agent::TransactionState.tl_get
           @start_time = start_time
           @node_count = 0
           @prepared = false
           @guid = generate_guid
-          @tx_id = state.request_guid
           @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")
         end
 
@@ -30,6 +28,7 @@ module TingYun
         end
 
 
+        EMPTY_STRING = ''.freeze
 
         include TingYun::Support::Coerce
         
@@ -46,10 +45,10 @@ module TingYun
           [
               @start_time.round,
               duration,
-              TingYun::Helper.correctly_encoded(metric_name)|| '',
-              TingYun::Helper.correctly_encoded(uri||metric_name||''),
+              TingYun::Helper.correctly_encoded(attributes[:metric_name]|| EMPTY_STRING),
+              TingYun::Helper.correctly_encoded(attributes[:request_path]||attributes[:metric_name]|| EMPTY_STRING),
               encoder.encode(trace_tree),
-              tx_id,
+              attributes[:tx_id],
               guid
           ]
         end
@@ -98,7 +97,7 @@ module TingYun
         def custom_params
           custom_param = {
               :threadName => string(attributes.agent_attributes[:threadName]),
-              :referer    => string(attributes.agent_attributes[:referer]) || ''
+              :referer    => string(attributes.agent_attributes[:referer]) || EMPTY_STRING
           }
           custom_param[:httpStatus] = int(attributes.agent_attributes[:httpStatus]) if attributes.agent_attributes[:httpStatus]
 

@@ -10,15 +10,10 @@ module TingYun
           @exceptions = {}
         end
 
-        def record_exceptions(uri, port, metric_name, attributes)
+        def record_exceptions(attributes)
           unless @exceptions.empty?
             @exceptions.each do |exception, options|
-
-              options[:uri]           ||= uri
-              options[:port]            = port
-              options[:metric_name]     = metric_name
               options[:attributes]      = attributes
-
               ::TingYun::Agent.instance.error_collector.notice_error(exception, options)
             end
           end

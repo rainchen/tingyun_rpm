@@ -11,7 +11,7 @@ module TingYun
 
       # Request data
       attr_accessor :transaction_sample_builder
-      attr_reader   :current_transaction, :traced_method_stack
+      attr_reader   :current_transaction, :traced_method_stack, :timings
       # Sql Sampler Transaction Data
       attr_accessor :sql_sampler_transaction_data,
                     :client_transaction_id,
@@ -48,6 +48,7 @@ module TingYun
         @untraced = []
         @current_transaction = nil
         @traced_method_stack = TingYun::Agent::TracedMethodStack.new
+        @record_tt = nil
       end
 
       # This starts the timer for the transaction.
@@ -57,11 +58,13 @@ module TingYun
         # and (more importantly) outside the scope of a transaction
         @current_transaction = transaction
         @traced_method_stack.clear
+        @client_transaction_id = nil
         @transaction_sample_builder = nil
         @sql_sampler_transaction_data = nil
-        @cross_tx_data = nil
         @thrift_return_data = nil
         @timings = nil
+        @client_req_id = nil
+        @client_tingyun_id_secret = nil
       end
 
       # TT's and SQL

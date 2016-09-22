@@ -69,8 +69,6 @@ module TingYun
           last_builder.finish_trace(time)
 
           final_trace = last_builder.trace
-          final_trace.metric_name = txn.best_name
-          final_trace.uri = txn.request_path
           final_trace.attributes = txn.attributes
 
 

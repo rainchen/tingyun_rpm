@@ -151,7 +151,7 @@ module TingYun
 
         record_summary_metrics(outermost_node_name, end_time)
         @apdex.record_apdex(@frozen_name, end_time, @exceptions.had_error?)
-        @exceptions.record_exceptions(request_path, request_port, best_name, @attributes)
+        @exceptions.record_exceptions(@attributes)
 
 
         TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)

@@ -93,7 +93,6 @@ module TingYun
         def start(state, category, options)
           category ||= :controller
           txn = state.current_transaction
-          options[:client_transaction_id] = state.client_transaction_id
           if txn
             txn.create_nested_frame(state, category, options)
           else

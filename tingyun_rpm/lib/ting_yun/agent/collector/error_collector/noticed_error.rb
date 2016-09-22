@@ -12,30 +12,11 @@ module TingYun
     module Collector
       class NoticedError
 
-        EMPTY_STRING = ''.freeze
 
-        def self.create(exception, options)
-          error_metric = options.delete(:metric_name) || EMPTY_STRING
-          noticed_error = new(error_metric, exception)
-          noticed_error.request_uri = options.delete(:uri) || EMPTY_STRING
-          noticed_error.request_port = options.delete(:port) || EMPTY_STRING
-          noticed_error.attributes  = options.delete(:attributes) || EMPTY_STRING
-
-          noticed_error.stack_trace = extract_stack_trace(exception)
-
-          noticed_error.attributes_from_notice_error = options.delete(:custom_params) || {}
-
-          # Any options that are passed to notice_error which aren't known keys
-          # get treated as custom attributes, so merge them into that hash.
-          noticed_error.attributes_from_notice_error.merge!(options)
-
-          noticed_error
-        end
 
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
-                      :request_uri, :request_port,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :thread_name, :is_external_error, :external_metric_name, :code, :trace
+                      :count_error, :is_external_error, :external_metric_name, :code, :trace
 
         attr_reader :exception_id, :is_internal
 
@@ -43,12 +24,9 @@ module TingYun
         def initialize(metric_name, exception, timestamp = Time.now)
           @metric_name = metric_name
           @timestamp = timestamp
-
-          @request = Request.new(options.delete(:uri) )
           @stack_trace = []
           @count_error = 1
           @exception_id = exception.object_id
-
           @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
           @external_metric_name = exception.instance_variable_get :@tingyun_klass
           @is_external_error = exception.instance_variable_get :@tingyun_external
@@ -113,7 +91,7 @@ module TingYun
              string(exception_class_name),
              string(message),
              count_error,
-             string(request_uri),
+             string(attributes.agent_attributes[:request_path]),
              encoder.encode(error_params)
             ]
           end

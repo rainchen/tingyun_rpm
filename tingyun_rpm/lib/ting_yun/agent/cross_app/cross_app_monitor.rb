@@ -49,7 +49,6 @@ module TingYun
             response_headers[TY_DATA_HEADER] = TingYun::Support::Serialize::JSONWrapper.dump build_payload(state)
             TingYun::Agent.logger.debug("now,cross app will send response_headers  #{response_headers[TY_DATA_HEADER]}")
           end
-          state.client_tingyun_id_secret = nil #clear_client_tingyun_id_secret
         end
       end
 

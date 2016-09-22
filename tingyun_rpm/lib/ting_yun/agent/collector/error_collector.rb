@@ -73,7 +73,7 @@ module TingYun
           tag_exception(exception)
           state = ::TingYun::Agent::TransactionState.tl_get
           increment_error_count(state)
-          noticed_error = TingYun::Agent::Collector::NoticedError.create(exception, options)
+          noticed_error = notice_error(exception, options)
           if noticed_error.is_external_error
             external_error_array.add_to_error_queue(noticed_error)
           else
@@ -99,6 +99,16 @@ module TingYun
           end
         end
 
+        EMPTY_STRING = ''.freeze
+
+        def create_noticed_error(exception, options)
+          attributes = options[:attributes]
+          error_metric = attributes.agent_attributes[:metric_name] || EMPTY_STRING
+          noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
+          noticed_error.attributes  = attributes
+          noticed_error.stack_trace = extract_stack_trace(exception)
+          noticed_error
+        end
 
 
         def skip_notice_error?(exception)

@@ -67,6 +67,9 @@ module TingYun
             @request_attributes.assign_agent_attributes @attributes
           end
 
+          @attributes.add_agent_attribute(:tx_id,  @guid);
+          @attributes.add_agent_attribute(:metric_name,  best_name);
+
         end
 
 
