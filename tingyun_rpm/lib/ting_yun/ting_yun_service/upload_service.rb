@@ -42,8 +42,8 @@ module TingYun
 
 
       # The collector wants to recieve metric data in a format that's different
-      # from how we store it inte -nally, so this method handles the translation.
-      # It also handles translating metric names to IDs using our metric ID cache.
+      # # from how we store it inte -nally, so this method handles the translation.
+      # # It also handles translating metric names to IDs using our metric ID cache.
       def build_metric_data_array(stats_hash)
         action_array = []
         adpex_array = []
