@@ -55,7 +55,6 @@ module TingYun
           if first_middleware
             events.notify(:cross_app_before_call, env)
           end
-          TingYun::Agent::Transaction.start(state, category, build_transaction_options(env, first_middleware))
 
           result = (target == self) ? traced_call(env) : target.call(env)
 
