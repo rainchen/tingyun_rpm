@@ -50,6 +50,8 @@ module TingYun
         first_middleware = note_transaction_started(env)
         state = TingYun::Agent::TransactionState.tl_get
         begin
+
+          TingYun::Agent::Transaction.start(state, category, build_transaction_options(env, first_middleware))
           if first_middleware
             events.notify(:cross_app_before_call, env)
           end
