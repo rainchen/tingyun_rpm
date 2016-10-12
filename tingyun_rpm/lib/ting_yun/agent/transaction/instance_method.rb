@@ -51,11 +51,11 @@ module TingYun
         end
 
 
-        alias_method :ignore, :needs_middleware_summary_metrics?
-
         def needs_middleware_summary_metrics?(name)
           name.start_with?(MIDDLEWARE_PREFIX)
         end
+
+        alias_method :ignore, :needs_middleware_summary_metrics?
 
         def record_summary_metrics(outermost_node_name,end_time)
           unless @frozen_name == outermost_node_name
