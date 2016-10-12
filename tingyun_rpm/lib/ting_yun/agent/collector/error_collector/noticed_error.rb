@@ -28,10 +28,12 @@ module TingYun
           @count_error = 1
           @exception_id = exception.object_id
           @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
-          @external_metric_name = exception.tingyun_klass
-          @is_external_error = exception.tingyun_external
-          @code = exception.tingyun_code
-          @trace = exception.tingyun_trace
+          @is_external_error = exception.respond_to?(:tingyun_external)? exception.tingyun_external : false
+          if @is_external_error
+            @external_metric_name = exception.tingyun_klass
+            @code = exception.tingyun_code
+            @trace = exception.tingyun_trace
+          end
           # It's critical that we not hold onto the exception class constant in this
           # class. These objects get serialized for Resque to a process that might
           # not have the original exception class loaded, so do all processing now
