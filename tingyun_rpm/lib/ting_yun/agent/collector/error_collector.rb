@@ -73,7 +73,7 @@ module TingYun
           tag_exception(exception)
           state = ::TingYun::Agent::TransactionState.tl_get
           increment_error_count(state)
-          noticed_error = notice_error(exception, options)
+          noticed_error = create_noticed_error(exception, options)
           if noticed_error.is_external_error
             external_error_array.add_to_error_queue(noticed_error)
           else
