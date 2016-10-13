@@ -101,9 +101,6 @@ module TingYun
         Agent.config[:'transaction_tracer.limit_segments']
       end
 
-      def set_trace_id(id)
-        @trace.tx_id = id
-      end
     end
   end
 end
