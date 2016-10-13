@@ -53,18 +53,16 @@ module TingYun
 
       # This starts the timer for the transaction.
       def reset(transaction=nil)
-        # We purposefully don't reset @untraced, @record_tt and @record_sql
+        # We purposefully don't reset @untraced, @record_tt and @record_sql,@client_transaction_id,@client_tingyun_id_secret
         # since those are managed by TingYun::Agent.disable_* calls explicitly
         # and (more importantly) outside the scope of a transaction
         @current_transaction = transaction
         @traced_method_stack.clear
-        @client_transaction_id = nil
         @transaction_sample_builder = nil
         @sql_sampler_transaction_data = nil
         @thrift_return_data = nil
         @timings = nil
         @client_req_id = nil
-        @client_tingyun_id_secret = nil
       end
 
       # TT's and SQL
