@@ -22,7 +22,7 @@ module TingYun
           txn_options = create_transaction_options(trace_options, category)
 
           begin
-             txn = TingYun::Agent::Transaction.start(state, category, txn_options)
+            TingYun::Agent::Transaction.start(state, category, txn_options)
             begin
               yield
             rescue => e

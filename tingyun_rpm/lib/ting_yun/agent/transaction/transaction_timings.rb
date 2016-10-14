@@ -8,18 +8,15 @@ module TingYun
 
       class Timings <  Struct.new :sql_duration, :external_duration, :rds_duration, :mc_duration, :mon_duration; end
 
-      def initialize(queue_time_in_seconds, start_time_in_seconds, transaction_name, trace_id)
+      def initialize(queue_time_in_seconds, start_time_in_seconds)
         @queue_time_in_seconds = clamp_to_positive(queue_time_in_seconds.to_f)
         @start_time_in_seconds = clamp_to_positive(start_time_in_seconds.to_f)
 
-        @transaction_name = transaction_name
-        @trace_id = trace_id
         @timings = TingYun::Agent::TransactionTimings::Timings.new(0.0,0.0,0.0,0.0,0.0)
       end
 
 
-      attr_reader :transaction_name,
-                  :start_time_in_seconds, :queue_time_in_seconds, :trace_id, :timings
+      attr_reader :start_time_in_seconds, :queue_time_in_seconds, :timings
 
       extend Forwardable
 
@@ -29,9 +26,7 @@ module TingYun
                      :mc_duration, :mc_duration=,
                      :mon_duration, :mon_duration=
 
-      def transaction_name_or_unknown
-        transaction_name || ::TingYun::Agent::UNKNOWN_METRIC
-      end
+
 
       def start_time_as_time
         Time.at(@start_time_in_seconds)

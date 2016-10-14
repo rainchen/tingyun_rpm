@@ -54,10 +54,10 @@ module TingYun
 
           data = {
               :id => TingYun::Agent.config[:tingyunIdSecret],
-              :n => timings.transaction_name_or_unknown ,
+              :n => state.transaction_name ,
               :a => timings.app_time_in_millis,
               :q => timings.queue_time_in_millis,
-              :tid => timings.trace_id
+              :tid => state.trace_id
           }
           TingYun::Support::Serialize::JSONWrapper.dump(data)
         end

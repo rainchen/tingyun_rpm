@@ -58,8 +58,8 @@ module TingYun
 
         payload = {
           :id => TingYun::Agent.config[:tingyunIdSecret].split('|')[1],
-          :action => timings.transaction_name_or_unknown,
-          :trId => timings.trace_id,
+          :action => state.transaction_name,
+          :trId => state.trace_id,
           :time => {
             :duration => timings.app_time_in_seconds,
             :qu => timings.queue_time_in_millis,

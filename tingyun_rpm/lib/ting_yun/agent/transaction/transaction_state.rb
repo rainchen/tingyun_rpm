@@ -119,7 +119,7 @@ module TingYun
       end
 
       def timings
-        @timings ||= TingYun::Agent::TransactionTimings.new(transaction_queue_time, transaction_start_time, transaction_name, trace_id)
+        @timings ||= TingYun::Agent::TransactionTimings.new(transaction_queue_time, transaction_start_time)
       end
 
       def transaction_start_time
