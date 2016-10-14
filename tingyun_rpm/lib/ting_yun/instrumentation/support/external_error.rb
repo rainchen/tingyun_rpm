@@ -34,7 +34,7 @@ module TingYun
             when Timeout::Error
               set_attributes(e, klass, 903)
             else
-              set_attributes(e, klass, 100)
+              set_attributes(e, klass, 1000)
           end
 
           TingYun::Agent.notice_error(e)

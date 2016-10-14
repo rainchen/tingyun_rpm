@@ -93,7 +93,7 @@ module TingYun
              string(exception_class_name),
              string(message),
              count_error,
-             string(attributes.agent_attributes[:request_path]),
+             string(attributes.agent_attributes[:request_path]||metric_name),
              encoder.encode(error_params)
             ]
           end
