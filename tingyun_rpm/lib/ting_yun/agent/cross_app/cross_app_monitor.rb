@@ -61,7 +61,7 @@ module TingYun
           :action => state.transaction_name,
           :trId => state.trace_id,
           :time => {
-            :duration => timings.app_time_in_seconds,
+            :duration => timings.app_time_in_millis,
             :qu => timings.queue_time_in_millis,
             :db => timings.sql_duration,
             :ex => timings.external_duration,
