@@ -11,4 +11,4 @@ log/
 .ruby-version
 .idea/
 todo
-
+.DS_Store
