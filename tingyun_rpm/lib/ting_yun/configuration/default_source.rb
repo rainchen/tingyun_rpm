@@ -382,13 +382,6 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Autodetected application framework used to enable framework-specific functionality.'
         },
-        :monitor_mode => {
-            :default => true,
-            :public => true,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable the transmission of data to the collector.'
-        },
         :'nbs.audit_mode' => {
             :default => false,
             :public => true,
