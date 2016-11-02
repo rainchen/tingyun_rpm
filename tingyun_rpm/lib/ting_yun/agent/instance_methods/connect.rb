@@ -19,6 +19,8 @@ module TingYun
 
         # Disconnect just sets connected to false, which prevents
         # the agent from trying to connect again
+        # @connect_state has three state {:disconnected,:pending,:connected}
+
         def disconnect
           @connect_state = :disconnected
           true

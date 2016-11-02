@@ -126,16 +126,16 @@ module TingYun
 
           def reset!
             with_stats_lock do
-              old = @stats_hash
               @stats_hash = StatsHash.new
-              old
             end
           end
 
           def harvest!
-            now = Time.now
-            snapshot = reset!
-            snapshot.harvested_at = now
+            with_stats_lock do
+              snapshot = @stats_hash
+              snapshot.harvested_at = now
+              @stats_hash = StatsHash.new
+            end
             snapshot
           end
 
