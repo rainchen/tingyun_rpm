@@ -14,7 +14,7 @@ module TingYun
       module ContainerDataManager
 
 
-        attr_reader :stats_engine, :error_collector, :transaction_sampler, :sql_sampler, :middleware
+        attr_reader :stats_engine, :error_collector, :transaction_sampler, :sql_sampler
 
 
         def drop_buffered_data
@@ -34,7 +34,6 @@ module TingYun
           @error_collector = TingYun::Agent::Collector::ErrorCollector.new
           @transaction_sampler = TingYun::Agent::Collector::TransactionSampler.new
           @sql_sampler = TingYun::Agent::Collector::SqlSampler.new
-          @middleware = TingYun::Agent::Collector::MiddleWareCollector.new(@events)
         end
 
         def container_for_endpoint(endpoint)

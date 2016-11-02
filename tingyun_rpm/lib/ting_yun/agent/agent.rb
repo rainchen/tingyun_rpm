@@ -26,7 +26,7 @@ module TingYun
       end
 
       # service for communicating with collector
-      attr_accessor :service, :cross_app_monitor
+      attr_accessor :service, :cross_app_monitor, :middleware
       attr_reader :events
 
       extend ClassMethods
@@ -43,6 +43,7 @@ module TingYun
         @after_fork_lock = Mutex.new
         @dispatcher = TingYun::Agent::Dispatcher.new(@events)
         @cross_app_monitor = TingYun::Agent::CrossAppMonitor.new(@events)
+        @middleware = TingYun::Agent::Collector::MiddleWareCollector.new(@events)
 
         init_containers
       end
