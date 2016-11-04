@@ -16,6 +16,8 @@ module TingYun
         max_attempts = 2
         attempts = 0
         begin
+          attempts += 1
+          conn = http_connection
           TingYun::Agent.logger.debug "Sending request to #{opts[:collector]}#{opts[:uri]}"
           TingYun::Support::TimerLib.timeout(@request_timeout) do
             response = conn.request(request)

@@ -131,9 +131,10 @@ module TingYun
           end
 
           def harvest!
+            snapshot = nil
             with_stats_lock do
               snapshot = @stats_hash
-              snapshot.harvested_at = now
+              snapshot.harvested_at = Time.now
               @stats_hash = StatsHash.new
             end
             snapshot
