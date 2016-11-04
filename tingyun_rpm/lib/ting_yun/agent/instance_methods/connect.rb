@@ -104,8 +104,14 @@ module TingYun
         #   agent run and Ting Yun sees it as a separate instance (default is false).
         def catch_errors
           yield
-        rescue => e
+        rescue  TingYun::Support::Exception::UnKnownServerException => e
           handle_force_restart(e)
+          retry
+        rescue TingYun::Support::Exception::ServerConnectionException => e
+          handle_delay_restart(e, 60)
+          retry
+        rescue => e
+          handle_delay_restart(e, 60)
           retry
         end
 

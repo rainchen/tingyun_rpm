@@ -105,7 +105,7 @@ module TingYun
         def harvest_from_container(container, endpoint)
           items =[]
           begin
-             if TingYun::Agent.config[:'nbs.agent_enabled'] && TingYun::Agent.config[:'enabled']
+             if TingYun::Agent.config[:'enabled']
                items = container.harvest!
              else
                container.reset!

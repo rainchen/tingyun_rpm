@@ -108,12 +108,6 @@ module TingYun
         Proc.new { TingYun::Agent.config[:ssl] ? 443 : 80 }
       end
 
-      def self.agent_enabled
-        Proc.new {
-          TingYun::Agent.config[:enabled]
-        }
-      end
-
       def self.action_tracer_action_threshold
         Proc.new { TingYun::Agent.config[:apdex_t] * 4 }
       end
@@ -162,7 +156,7 @@ module TingYun
             :description => 'Enable or disable the agent.'
         },
         :'nbs.agent_enabled' => {
-            :default => DefaultSource.agent_enabled,
+            :default => true,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,

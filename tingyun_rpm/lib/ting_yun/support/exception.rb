@@ -6,36 +6,11 @@
 module TingYun
   module Support
     module Exception
-      # An exception that is thrown by the server if the agent license is invalid.
-      class LicenseException < StandardError;
-      end
-
-      # An exception that is thrown by the agent, if server['nbs.agent_enable']==false.
-      class AgentEnableException <StandardError;
-      end
 
       # An exception that is thrown by the server, drop the data.
       class UnKnownServerException < StandardError;
       end
 
-      # An exception that forces an agent to stop reporting until its mongrel is restarted.
-      class ForceDisconnectException < StandardError;
-      end
-
-      # An exception that forces an agent to restart.
-      class ForceRestartException < StandardError;
-      end
-
-      # An exception that forces an agent to restart.
-      class InvalidDataException < StandardError;
-      end
-
-      class ExpiredConfigurationException < StandardError;
-      end
-
-      # An exception that forces an agent to restart initAgentApp.
-      class InvalidDataTokenException < StandardError;
-      end
       # Used to blow out of a periodic task without logging a an error, such as for routine
       # failures.
       class ServerConnectionException < StandardError;
@@ -54,15 +29,6 @@ module TingYun
       class SerializationError < StandardError;
       end
 
-      class BackgroundLoadingError < StandardError;
-      end
-
-      class UnsupportedMediaType < StandardError
-      end
-      # Used to wrap errors reported to agent by the collector
-      class CollectorError < StandardError;
-      end
-
       #This is the base class for all errors that we want to record , It provides the
       # standard support text at the front of the message, and is used for flagging
       # agent errors when checking queue limits.
@@ -74,6 +40,7 @@ module TingYun
 
       class InternalServerError < StandardError
       end
+
     end
   end
 end

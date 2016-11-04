@@ -49,12 +49,15 @@ module TingYun
         # this clears the data, clears connection attempts, and
         # waits a while to reconnect.
         def handle_force_restart(error)
-
           TingYun::Agent.logger.debug error.message
           drop_buffered_data
           @service.force_restart if @service
           @connect_state = :pending
-          sleep 60
+        end
+
+        def handle_delay_restart(error, sec)
+          handle_force_restart(error)
+          sleep sec
         end
 
         def handle_force_disconnect(error)
