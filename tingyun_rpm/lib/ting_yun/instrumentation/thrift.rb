@@ -62,10 +62,10 @@ TingYun::Support::LibraryDetection.defer do
 
         end
 
-
-      alias :send_message_args_without_tingyun :send_message_args
-      alias :send_message_args  :send_message_args_with_tingyun
-
+      if TingYun::Agent.config[:'nbs.transaction_tracer.thrift']
+        alias :send_message_args_without_tingyun :send_message_args
+        alias :send_message_args  :send_message_args_with_tingyun
+      end
 
       def send_message_with_tingyun(name, args_class, args = {})
 

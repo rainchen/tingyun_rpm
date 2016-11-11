@@ -638,6 +638,13 @@ module TingYun
             :type => Array,
             :allowed_from_server => false,
             :description => 'Specify an array of Rake tasks to automatically instrument.'
+        },
+        :'nbs.transaction_tracer.thrift' =>{
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable the thrift cross application feature'
         }
     }.freeze
   end
