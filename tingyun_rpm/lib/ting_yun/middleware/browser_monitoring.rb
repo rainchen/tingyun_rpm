@@ -47,6 +47,7 @@ module TingYun
 
     def should_instrument?(env, status, headers)
       status == 200 &&
+          is_ajax? &&
           !env[ALREADY_INSTRUMENTED_KEY] &&
           is_html?(headers) &&
           !is_attachment?(headers)
@@ -54,6 +55,10 @@ module TingYun
 
     def is_html?(headers)
       headers[CONTENT_TYPE] && headers[CONTENT_TYPE].include?(TEXT_HTML)
+    end
+
+    def is_ajax?(env)
+      env["HTTP_X_REQUESTED_WITH"].nil?
     end
 
     def is_attachment?(headers)

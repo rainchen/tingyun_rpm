@@ -62,7 +62,7 @@ TingYun::Support::LibraryDetection.defer do
 
         end
 
-      if TingYun::Agent.config[:'nbs.transaction_tracer.thrift']
+      if TingYun::Agent.config[:'nbs.transaction_tracer.thrift'] && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
         alias :send_message_args_without_tingyun :send_message_args
         alias :send_message_args  :send_message_args_with_tingyun
       end
