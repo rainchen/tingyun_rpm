@@ -35,7 +35,7 @@ module TingYun
         protected
 
         def return_value(data)
-          if data.respond_to?(:has_key?) && data.has_key?('status') && data.has_key?('result')
+          if data.respond_to?(:has_key?) && data.has_key?('status') 
             if data['status'] =="error"
               raise TingYun::Support::Exception::UnKnownServerException.new("sorry，the application is unable to use the tingyun service now, we should reconnect again ")
             else

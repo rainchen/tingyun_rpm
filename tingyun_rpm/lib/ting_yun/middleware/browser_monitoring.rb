@@ -47,7 +47,7 @@ module TingYun
 
     def should_instrument?(env, status, headers)
       status == 200 &&
-          is_ajax? &&
+          is_ajax?(env) &&
           !env[ALREADY_INSTRUMENTED_KEY] &&
           is_html?(headers) &&
           !is_attachment?(headers)
