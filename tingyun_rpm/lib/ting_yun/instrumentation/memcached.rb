@@ -25,63 +25,24 @@ TingYun::Support::LibraryDetection.defer do
         end
       end
 
-      # methods = [:incr, :decr, :compare_and_swap]
       methods = [:set, :add, :increment, :decrement, :replace, :append, :prepend, :cas,
                  :delete, :flush, :get, :exist, :get_from_last, :server_by_key, :stats]
+
       methods.each do |method|
+        next unless public_method_defined? method
+
         alias_method "#{method}_without_tingyun_trace".to_sym, method.to_sym
 
-        case method
-          when :set, :add, :replace
-            define_method method do |key, value, ttl=@default_ttl, encode=true, flags=Memcached::FLAGS|
-              TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
-                send "#{method}_without_tingyun_trace", key, value, ttl, encode, flags
-              end
-            end
-          when :increment, :decrement
-            define_method method do |key, offset=1|
-              TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
-                send "#{method}_without_tingyun_trace", key, offset
-              end
-            end
-          when :append, :prepend
-            define_method method do |key, value|
-              TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
-                send "#{method}_without_tingyun_trace", key, value
-              end
-            end
-          when :cas
-            define_method method do |keys, ttl=@default_ttl, decode=true|
-              TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
-                send "#{method}_without_tingyun_trace", keys, ttl, decode
-              end
-            end
-          when :flush
-            define_method method do
-              TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
-                send "#{method}_without_tingyun_trace"
-              end
-            end
-          when :delete, :exist, :server_by_key
-            define_method method do |key|
-              TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
-                send "#{method}_without_tingyun_trace", key
-              end
-            end
-          when :get, :get_from_last
-            define_method method do |keys, decode=true|
-              TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
-                send "#{method}_without_tingyun_trace", keys, decode
-              end
-            end
-          when :stats
-            define_method method do |subcommand = nil|
-              TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
-                send "#{method}_without_tingyun_trace", subcommand
-              end
-            end
+        define_method method do |*args, &block|
+          TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, method(:record_memcached_duration)) do
+            send "#{method}_without_tingyun_trace", *args, &block
+          end
         end
       end
+
+      alias :incr :increment
+      alias :decr :decrement
+      alias :compare_and_swap :cas if public_method_defined? :compare_and_swap
     end
   end
 end
