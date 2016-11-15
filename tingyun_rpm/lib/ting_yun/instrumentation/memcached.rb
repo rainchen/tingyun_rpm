@@ -15,15 +15,11 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     require 'ting_yun/agent/datastore'
+    require 'ting_yun/instrumentation/support/timings'
 
     ::Memcached.class_eval do
 
-      def record_memcached_duration(_1, _2, duration)
-        state = TingYun::Agent::TransactionState.tl_get
-        if state
-          state.timings.memchd_duration = state.timings.memchd_duration + duration * 1000
-        end
-      end
+      include TingYun::Instrumentation::Support::Timings
 
       methods = [:set, :add, :increment, :decrement, :replace, :append, :prepend, :cas,
                  :delete, :flush, :get, :exist, :get_from_last, :server_by_key, :stats]
