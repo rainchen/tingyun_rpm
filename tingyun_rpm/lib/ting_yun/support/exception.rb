@@ -29,6 +29,8 @@ module TingYun
       class SerializationError < StandardError;
       end
 
+      class AppSessionKeyError < StandardError;
+      end
       #This is the base class for all errors that we want to record , It provides the
       # standard support text at the front of the message, and is used for flagging
       # agent errors when checking queue limits.
