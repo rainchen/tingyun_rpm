@@ -21,11 +21,13 @@ TingYun::Support::LibraryDetection.defer do
 
       include TingYun::Instrumentation::Support::Timings
 
+      connect_method = (private_method_defined? :connect) ? :connect : :connection
       private
-      alias_method :connect_without_tingyun_trace, :connect
-      def connect
+      alias_method :connect_without_tingyun_trace, connect_method
+
+      define_method connect_method do |*args, &block|
         TingYun::Agent::Datastore.wrap('Memcached', 'connect', nil, method(:record_memcached_duration)) do
-          connect_without_tingyun_trace
+          send "#{connect_method}_without_tingyun_trace", *args, &block
         end
       end
     end
@@ -49,7 +51,7 @@ TingYun::Support::LibraryDetection.defer do
       end
 
       alias :flush_all :flush
-      alias :reset :close
+      alias :reset :close if public_method_defined? :reset
     end
   end
 end
