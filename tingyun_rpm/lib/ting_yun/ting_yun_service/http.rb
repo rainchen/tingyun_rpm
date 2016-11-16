@@ -19,7 +19,8 @@ module TingYun
 
       def remote_method_uri(method)
         params = {'licenseKey'=> @license_key,'version' => @data_version}
-        params[:appSessionKey] = @appSessionKey if @appSessionKey
+        raise ::TingYun::Support::Exception::AppSessionKeyError.new("@appSessionKey is asked when the upload-method happen") if method==:upload && @appSessionKey.nil?
+        params[:appSessionKey] = @appSessionKey
 
         uri = "/" + method.to_s
         uri << '?' + params.map do |k,v|
