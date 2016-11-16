@@ -58,8 +58,6 @@ module TingYun
     end
 
     def force_restart
-      @applicationId = nil
-      @appSessionKey = nil
       @metric_id_cache = {}
       close_shared_connection
     end

@@ -19,11 +19,7 @@ module TingYun
 
       def remote_method_uri(method)
         params = {'licenseKey'=> @license_key,'version' => @data_version}
-        if @appSessionKey
-          params[:appSessionKey] = @appSessionKey
-        else
-          raise ::TingYun::Support::Exception::AppSessionKeyError.new("appSessionKey is not exist. TingYun agent should restart")
-        end
+        params[:appSessionKey] = @appSessionKey if @appSessionKey
 
         uri = "/" + method.to_s
         uri << '?' + params.map do |k,v|
