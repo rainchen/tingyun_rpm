@@ -27,7 +27,7 @@ TingYun::Support::LibraryDetection.defer do
 
       define_method connect_method do |*args, &block|
         TingYun::Agent::Datastore.wrap('Memcached', 'connect', nil, method(:record_memcached_duration)) do
-          send "#{connect_method}_without_tingyun_trace", *args, &block
+          connect_without_tingyun_trace *args, &block
         end
       end
     end
