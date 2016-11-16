@@ -23,8 +23,8 @@ TingYun::Support::LibraryDetection.defer do
 
         include TingYun::Instrumentation::Support::Timings
 
-        methods = [:set, :add, :increment, :decrement, :replace, :append, :prepend, :cas,
-                   :delete, :flush, :get, :exist, :get_from_last, :server_by_key, :stats]
+        methods = [:set, :add, :increment, :decrement, :replace, :append, :prepend, :cas,:delete, :flush, :get, :exist,
+                   :get_from_last, :server_by_key, :stats, :set_servers]
 
         methods.each do |method|
           next unless public_method_defined? method
