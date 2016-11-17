@@ -1,4 +1,17 @@
 # encoding: utf-8
+module TingYun
+  module Instrumentation
+    module Timings
+      def record_memcached_duration(_1, _2, duration)
+        state = TingYun::Agent::TransactionState.tl_get
+        if state
+          state.timings.memchd_duration = state.timings.memchd_duration + duration * 1000
+        end
+      end
+    end
+  end
+end
+
 
 TingYun::Support::LibraryDetection.defer do
   named :memcached
@@ -16,14 +29,13 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     require 'ting_yun/agent/datastore'
-    require 'ting_yun/instrumentation/support/timings'
 
     if defined?(::Memcached)
       ::Memcached.class_eval do
 
-        include TingYun::Instrumentation::Support::Timings
+        include TingYun::Instrumentation::Timings
 
-        methods = [:set, :add, :increment, :decrement, :replace, :append, :prepend, :cas,:delete, :flush, :get, :exist,
+        methods = [:set, :add, :increment, :decrement, :replace, :append, :prepend, :cas, :delete, :flush, :get, :exist,
                    :get_from_last, :server_by_key, :stats, :set_servers]
 
         methods.each do |method|
@@ -47,7 +59,7 @@ TingYun::Support::LibraryDetection.defer do
     if defined?(::Dalli::Server)
       ::Dalli::Server.class_eval do
 
-        include TingYun::Instrumentation::Support::Timings
+        include TingYun::Instrumentation::Timings
 
         connect_method = (private_method_defined? :connect) ? :connect : :connection
         private
@@ -68,11 +80,10 @@ TingYun::Support::LibraryDetection.defer do
     if defined?(::Dalli::Client)
       ::Dalli::Client.class_eval do
 
-        include TingYun::Instrumentation::Support::Timings
+        include TingYun::Instrumentation::Timings
 
-        methods = [:multi, :get, :get_multi, :cas, :cas!, :set, :add, :replace, :delete, :append, :prepend, :flush,
-                   :incr, :decr, :touch, :stats, :reset_stats, :alive!, :version, :close, :with, :get_cas, :get_multi_cas,
-                   :set_cas, :replace_cas, :delete_cas]
+        methods = [:get, :get_multi, :cas, :cas!, :set, :add, :replace, :delete, :append, :prepend, :flush, :incr, :decr,
+                   :touch, :stats, :reset_stats, :close, :get_cas, :get_multi_cas, :set_cas, :replace_cas, :delete_cas]
         methods.each do |method|
           next unless public_method_defined? method
           alias_method "#{method}_without_tingyun_trace".to_sym, method.to_sym
