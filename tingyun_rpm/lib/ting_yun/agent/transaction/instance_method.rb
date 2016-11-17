@@ -25,6 +25,10 @@ module TingYun
           end
         end
 
+        def make_transaction_name(name, category=nil)
+          namer = TingYun::Instrumentation::Support::TransactionNamer
+          "#{namer.prefix_for_category(self, category)}#{name}"
+        end
 
         def name_last_frame(name)
           frame_stack.last.name = name
