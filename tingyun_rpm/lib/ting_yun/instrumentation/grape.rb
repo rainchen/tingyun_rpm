@@ -6,6 +6,10 @@ TingYun::Support::LibraryDetection.defer do
     defined?(::Grape) && defined?(::Grape::Endpoint)
   end
 
+  executes do
+    TingYun::Agent.logger.info 'Installing grape instrumentation'
+  end
+
 
   executes do
     ::Grape::Endpoint.class_eval do
@@ -17,11 +21,10 @@ TingYun::Support::LibraryDetection.defer do
                   self.namespace.sub(%r{\A/}, ''), # removing leading slashes
                   self.options[:path].first,
           ].compact.select{ |n| n.to_s unless n.to_s.empty? }.join("/")
-          binding.pry
           TingYun::Agent::Transaction.set_default_transaction_name(name, :controller)
           run_without_tingyun(*args)
         rescue => e
-          TingYun::Agent.instance.logger.info("Error getting Grape Endpoint Name. Error: #{e.message}. Options: #{self.options.inspect}")
+          TingYun::Agent.logger.info("Error getting Grape Endpoint Name. Error: #{e.message}. Options: #{self.options.inspect}")
         end
 
       end
