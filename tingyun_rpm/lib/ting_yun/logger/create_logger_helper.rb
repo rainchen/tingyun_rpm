@@ -30,6 +30,19 @@ module TingYun
             @log = ::Logger.new(STDOUT)
             warn("check_log_file:  Failed creating logger for file #{@file_path}, using standard out for logging.", e)
           end
+        else
+          file_size = @log.logdev.dev.stat.size rescue 0
+          if file_size >= (::TingYun::Agent.config[:agent_log_file_size] * 1024 * 1024)
+            @file_path = @file_path.gsub(/_(\d+)\.log$/, "_#{Time.current.to_i}.log")
+            begin
+              @log = ::Logger.new(@file_path)
+              set_log_level
+              set_log_format
+            rescue => e
+              @log = ::Logger.new(STDOUT)
+              warn("check_log_file: Failed creating logger for file #{@file_path} when logfile reaches agent_log_file_size, using standard out for logging.", e)
+            end
+          end
         end
       end
 
@@ -41,7 +54,7 @@ module TingYun
           @log = ::Logger.new(STDOUT)
           warn("Error creating log directory #{::TingYun::Agent.config[:agent_log_file_path]}, using standard out for logging.")
         else
-          @file_path = "#{path}/#{::TingYun::Agent.config[:agent_log_file_name]}"
+          @file_path = "#{path}/#{::TingYun::Agent.config[:agent_log_file_name].gsub('.log', "_#{Time.current.to_i}.log")}"
           begin
             @log = ::Logger.new(@file_path)
           rescue => e

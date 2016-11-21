@@ -354,6 +354,13 @@ module TingYun
             :allowed_from_server => false,
             :description => 'log  filename.'
         },
+        :agent_log_file_size => {
+            :default => 10,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => false,
+            :description => "Create a new logfile once it reaches this value. and this value's unit is MB."
+        },
         :config_search_paths => {
             :default => DefaultSource.config_search_paths,
             :public => false,
