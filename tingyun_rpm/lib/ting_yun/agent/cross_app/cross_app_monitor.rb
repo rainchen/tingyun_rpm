@@ -68,6 +68,7 @@ module TingYun
             :rds => timings.rds_duration,
             :mc => timings.mc_duration,
             :mon => timings.mon_duration,
+            :med => timings.memchd_duration,
             :code => timings.app_execute_duration
           }
         }
