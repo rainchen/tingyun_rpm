@@ -15,8 +15,8 @@ module TingYun
 
     TITLE_END           = '</title>'.freeze
     TITLE_END_CAPITAL   = '</TITLE>'.freeze
-    HEAD_END            = '</head>'.freeze
-    HEAD_END_CAPITAL    = '</HEAD>'.freeze
+    HEAD_END            = '<head>'.freeze
+    HEAD_END_CAPITAL    = '<HEAD>'.freeze
 
     GT                  = '>'.freeze
 
