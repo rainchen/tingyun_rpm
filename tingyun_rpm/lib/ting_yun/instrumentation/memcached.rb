@@ -5,7 +5,7 @@ module TingYun
       def record_memcached_duration(_1, _2, duration)
         state = TingYun::Agent::TransactionState.tl_get
         if state
-          state.timings.memchd_duration = state.timings.memchd_duration + duration * 1000
+          state.timings.mc_duration = state.timings.mc_duration + duration * 1000
         end
       end
     end
