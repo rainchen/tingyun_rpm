@@ -11,6 +11,10 @@ module TingYun
         'Net::HTTP'
       end
 
+      def from
+        "net%2Fhttp"
+      end
+
       def host
         if hostname = self['host']
           hostname.split(':').first
