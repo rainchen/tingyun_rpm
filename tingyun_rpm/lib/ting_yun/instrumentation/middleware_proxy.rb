@@ -14,10 +14,7 @@ module TingYun
       end
 
       def self.needs_wrapping?(target)
-        (
-        !target.respond_to?(:_nr_has_middleware_tracing) &&
-            !is_sinatra_app?(target)
-        )
+        !target.respond_to?(:_nr_has_middleware_tracing)
       end
 
       def self.wrap(target, is_app=false)

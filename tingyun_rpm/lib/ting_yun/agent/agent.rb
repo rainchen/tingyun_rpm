@@ -106,8 +106,16 @@ module TingYun
         raise
       end
 
+      def sinatra_classic_app?
+        defined?(::Sinatra::Base) && ::Sinatra::Base.respond_to?(:run!)
+      end
+
+      def should_install_exit_handler?
+        !sinatra_classic_app?
+      end
 
       def install_exit_handler
+        return unless should_install_exit_handler?
         TingYun::Agent.logger.debug("Installing at_exit handler")
         at_exit do
           if defined?(RUBY_ENGINE) && RUBY_ENGINE == "ruby" && RUBY_VERSION.match(/^1\.9/)

@@ -19,7 +19,7 @@ module TingYun
             when :uri then
               ::TingYun::Agent::Transaction::CONTROLLER_PREFIX
             when :sinatra then
-              ::TingYun::Agent::Transaction::SINATRA_PREFIX
+              ::TingYun::Agent::Transaction::CONTROLLER_PREFIX
             when :middleware then
               ::TingYun::Agent::Transaction::MIDDLEWARE_PREFIX
             when :grape then

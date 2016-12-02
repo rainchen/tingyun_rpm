@@ -11,6 +11,8 @@ module TingYun
     module Support
       module ControllerInstrumentation
 
+        extend self
+
         NR_DEFAULT_OPTIONS    = {}.freeze          unless defined?(NR_DEFAULT_OPTIONS   )
 
         def perform_action_with_tingyun_trace (*args, &block)
@@ -40,6 +42,7 @@ module TingYun
           txn_options = {}
 
           txn_options[:request] ||= request if respond_to?(:request)
+          txn_options[:request] ||= trace_options[:request] if trace_options[:request]
           txn_options[:filtered_params] = trace_options[:params]
           txn_options[:transaction_name] = TingYun::Instrumentation::Support::TransactionNamer.name_for(nil, self, category, trace_options)
           txn_options[:apdex_start_time] = Time.now
