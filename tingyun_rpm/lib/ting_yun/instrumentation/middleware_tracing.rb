@@ -45,8 +45,13 @@ module TingYun
         end
       end
 
+      def sinatra_static?(env)
+        defined?(::Sinatra) && defined?(::Sinatra::Base) && env['REQUEST_URI'] && env['REQUEST_URI'] =~ /\.(css|js|html|png|jpg|jpeg|gif|bmp)\Z/i
+      end
 
       def call(env)
+        return target.call(env) if sinatra_static?(env)
+
         first_middleware = note_transaction_started(env)
         state = TingYun::Agent::TransactionState.tl_get
         begin
