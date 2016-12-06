@@ -61,7 +61,7 @@ module TingYun
         my_data = state.thrift_return_data
 
 
-        if my_data
+        if my_data && TingYun::Agent.config[:'nbs.transaction_tracer.thrift'] && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
           uri = "thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{operate}"
           metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
         end

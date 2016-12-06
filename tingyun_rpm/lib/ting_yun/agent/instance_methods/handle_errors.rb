@@ -53,8 +53,13 @@ module TingYun
           drop_buffered_data
           @service.force_restart if @service
           @connect_state = :pending
-          sleep 30
         end
+
+        def handle_delay_restart(error, sec)
+          handle_force_restart(error)
+          sleep sec
+        end
+
         def handle_force_disconnect(error)
           TingYun::Agent.logger.warn "Ting Yun forced this agent to disconnect (#{error.message})"
           disconnect

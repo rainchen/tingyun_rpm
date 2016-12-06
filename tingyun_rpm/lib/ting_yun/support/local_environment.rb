@@ -113,7 +113,7 @@ module TingYun
       end
 
       def check_for_puma
-        if defined?(::Puma) && File.basename($0) == 'puma'
+        if defined?(::Puma) && $0.include?('puma')
           @discovered_dispatcher = :puma
         end
       end

@@ -34,7 +34,7 @@ module TingYun
         end
 
         events.subscribe(:cross_app_after_call) do |_status_code, headers, _body| #THREAD_LOCAL_ACCESS
-          insert_response_header(headers)
+          insert_response_header(headers) if TingYun::Agent::CrossAppTracing.cross_app_enabled?
         end
 
       end

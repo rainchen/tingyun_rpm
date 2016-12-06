@@ -38,7 +38,6 @@ module TingYun
         @environment_report = nil
         @service = TingYunService.new
         @connect_state = :pending #[:pending, :connected, :disconnected]
-        @connect_attempts = 0
         @events  = TingYun::Agent::Event::EventListener.new
         @after_fork_lock = Mutex.new
         @dispatcher = TingYun::Agent::Dispatcher.new(@events)
@@ -79,32 +78,21 @@ module TingYun
 
       def connect!(option={})
         defaults = {
-            :keep_retrying => ::TingYun::Agent.config[:keep_retrying],
-            :force_reconnect => ::TingYun::Agent.config[:force_reconnect]
+            :force_reconnect => ::TingYun::Agent.config[:force_reconnect],
+            :keep_retrying => ::TingYun::Agent.config[:keep_retrying]
         }
         opts = defaults.merge(option)
         return unless should_connect?(opts[:force_reconnect])
         TingYun::Agent.logger.debug "Connecting Process to Ting Yun: #$0"
         query_server_for_configuration
-        @connected_pid = $$
         @connect_state = :connected
-      rescue TingYun::Support::Exception::LicenseException => error
-        handle_license_error(error)
-      rescue TingYun::Support::Exception::UnrecoverableAgentException => error
-        handle_unrecoverable_agent_error(error)
-      rescue StandardError, Timeout::Error, TingYun::Support::Exception::ServerConnectionException, TingYun::Support::Exception::AgentEnableException => error
-        log_error(error)
-        if TingYun::Agent.config[:keep_retrying]
-          note_connect_failure
-          ::TingYun::Agent.logger.info "Will re-attempt in 60 seconds"
-          sleep 60
-          retry
-        else
-          disconnect
-        end
       rescue Exception => error
-        ::TingYun::Agent.logger.error "Exception of unexpected type during Agent#connect():", error
-        raise
+        ::TingYun::Agent.logger.error "Exception of unexpected type during Agent#connect! :", error
+        log_error(error)
+        if opts[:keep_retrying]
+          ::TingYun::Agent.logger.info "Will re-attempt in 60 seconds"
+          raise
+        end
       end
 
 

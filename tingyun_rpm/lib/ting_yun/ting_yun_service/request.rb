@@ -33,18 +33,9 @@ module TingYun
         end
         TingYun::Agent.logger.debug "Received response, status: #{response.code}, encoding: '#{response['content-encoding']}'"
 
-
         case response
           when Net::HTTPSuccess
             true # do nothing
-          when Net::HTTPServiceUnavailable
-            raise TingYun::Support::Exception::ServerConnectionException, "Service unavailable (#{response.code}): #{response.message}"
-          when Net::HTTPGatewayTimeOut
-            raise TingYun::Support::Exception::ServerConnectionException, "Gateway timeout (#{response.code}): #{response.message}"
-          when Net::HTTPRequestEntityTooLarge
-            raise TingYun::Support::Exception::UnrecoverableServerException, '413 Request Entity Too Large'
-          when Net::HTTPUnsupportedMediaType
-            raise TingYun::Support::Exception::UnsupportedMediaType, '415 Unsupported Media Type'
           else
             raise TingYun::Support::Exception::ServerConnectionException, "Unexpected response from server (#{response.code}): #{response.message}"
         end
