@@ -14,7 +14,6 @@ TingYun::Support::LibraryDetection.defer do
 
   depends_on do
     defined?(::HTTPClient) && TingYun::Instrumentation::HttpClient.version_support?
-    # false
   end
 
   executes do
@@ -26,16 +25,16 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     ::HTTPClient.class_eval do
-      [:follow_redirect].each do |method|
-        next unless private_method_defined? method
-        private
-        alias_method "#{method}_without_tingyun_trace".to_sym, method.to_sym
 
-        define_method method do |*args, &block|
+      if private_method_defined? :follow_redirect
+        private
+        alias_method :follow_redirect_without_tingyun_trace, :follow_redirect
+
+        def follow_redirect(*args, &block)
           begin
-            send "#{method}_without_tingyun_trace".to_sym, *args, &block
+            follow_redirect_without_tingyun_trace(*args, &block)
           rescue => e
-            args[1] = (private_method_defined? :to_resource_url) ? to_resource_url(args[1]) : urify(args[1])
+            args[1] = (::Module.private_method_defined? :to_resource_url) ? to_resource_url(args[1]) : urify(args[1])
             proxy = no_proxy?(args[1]) ? nil : @proxy
             tingyun_request = TingYun::Http::HttpClientRequest.new(proxy, *args, &block)
             ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{tingyun_request.uri}/http_client%2Fhttp")
