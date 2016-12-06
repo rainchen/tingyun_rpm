@@ -1,7 +1,10 @@
 # encoding: utf-8
 module TingYun::Instrumentation::HttpClient
-  def self.version_2_1_5_or_later?
-    (TingYun::Support::VersionNumber.new(HTTPClient::VERSION) <=> TingYun::Support::VersionNumber.new('2.1.5')) >= 0
+
+  HTTPCLIENT_MIN_VERSION = '2.1.5'.freeze
+
+  def self.version_support?
+    TingYun::Support::VersionNumber.new(HTTPClient::VERSION) >= TingYun::Support::VersionNumber.new(HTTPCLIENT_MIN_VERSION)
   end
 end
 
@@ -10,7 +13,7 @@ TingYun::Support::LibraryDetection.defer do
   named :http_client
 
   depends_on do
-    defined?(::HTTPClient) && TingYun::Instrumentation::HttpClient.version_2_1_5_or_later?
+    defined?(::HTTPClient) && TingYun::Instrumentation::HttpClient.version_support?
     # false
   end
 
