@@ -6,7 +6,12 @@ module TingYun
     module Sinatra
       module Action
 
+        SINATRA_MIN_VERSION = '1.2.3'.freeze
         include TingYun::Instrumentation::Support::SplitController
+
+        def self.version_support?
+          TingYun::Support::VersionNumber.new(::Sinatra::VERSION) >= TingYun::Support::VersionNumber.new(SINATRA_MIN_VERSION)
+        end
 
         def tingyun_metric_path(current_class)
           if find_rule(request.request_method.upcase, request.path, request.env, request.params)
@@ -26,7 +31,7 @@ TingYun::Support::LibraryDetection.defer do
   @name = :sinatra_action
 
   depends_on do
-    defined?(::Sinatra) && defined?(::Sinatra::Base)
+    defined?(::Sinatra) && defined?(::Sinatra::Base) && TingYun::Instrumentation::Sinatra::Action.version_support?
   end
 
   executes do
@@ -37,7 +42,6 @@ TingYun::Support::LibraryDetection.defer do
     ::Sinatra::Base.class_eval do
       private
       alias :route_eval_without_tingyun_trace :route_eval
-      alias :static_without_tingyun_trace! :static!
 
       def route_eval(*args, &block)
 
