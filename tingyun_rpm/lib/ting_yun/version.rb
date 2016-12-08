@@ -6,11 +6,11 @@ module TingYun
 
     MAJOR = 1
 
-    MINOR = 1
+    MINOR = 2
 
-    TINY = 4
+    TINY = 0
 
-    PRE = 7
+    PRE = 0
 
 
     STRING = [MAJOR, MINOR, TINY, PRE].compact.join('.')
