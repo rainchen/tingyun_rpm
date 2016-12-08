@@ -8,10 +8,10 @@ module TingYun
 
     MINOR = 1
 
-    TINY = 5
+    TINY = 4
 
 
-    PRE = 0
+    PRE = 7
 
 
     STRING = [MAJOR, MINOR, TINY, PRE].compact.join('.')
