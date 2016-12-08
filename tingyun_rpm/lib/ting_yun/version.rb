@@ -9,7 +9,7 @@ module TingYun
     MINOR = 1
 
     TINY = 6
-
+    
 
     PRE = 6
 
