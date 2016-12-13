@@ -12,6 +12,7 @@ module TingYun
 
 
         ACTIVE_RECORD = "ActiveRecord".freeze unless defined?(ACTIVE_RECORD)
+        DATA_MAPPER = "DataMapper".freeze
 
         # Used by both the AR 3.x and 4.x instrumentation
         def instrument_additional_methods
@@ -77,6 +78,12 @@ module TingYun
           TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD)
         end
 
+        def metrics_for_data_mapper(name, sql, adapter_name, model=nil)
+          product = map_product(adapter_name)
+          operation = name || TingYun::Instrumentation::Support::Database.parse_operation_from_query(sql)
+          model ||= product
+          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, DATA_MAPPER)
+        end
 
         SPACE = ' '.freeze unless defined?(SPACE)
         EMPTY = [].freeze unless defined?(EMPTY)

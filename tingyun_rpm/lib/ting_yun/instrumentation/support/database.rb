@@ -14,7 +14,8 @@ module TingYun
             'DELETE',
             'INSERT',
             'SHOW',
-            'CALL'
+            'CALL',
+            'PRAGMA'
         ]
 
         SQL_COMMENT_REGEX = Regexp.new('/\*.*?\*/', Regexp::MULTILINE).freeze
