@@ -1,22 +1,13 @@
 # encoding: utf-8
 
 require 'ting_yun/agent/method_tracer'
-
-module TingYun::Instrumentation::Sinatra::View
-
-  SINATRA_MIN_VERSION = '1.2.3'.freeze
-
-  def self.version_support?
-    TingYun::Support::VersionNumber.new(::Sinatra::VERSION) >= TingYun::Support::VersionNumber.new(SINATRA_MIN_VERSION)
-  end
-
-end
+require 'ting_yun/instrumentation/support/sinatra_helper'
 
 TingYun::Support::LibraryDetection.defer do
   @name = :sinatra_view
 
   depends_on do
-    defined?(::Sinatra) && defined?(::Sinatra::Templates) && TingYun::Instrumentation::Sinatra::View.version_support?
+    defined?(::Sinatra) && defined?(::Sinatra::Templates) && TingYun::Instrumentation::Support::SinatraHelper.version_supported?
   end
 
   executes do
