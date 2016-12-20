@@ -6,6 +6,7 @@ require 'ting_yun/agent/method_tracer'
 require 'ting_yun/agent/collector/transaction_sampler'
 require 'ting_yun/agent/collector/sql_sampler'
 require 'ting_yun/agent/database'
+require 'ting_yun/instrumentation/support/sinatra_helper'
 
 module TingYun
   module Instrumentation
@@ -75,7 +76,8 @@ TingYun::Support::LibraryDetection.defer do
   depends_on do
     defined?(::ActiveRecord) && defined?(::ActiveRecord::Base) &&
         (!defined?(::ActiveRecord::VERSION) ||
-            ::ActiveRecord::VERSION::MAJOR.to_i <= 3)
+            ::ActiveRecord::VERSION::MAJOR.to_i <= 3 ||
+            (defined?(::Sinatra) && defined?(::Sinatra::Base) && TingYun::Instrumentation::Support::SinatraHelper.version_supported?))
   end
 
   executes do
