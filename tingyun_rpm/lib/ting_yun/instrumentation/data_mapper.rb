@@ -129,5 +129,27 @@ TingYun::Support::LibraryDetection.defer do
         end
       end
     end
+
+    ::DataMapper::Aggregates::DataObjectsAdapter.class_eval do
+
+      alias_method :aggregate_without_tingyun_trace, :aggregate
+
+      def aggregate(*args, &block)
+        state = TingYun::Agent::TransactionState.tl_get
+        *params = get_metrics_params(:read, *args, &block)
+        metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
+
+        TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+          t0 = Time.now
+          begin
+            aggregate_without_tingyun_trace(*args, &block)
+          ensure
+            elapsed_time = (Time.now - t0).to_f
+            state.timings.sql_duration = state.timings.sql_duration  + elapsed_time * 1000
+          end
+        end
+      end
+    end
+
   end
 end
