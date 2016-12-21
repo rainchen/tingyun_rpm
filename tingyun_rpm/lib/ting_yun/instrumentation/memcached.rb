@@ -16,8 +16,8 @@ end
 TingYun::Support::LibraryDetection.defer do
   named :memcached
 
-  depends_on do
-    defined?(::Memcached) || (defined?(::Dalli) && defined?(::Dalli::Client) && Rails::VERSION::MAJOR.to_i >= 3)
+  depends_on doga
+    defined?(::Memcached) || (defined?(::Dalli) && defined?(::Dalli::Client))
   end
 
 
