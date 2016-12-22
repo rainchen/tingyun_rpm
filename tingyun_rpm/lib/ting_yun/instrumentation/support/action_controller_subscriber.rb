@@ -9,7 +9,7 @@ require 'ting_yun/instrumentation/support/parameter_filtering'
 
 module TingYun
   module Instrumentation
-    module Rails4
+    module Rails
       class ActionControllerSubscriber < TingYun::Instrumentation::Support::EventedSubscriber
         def start(name, id, payload) #THREAD_LOCAL_ACCES
           state = TingYun::Agent::TransactionState.tl_get
@@ -17,8 +17,8 @@ module TingYun
           event = ControllerEvent.new(name, Time.now, nil, id, payload, request)
           push_event(event)
           # if state.execution_traced?
-            start_transaction(state, event)
-          # end
+          start_transaction(state, event)
+            # end
         rescue => e
           log_notification_error(e, name, 'start')
         end
@@ -90,7 +90,7 @@ module TingYun
         end
 
         def params
-           payload[:params]
+          payload[:params]
         end
 
         def metric_path
@@ -122,27 +122,3 @@ module TingYun
     end
   end
 end
-
-
-TingYun::Support::LibraryDetection.defer do
-  @name = :rails4_controller
-
-  depends_on do
-    defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 4
-  end
-
-  depends_on do
-    defined?(ActionController) && defined?(ActionController::Base)
-  end
-
-  executes do
-    ::TingYun::Agent.logger.info 'Installing Rails 4 Controller instrumentation'
-  end
-
-  executes do
-    ::TingYun::Instrumentation::Rails4::ActionControllerSubscriber \
-      .subscribe(/^process_action.action_controller$/)
-  end
-end
-
-
