@@ -22,6 +22,6 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     # enumerate the specific events we want so that we do not get unexpected additions in the future
     ActiveSupport::Notifications.subscribe(/(perform_action|transmit)\.action_cable/,
-                                           TingYun::Agent::Instrumentation::ActionCableSubscriber.new)
+                                           TingYun::Instrumentation::Rails::ActionCableSubscriber.new)
   end
 end
