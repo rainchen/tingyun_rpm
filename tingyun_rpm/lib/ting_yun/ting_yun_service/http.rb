@@ -7,6 +7,7 @@ require 'net/http'
 require 'ting_yun/ting_yun_service/ssl'
 require 'ting_yun/ting_yun_service/request'
 require 'ting_yun/ting_yun_service/connection'
+require 'ting_yun/support/exception'
 
 module TingYun
   class TingYunService
@@ -18,7 +19,9 @@ module TingYun
 
       def remote_method_uri(method)
         params = {'licenseKey'=> @license_key,'version' => @data_version}
-        params[:appSessionKey] = @appSessionKey if @appSessionKey
+        raise ::TingYun::Support::Exception::AppSessionKeyError.new("@appSessionKey is asked when the upload-method happen") if method==:upload && @appSessionKey.nil?
+        params[:appSessionKey] = @appSessionKey
+
         uri = "/" + method.to_s
         uri << '?' + params.map do |k,v|
           next unless v

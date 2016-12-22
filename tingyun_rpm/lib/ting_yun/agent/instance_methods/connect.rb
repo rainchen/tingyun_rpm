@@ -14,8 +14,7 @@ module TingYun
 
         include HandleErrors
 
-        # number of attempts we've made to contact the server
-        attr_accessor :connect_attempts
+
 
         # Disconnect just sets connected to false, which prevents
         # the agent from trying to connect again
@@ -41,17 +40,6 @@ module TingYun
           force || (!connected? && !disconnected?)
         end
 
-        # Retry period is a minute for each failed attempt that
-        # we've made. This should probably do some sort of sane TCP
-        # backoff to prevent hammering the server, but a minute for
-        # each attempt seems to work reasonably well.
-        def connect_retry_period
-          [600, connect_attempts * 60].min
-        end
-
-        def note_connect_failure
-          self.connect_attempts += 1
-        end
 
         def generate_environment_report
           @environment_report = environment_for_connect
@@ -116,17 +104,15 @@ module TingYun
         #   agent run and Ting Yun sees it as a separate instance (default is false).
         def catch_errors
           yield
-
-        rescue TingYun::Support::Exception::ExpiredConfigurationException => e
+        rescue  TingYun::Support::Exception::UnKnownServerException => e
           handle_force_restart(e)
           retry
-        rescue TingYun::Support::Exception::InvalidDataTokenException => e
-          handle_force_restart(e)
+        rescue TingYun::Support::Exception::ServerConnectionException => e
+          handle_delay_restart(e, 60)
           retry
-        rescue TingYun::Support::Exception::InvalidDataException => e
-          handle_force_restart(e)
         rescue => e
-          handle_other_error(e)
+          handle_delay_restart(e, 60)
+          retry
         end
 
         # Takes a hash of configuration data returned from the

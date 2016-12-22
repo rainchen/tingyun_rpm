@@ -42,7 +42,8 @@ TingYun::Support::LibraryDetection.defer do
       include TingYun::Instrumentation::ThriftHelper
 
 
-      def send_message_args_with_tingyun(args_class, args = {})
+        def send_message_args_with_tingyun(args_class, args = {})
+          return send_message_args_without_tingyun(args_class, args) unless TingYun::Agent.config[:'nbs.transaction_tracer.thrift'] && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
           begin
             state = TingYun::Agent::TransactionState.tl_get
             return  unless state.execution_traced?
@@ -59,12 +60,9 @@ TingYun::Support::LibraryDetection.defer do
           ensure
             send_message_args_without_tingyun(args_class, args)
           end
-
         end
-
-
-      alias :send_message_args_without_tingyun :send_message_args
-      alias :send_message_args  :send_message_args_with_tingyun
+        alias :send_message_args_without_tingyun :send_message_args
+        alias :send_message_args  :send_message_args_with_tingyun
 
 
       def send_message_with_tingyun(name, args_class, args = {})
