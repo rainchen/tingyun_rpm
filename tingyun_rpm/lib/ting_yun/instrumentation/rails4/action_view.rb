@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-
+require 'ting_yun/instrumentation/support/action_view_subscriber'
 
 TingYun::Support::LibraryDetection.defer do
   @name = :rails4_view
