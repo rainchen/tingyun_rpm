@@ -1,3 +1,4 @@
+# encoding: utf-8
 
 TingYun::Support::LibraryDetection.defer do
   named :grape
