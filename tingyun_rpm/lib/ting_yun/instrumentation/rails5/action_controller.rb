@@ -18,9 +18,9 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     class ActionController::Base
-      include TingYun::Agent::Instrumentation::ControllerInstrumentation
+      include TingYun::Instrumentation::Support::ControllerInstrumentation
     end
-    TingYun::Agent::Instrumentation::ActionControllerSubscriber \
+    ::TingYun::Instrumentation::Rails::ActionControllerSubscriber \
       .subscribe(/^process_action.action_controller$/)
   end
 end

@@ -11,7 +11,7 @@ TingYun::Support::LibraryDetection.defer .defer do
 
   depends_on do
     !TingYun::Agent.config[:disable_view_instrumentation] &&
-        !TingYun::Agent::Instrumentation::ActionViewSubscriber.subscribed?
+        !TingYun::Instrumentation::Rails::ActionViewSubscriber.subscribed?
   end
 
   executes do
@@ -19,6 +19,6 @@ TingYun::Support::LibraryDetection.defer .defer do
   end
 
   executes do
-    TingYun::Agent::Instrumentation::ActionViewSubscriber.subscribe(/render_.+\.action_view$/)
+    TingYun::Instrumentation::Rails::ActionViewSubscriber.subscribe(/render_.+\.action_view$/)
   end
 end
