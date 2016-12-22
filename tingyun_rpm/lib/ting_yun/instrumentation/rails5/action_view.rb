@@ -2,7 +2,7 @@
 
 require 'ting_yun/instrumentation/support/action_view_subscriber'
 
-TingYun::Support::LibraryDetection.defer .defer do
+TingYun::Support::LibraryDetection.defer do
   named  :rails5_view
 
   depends_on do

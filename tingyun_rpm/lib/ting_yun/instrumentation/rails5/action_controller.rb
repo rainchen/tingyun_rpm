@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require 'ting_yun/instrumentation/support/action_controller_subscriber'
 
 TingYun::Support::LibraryDetection.defer do
   named :rails5_controller

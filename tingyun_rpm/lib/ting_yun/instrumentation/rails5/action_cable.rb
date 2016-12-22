@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-
+require 'ting_yun/instrumentation/support/action_cable_subscriber'
 
 TingYun::Support::LibraryDetection.defer do
   named  :rails5_action_cable
