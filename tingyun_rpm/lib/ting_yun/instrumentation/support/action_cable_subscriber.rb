@@ -4,7 +4,7 @@ require 'ting_yun/instrumentation/support/evented_subscriber'
 require 'ting_yun/agent/method_tracer_helpers'
 
 module TingYun
-  module Agent
+  module Instrumentation
     module Rails
       class ActionCableSubscriber < TingYun::Instrumentation::Support::EventedSubscriber
 
