@@ -36,16 +36,29 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     ::Sinatra::Base.class_eval do
+
+      class << self
+        private
+        alias :route_without_origin_path :route
+
+        def route(verb, path, options = {}, &block)
+          res = route_without_origin_path(verb, path, options = {}, &block)
+          @routes[verb].last << path
+          res
+        end
+      end
+
+
       private
       alias :route_eval_without_tingyun_trace :route_eval
 
       def ty_get_path(base)
         if routes = base.routes[@request.request_method]
-          routes.each do |pattern, keys, conditions, block|
+          routes.each do |pattern, keys, conditions, block, origin_path|
             route = @request.path_info
             route = '/' if route.empty? and not settings.empty_path_info?
             next unless pattern.match(route)
-            return base.name, pattern.source
+            return (origin_path.respond_to?(:source) ? origin_path.source : origin_path)
           end
         end
         ty_get_path(base.superclass) if base.superclass.respond_to?(:routes)
@@ -61,12 +74,11 @@ TingYun::Support::LibraryDetection.defer do
         end
 
         params = TingYun::Instrumentation::Support::ParameterFiltering.flattened_filter_request_parameters(@params)
-        class_name, patten_path = ty_get_path(self.class)
 
         TingYun::Instrumentation::Support::ControllerInstrumentation.perform_action_with_tingyun_trace(
             :category => :sinatra,
             :name     => @request.path_info,
-            :path     => tingyun_metric_path(self.class.name, patten_path),
+            :path     => tingyun_metric_path(self.class.name, ty_get_path(self.class)),
             :params   => params,
             :class_name => self.class.name,
             :request => @request
