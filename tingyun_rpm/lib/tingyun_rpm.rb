@@ -23,7 +23,7 @@
 
 require 'ting_yun/frameworks'
 
-# require 'pry'
+
 #if the agent had started in manual , then shouldn't start in auto again
 
 
@@ -48,5 +48,3 @@ if defined?(Rails::VERSION)
 else
   TingYun::Frameworks.init_start
 end
-
-
