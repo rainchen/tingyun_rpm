@@ -36,7 +36,7 @@ module TingYun
 
 
 
-        def self.metrics_for(product, operation, collection = nil, generic_product = nil, host = nil, port = nil )
+        def self.metrics_for(product, operation, collection = nil,  host = nil, port = nil, generic_product = nil )
           operation = operation.to_s.upcase
           if overrides = overridden_operation_and_collection   # [method, model_name, product]
             if should_override?(overrides, product, generic_product)
