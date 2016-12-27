@@ -18,11 +18,11 @@ module TingYun
           NOSQL.include?(product)
         end
 
-        def self.metric_name(product, collection, operation)
+        def self.metric_name(product, collection, operation,host,port)
           if checkNosql(product)
-              "#{product}/#{collection}/#{operation}"
+              "#{product}/#{host}:#{port}%2F#{collection}/#{operation}"
           else
-            "Database #{product}/#{collection}/#{operation}"
+            "Database #{product}/#{host}:#{port}%2F#{collection}/#{operation}"
           end
         end
 
@@ -34,7 +34,7 @@ module TingYun
           end
         end
 
-        def self.metrics_for(product, operation, collection = nil,  host = nil, port = nil, generic_product = nil )
+        def self.metrics_for(product, operation, host = nil, port = nil, dbname = 'Unknown', collection = nil,  generic_product = nil )
           operation = operation.to_s.upcase
           if overrides = overridden_operation_and_collection   # [method, model_name, product]
             if should_override?(overrides, product, generic_product)
@@ -57,9 +57,9 @@ module TingYun
           if checkNosql(product)
             metrics << "#{product}/#{host}:#{port}/NULL/ALL"
           else
-
+            metrics << "#{product}/#{host}:#{port}%2F#{dbname}/NULL/ALL"
           end
-          metrics.unshift metric_name(product, collection, operation) if collection
+          metrics.unshift metric_name(product, collection, operation,host,port) if collection
           metrics
         end
 
