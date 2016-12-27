@@ -35,7 +35,7 @@ module TingYun
           def tingyun_host_port
            return @db.connection.host_port if self.instance_variable_defined? :@db
            return @host_to_try if self.instance_variable_defined? :@host_to_try
-           return ['','']
+           return ['Unknown', 0]
           end
 
           def tingyun_generate_metrics(operation, payload = nil)

@@ -29,6 +29,7 @@ module TingYun
                                                               TingYun::Agent::Datastore::Mongo.transform_operation(name),
                                                               host_port[0],
                                                               host_port[1],
+                                                              nil,
                                                               collection)
         rescue => e
           TingYun::Agent.logger.debug("Failure during Mongo metric generation", e)

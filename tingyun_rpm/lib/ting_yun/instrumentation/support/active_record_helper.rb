@@ -74,7 +74,7 @@ module TingYun
           model = model_from_splits(splits) || product
           operation = operation_from_splits(splits, sql)
 
-          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, config[:host], config[:port], ACTIVE_RECORD)
+          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, config[:host], config[:port], config[:database], model, ACTIVE_RECORD)
         end
 
 

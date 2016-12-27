@@ -34,8 +34,6 @@ module TingYun
           end
         end
 
-
-
         def self.metrics_for(product, operation, collection = nil,  host = nil, port = nil, generic_product = nil )
           operation = operation.to_s.upcase
           if overrides = overridden_operation_and_collection   # [method, model_name, product]
@@ -56,6 +54,11 @@ module TingYun
             product_suffixed_rollup(product,suffix)
           end
 
+          if checkNosql(product)
+            metrics << "#{product}/#{host}:#{port}/NULL/ALL"
+          else
+
+          end
           metrics.unshift metric_name(product, collection, operation) if collection
           metrics
         end
