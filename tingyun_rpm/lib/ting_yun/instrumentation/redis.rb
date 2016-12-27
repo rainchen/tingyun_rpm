@@ -32,7 +32,7 @@ TingYun::Support::LibraryDetection.defer do
       def call_with_tingyun_trace(*args, &blk)
         operation = args[0].is_a?(Array) ? args[0][0] : args[0]
 
-        TingYun::Agent::Datastore.wrap("Redis", operation, nil, method(:record_redis_duration)) do
+        TingYun::Agent::Datastore.wrap("Redis", operation, nil, host, port, method(:record_redis_duration)) do
           call_without_tingyun_trace(*args, &blk)
         end
       end
@@ -46,7 +46,7 @@ TingYun::Support::LibraryDetection.defer do
           pipeline = args[0]
           operation = pipeline.is_a?(::Redis::Pipeline::Multi) ? 'multi' : 'pipeline'
 
-          TingYun::Agent::Datastore.wrap("Redis", operation, nil, method(:record_redis_duration)) do
+          TingYun::Agent::Datastore.wrap("Redis", operation, nil, host, port, method(:record_redis_duration)) do
             call_pipelined_without_tingyun_trace(*args, &block)
           end
         end
@@ -60,7 +60,7 @@ TingYun::Support::LibraryDetection.defer do
         alias_method :connect_without_tingyun, :connect
 
         def connect(*args, &block)
-          TingYun::Agent::Datastore.wrap("Redis", "connect", nil, method(:record_redis_duration)) do
+          TingYun::Agent::Datastore.wrap("Redis", "connect", nil, host, port, method(:record_redis_duration)) do
             connect_without_tingyun(*args, &block)
           end
         end

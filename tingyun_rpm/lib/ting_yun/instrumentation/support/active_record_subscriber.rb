@@ -62,9 +62,10 @@ module TingYun
         end
 
         def record_metrics(event, config)
+          binding.pry
           base, *other_metrics = TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(event.payload[:name],
                                                                                                    TingYun::Helper.correctly_encoded(event.payload[:sql]),
-                                                                                                   config && config[:adapter])
+                                                                                                   config)
 
           TingYun::Agent.agent.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, event.duration)
 

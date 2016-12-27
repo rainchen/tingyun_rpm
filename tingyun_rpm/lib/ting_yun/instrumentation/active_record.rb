@@ -46,7 +46,7 @@ module TingYun
         metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(
             TingYun::Helper.correctly_encoded(name),
             TingYun::Helper.correctly_encoded(sql),
-            @config && @config[:adapter])
+            @config)
 
         scoped_metric = metrics.first
 

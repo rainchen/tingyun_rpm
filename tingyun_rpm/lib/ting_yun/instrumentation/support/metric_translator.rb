@@ -10,7 +10,7 @@ module TingYun
 
         MONGODB = 'MongoDB'.freeze
 
-        def self.metrics_for(name, payload)
+        def self.metrics_for(name, payload,host_port)
           payload ||= {}
 
           return nil  if collection_in_selector?(payload)
@@ -27,7 +27,7 @@ module TingYun
 
           TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB,
                                                               TingYun::Agent::Datastore::Mongo.transform_operation(name),
-                                                              collection)
+                                                              collection, host_port[0], host_port[1])
         rescue => e
           TingYun::Agent.logger.debug("Failure during Mongo metric generation", e)
           nil

@@ -68,13 +68,13 @@ module TingYun
           end
         end
 
-        def metrics_for(name, sql, adapter_name)
-          product = map_product(adapter_name)
+        def metrics_for(name, sql, config)
+          product = map_product(config[:adapter])
           splits = split_name(name)
           model = model_from_splits(splits) || product
           operation = operation_from_splits(splits, sql)
 
-          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD)
+          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, ACTIVE_RECORD, config[:host], config[:port])
         end
 
 

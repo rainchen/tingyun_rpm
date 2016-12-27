@@ -9,10 +9,10 @@ module TingYun
     module Datastore
 
 
-      def self.wrap(product, operation, collection = nil, callback = nil)
+      def self.wrap(product, operation, collection = nil, ip_address = nil, port = nil, callback = nil )
         return yield unless operation
 
-        metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, collection)
+        metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, collection, ip_address , port )
 
         scoped_metric = metrics.last
 
