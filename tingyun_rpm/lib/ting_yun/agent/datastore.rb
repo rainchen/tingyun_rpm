@@ -11,19 +11,15 @@ module TingYun
 
       def self.wrap(product, operation, collection = nil, ip_address = nil, port = nil, callback = nil )
         return yield unless operation
-
         metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, ip_address , port, nil,collection )
-
-        scoped_metric = metrics.last
-
         TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
           t0 = Time.now
           begin
-            result = yield
+            yield
           ensure
             elapsed_time = (Time.now - t0).to_f
             if callback
-              callback.call(result, scoped_metric, elapsed_time)
+              callback.call(elapsed_time)
             end
           end
         end

@@ -34,7 +34,7 @@ module TingYun
           end
         end
 
-        def self.metrics_for(product, operation, host = nil, port = nil, dbname = 'Unknown', collection = nil,  generic_product = nil )
+        def self.metrics_for(product, operation, host = 'Unknown', port = 0, dbname = 'Unknown', collection = nil,  generic_product = nil )
           operation = operation.to_s.upcase
           if overrides = overridden_operation_and_collection   # [method, model_name, product]
             if should_override?(overrides, product, generic_product)
@@ -55,9 +55,9 @@ module TingYun
           end
 
           if checkNosql(product)
-            metrics << "#{product}/#{host}:#{port}/NULL/ALL"
+            metrics << "#{product}/#{host}:#{port}/ALL"
           else
-            metrics << "#{product}/#{host}:#{port}%2F#{dbname}/NULL/ALL"
+            metrics << "#{product}/#{host}:#{port}%2F#{dbname}/ALL"
           end
           metrics.unshift metric_name(product, collection, operation,host,port) if collection
           metrics
