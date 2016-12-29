@@ -68,7 +68,7 @@ module TingYun
       end
 
       def metrics(event)
-        TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB, TingYun::Agent::Datastore::Mongo.transform_operation(event.command_name), collection(event))
+        TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB, TingYun::Agent::Datastore::Mongo.transform_operation(event.command_name), event.address.host, event.address.port, nil, collection(event))
       end
 
       def generate_statement(event)

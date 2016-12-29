@@ -46,6 +46,8 @@ module TingYun
                   :rails3
                 when 4
                   :rails4
+                when 5
+                  :rails5
                 else
                   ::TingYun::Agent.logger.error "Detected unsupported Rails version #{Rails::VERSION::STRING}"
               end
@@ -108,12 +110,6 @@ module TingYun
         Proc.new { TingYun::Agent.config[:ssl] ? 443 : 80 }
       end
 
-      def self.agent_enabled
-        Proc.new {
-          TingYun::Agent.config[:enabled]
-        }
-      end
-
       def self.action_tracer_action_threshold
         Proc.new { TingYun::Agent.config[:apdex_t] * 4 }
       end
@@ -162,7 +158,7 @@ module TingYun
             :description => 'Enable or disable the agent.'
         },
         :'nbs.agent_enabled' => {
-            :default => DefaultSource.agent_enabled,
+            :default => true,
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,
@@ -381,13 +377,6 @@ module TingYun
             :type => Symbol,
             :allowed_from_server => false,
             :description => 'Autodetected application framework used to enable framework-specific functionality.'
-        },
-        :monitor_mode => {
-            :default => true,
-            :public => true,
-            :type => Boolean,
-            :allowed_from_server => false,
-            :description => 'Enable or disable the transmission of data to the collector.'
         },
         :'nbs.audit_mode' => {
             :default => false,
@@ -651,6 +640,13 @@ module TingYun
             :type => Array,
             :allowed_from_server => false,
             :description => 'Specify an array of Rake tasks to automatically instrument.'
+        },
+        :'nbs.transaction_tracer.thrift' =>{
+            :default => true,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable the thrift cross application feature'
         }
     }.freeze
   end

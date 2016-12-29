@@ -23,7 +23,7 @@
 
 require 'ting_yun/frameworks'
 
-require 'pry'
+# require 'pry'
 #if the agent had started in manual , then shouldn't start in auto again
 
 

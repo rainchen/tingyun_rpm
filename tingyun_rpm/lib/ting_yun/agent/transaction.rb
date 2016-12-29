@@ -29,10 +29,11 @@ module TingYun
       RAKE_TRANSACTION_PREFIX     = 'BackgroundAction/Rake'.freeze
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
       RACK_PREFIX = 'Rack/'.freeze
-      SINATRA_PREFIX = 'Sinatra/'.freeze
+      SINATRA_PREFIX = 'WebAction/Sinatra/'.freeze
       MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
-      GRAPE_PREFIX = 'Grape/'.freeze
-      RAKE_PREFIX = 'Rake'.freeze
+      GRAPE_PREFIX = 'WebAction/Grape/'.freeze
+      RAKE_PREFIX = 'WebAction/Rake'.freeze
+      CABLE_PREFIX = 'WebAction/ActionCable'.freeze
 
       EMPTY_SUMMARY_METRICS = [].freeze
       MIDDLEWARE_SUMMARY_METRICS = ['Middleware/all'.freeze].freeze

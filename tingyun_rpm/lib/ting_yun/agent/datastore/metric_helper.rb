@@ -9,7 +9,7 @@ module TingYun
         ALL_WEB = "AllWeb".freeze
         ALL_BACKGROUND = "AllBackground".freeze
         ALL = "All".freeze
-
+        UNKNOWN = 'Unknown'.freeze
         NOSQL = %w(MongoDB Redis Memcached).freeze
 
         CACHE = %w(Redis Memcached).freeze
@@ -18,11 +18,11 @@ module TingYun
           NOSQL.include?(product)
         end
 
-        def self.metric_name(product, collection, operation)
+        def self.metric_name(product, collection, operation,host,port,dbname)
           if checkNosql(product)
-              "#{product}/#{collection}/#{operation}"
+            "#{product}/#{host}:#{port}%2F#{collection}/#{operation}"
           else
-            "Database #{product}/#{collection}/#{operation}"
+            "Database #{product}/#{host}:#{port}%2F#{dbname}%2F#{collection}/#{operation}"
           end
         end
 
@@ -34,9 +34,9 @@ module TingYun
           end
         end
 
-
-
-        def self.metrics_for(product, operation, collection = nil, generic_product = nil)
+        def self.metrics_for(product, operation, host = UNKNOWN, port = 0, dbname = UNKNOWN, collection = nil,  generic_product = nil )
+          host ||= UNKNOWN
+          port ||= 0
           operation = operation.to_s.upcase
           if overrides = overridden_operation_and_collection   # [method, model_name, product]
             if should_override?(overrides, product, generic_product)
@@ -56,7 +56,12 @@ module TingYun
             product_suffixed_rollup(product,suffix)
           end
 
-          metrics.unshift metric_name(product, collection, operation) if collection
+          if checkNosql(product)
+            metrics << "#{product}/#{host}:#{port}/ALL"
+          else
+            metrics << "Database #{product}/#{host}:#{port}%2F#{dbname}/ALL"
+          end
+          metrics.unshift metric_name(product, collection, operation,host,port,dbname) if collection
           metrics
         end
 
