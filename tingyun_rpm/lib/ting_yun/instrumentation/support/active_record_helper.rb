@@ -78,11 +78,16 @@ module TingYun
           TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, config[:host], config[:port], config[:database], model, ACTIVE_RECORD)
         end
 
-        def metrics_for_data_mapper(name, sql, adapter_name, model=nil)
-          product = map_product(adapter_name)
-          operation = name || TingYun::Instrumentation::Support::Database.parse_operation_from_query(sql)
-          model ||= product
-          TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, model, DATA_MAPPER)
+        def metrics_for_data_mapper(name, sql, config, model=nil)
+          if config
+            product = map_product(config.query['adapter'])
+            operation = name || TingYun::Instrumentation::Support::Database.parse_operation_from_query(sql)
+            model ||= product
+            db = config.query['database'] || config.path.split('/').last
+            host = nil if config.host && config.host.empty?
+            port = nil if config.host && config.host.empty?
+            TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, host, port, db, model, DATA_MAPPER)
+          end
         end
 
         SPACE = ' '.freeze unless defined?(SPACE)
@@ -140,6 +145,8 @@ module TingYun
             "mysql2" => "MySQL",
 
             "postgresql" => "Postgres",
+
+            "postgres" => "Postgres",
 
             "sqlite3" => "SQLite",
 

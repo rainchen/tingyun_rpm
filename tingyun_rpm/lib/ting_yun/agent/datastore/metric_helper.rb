@@ -35,6 +35,7 @@ module TingYun
         end
 
         def self.metrics_for(product, operation, host = UNKNOWN, port = 0, dbname = UNKNOWN, collection = nil,  generic_product = nil )
+          dbname ||= UNKNOWN
           host ||= UNKNOWN
           port ||= 0
           operation = operation.to_s.upcase

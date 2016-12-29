@@ -119,19 +119,19 @@ TingYun::Support::LibraryDetection.defer do
           case method
             when :read
               query = args[0]
-              return TingYun::Helper.correctly_encoded('SELECT'), nil, self.options && self.options['adapter'], DataMapper::Inflector.classify(query.model.storage_name(name))
+              return TingYun::Helper.correctly_encoded('SELECT'), nil, self.normalized_uri, DataMapper::Inflector.classify(query.model.storage_name(name))
             when :update
               collection = args[1]
-              return TingYun::Helper.correctly_encoded('UPDATE'), nil, self.options && self.options['adapter'], DataMapper::Inflector.classify(collection.query.model.storage_name(name))
+              return TingYun::Helper.correctly_encoded('UPDATE'), nil, self.normalized_uri, DataMapper::Inflector.classify(collection.query.model.storage_name(name))
             when :delete
               collection = args[0]
-              return TingYun::Helper.correctly_encoded('DELETE'), nil, self.options && self.options['adapter'], DataMapper::Inflector.classify(collection.query.model.storage_name(name))
+              return TingYun::Helper.correctly_encoded('DELETE'), nil, self.normalized_uri, DataMapper::Inflector.classify(collection.query.model.storage_name(name))
             when :create
               model = args[0]
-              return TingYun::Helper.correctly_encoded('INSERT'), nil, self.options && self.options['adapter'], DataMapper::Inflector.classify(model.storage_name(name))
+              return TingYun::Helper.correctly_encoded('INSERT'), nil, self.normalized_uri, DataMapper::Inflector.classify(model.storage_name(name))
             when :select, :execute
               sql = args[0]
-              return nil, sql, self.options && self.options['adapter']
+              return nil, sql, self.normalized_uri
           end
         end
       end
