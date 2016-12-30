@@ -14,13 +14,13 @@ module TingYun
       include ::TingYun::Logger::LogOnce
       include ::TingYun::Logger::CreateLoggerHelper
 
+      attr_reader :file_path
       def initialize(root = "", override_logger=nil)
         @already_logged_lock = Mutex.new
         clear_already_logged
         create_log(root, override_logger)
         set_log_level
         set_log_format
-        set_logdev_can_be_read
 
         gather_startup_logs
       end
@@ -128,13 +128,6 @@ module TingYun
         prefix = wants_stdout? ? '** [TingYun]' : ''
         @log.formatter = Proc.new do |severity, timestamp, progname, msg|
           "#{prefix}[#{timestamp.strftime("%m/%d/%y %H:%M:%S %z")} #{hostname} (#{$$})] #{severity} : #{msg}\n"
-        end
-      end
-
-      # 为读取log文件大小  @log.logdev.dev.stat.size(单位：字节)
-      def set_logdev_can_be_read
-        ::Logger::class_eval do
-          attr_reader :logdev
         end
       end
 
