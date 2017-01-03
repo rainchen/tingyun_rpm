@@ -70,6 +70,7 @@ module TingYun
         end
 
         def metrics_for(name, sql, config)
+          config ||={}
           product = map_product(config[:adapter])
           splits = split_name(name)
           model = model_from_splits(splits) || product
