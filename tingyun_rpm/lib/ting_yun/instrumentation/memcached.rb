@@ -5,7 +5,7 @@ module TingYun
       def record_memcached_duration(duration)
         state = TingYun::Agent::TransactionState.tl_get
         if state
-          state.timings.memchd_duration = state.timings.memchd_duration + duration * 1000
+          state.timings.mc_duration = state.timings.mc_duration + duration * 1000
         end
       end
     end
@@ -28,7 +28,7 @@ TingYun::Support::LibraryDetection.defer do
   named :memcached
 
   depends_on do
-    defined?(::Memcached) || (defined?(::Dalli) && defined?(::Dalli::Client) && Rails::VERSION::MAJOR.to_i >= 3)
+    defined?(::Memcached) || (defined?(::Dalli) && defined?(::Dalli::Client))
   end
 
 
