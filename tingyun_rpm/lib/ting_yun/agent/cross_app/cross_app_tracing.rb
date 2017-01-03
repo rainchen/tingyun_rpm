@@ -35,9 +35,9 @@ module TingYun
         begin
           node = start_trace(state, t0, request)
           response = yield
-          capture_exception(response, request, 'net%2Fhttp')
+          capture_exception(response, request)
         rescue => e
-          klass = "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
+          klass = "External/#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
           handle_error(e, klass)
         ensure
           finish_trace(state, t0, node, request, response)
@@ -89,7 +89,7 @@ module TingYun
         ::TingYun::Agent::Collector::TransactionSampler.add_node_info(:uri => TingYun::Agent::HTTPClients::URIUtil.filter_uri(request.uri))
         if cross_app
           ::TingYun::Agent::Collector::TransactionSampler.tl_builder.set_txId_and_txData(state.client_transaction_id || state.request_guid,
-                                                             TingYun::Support::Serialize::JSONWrapper.load(response[TY_DATA_HEADER].gsub("'",'"')))
+                                                                                         TingYun::Support::Serialize::JSONWrapper.load(get_ty_data_header(response).gsub("'",'"')))
         end
       end
 
@@ -123,8 +123,8 @@ module TingYun
 
       def metrics_for_regular_request( request )
         metrics = []
-        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
-        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
+        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
+        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
 
         return metrics
       end
@@ -148,8 +148,8 @@ module TingYun
       # has the appropriate headers.
       def response_is_cross_app?( response )
         return false unless response
-        return false unless response[TY_DATA_HEADER]
         return false unless cross_app_enabled?
+        return false unless get_ty_data_header(response)
 
         return true
       end
@@ -157,8 +157,8 @@ module TingYun
       # Return the set of metric objects appropriate for the given cross app
       # +response+.
       def metrics_for_cross_app_response(request, response )
-        my_data =  TingYun::Support::Serialize::JSONWrapper.load response[TY_DATA_HEADER].gsub("'",'"')
-        uri = "#{request.uri.to_s.gsub('/','%2F')}/net%2Fhttp"
+        my_data =  TingYun::Support::Serialize::JSONWrapper.load get_ty_data_header(response).gsub("'",'"')
+        uri = "#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
         metrics = []
         metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
         metrics << "External/#{my_data["action"]}:#{uri}"
@@ -166,6 +166,13 @@ module TingYun
         return metrics
       end
 
+      def get_ty_data_header(response)
+        if response.class == ::HTTP::Message
+          response.header[TY_DATA_HEADER].first rescue nil
+        else
+          response[TY_DATA_HEADER] rescue nil
+        end
+      end
     end
   end
 end
