@@ -14,6 +14,7 @@ module TingYun
       include ::TingYun::Logger::LogOnce
       include ::TingYun::Logger::CreateLoggerHelper
 
+      attr_reader :file_path
       def initialize(root = "", override_logger=nil)
         @already_logged_lock = Mutex.new
         clear_already_logged

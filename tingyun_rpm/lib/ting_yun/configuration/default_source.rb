@@ -350,6 +350,27 @@ module TingYun
             :allowed_from_server => false,
             :description => 'log  filename.'
         },
+        :agent_log_file_size => {
+            :default => 10,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => false,
+            :description => "Create a new logfile once it reaches this value. and this value's unit is MB."
+        },
+        :agent_log_file_number => {
+            :default => 500,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => false,
+            :description => "The remaining number of log file, delete the earliest when more than this value."
+        },
+        :agent_log_file_check_days => {
+            :default => 7,
+            :public => true,
+            :type => Fixnum,
+            :allowed_from_server => false,
+            :description => "Check for create new logfile when reach days of this value."
+        },
         :config_search_paths => {
             :default => DefaultSource.config_search_paths,
             :public => false,

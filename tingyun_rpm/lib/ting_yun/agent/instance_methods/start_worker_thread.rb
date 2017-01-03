@@ -43,6 +43,11 @@ module TingYun
           end
           @event_loop.fire_every(Agent.config[:data_report_period], :report_data)
 
+          @event_loop.on(:create_new_logfile) do
+            TingYun::Logger::CreateLoggerHelper.create_new_logfile
+          end
+          @event_loop.fire_every(TingYun::Agent.config[:agent_log_file_check_days]*60*60*24, :create_new_logfile)
+
           @event_loop.run
         end
       end

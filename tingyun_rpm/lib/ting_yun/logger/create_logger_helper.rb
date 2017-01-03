@@ -4,7 +4,7 @@ module TingYun
   module Logger
     module CreateLoggerHelper
 
-
+      module_function
 
       def create_log(root, override_logger)
         if !override_logger.nil?
@@ -26,6 +26,7 @@ module TingYun
           begin
             @log = ::Logger.new(@file_path)
             set_log_format
+            set_log_level
           rescue => e
             @log = ::Logger.new(STDOUT)
             warn("check_log_file:  Failed creating logger for file #{@file_path}, using standard out for logging.", e)
@@ -33,7 +34,20 @@ module TingYun
         end
       end
 
-
+      def create_new_logfile
+        file_path = TingYun::Agent.logger.file_path
+        shift_age = TingYun::Agent.config[:agent_log_file_number]
+        if File.size(file_path) >= (TingYun::Agent.config[:agent_log_file_size])*1024*1024
+          (shift_age-3).downto(0) do |i|
+            index_file = file_path.gsub('.log', "_#{i}.log")
+            if FileTest.exist?(index_file)
+              File.rename(index_file, file_path.gsub('.log', "_#{i+1}.log"))
+            end
+          end
+          TingYun::Agent.agent.untraced_graceful_disconnect
+          File.rename(file_path, file_path.gsub('.log', "_0.log"))
+        end
+      end
 
       def create_log_to_file(root)
         path = find_or_create_file_path(::TingYun::Agent.config[:agent_log_file_path], root)
