@@ -62,7 +62,6 @@ module TingYun
         end
 
         def record_metrics(event, config)
-          binding.pry
           base, *other_metrics = TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(event.payload[:name],
                                                                                                    TingYun::Helper.correctly_encoded(event.payload[:sql]),
                                                                                                    config)

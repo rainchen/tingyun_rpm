@@ -62,7 +62,7 @@ module TingYun
           else
             metrics << "Database #{product}/#{host}:#{port}%2F#{dbname}/ALL"
           end
-          metrics.unshift metric_name(product, collection, operation,host,port,dbname) if collection
+          metrics.unshift metric_name(product, collection, operation,host,port,dbname) if collection or include_database?(product)
           metrics
         end
 
