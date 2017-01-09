@@ -7,8 +7,6 @@ require 'ting_yun/agent/method_tracer'
 module TingYun
   module Agent
     module Datastore
-
-
       def self.wrap(product, operation, collection = nil, ip_address = nil, port = nil, callback = nil )
         return yield unless operation
         metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, ip_address , port, nil,collection )

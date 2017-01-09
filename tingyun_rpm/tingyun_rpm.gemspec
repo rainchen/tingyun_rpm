@@ -25,12 +25,12 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.rubygems_version = Gem::VERSION
 
-  s.add_development_dependency 'rake', '10.1.0'
+  s.add_development_dependency 'rake', '~> 10.1.0'
   s.add_development_dependency 'minitest', '~> 4.7'
-  s.add_development_dependency 'minitest-ci', '= 2.4.0'
+  s.add_development_dependency 'minitest-ci', '~> 2.4.0'
   s.add_development_dependency 'minitest-focus', '~> 1.1'
   s.add_development_dependency 'minitest-reporters', '0.14.24'
-  s.add_development_dependency 'simplecov', '= 0.10.0'
+  s.add_development_dependency 'simplecov', '~> 0.10.0'
   s.add_development_dependency 'mocha', '~> 0.13.0'
   s.add_development_dependency 'rails', '~> 3.2'
   s.add_development_dependency 'pry', '~> 0.9.12'
