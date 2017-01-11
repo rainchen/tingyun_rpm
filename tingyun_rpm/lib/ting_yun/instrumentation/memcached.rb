@@ -98,7 +98,7 @@ TingYun::Support::LibraryDetection.defer do
         def perform(*args, &block)
           return block.call if block
           op, key = args[0..1]
-          current_ring = respond_to?(:ring) ? ring : @ring
+          current_ring = self.class.private_method_defined?(:ring) ? ring : @ring
           server = current_ring.server_for_key(validate_key(key.to_s)) rescue nil
           if server
             host = server.hostname
