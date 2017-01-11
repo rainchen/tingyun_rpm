@@ -20,6 +20,7 @@ module TingYun
 
         def self.metric_name(product, collection, operation,host,port,dbname)
           if checkNosql(product)
+            return "#{product}/#{host}:#{port}%2F#{dbname}%2F#{collection}/#{operation}" if product=="MongoDB"
             "#{product}/#{host}:#{port}%2F#{collection}/#{operation}"
           else
             "Database #{product}/#{host}:#{port}%2F#{dbname}%2F#{collection}/#{operation}"
