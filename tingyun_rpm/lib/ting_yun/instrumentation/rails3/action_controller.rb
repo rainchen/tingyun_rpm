@@ -21,7 +21,7 @@ module TingYun
 
             action = action_name_override || action_name
             if action_name_override || self.class.action_methods.include?(action)
-              "Rail/#{self.class.controller_path}%2F#{action}"
+              "Rails/#{self.class.controller_path}%2F#{action}"
             else
               "Rails/#{self.class.controller_path}%2F(other)"
             end
