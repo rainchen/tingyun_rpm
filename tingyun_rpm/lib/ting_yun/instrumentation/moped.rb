@@ -61,7 +61,7 @@ module TingYun
         return operation_name, collection
       end
 
-      def record_mongo_duration(_1, _2, duration)
+      def record_mongo_duration(duration)
         state = TingYun::Agent::TransactionState.tl_get
         if state
           state.timings.mon_duration = state.timings.mon_duration +  duration * 1000
