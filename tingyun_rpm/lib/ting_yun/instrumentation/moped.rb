@@ -32,7 +32,8 @@ module TingYun
         operation = TingYun::Agent::Datastore::Mongo.transform_operation(operation_name)
 
         res = nil
-        TingYun::Agent::Datastore.wrap(MONGODB, operation, collection, ip_address, port, options["database"], method(:record_mongo_duration)) do
+        database = options["database"] || options[:database]
+        TingYun::Agent::Datastore.wrap(MONGODB, operation, collection, ip_address, port, database, method(:record_mongo_duration)) do
           res = log_without_tingyun_instrumentation(operations, &blk)
         end
 
