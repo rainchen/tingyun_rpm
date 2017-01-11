@@ -55,7 +55,7 @@ TingYun::Support::LibraryDetection.defer do
           alias_method "#{method}_without_tingyun_trace".to_sym, method.to_sym
 
           define_method method do |*args, &block|
-            TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, nil, nil, method(:record_memcached_duration)) do
+            TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, nil, nil, nil, method(:record_memcached_duration)) do
               send "#{method}_without_tingyun_trace", *args, &block
             end
           end
@@ -80,7 +80,7 @@ TingYun::Support::LibraryDetection.defer do
           if @sock
             connect_without_tingyun_trace *args, &block
           else
-            TingYun::Agent::Datastore.wrap('Memcached', 'connect', nil, hostname, port, method(:record_memcached_duration)) do
+            TingYun::Agent::Datastore.wrap('Memcached', 'connect', nil, hostname, port, nil, method(:record_memcached_duration)) do
               connect_without_tingyun_trace *args, &block
             end
           end
@@ -104,7 +104,7 @@ TingYun::Support::LibraryDetection.defer do
             host = server.hostname
             port = server.port
           end
-          TingYun::Agent::Datastore.wrap('Memcached', op.to_s, nil, host, port, method(:record_memcached_duration)) do
+          TingYun::Agent::Datastore.wrap('Memcached', op.to_s, nil, host, port, nil, method(:record_memcached_duration)) do
             perform_without_tingyun_trace(*args, &block)
           end
         end
@@ -117,7 +117,7 @@ TingYun::Support::LibraryDetection.defer do
           alias_method "#{method}_without_tingyun_trace".to_sym, method.to_sym
 
           define_method method do |*args, &block|
-            TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, nil, nil, method(:record_memcached_duration)) do
+            TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, nil, nil, nil, method(:record_memcached_duration)) do
               send "#{method}_without_tingyun_trace", *args, &block
             end
           end
