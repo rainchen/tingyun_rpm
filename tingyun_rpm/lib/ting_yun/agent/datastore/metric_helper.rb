@@ -59,9 +59,9 @@ module TingYun
           end
 
           if checkNosql(product)
-            metrics << "#{product}/#{host}:#{port}/ALL"
+            metrics << (product=="MongoDB" ? "#{product}/#{host}:#{port}%2F#{dbname}/All" : "#{product}/#{host}:#{port}/All")
           else
-            metrics << "Database #{product}/#{host}:#{port}%2F#{dbname}/ALL"
+            metrics << "Database #{product}/#{host}:#{port}%2F#{dbname}/All"
           end
           metrics.unshift metric_name(product, collection, operation,host,port,dbname) if collection
           metrics.unshift  "#{product}/#{host}:#{port}/#{operation}" if product=="Memcached"
