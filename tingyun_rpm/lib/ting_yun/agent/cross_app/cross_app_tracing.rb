@@ -167,7 +167,7 @@ module TingYun
       end
 
       def get_ty_data_header(response)
-        if response.class == ::HTTP::Message
+        if defined?(::HTTP) && defined?(::HTTP::Message) && response.class == ::HTTP::Message
           response.header[TY_DATA_HEADER].first rescue nil
         else
           response[TY_DATA_HEADER] rescue nil
