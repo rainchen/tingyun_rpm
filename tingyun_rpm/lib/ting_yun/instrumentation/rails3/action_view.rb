@@ -40,6 +40,10 @@ TingYun::Support::LibraryDetection.defer do
   # We can't be sure that this will work with future versions of Rails 3.
   # Currently enabled for Rails 3.1 and 3.2
   depends_on do
+    !::TingYun::Agent.config[:disable_action_view]
+  end
+
+  depends_on do
     defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 3 && ([1,2].member?(::Rails::VERSION::MINOR.to_i))
   end
 

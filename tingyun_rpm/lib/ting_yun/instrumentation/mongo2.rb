@@ -23,6 +23,10 @@ TingYun::Support::LibraryDetection.defer do
   named :mongo2
 
   depends_on do
+    !::TingYun::Agent.config[:disable_mongo]
+  end
+
+  depends_on do
     require 'ting_yun/agent/datastore/mongo'
     defined?(::Mongo) && TingYun::Agent::Datastore::Mongo.unsupported_2x? && defined?(::Mongo::Monitoring::Global)
   end

@@ -82,7 +82,7 @@ end
 TingYun::Support::LibraryDetection.defer do
   named :mongo_moped
   depends_on do
-    defined?(::Moped)
+    defined?(::Moped) && !::TingYun::Agent.config[:disable_mongo]
   end
 
   executes do

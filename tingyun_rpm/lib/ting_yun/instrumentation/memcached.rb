@@ -31,6 +31,10 @@ TingYun::Support::LibraryDetection.defer do
     defined?(::Memcached) || (defined?(::Dalli) && defined?(::Dalli::Client))
   end
 
+  depends_on do
+    !::TingYun::Agent.config[:disable_memcache]
+  end
+
 
   executes do
     TingYun::Agent.logger.info "Installing Memcached Instrumentation" if defined?(::Memcached)

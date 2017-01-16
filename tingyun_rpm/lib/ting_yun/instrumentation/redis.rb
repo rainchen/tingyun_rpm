@@ -6,7 +6,8 @@ TingYun::Support::LibraryDetection.defer do
   named :redis
 
   depends_on do
-    defined?(::Redis)
+    defined?(::Redis) &&
+        !::TingYun::Agent.config[:disable_redis]
   end
 
 

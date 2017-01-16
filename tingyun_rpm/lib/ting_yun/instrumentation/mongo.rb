@@ -86,6 +86,10 @@ TingYun::Support::LibraryDetection.defer do
   named :mongo
 
   depends_on do
+    !::TingYun::Agent.config[:disable_mongo]
+  end
+
+  depends_on do
     defined?(::Mongo)
   end
 

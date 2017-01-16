@@ -6,6 +6,10 @@ TingYun::Support::LibraryDetection.defer do
   named  :rails5_action_cable
 
   depends_on do
+    !::TingYun::Agent.config[:disable_action_cable]
+  end
+
+  depends_on do
     defined?(::Rails) &&
         ::Rails::VERSION::MAJOR.to_i == 5 &&
         defined?(::ActionCable)
