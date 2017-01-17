@@ -132,7 +132,7 @@ module TingYun
             "mysql" => "MySQL",
             "mysql2" => "MySQL",
 
-            "postgresql" => "Postgres",
+            "postgresql" => "PostgreSQL",
 
             "sqlite3" => "SQLite",
 
@@ -140,7 +140,7 @@ module TingYun
             "jdbcmysql" => "MySQL",
 
             # https://rubygems.org/gems/activerecord-jdbcpostgresql-adapter
-            "jdbcpostgresql" => "Postgres",
+            "jdbcpostgresql" => "PostgreSQL",
 
             # https://rubygems.org/gems/activerecord-jdbcsqlite3-adapter
             "jdbcsqlite3" => "SQLite",
@@ -157,7 +157,7 @@ module TingYun
             "mssql" => "MSSQL",
 
             # https://rubygems.org/gems/activerecord-sqlserver-adapter
-            "sqlserver" => "MSSQL",
+            "sqlserver" => "SQLServer",
 
             # https://rubygems.org/gems/activerecord-odbc-adapter
             "odbc" => "ODBC",
