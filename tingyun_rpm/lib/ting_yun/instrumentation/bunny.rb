@@ -11,7 +11,22 @@ TingYun::Support::LibraryDetection.defer do
   end
 
   executes do
-    ::Bunny::Session.class_eval do
+    ::Bunny::Exchange.class_eval do
+
+      if public_method_defined? :publish
+
+
+        def publish_with_tingyun(payload, opts = {})
+          state = TingYun::Agent::TransactionState.tl_get
+          TingYun::Agent::Transaction.wrap(state, "Message/RabbitMQ/localhost:3307%2FProduce%2FQueue%2Fbunny.examples.hello_world", :RabbitMq)  do
+            publish_without_tingyun(payload, opts = {})
+          end
+
+        end
+
+        alias_method :publish_without_tingyun, :publish
+        alias_method :publish, :publish_with_tingyun
+      end
 
     end
   end
