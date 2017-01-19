@@ -2,6 +2,7 @@
 require 'ting_yun/configuration/dotted_hash'
 require 'ting_yun/support/language_support'
 require 'erb'
+require 'yaml'
 
 module TingYun
   module Configuration
