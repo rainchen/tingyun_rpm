@@ -45,7 +45,7 @@ TingYun::Support::LibraryDetection.defer do
         def call_with_tingyun(*args)
           begin
             state = TingYun::Agent::TransactionState.tl_get
-            TingYun::Agent::Transaction.start(state, :RabbitMQ,{})
+            TingYun::Agent::Transaction.set_default_transaction_name(name, :controller)
           rescue => e
             TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
           ensure
