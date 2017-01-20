@@ -15,13 +15,15 @@ TingYun::Support::LibraryDetection.defer do
 
       if public_method_defined? :publish
 
-
         def publish_with_tingyun(payload, opts = {})
           state = TingYun::Agent::TransactionState.tl_get
-          TingYun::Agent::Transaction.wrap(state, "Message/RabbitMQ/localhost:3307%2FProduce%2FQueue%2Fbunny.examples.hello_world", :RabbitMq)  do
-            publish_without_tingyun(payload, opts = {})
+          queue_name = opts[:routing_key]
+          opts['TingyunID'] = "#{TingYun::Agent.config[:tingyunIdSecret]};c=1;x=#{state.request_guid};e=#{state.request_guid}"
+          metric_name = "Message/RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2FProduce%2FQueue%2F#{name}-#{queue_name}"
+          TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq)  do
+            TingYun::Agent.record_metric("#{metric_name}/Byte",payload.bytesize) if payload
+            publish_without_tingyun(payload, opts)
           end
-
         end
 
         alias_method :publish_without_tingyun, :publish
