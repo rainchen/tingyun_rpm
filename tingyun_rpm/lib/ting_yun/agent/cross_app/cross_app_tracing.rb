@@ -138,8 +138,7 @@ module TingYun
 
       # Inject the X-Process header into the outgoing +request+.
       def inject_request_headers(state, request)
-        cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
-            raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+        cross_app_id  = TingYun::Agent.config[:tingyunIdSecret]
 
         request[TY_ID_HEADER] = "#{cross_app_id};c=1;x=#{state.request_guid}"
       end
