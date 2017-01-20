@@ -85,6 +85,8 @@ module TingYun
             operation = name || TingYun::Instrumentation::Support::Database.parse_operation_from_query(sql)
             model ||= product
             db = config.query['database'] || config.path.split('/').last
+            host = config.host
+            port = config.port
             host = nil if config.host && config.host.empty?
             port = nil if config.host && config.host.empty?
             TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, host, port, db, model, DATA_MAPPER)
