@@ -40,7 +40,7 @@ module TingYun
 
           def tingyun_generate_metrics(operation, payload = nil)
             payload ||= { :collection => self.name, :database => self.db.name }
-            TingYun::Instrumentation::Support::MetricTranslator.metrics_for(operation, payload,tingyun_host_port)
+            TingYun::Instrumentation::Support::MetricTranslator.metrics_for(operation, payload, tingyun_host_port)
           end
 
           def instrument_with_tingyun(name, payload = {}, &block)
@@ -84,6 +84,10 @@ end
 
 TingYun::Support::LibraryDetection.defer do
   named :mongo
+
+  depends_on do
+    !::TingYun::Agent.config[:disable_mongo]
+  end
 
   depends_on do
     defined?(::Mongo)

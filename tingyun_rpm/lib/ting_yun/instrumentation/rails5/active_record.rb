@@ -4,6 +4,9 @@ require 'ting_yun/instrumentation/support/active_record_subscriber'
 TingYun::Support::LibraryDetection.defer do
   named :active_record_5
 
+  depends_on do
+    !::TingYun::Agent.config[:disable_active_record]
+  end
 
   depends_on do
     defined?(::ActiveRecord) && defined?(::ActiveRecord::Base) &&

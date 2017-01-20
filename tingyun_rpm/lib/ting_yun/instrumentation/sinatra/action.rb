@@ -27,6 +27,10 @@ TingYun::Support::LibraryDetection.defer do
   @name = :sinatra_action
 
   depends_on do
+    !::TingYun::Agent.config[:disable_action_controller]
+  end
+
+  depends_on do
     defined?(::Sinatra) && defined?(::Sinatra::Base) && TingYun::Instrumentation::Support::SinatraHelper.version_supported?
   end
 

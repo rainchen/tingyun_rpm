@@ -16,6 +16,10 @@ TingYun::Support::LibraryDetection.defer do
     defined?(::HTTPClient) && TingYun::Instrumentation::HttpClient.version_support?
   end
 
+  depends_on do
+    !::TingYun::Agent.config[:disable_http_client]
+  end
+
   executes do
     ::TingYun::Agent.logger.info 'Installing HTTPClient instrumentation'
     require 'ting_yun/agent/cross_app/cross_app_tracing'

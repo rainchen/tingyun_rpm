@@ -24,6 +24,10 @@ TingYun::Support::LibraryDetection.defer do
   named :data_mapper
 
   depends_on do
+    !::TingYun::Agent.config[:disable_data_mapper]
+  end
+
+  depends_on do
     begin
       require 'dm-do-adapter'
       TingYun::Instrumentation::DataMapper.support_data_mapper?

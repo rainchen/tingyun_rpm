@@ -6,6 +6,10 @@ TingYun::Support::LibraryDetection.defer do
   @name = :rails4_view
 
   depends_on do
+    !::TingYun::Agent.config[:disable_action_view]
+  end
+
+  depends_on do
     defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 4
   end
 

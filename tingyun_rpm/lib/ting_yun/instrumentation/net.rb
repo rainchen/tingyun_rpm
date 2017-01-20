@@ -5,7 +5,7 @@ TingYun::Support::LibraryDetection.defer do
   named :net_http
 
   depends_on do
-    defined?(Net) && defined?(Net::HTTP)
+    defined?(Net) && defined?(Net::HTTP) && !::TingYun::Agent.config[:disable_net_http]
   end
 
   executes do

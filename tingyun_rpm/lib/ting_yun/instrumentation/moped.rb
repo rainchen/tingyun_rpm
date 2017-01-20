@@ -32,7 +32,8 @@ module TingYun
         operation = TingYun::Agent::Datastore::Mongo.transform_operation(operation_name)
 
         res = nil
-        TingYun::Agent::Datastore.wrap(MONGODB, operation, collection, ip_address, port, method(:record_mongo_duration)) do
+        database = options["database"] || options[:database]
+        TingYun::Agent::Datastore.wrap(MONGODB, operation, collection, ip_address, port, database, method(:record_mongo_duration)) do
           res = log_without_tingyun_instrumentation(operations, &blk)
         end
 
@@ -61,7 +62,7 @@ module TingYun
         return operation_name, collection
       end
 
-      def record_mongo_duration(_1, _2, duration)
+      def record_mongo_duration(duration)
         state = TingYun::Agent::TransactionState.tl_get
         if state
           state.timings.mon_duration = state.timings.mon_duration +  duration * 1000
@@ -81,7 +82,7 @@ end
 TingYun::Support::LibraryDetection.defer do
   named :mongo_moped
   depends_on do
-    defined?(::Moped)
+    defined?(::Moped) && !::TingYun::Agent.config[:disable_mongo]
   end
 
   executes do

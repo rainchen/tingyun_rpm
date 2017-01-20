@@ -31,6 +31,10 @@ TingYun::Support::LibraryDetection.defer do
     defined?(::Memcached) || (defined?(::Dalli) && defined?(::Dalli::Client))
   end
 
+  depends_on do
+    !::TingYun::Agent.config[:disable_memcache]
+  end
+
 
   executes do
     TingYun::Agent.logger.info "Installing Memcached Instrumentation" if defined?(::Memcached)
@@ -55,7 +59,7 @@ TingYun::Support::LibraryDetection.defer do
           alias_method "#{method}_without_tingyun_trace".to_sym, method.to_sym
 
           define_method method do |*args, &block|
-            TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, nil, nil, method(:record_memcached_duration)) do
+            TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, nil, nil, nil, method(:record_memcached_duration)) do
               send "#{method}_without_tingyun_trace", *args, &block
             end
           end
@@ -80,7 +84,7 @@ TingYun::Support::LibraryDetection.defer do
           if @sock
             connect_without_tingyun_trace *args, &block
           else
-            TingYun::Agent::Datastore.wrap('Memcached', 'connect', nil, hostname, port, method(:record_memcached_duration)) do
+            TingYun::Agent::Datastore.wrap('Memcached', 'connect', nil, hostname, port, nil, method(:record_memcached_duration)) do
               connect_without_tingyun_trace *args, &block
             end
           end
@@ -98,13 +102,13 @@ TingYun::Support::LibraryDetection.defer do
         def perform(*args, &block)
           return block.call if block
           op, key = args[0..1]
-          current_ring = respond_to?(:ring) ? ring : @ring
+          current_ring = self.class.private_method_defined?(:ring) ? ring : @ring
           server = current_ring.server_for_key(validate_key(key.to_s)) rescue nil
           if server
             host = server.hostname
             port = server.port
           end
-          TingYun::Agent::Datastore.wrap('Memcached', op.to_s, nil, host, port, method(:record_memcached_duration)) do
+          TingYun::Agent::Datastore.wrap('Memcached', op.to_s, nil, host, port, nil, method(:record_memcached_duration)) do
             perform_without_tingyun_trace(*args, &block)
           end
         end
@@ -117,7 +121,7 @@ TingYun::Support::LibraryDetection.defer do
           alias_method "#{method}_without_tingyun_trace".to_sym, method.to_sym
 
           define_method method do |*args, &block|
-            TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, nil, nil, method(:record_memcached_duration)) do
+            TingYun::Agent::Datastore.wrap('Memcached', method.to_s, nil, nil, nil, nil, method(:record_memcached_duration)) do
               send "#{method}_without_tingyun_trace", *args, &block
             end
           end

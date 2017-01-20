@@ -21,7 +21,7 @@ module TingYun
 
             action = action_name_override || action_name
             if action_name_override || self.class.action_methods.include?(action)
-              "Rail/#{self.class.controller_path}%2F#{action}"
+              "Rails/#{self.class.controller_path}%2F#{action}"
             else
               "Rails/#{self.class.controller_path}%2F(other)"
             end
@@ -47,6 +47,10 @@ end
 
 TingYun::Support::LibraryDetection.defer do
   @name = :rails3_controller
+
+  depends_on do
+    !::TingYun::Agent.config[:disable_action_controller]
+  end
 
   depends_on do
     defined?(::Rails) && ::Rails::VERSION::MAJOR.to_i == 3
