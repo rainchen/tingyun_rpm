@@ -25,6 +25,10 @@ module TingYun
           end
         end
 
+        def make_transaction_name(name, category=nil)
+          namer = TingYun::Instrumentation::Support::TransactionNamer
+          "#{namer.prefix_for_category(self, category)}#{name}"
+        end
 
         def name_last_frame(name)
           frame_stack.last.name = name
@@ -40,7 +44,7 @@ module TingYun
           !category || frame_stack.size == 1 || similar_category?(category)
         end
 
-        WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware, :thrift].freeze
+        WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware, :thrift, :action_cable].freeze
 
         def web_category?(category)
           WEB_TRANSACTION_CATEGORIES.include?(category)

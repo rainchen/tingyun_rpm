@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 require 'ting_yun/instrumentation/support/evented_subscriber'
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/active_record_helper'
@@ -9,7 +10,7 @@ require 'ting_yun/agent/database'
 
 module TingYun
   module Instrumentation
-    module Rails4
+    module Rails
       class ActiveRecordSubscriber < TingYun::Instrumentation::Support::EventedSubscriber
         CACHED_QUERY_NAME = 'CACHE'.freeze unless defined? CACHED_QUERY_NAME
 
@@ -51,11 +52,11 @@ module TingYun
           frame = stack.push_frame(state, :active_record, event.time)
 
           sql_sampler.notice_sql(event.payload[:sql], metric, config,
-                        TingYun::Helper.milliseconds_to_seconds(event.duration),
-                        state, @explainer, event.payload[:binds], event.payload[:name])
+                                 TingYun::Helper.milliseconds_to_seconds(event.duration),
+                                 state, @explainer, event.payload[:binds], event.payload[:name])
 
           transaction_sampler.notice_sql(event.payload[:sql], config, event.duration,
-                        state, @explainer, event.payload[:binds], event.payload[:name])
+                                         state, @explainer, event.payload[:binds], event.payload[:name])
           # exit transaction trace node
           stack.pop_frame(state, frame, metric, event.end)
         end
@@ -97,30 +98,5 @@ module TingYun
         end
       end
     end
-  end
-end
-
-TingYun::Support::LibraryDetection.defer do
-  named :active_record_4
-
-
-  depends_on do
-    defined?(::ActiveRecord) && defined?(::ActiveRecord::Base) &&
-        defined?(::ActiveRecord::VERSION) &&
-        ::ActiveRecord::VERSION::MAJOR.to_i >= 4
-  end
-
-  depends_on do
-    !TingYun::Instrumentation::Rails4::ActiveRecordSubscriber.subscribed?
-  end
-
-  executes do
-    ::TingYun::Agent.logger.info 'Installing ActiveRecord 4 instrumentation'
-  end
-
-  executes do
-    ActiveSupport::Notifications.subscribe('sql.active_record',
-                                           TingYun::Instrumentation::Rails4::ActiveRecordSubscriber.new)
-    ::TingYun::Instrumentation::Support::ActiveRecordHelper.instrument_additional_methods
   end
 end

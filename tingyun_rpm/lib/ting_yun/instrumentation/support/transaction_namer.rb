@@ -26,6 +26,8 @@ module TingYun
               ::TingYun::Agent::Transaction::GRAPE_PREFIX
             when :rake then
               ::TingYun::Agent::Transaction::RAKE_PREFIX
+            when :action_cable then
+              ::TingYun::Agent::Transaction::CABLE_PREFIX
             else
               "#{category.to_s}/" # for internal use only
           end

@@ -15,15 +15,15 @@ module TingYun
 
         def tingyun_metric_path(action_name_override = nil)
           if find_rule(request.request_method.upcase, request.path, request.env, request.filtered_parameters)
-            return "Rails3/#{namespace}/#{name(request.path.slice(1..-1), request.env, request.filtered_parameters, request.cookies)}"
+            return "Rails/#{namespace}/#{name(request.path.slice(1..-1), request.env, request.filtered_parameters, request.cookies)}"
           else
             return  self.env["PATH_INFO"] unless TingYun::Agent.config[:'nbs.auto_action_naming']
 
             action = action_name_override || action_name
             if action_name_override || self.class.action_methods.include?(action)
-              "Rails3/#{self.class.controller_path}%2F#{action}"
+              "Rail/#{self.class.controller_path}%2F#{action}"
             else
-              "Rails3/#{self.class.controller_path}%2F(other)"
+              "Rails/#{self.class.controller_path}%2F(other)"
             end
           end
         end
