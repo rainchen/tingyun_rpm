@@ -138,6 +138,7 @@ module TingYun
             end_time.to_f)
 
         commit(state, end_time, name) unless ignore(best_name)
+        TingYun::Agent::TransactionState.reset_tl_mq
       end
 
 

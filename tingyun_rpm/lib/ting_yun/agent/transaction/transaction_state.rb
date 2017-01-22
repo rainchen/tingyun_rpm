@@ -29,6 +29,21 @@ module TingYun
         tl_state_for(Thread.current)
       end
 
+      def self.tl_mq_get
+        thread = Thread.current
+        state = thread[:tingyun_mq_transaction_state]
+        if state.nil?
+          state = TransactionState.new
+          thread[:tingyun_mq_transaction_state] = state
+        end
+        state
+      end
+
+      def self.reset_tl_mq
+        thread = Thread.current
+        thread[:tingyun_mq_transaction_state] = nil
+      end
+
       # This method should only be used by TransactionState for access to the
       # current thread's state or to provide read-only accessors for other threads
       #

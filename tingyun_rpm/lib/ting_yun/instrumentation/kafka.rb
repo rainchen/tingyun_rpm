@@ -86,7 +86,7 @@ TingYun::Support::LibraryDetection.defer do
         def each_message(*args, **options, &block)
           wrap_block = Proc.new do |message|
             begin
-              state = TingYun::Agent::TransactionState.tl_get
+              state = TingYun::Agent::TransactionState.tl_mq_get
               ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
               metric_name = "Message/Kafka/#{ip_and_hosts}%2FConsume%2FTopic%2F#{message.topic}"
               TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
@@ -111,7 +111,7 @@ TingYun::Support::LibraryDetection.defer do
       def each_message(*args, **options, &block)
         wrap_block = Proc.new do |message|
           begin
-            state = TingYun::Agent::TransactionState.tl_get
+            state = TingYun::Agent::TransactionState.tl_mq_get
             ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
             metric_name = "Message/Kafka/#{ip_and_hosts}%2FConsume%2FTopic%2F#{message.topic}"
             TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
@@ -130,14 +130,15 @@ TingYun::Support::LibraryDetection.defer do
       end
 
       def each_batch(*args, **options, &block)
-        wrap_block = Proc.new do |message|
+        wrap_block = Proc.new do |batch|
           begin
-            state = TingYun::Agent::TransactionState.tl_get
+            state = TingYun::Agent::TransactionState.tl_mq_get
             ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
-            metric_name = "Message/Kafka/#{ip_and_hosts}%2FConsume%2FTopic%2F#{message.topic}"
+            metric_name = "Message/Kafka/#{ip_and_hosts}%2FConsume%2FTopic%2F#{batch.topic}"
             TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
             TingYun::Agent::Transaction.wrap(state, metric_name , :Kafka)  do
-              TingYun::Agent.record_metric("#{metric_name}/Byte",message.value.bytesize) if message.value
+              bytesize = batch.reduce(0){ |res, msg| res += (msg.value ? msg.value.bytesize : 0)}
+              TingYun::Agent.record_metric("#{metric_name}/Byte", bytesize) if bytesize > 0
               block.call(message)
             end
           rescue => e
