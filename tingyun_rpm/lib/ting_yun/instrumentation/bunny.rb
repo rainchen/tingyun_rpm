@@ -20,7 +20,9 @@ TingYun::Support::LibraryDetection.defer do
             state = TingYun::Agent::TransactionState.tl_get
             queue_name = opts[:routing_key]
             opts[:headers] = {} unless opts[:headers]
-            opts[:headers][:TingyunID] = "#{TingYun::Agent.config[:tingyunIdSecret]};c=1;x=#{state.request_guid};e=#{state.request_guid}"
+            externel_guid = tingyun_externel_guid
+            state.transaction_sample_builder.current_node["externalId"] = externel_guid
+            opts[:headers][:TingyunID] = "#{TingYun::Agent.config[:tingyunIdSecret]};c=1;x=#{state.request_guid};e=#{externel_guid}"
             metric_name = "Message/RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2FProduce%2FQueue%2F#{name}-#{queue_name}"
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq)  do
               TingYun::Agent.record_metric("#{metric_name}/Byte",payload.bytesize) if payload
@@ -30,6 +32,16 @@ TingYun::Support::LibraryDetection.defer do
             TingYun::Agent.logger.error("Failed to Bunny publish_with_tingyun : ", e)
             publish_without_tingyun(payload, opts)
           end
+        end
+
+
+        # generate a random 64 bit uuid
+        def tingyun_externel_guid
+          guid = ''
+          16.times do
+            guid << (0..15).map{|i| i.to_s(16)}[rand(16)]
+          end
+          guid
         end
 
         alias_method :publish_without_tingyun, :publish
@@ -44,8 +56,10 @@ TingYun::Support::LibraryDetection.defer do
 
         def call_with_tingyun(*args)
           begin
-            cross_app_enabled?(args[1]&&args[1][:headers]&&args[1][:headers]["TingyunID"])
+            tingyun_id_secret = args[1]&&args[1][:headers]&&args[1][:headers]["TingyunID"]
             state = TingYun::Agent::TransactionState.tl_get
+            state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
+            state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account?
             metric_name = "Message/RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2FConsume%2FQueue%2F#{queue_name}"
             Tin Yun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/#{metric_name}"})
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq)  do
@@ -65,8 +79,28 @@ TingYun::Support::LibraryDetection.defer do
       end
 
       def cross_app_enabled?(tingyun_id_secret)
-        tingyun_id_secret && ::TingYun::Agent.config[:tingyunIdSecret] && tingyun_id_secret.start_with?(::TingYun::Agent.config[:tingyunIdSecret])
+        tingyun_id_secret && ::TingYun::Agent.config[:tingyunIdSecret]
       end
+
+      def build_payload(state)
+        timings = state.timings
+        payload = {
+            :applicationId => TingYun::Agent.config[:tingyunIdSecret].split('|')[1],
+            :transactionId => state.client_transaction_id,
+            :externalId => state.extenel_req_id,
+            :time => {
+                :duration => timings.app_time_in_millis,
+                :qu => timings.queue_time_in_millis,
+                :db => timings.sql_duration,
+                :ex => timings.external_duration,
+                :rds => timings.rds_duration,
+                :mc => timings.mc_duration,
+                :mon => timings.mon_duration,
+                :code => timings.app_execute_duration
+            }
+        }
+      end
+
     end
   end
 
