@@ -58,13 +58,13 @@ TingYun::Support::LibraryDetection.defer do
           begin
             tingyun_id_secret = args[1]&&args[1][:headers]&&args[1][:headers]["TingyunID"]
             state = TingYun::Agent::TransactionState.tl_get
-            state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
-            state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account?
             metric_name = "Message/RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2FConsume%2FQueue%2F#{queue_name}"
-            Tin Yun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/#{metric_name}"})
+            TingYun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/#{metric_name}"})
+            state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq)  do
               TingYun::Agent.record_metric("#{metric_name}/Byte",args[2].bytesize) if args[2]
               call_without_tingyun(*args)
+              state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account?
             end
           rescue => e
             TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)

@@ -640,6 +640,13 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => true,
             :description => 'Enable or disable the thrift cross application feature'
+        },
+        :restart_thread_in_children => {
+            :default => true,
+            :public => false,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'Controls whether to check on running a transaction whether to respawn the harvest thread.'
         }
     }.freeze
   end

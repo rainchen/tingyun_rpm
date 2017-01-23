@@ -17,9 +17,13 @@ module TingYun
       end
 
       def on_transaction(*_)
-        return unless needs_restart?
+        return unless restart_in_children_enabled? && needs_restart?
 
         restart_harvest_thread
+      end
+
+      def restart_in_children_enabled?
+        TingYun::Agent.config[:restart_thread_in_children]
       end
 
       def mark_started(pid = Process.pid)

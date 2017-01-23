@@ -74,7 +74,6 @@ module TingYun
         @thrift_return_data = nil
         @timings = nil
         @client_req_id = nil
-        @extenel_req_id = nil
       end
 
       # TT's and SQL
