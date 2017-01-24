@@ -85,7 +85,8 @@ module TingYun
             Transaction.notice_error(e)
             raise e
           ensure
-            Transaction.stop(state)
+            # when kafka consumer in task, drop original web_action
+            Transaction.stop(state) if state.current_transaction
           end
         end
 

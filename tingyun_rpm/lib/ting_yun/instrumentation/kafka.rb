@@ -70,7 +70,7 @@ TingYun::Support::LibraryDetection.defer do
             TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka) do
               res = fetch_messages_without_tingyun(*args, **options, &block)
               bytesize = res.reduce(0){ |res, msg| res += (msg.value ? msg.value.bytesize : 0)}
-              TingYun::Agent.record_metric("#{metric_name}/Byte", bytesize) if bytesize > 0
+              TingYun::Agent.record_metric("#{metric_name}/Byte", bytesize) if bytesize.to_i > 0
               res
             end
           rescue => e
@@ -107,53 +107,66 @@ TingYun::Support::LibraryDetection.defer do
       end
     end
 
-    Kafka::Consumer.class_eval do
-      alias_method :each_message_without_tingyun, :each_message
-      alias_method :each_batch_without_tingyun, :each_batch
-      def each_message(*args, **options, &block)
-        wrap_block = Proc.new do |message|
-          begin
-            state = TingYun::Agent::TransactionState.tl_get
-            state.reset
-            ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
-            metric_name = "Message/Kafka/#{ip_and_hosts}%2FConsume%2FTopic%2F#{message.topic}"
-            TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
-            TingYun::Agent::Transaction.wrap(state, metric_name , :Kafka)  do
-              TingYun::Agent.record_metric("#{metric_name}/Byte",message.value.bytesize) if message.value
-              block.call(message)
+    if defined?(::Kafka::Consumer)
+      Kafka::Consumer.class_eval do
+        if public_method_defined? :each_message
+          alias_method :each_message_without_tingyun, :each_message
+          def each_message(*args, **options, &block)
+            wrap_block = Proc.new do |message|
+              begin
+                state = TingYun::Agent::TransactionState.tl_get
+                state.reset
+                ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+                metric_name = "Message/Kafka/#{ip_and_hosts}%2FConsume%2FTopic%2F#{message.topic}"
+                TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
+                TingYun::Agent::Transaction.wrap(state, metric_name , :Kafka)  do
+                  TingYun::Agent.record_metric("#{metric_name}/Byte", message.value.bytesize) if message.value
+                  block.call(message)
+                end
+              rescue => e
+                TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
+                block.call(message)
+              ensure
+                TingYun::Agent::Transaction.stop(state)
+              end
             end
-          rescue => e
-            TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
-            block.call(message)
-          ensure
-            TingYun::Agent::Transaction.stop(state)
+            if options.empty? && args.empty?
+              each_message_without_tingyun(&wrap_block)
+            else
+              each_message_without_tingyun(*args, **options, &wrap_block)
+            end
           end
         end
-        each_message_without_tingyun(*args, **options, &wrap_block)
-      end
 
-      def each_batch(*args, **options, &block)
-        wrap_block = Proc.new do |batch|
-          begin
-            state = TingYun::Agent::TransactionState.tl_get
-            state.reset
-            ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
-            metric_name = "Message/Kafka/#{ip_and_hosts}%2FConsume%2FTopic%2F#{batch.topic}"
-
-            TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
-            TingYun::Agent::Transaction.wrap(state, metric_name , :Kafka)  do
-              bytesize = batch.messages.reduce(0){ |res, msg| res += (msg.value ? msg.value.bytesize : 0)}
-              TingYun::Agent.record_metric("#{metric_name}/Byte", bytesize) if bytesize > 0
-              block.call(batch)
+        if public_method_defined? :each_batch
+          alias_method :each_batch_without_tingyun, :each_batch
+          def each_batch(*args, **options, &block)
+            wrap_block = Proc.new do |batch|
+              begin
+                state = TingYun::Agent::TransactionState.tl_get
+                state.reset
+                ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+                metric_name = "Message/Kafka/#{ip_and_hosts}%2FConsume%2FTopic%2F#{batch.topic}"
+                TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
+                TingYun::Agent::Transaction.wrap(state, metric_name , :Kafka)  do
+                  bytesize = batch.messages.reduce(0){ |res, msg| res += (msg.value ? msg.value.bytesize : 0)}
+                  TingYun::Agent.record_metric("#{metric_name}/Byte", bytesize) if bytesize.to_i > 0
+                  block.call(batch)
+                end
+              rescue => e
+                TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
+                block.call(batch)
+              ensure
+                TingYun::Agent::Transaction.stop(state)
+              end
             end
-          rescue => e
-            TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
-            block.call(batch)
-          ensure
-            TingYun::Agent::Transaction.stop(state)
+            if options.empty? && args.empty?
+              each_batch_without_tingyun(&wrap_block)
+            else
+              each_batch_without_tingyun(*args, **options, &wrap_block)
+            end
           end
         end
-        each_batch_without_tingyun(*args, **options, &wrap_block)
       end
     end
 
