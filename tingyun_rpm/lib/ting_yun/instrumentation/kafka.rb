@@ -1,12 +1,25 @@
 # encoding: utf-8
 
+module TingYun::Instrumentation::Kafka
+
+  KAFKA_MIN_VERSION = '0.2.0'.freeze
+  KAFKA_MAX_VERSION = '0.3.16'.freeze
+
+  def self.version_support?
+    kafka_version = TingYun::Support::VersionNumber.new(Kafka::VERSION)
+    kafka_version >= TingYun::Support::VersionNumber.new(KAFKA_MIN_VERSION) &&
+        kafka_version <= TingYun::Support::VersionNumber.new(KAFKA_MAX_VERSION)
+  end
+end
+
 TingYun::Support::LibraryDetection.defer do
   named :ruby_kafka
 
   depends_on do
     begin
       require 'kafka'
-      defined?(::Kafka) && !TingYun::Agent.config[:disable_kafka]
+      defined?(::Kafka) && !TingYun::Agent.config[:disable_kafka] &&
+          TingYun::Instrumentation::Kafka.version_support?
     rescue LoadError
       false
     end
