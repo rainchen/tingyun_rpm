@@ -33,7 +33,7 @@ module TingYun
         end
 
 
-        def stop(state, end_time = Time.now)
+        def stop(state, end_time = Time.now, summary_metric_names=[])
 
           txn = state.current_transaction
 
@@ -55,6 +55,7 @@ module TingYun
             else
               summary_metrics = EMPTY_SUMMARY_METRICS
             end
+            summary_metrics = summary_metric_names unless summary_metric_names.empty?
 
             TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
                 state,
@@ -74,7 +75,7 @@ module TingYun
           nil
         end
 
-        def wrap(state, name, category, options = {})
+        def wrap(state, name, category, options = {}, summary_metrics=[])
           Transaction.start(state, category, options.merge(:transaction_name => name))
 
           begin
@@ -86,7 +87,7 @@ module TingYun
             raise e
           ensure
             # when kafka consumer in task, drop original web_action
-            Transaction.stop(state) if state.current_transaction
+            Transaction.stop(state, Time.now, summary_metrics) if state.current_transaction
           end
         end
 

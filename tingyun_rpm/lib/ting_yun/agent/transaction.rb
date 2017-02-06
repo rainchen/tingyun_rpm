@@ -109,7 +109,7 @@ module TingYun
 
 
 
-      def stop(state, end_time, outermost_frame)
+      def stop(state, end_time, outermost_frame, summary_metrics = [])
 
         freeze_name_and_execute
 
@@ -126,7 +126,7 @@ module TingYun
         else
           summary_metrics_with_exclusive_time = EMPTY_SUMMARY_METRICS
         end
-
+        summary_metrics_with_exclusive_time = summary_metrics unless summary_metrics.empty?
 
         TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
             state,
