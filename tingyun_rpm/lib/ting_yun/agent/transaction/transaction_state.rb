@@ -17,7 +17,8 @@ module TingYun
                     :client_transaction_id,
                     :client_tingyun_id_secret,
                     :client_req_id,
-                    :thrift_return_data
+                    :thrift_return_data,
+                    :extenel_req_id
 
 
 
@@ -114,6 +115,8 @@ module TingYun
             @client_transaction_id = m.post_match
           elsif m = e.match(/r=/)
             @client_req_id = m.post_match
+          elsif m = e.match(/e=/)
+            @extenel_req_id = m.post_match
           end
         end
       end
