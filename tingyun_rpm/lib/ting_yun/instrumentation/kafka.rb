@@ -59,7 +59,7 @@ TingYun::Support::LibraryDetection.defer do
         def deliver_message(*args, **options, &block)
           begin
             state = TingYun::Agent::TransactionState.tl_get
-            ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+            ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue 'Unknown:0'
             metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
@@ -79,7 +79,7 @@ TingYun::Support::LibraryDetection.defer do
         def fetch_messages(*args, **options, &block)
           begin
             state = TingYun::Agent::TransactionState.tl_get
-            ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+            ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue 'Unknown:0'
             metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FConsume"
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
             TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
@@ -103,7 +103,7 @@ TingYun::Support::LibraryDetection.defer do
             begin
               state = TingYun::Agent::TransactionState.tl_get
               state.reset
-              ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+              ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue 'Unknown:0'
               metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{message.topic}%2FConsume"
               summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
               TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
@@ -132,7 +132,7 @@ TingYun::Support::LibraryDetection.defer do
               begin
                 state = TingYun::Agent::TransactionState.tl_get
                 state.reset
-                ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+                ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue 'Unknown:0'
                 metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{message.topic}%2FConsume"
                 summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
                 TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
@@ -162,7 +162,7 @@ TingYun::Support::LibraryDetection.defer do
               begin
                 state = TingYun::Agent::TransactionState.tl_get
                 state.reset
-                ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+                ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue 'Unknown:0'
                 metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{batch.topic}%2FConsume"
                 summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
                 TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
@@ -194,7 +194,7 @@ TingYun::Support::LibraryDetection.defer do
         begin
           state = TingYun::Agent::TransactionState.tl_get
           return produce_without_tingyun(*args, **options, &block) unless state.current_transaction
-          ip_and_hosts = @cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+          ip_and_hosts = @cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue 'Unknown:0'
           metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
           summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Produce')
           TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
@@ -216,7 +216,7 @@ TingYun::Support::LibraryDetection.defer do
           def produce(*args, **options, &block)
             begin
               state = TingYun::Agent::TransactionState.tl_get
-              ip_and_hosts = @worker.producer.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue nil
+              ip_and_hosts = @worker.producer.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue 'Unknown:0'
               metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
               summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Produce')
               TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
