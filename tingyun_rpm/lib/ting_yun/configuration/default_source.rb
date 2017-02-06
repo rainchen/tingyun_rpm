@@ -87,13 +87,6 @@ module TingYun
         Proc.new { ::TingYun::Frameworks.framework.local_env.discovered_dispatcher }
       end
 
-
-      def self.audit_log_path
-        Proc.new {
-          File.join(TingYun::Agent.config[:log_file_path], 'newrelic_audit.log')
-        }
-      end
-
       # On Rubies with string encodings support (1.9.x+), default to always
       # normalize encodings since it's safest and fast. Without that support
       # the conversions are too expensive, so only enable if overridden to.

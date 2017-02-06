@@ -23,9 +23,7 @@
 
 require 'ting_yun/frameworks'
 
-
 #if the agent had started in manual , then shouldn't start in auto again
-
 
 if defined?(Rails::VERSION)
   if Rails::VERSION::MAJOR.to_i >= 3
