@@ -638,6 +638,13 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => true,
             :description => 'Enable or disable the thrift cross application feature'
+        },
+        :'nbs.quantile' => {
+            :default => "[50,80,90,95]",
+            :public => true,
+            :type => String,
+            :allowed_from_server => true,
+            :description => 'temp'
         }
     }.freeze
   end
