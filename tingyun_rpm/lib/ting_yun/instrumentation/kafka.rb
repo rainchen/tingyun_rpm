@@ -4,11 +4,18 @@ module TingYun::Instrumentation::Kafka
 
   KAFKA_MIN_VERSION = '0.2.0'.freeze
   KAFKA_MAX_VERSION = '0.3.16'.freeze
+  RUBY_MIN_VERSION = '2.0.0'.freeze
 
   def self.version_support?
-    kafka_version = TingYun::Support::VersionNumber.new(Kafka::VERSION)
-    kafka_version >= TingYun::Support::VersionNumber.new(KAFKA_MIN_VERSION) &&
-        kafka_version <= TingYun::Support::VersionNumber.new(KAFKA_MAX_VERSION)
+    if defined? RUBY_VERSION
+      kafka_version = TingYun::Support::VersionNumber.new(Kafka::VERSION)
+      ruby_version = TingYun::Support::VersionNumber.new(RUBY_VERSION)
+      ruby_version >= TingYun::Support::VersionNumber.new(RUBY_MIN_VERSION) &&
+          kafka_version >= TingYun::Support::VersionNumber.new(KAFKA_MIN_VERSION) &&
+          kafka_version <= TingYun::Support::VersionNumber.new(KAFKA_MAX_VERSION)
+    else
+      false
+    end
   end
 end
 
