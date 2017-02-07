@@ -10,7 +10,7 @@ module TingYun
       class TraceNode
 
         attr_reader :entry_timestamp, :parent_node, :called_nodes
-        attr_accessor :metric_name, :exit_timestamp, :uri, :count, :klass, :method
+        attr_accessor :metric_name, :exit_timestamp, :uri, :count, :klass, :method, :name
 
 
 
@@ -40,13 +40,21 @@ module TingYun
         end
 
 
+        def pre_metric_name(metric_name)
+         @name ||= if metric_name.start_with?('Database ')
+            "#{metric_name.split('/')[0]}%2F#{metric_name.split('%2F')[-1]}"
+          else
+            metric_name
+          end
+        end
+
         def to_array
           [TingYun::Helper.time_to_millis(entry_timestamp),
            TingYun::Helper.time_to_millis(exit_timestamp),
-           TingYun::Support::Coerce.string(metric_name),
+           TingYun::Support::Coerce.string(pre_metric_name(metric_name)),
            TingYun::Support::Coerce.string(uri)||'',
            TingYun::Support::Coerce.int(count),
-           TingYun::Support::Coerce.string(klass)||TingYun::Support::Coerce.string(metric_name),
+           TingYun::Support::Coerce.string(klass)||TingYun::Support::Coerce.string(pre_metric_name(metric_name)),
            TingYun::Support::Coerce.string(method)||'',
            params] +
            [(@called_nodes ? @called_nodes.map{|s| s.to_array} : [])]

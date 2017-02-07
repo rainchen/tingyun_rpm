@@ -71,6 +71,7 @@ module TingYun
           end
           metrics.unshift metric_name(product, collection, operation,host,port,dbname) if collection
           metrics.unshift  "#{product}/#{host}:#{port}/#{operation}" if product=="Memcached"
+
           metrics
         end
 
