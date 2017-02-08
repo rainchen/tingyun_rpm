@@ -44,8 +44,11 @@ module TingYun
     end
 
     def time_to_millis(time)
-      mtime = (time.to_f * 1000).round
-      mtime > 0 ? mtime : time.to_f * 1000
+      (time.to_f * 1000).round
+    end
+
+    def time_to_f_millis(time)
+      (time.to_f * 1000)
     end
 
     def milliseconds_to_seconds(milliseconds)

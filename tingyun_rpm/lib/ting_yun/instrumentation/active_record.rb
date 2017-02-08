@@ -44,14 +44,14 @@ module TingYun
 
         state = TingYun::Agent::TransactionState.tl_get
         sql, name, _ = args
-        metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(
+        klass_name, *metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(
             TingYun::Helper.correctly_encoded(name),
             TingYun::Helper.correctly_encoded(sql),
             @config)
 
         scoped_metric = metrics.first
 
-        TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+        TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
           t0 = Time.now
           begin
             log_without_tingyun_instrumentation(*args, &block)

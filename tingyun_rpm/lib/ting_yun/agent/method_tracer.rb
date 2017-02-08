@@ -55,8 +55,8 @@ module TingYun
       end
 
 
-      def self.trace_execution_scoped(metric_names, options={}, callback = nil) #THREAD_LOCAL_ACCESS
-        TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metric_names, options, callback) do
+      def self.trace_execution_scoped(metric_names, options={}, callback = nil, klass_name=nil) #THREAD_LOCAL_ACCESS
+        TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metric_names, options, callback, klass_name) do
           # Using an implicit block avoids object allocation for a &block param
           yield
         end

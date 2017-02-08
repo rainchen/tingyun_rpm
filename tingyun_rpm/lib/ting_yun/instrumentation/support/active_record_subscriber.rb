@@ -38,37 +38,37 @@ module TingYun
           state = TingYun::Agent::TransactionState.tl_get
           event = pop_event(id)
           config = active_record_config_for_event(event)
-          base_metric = record_metrics(event, config)
-          notice_sql(state, event, config, base_metric)
+          base, metric = record_metrics(event, config)
+          notice_sql(state, event, config, base, metric)
         rescue Exception => e
           log_notification_error(e, name, 'finish')
         end
 
 
-        def notice_sql(state, event, config, metric)
+        def notice_sql(state, event, config, base, metric)
           stack  = state.traced_method_stack
           state.timings.sql_duration = state.timings.sql_duration + event.duration
           # enter transaction trace node
           frame = stack.push_frame(state, :active_record, event.time)
 
-          sql_sampler.notice_sql(event.payload[:sql], metric, config,
+          sql_sampler.notice_sql(event.payload[:sql], base, config,
                                  TingYun::Helper.milliseconds_to_seconds(event.duration),
                                  state, @explainer, event.payload[:binds], event.payload[:name])
 
           transaction_sampler.notice_sql(event.payload[:sql], config, event.duration,
                                          state, @explainer, event.payload[:binds], event.payload[:name])
           # exit transaction trace node
-          stack.pop_frame(state, frame, metric, event.end)
+          stack.pop_frame(state, frame, base, event.end, true, metric)
         end
 
         def record_metrics(event, config)
-          base, *other_metrics = TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(event.payload[:name],
+          metric, base, *other_metrics = TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for(event.payload[:name],
                                                                                                    TingYun::Helper.correctly_encoded(event.payload[:sql]),
                                                                                                    config)
 
           TingYun::Agent.agent.stats_engine.tl_record_scoped_and_unscoped_metrics(base, other_metrics, event.duration)
 
-          base
+          return base, metric
         end
 
 
