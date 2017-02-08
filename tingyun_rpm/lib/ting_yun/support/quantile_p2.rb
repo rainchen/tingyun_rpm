@@ -118,7 +118,7 @@ module TingYun
           (1..markers_y.length - 1).times do |i|
             n_ = markers_x[i] * obsIdx
             di = n_ - p2_n[i]
-            if ((di-1.0 >=0.000001  && p2_n[i + 1] - p2_n[i] > 1) || ((di+1.0 <=0.000001  && p2_n[i - 1] - p2_n[i] < -1))) do
+            if ((di-1.0 >=0.000001  && p2_n[i + 1] - p2_n[i] > 1) || ((di+1.0 <=0.000001  && p2_n[i - 1] - p2_n[i] < -1)))
               d = di < 0 ? -1 : 1
               qi_ = quadPred(d, i)
               if (qi_ < markers_y[i - 1] || qi_ > markers_y[i + 1])
