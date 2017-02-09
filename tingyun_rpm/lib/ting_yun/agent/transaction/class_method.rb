@@ -45,7 +45,7 @@ module TingYun
           nested_frame = txn.frame_stack.pop
 
           if txn.frame_stack.empty?
-            txn.stop(state, end_time, nested_frame)
+            txn.stop(state, end_time, nested_frame, summary_metric_names)
             state.reset
           else
             nested_name = nested_transaction_name(nested_frame.name)
