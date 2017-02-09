@@ -18,6 +18,7 @@ TingYun::Support::LibraryDetection.defer do
         def publish_with_tingyun(payload, opts = {})
           begin
             state = TingYun::Agent::TransactionState.tl_get
+            return publish_without_tingyun(payload, opts) unless state.current_transaction
             queue_name = opts[:routing_key]
             opts[:headers] = {} unless opts[:headers]
             externel_guid = tingyun_externel_guid
