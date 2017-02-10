@@ -120,8 +120,8 @@ module TingYun
         def send_data_to_endpoint(endpoint, items, container)
           TingYun::Agent.logger.info("Sending #{items.size} items to #{endpoint}")
           begin
-            if container.respond_to?(:base_quantile_hash)
-              @service.send(endpoint, items, container.base_quantile_hash)
+            if container.respond_to?(:harvest_base_quantile_hash!)
+              @service.send(endpoint, items, container.harvest_base_quantile_hash!)
             else
               @service.send(endpoint, items)
             end

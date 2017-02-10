@@ -127,6 +127,7 @@ module TingYun
           def reset!
             with_stats_lock do
               @stats_hash = StatsHash.new
+              @base_quantile_hash = BaseQuantileHash.new
             end
           end
 
@@ -136,6 +137,15 @@ module TingYun
               snapshot = @stats_hash
               snapshot.harvested_at = Time.now
               @stats_hash = StatsHash.new
+            end
+            snapshot
+          end
+
+          def harvest_base_quantile_hash!
+            snapshot = nil
+            with_stats_lock do
+              snapshot = @base_quantile_hash
+              @base_quantile_hash = BaseQuantileHash.new
             end
             snapshot
           end
