@@ -65,7 +65,7 @@ TingYun::Support::LibraryDetection.defer do
           begin
             state = TingYun::Agent::TransactionState.tl_get
             ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue TingYun::Instrumentation::Kafka::UNKNOWN
-            metric_name = "Message Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
+            metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
               TingYun::Agent.record_metric("#{metric_name}/Byte", args[0].bytesize) if args[0]
@@ -85,7 +85,7 @@ TingYun::Support::LibraryDetection.defer do
           begin
             state = TingYun::Agent::TransactionState.tl_get
             ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue TingYun::Instrumentation::Kafka::UNKNOWN
-            metric_name = "Message Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FConsume"
+            metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FConsume"
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
             TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
               res = fetch_messages_without_tingyun(*args, **options, &block)
@@ -109,11 +109,11 @@ TingYun::Support::LibraryDetection.defer do
               state = TingYun::Agent::TransactionState.tl_get
               state.reset
               ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue TingYun::Instrumentation::Kafka::UNKNOWN
-              metric_name = "#{ip_and_hosts}%2FTopic%2F#{message.topic}%2FConsume"
+              metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{message.topic}%2FConsume"
               summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
-              TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/Message/Kafka/#{metric_name}"})
-              TingYun::Agent::Transaction.wrap(state, "Message Kafka/#{metric_name}" , :Kafka, {}, summary_metrics)  do
-                TingYun::Agent.record_metric("Message Kafka/#{metric_name}/Byte",message.value.bytesize) if message.value
+              TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
+              TingYun::Agent::Transaction.wrap(state, metric_name , :Kafka, {}, summary_metrics)  do
+                TingYun::Agent.record_metric("#{metric_name}/Byte",message.value.bytesize) if message.value
                 block.call(message)
               end
             rescue => e
@@ -138,11 +138,11 @@ TingYun::Support::LibraryDetection.defer do
                 state = TingYun::Agent::TransactionState.tl_get
                 state.reset
                 ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue TingYun::Instrumentation::Kafka::UNKNOWN
-                metric_name = "#{ip_and_hosts}%2FTopic%2F#{message.topic}%2FConsume"
+                metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{message.topic}%2FConsume"
                 summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
-                TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/Message/Kafka/#{metric_name}"})
-                TingYun::Agent::Transaction.wrap(state, "Message Kafka/#{metric_name}" , :Kafka, {}, summary_metrics)  do
-                  TingYun::Agent.record_metric("Message Kafka/#{metric_name}/Byte", message.value.bytesize) if message.value
+                TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
+                TingYun::Agent::Transaction.wrap(state, metric_name , :Kafka, {}, summary_metrics)  do
+                  TingYun::Agent.record_metric("#{metric_name}/Byte", message.value.bytesize) if message.value
                   block.call(message)
                 end
               rescue => e
@@ -168,12 +168,12 @@ TingYun::Support::LibraryDetection.defer do
                 state = TingYun::Agent::TransactionState.tl_get
                 state.reset
                 ip_and_hosts = self.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue TingYun::Instrumentation::Kafka::UNKNOWN
-                metric_name = "#{ip_and_hosts}%2FTopic%2F#{batch.topic}%2FConsume"
+                metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{batch.topic}%2FConsume"
                 summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
-                TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/Message/Kafka/#{metric_name}"})
-                TingYun::Agent::Transaction.wrap(state, "Message Kafka/#{metric_name}" , :Kafka, {}, summary_metrics)  do
+                TingYun::Agent::Transaction.start(state,:message, {:transaction_name => "WebAction/#{metric_name}"})
+                TingYun::Agent::Transaction.wrap(state, metric_name , :Kafka, {}, summary_metrics)  do
                   bytesize = batch.messages.reduce(0){ |res, msg| res += (msg.value ? msg.value.bytesize : 0)}
-                  TingYun::Agent.record_metric("Message Kafka/#{metric_name}/Byte", bytesize) if bytesize.to_i > 0
+                  TingYun::Agent.record_metric("#{metric_name}/Byte", bytesize) if bytesize.to_i > 0
                   block.call(batch)
                 end
               rescue => e
@@ -200,7 +200,7 @@ TingYun::Support::LibraryDetection.defer do
           state = TingYun::Agent::TransactionState.tl_get
           return produce_without_tingyun(*args, **options, &block) unless state.current_transaction
           ip_and_hosts = @cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue TingYun::Instrumentation::Kafka::UNKNOWN
-          metric_name = "Message Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
+          metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
           summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Produce')
           TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
             TingYun::Agent.record_metric("#{metric_name}/Byte",args[0].bytesize) if args[0]
@@ -222,7 +222,7 @@ TingYun::Support::LibraryDetection.defer do
             begin
               state = TingYun::Agent::TransactionState.tl_get
               ip_and_hosts = @worker.producer.cluster.seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue TingYun::Instrumentation::Kafka::UNKNOWN
-              metric_name = "Message Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
+              metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FProduce"
               summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Produce')
               TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
                 TingYun::Agent.record_metric("#{metric_name}/Byte",args[0].bytesize) if args[0]
