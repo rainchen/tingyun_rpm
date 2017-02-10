@@ -78,28 +78,6 @@ TingYun::Support::LibraryDetection.defer do
         end
       end
 
-      if public_method_defined? :fetch_messages
-        alias_method :fetch_messages_without_tingyun, :fetch_messages
-
-        def fetch_messages(*args, **options, &block)
-          begin
-            state = TingYun::Agent::TransactionState.tl_get
-            ip_and_hosts = @seed_brokers.map{|a| [a.host, a.port].join(':')}.join(',') rescue TingYun::Instrumentation::Kafka::UNKNOWN
-            metric_name = "Message/Kafka/#{ip_and_hosts}%2FTopic%2F#{options[:topic]}%2FConsume"
-            summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('Kafka', ip_and_hosts, 'Consume')
-            TingYun::Agent::Transaction.wrap(state, metric_name, :Kafka, {}, summary_metrics) do
-              res = fetch_messages_without_tingyun(*args, **options, &block)
-              bytesize = res.reduce(0){ |res, msg| res += (msg.value ? msg.value.bytesize : 0)}
-              TingYun::Agent.record_metric("#{metric_name}/Byte", bytesize) if bytesize.to_i > 0
-              res
-            end
-          rescue => e
-            TingYun::Agent.logger.error("Failed to kafka fetch_messages : ", e)
-            fetch_messages_without_tingyun(*args, **options, &block)
-          end
-        end
-      end
-
       if public_method_defined? :each_message
         alias_method :each_message_without_tingyun, :each_message
 
