@@ -157,7 +157,7 @@ module TingYun
 
 
         TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
-        TingYun::Agent.instance.stats_engine.record_base_quantile(@base_quantile_hash)
+        TingYun::Agent.instance.stats_engine.record_base_quantile(@base_quantile_hash) if @exceptions.exceptions.empty?
       end
 
     end
