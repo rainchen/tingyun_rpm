@@ -57,7 +57,8 @@ module TingYun
                   :guid,
                   :category,
                   :default_name,
-                  :start_time
+                  :start_time,
+                  :base_quantile_hash
 
 
 
@@ -75,6 +76,7 @@ module TingYun
         @guid = client_transaction_id || generate_guid
         @frame_stack = []
         @frozen_name = nil
+        @base_quantile_hash = {}
         @default_name = TingYun::Helper.correctly_encoded(options[:transaction_name])
 
         if request = options[:request]
@@ -149,12 +151,13 @@ module TingYun
 
         TingYun::Agent.instance.sql_sampler.on_finishing_transaction(state, @frozen_name)
 
-        record_summary_metrics(outermost_node_name, end_time)
+        record_summary_metrics(state, outermost_node_name, end_time)
         @apdex.record_apdex(@frozen_name, end_time, @exceptions.had_error?)
         @exceptions.record_exceptions(@attributes)
 
 
         TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
+        TingYun::Agent.instance.stats_engine.record_base_quantile(@base_quantile_hash)
       end
 
     end

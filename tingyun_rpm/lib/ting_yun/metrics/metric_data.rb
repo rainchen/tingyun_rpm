@@ -13,11 +13,13 @@ module TingYun
       attr_accessor :metric_id
       # the actual statistics object
       attr_accessor :stats
+      attr_reader :quantile
 
-      def initialize(metric_spec, stats, metric_id)
+      def initialize(metric_spec, stats, metric_id, quantile = [])
         @metric_spec = metric_spec
         @stats = stats
         @metric_id = metric_id
+        @quantile = quantile
       end
 
       def eql?(o)
@@ -48,7 +50,11 @@ module TingYun
 
       def to_collector_array(encoder=nil)
         stat_key = metric_id || to_hash
-        [stat_key, metrics(stat_key)]
+        if quantile.empty?
+          [stat_key, metrics(stat_key)]
+        else
+          [stat_key, metrics(stat_key), quantile]
+        end
       end
 
       def to_hash

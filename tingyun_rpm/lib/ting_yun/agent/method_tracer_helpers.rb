@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'ting_yun/agent'
 require 'ting_yun/agent/transaction/transaction_state'
+require 'ting_yun/support/quantile_p2'
 
 module TingYun
   module Agent
@@ -41,6 +42,9 @@ module TingYun
                                                  "Metric #{first_name} has negative exclusive time: duration = #{duration} ms, child_time = #{frame.children_time}")
               end
               record_metrics(state, first_name, metric_names, duration, exclusive, options)
+              if TingYun::Support::QuantileP2.support? && first_name.start_with?('WebAction')
+                state.current_transaction.base_quantile_hash[first_name] = duration
+              end
             end
           end
         end

@@ -12,7 +12,7 @@ module TingYun
           return false if i.to_i == 0
           return false if i.to_i.to_s != i
         end
-        TingYun::Agent.config[:'nbs.quantile'] = quantile.map(&:to_i).to_s
+        # TingYun::Agent.config[:'nbs.quantile'] = quantile.map(&:to_i).to_s
         return true
       end
 
