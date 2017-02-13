@@ -149,8 +149,6 @@ module TingYun
 
             "postgresql" => "PostgreSQL",
 
-            "postgres" => "Postgres",
-
             "sqlite3" => "SQLite",
 
             # https://rubygems.org/gems/activerecord-jdbcpostgresql-adapter
@@ -174,7 +172,7 @@ module TingYun
             "mssql" => "MSSQL",
 
             # https://rubygems.org/gems/activerecord-sqlserver-adapter
-            "sqlserver" => "MSSQL",
+            "sqlserver" => "SQLServer",
 
             # https://rubygems.org/gems/activerecord-odbc-adapter
             "odbc" => "ODBC",

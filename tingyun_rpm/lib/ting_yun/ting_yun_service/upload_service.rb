@@ -2,6 +2,7 @@
 require 'ting_yun/metrics/metric_spec'
 require 'ting_yun/metrics/metric_data'
 require 'ting_yun/support/serialize/encodes'
+require 'ting_yun/support/quantile_p2'
 
 module TingYun
   class TingYunService
@@ -20,15 +21,15 @@ module TingYun
         TingYun::Support::Serialize::Encoders::Json
       end
 
-      def metric_data(stats_hash)
-
-        action_array, adpex_array, general_array, components_array, errors_array = build_metric_data_array(stats_hash)
+      def metric_data(stats_hash, base_quantile_hash)
+        action_array, adpex_array, general_array, components_array, errors_array = build_metric_data_array(stats_hash, base_quantile_hash)
 
         upload_data = {
             :type => 'perfMetrics',
             :timeFrom => stats_hash.started_at.to_i,
             :timeTo => stats_hash.harvested_at.to_i || Time.now.to_i,
             :interval => 60,
+            :config => {"nbs.quantile" => TingYun::Agent.config[:'nbs.quantile'] },
             :actions => action_array,
             :apdex => adpex_array,
             :components => components_array,
@@ -36,6 +37,7 @@ module TingYun
             :errors  => errors_array
         }
         result = invoke_remote(:upload, [upload_data])
+        self.quantile_cache = {}
         fill_metric_id_cache(result)
         result
       end
@@ -44,12 +46,15 @@ module TingYun
       # The collector wants to recieve metric data in a format that's different
       # # from how we store it inte -nally, so this method handles the translation.
       # # It also handles translating metric names to IDs using our metric ID cache.
-      def build_metric_data_array(stats_hash)
+      def build_metric_data_array(stats_hash, base_quantile_hash)
         action_array = []
         adpex_array = []
         general_array = []
         components_array = []
         errors_array = []
+
+        calculate_quantile(base_quantile_hash.hash)
+
         stats_hash.each do |metric_spec, stats|
 
           # Omit empty stats as an optimization
@@ -57,7 +62,7 @@ module TingYun
             metric_id = metric_id_cache[metric_spec.hash]
 
             if metric_spec.name.start_with?('WebAction','BackgroundAction')
-              action_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+              action_array << generate_action(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Apdex')
               adpex_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
@@ -85,6 +90,24 @@ module TingYun
         end
 
         [action_array, adpex_array, general_array, components_array, errors_array]
+      end
+
+      def generate_action(metric_spec, stats, metric_id)
+        if !TingYun::Support::QuantileP2.support? || metric_spec.name.start_with?('BackgroundAction')
+          TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+        else
+          quantile = self.quantile_cache[metric_spec.full_name]
+          TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id, quantile)
+        end
+      end
+
+      def calculate_quantile(base)
+        quantile = TingYun::Agent.config[:'nbs.quantile']
+        base.each do |action_name, base_list|
+          qm = TingYun::Support::QuantileP2.new(quantile[1..-2].split(',').map(&:to_i))
+          base_list.each{ |l| qm.add(l) }
+          self.quantile_cache[action_name] = qm.markers
+        end
       end
 
 

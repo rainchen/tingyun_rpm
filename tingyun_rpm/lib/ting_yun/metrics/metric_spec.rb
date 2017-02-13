@@ -8,7 +8,7 @@
 module TingYun
   module Metrics
     class MetricSpec
-      attr_accessor :name, :scope, :calleeId, :calleeName
+      attr_accessor :name, :scope, :calleeId, :calleeName, :full_name
 
       # the maximum length of a metric name or metric scope
       MAX_LENGTH = 255
@@ -16,6 +16,7 @@ module TingYun
       EMPTY_SCOPE = ''.freeze
 
       def initialize(metric_name='', metric_scope=nil)
+        @full_name = metric_name.to_s
         if metric_name.to_s.length > MAX_LENGTH
           @name = metric_name.to_s[LENGTH_RANGE]
         else
