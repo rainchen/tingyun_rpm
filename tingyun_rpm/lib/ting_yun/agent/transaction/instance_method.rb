@@ -1,5 +1,5 @@
 # encoding: utf-8
-
+require 'ting_yun/support/quantile_p2'
 module TingYun
   module Agent
     class Transaction
@@ -61,9 +61,13 @@ module TingYun
 
         alias_method :ignore, :needs_middleware_summary_metrics?
 
-        def record_summary_metrics(outermost_node_name,end_time)
+        def record_summary_metrics(state, outermost_node_name,end_time)
           unless @frozen_name == outermost_node_name
-            @metrics.record_unscoped(@frozen_name, TingYun::Helper.time_to_f_millis(end_time.to_f - start_time.to_f))
+            time = TingYun::Helper.time_to_millis(end_time.to_f - start_time.to_f)
+            @metrics.record_unscoped(@frozen_name, time)
+            if TingYun::Support::QuantileP2.support? && @frozen_name.start_with?('WebAction')
+              state.current_transaction.base_quantile_hash[@frozen_name] = time
+            end
           end
         end
 

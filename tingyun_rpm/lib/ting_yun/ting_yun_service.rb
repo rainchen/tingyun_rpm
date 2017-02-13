@@ -29,7 +29,8 @@ module TingYun
                   :metric_id_cache,
                   :applicationId,
                   :ssl_cert_store,
-                  :shared_tcp_connection
+                  :shared_tcp_connection,
+                  :quantile_cache
 
 
     def initialize(license_key=nil)
@@ -39,6 +40,7 @@ module TingYun
       @data_version = TingYun::VERSION::STRING
       @marshaller =TingYun::Support::Serialize::JsonMarshaller.new
       @metric_id_cache = {}
+      @quantile_cache = {}
     end
 
     def connect(settings={})

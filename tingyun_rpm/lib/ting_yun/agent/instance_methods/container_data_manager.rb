@@ -120,7 +120,11 @@ module TingYun
         def send_data_to_endpoint(endpoint, items, container)
           TingYun::Agent.logger.info("Sending #{items.size} items to #{endpoint}")
           begin
-            @service.send(endpoint, items)
+            if container.respond_to?(:harvest_base_quantile_hash!)
+              @service.send(endpoint, items, container.harvest_base_quantile_hash!)
+            else
+              @service.send(endpoint, items)
+            end
           rescue => e
             TingYun::Agent.logger.info("Unable to send #{endpoint} data, will try again later. Error: ", e)
             # container.merge!(items)

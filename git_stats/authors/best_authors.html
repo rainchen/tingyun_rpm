@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitStats - tingyun-ruby-agent</title>
+    <meta charset='utf-8'>
+    <link href='../assets/bootstrap/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <style>
+      body { padding-top: 60px; }
+    </style>
+    <link href='../assets/bootstrap/css/bootstrap-responsive.min.css' rel='stylesheet' type='text/css'>
+    <script src='../assets/jquery.min.js' type='text/javascript'></script>
+    <script src='../assets/bootstrap/js/bootstrap.min.js' type='text/javascript'></script>
+    <script src='../assets/highstock.js' type='text/javascript'></script>
+  </head>
+  <body>
+    <div class='navbar navbar-fixed-top'>
+      <div class='navbar-inner'>
+        <div class='container'>
+          <a class='btn btn-navbar' data-target='.nav-collapse' data-toggle='collapse'>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+          </a>
+          <a class='brand' href='../index.html'>GitStats - tingyun-ruby-agent</a>
+          <div class='nav-collapse collapse'>
+            <ul class='nav'>
+              <li class=''>
+                <a href='../general.html'>General</a>
+              </li>
+              <li class=''>
+                <a href='../activity/by_date.html'>Activity</a>
+              </li>
+              <li class='active'>
+                <a href='best_authors.html'>Authors</a>
+              </li>
+              <li class=''>
+                <a href='../files/by_date.html'>Files</a>
+              </li>
+              <li class=''>
+                <a href='../lines/by_date.html'>Lines</a>
+              </li>
+              <li class=''>
+                <a href='../comments/by_date.html'>Comments</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='container'>
+      <div class='tabbable tabs-left'>
+        <ul class='nav nav-tabs'>
+          <li class='active'>
+            <a href='best_authors.html'>Best authors</a>
+          </li>
+          <li class=''>
+            <a href='commits_sum_by_author_by_date.html'>Commits sum by author by date</a>
+          </li>
+          <li class=''>
+            <a href='changed_lines_by_author_by_date.html'>Changed lines by author by date</a>
+          </li>
+          <li class=''>
+            <a href='insertions_by_author_by_date.html'>Lines added by author by date</a>
+          </li>
+          <li class=''>
+            <a href='deletions_by_author_by_date.html'>Lines deleted by author by date</a>
+          </li>
+        </ul>
+        <div class='tab-content'>
+          <div class='tab-pane active'>
+            <div class='page-header'>
+              <h1 class='pagination-centered'>Best authors</h1>
+            </div>
+            <table class='table table-bordered table-condensed table-hover'>
+              <tr>
+                <th>#</th>
+                <th>Author</th>
+                <th>Commits</th>
+                <th>Lines added</th>
+                <th>Lines deleted</th>
+                <th>First_commit</th>
+                <th>Last commit</th>
+                <th></th>
+              </tr>
+              <tr>
+                <th>1</th>
+                <th>anehing &lt;anehing@gmail.com&gt;</th>
+                <td>390</td>
+                <td>96555</td>
+                <td>4598</td>
+                <td>January 12, 2016 18:19</td>
+                <td>October 14, 2016 18:34</td>
+                <td>
+                  <a class='btn' href='anehing/activity/by_date.html'>Activity</a>
+                </td>
+                <td>
+                  <a class='btn' href='anehing/author_details/commits_by_date.html'>Details</a>
+                </td>
+              </tr>
+              <tr>
+                <th>2</th>
+                <th>liuhq &lt;liuhq@ce082a47-4e5e-4a2f-b045-a6c6c2a1a5da&gt;</th>
+                <td>276</td>
+                <td>35318</td>
+                <td>19467</td>
+                <td>November 09, 2015 06:37</td>
+                <td>August 04, 2016 02:26</td>
+                <td>
+                  <a class='btn' href='liuhq/activity/by_date.html'>Activity</a>
+                </td>
+                <td>
+                  <a class='btn' href='liuhq/author_details/commits_by_date.html'>Details</a>
+                </td>
+              </tr>
+              <tr>
+                <th>3</th>
+                <th>tingyun-ruby-agent &lt;liuhq@tingyun.com&gt;</th>
+                <td>38</td>
+                <td>160</td>
+                <td>197</td>
+                <td>October 26, 2016 19:48</td>
+                <td>February 06, 2017 17:56</td>
+                <td>
+                  <a class='btn' href='tingyun_ruby_agent/activity/by_date.html'>Activity</a>
+                </td>
+                <td>
+                  <a class='btn' href='tingyun_ruby_agent/author_details/commits_by_date.html'>Details</a>
+                </td>
+              </tr>
+              <tr>
+                <th>4</th>
+                <th>wst07261144 &lt;wst07261144@gmail.com&gt;</th>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>November 21, 2016 17:20</td>
+                <td>November 21, 2016 17:20</td>
+                <td>
+                  <a class='btn' href='wst07261144/activity/by_date.html'>Activity</a>
+                </td>
+                <td>
+                  <a class='btn' href='wst07261144/author_details/commits_by_date.html'>Details</a>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
