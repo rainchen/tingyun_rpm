@@ -27,6 +27,15 @@ module TingYun
           end
         end
 
+        def self.metric_name_others(product, collection, operation)
+          collection ||= 'NULL'
+          if checkNosql(product)
+            "#{product}%2F#{collection}/#{operation}"
+          else
+            "Database #{product}%2F#{collection}/#{operation}"
+          end
+        end
+
         def self.product_suffixed_rollup(product,suffix)
           if checkNosql(product)
             "#{product}/NULL/#{suffix}"
@@ -44,7 +53,7 @@ module TingYun
         def self.metrics_for(product, operation, host = UNKNOWN, port = 0, dbname = UNKNOWN, collection = nil,  generic_product = nil )
           dbname ||= UNKNOWN
           host ||= UNKNOWN
-          port ||= 0
+          port ||= UNKNOWN
           operation = operation.to_s.upcase
           if overrides = overridden_operation_and_collection   # [method, model_name, product]
             if should_override?(overrides, product, generic_product)
@@ -71,7 +80,7 @@ module TingYun
           end
           metrics.unshift metric_name(product, collection, operation,host,port,dbname) if collection
           metrics.unshift  "#{product}/#{host}:#{port}/#{operation}" if product=="Memcached"
-
+          metrics.unshift  metric_name_others(product, collection, operation)
           metrics
         end
 

@@ -52,9 +52,9 @@ TingYun::Support::LibraryDetection.defer do
             model      = resource.model
             state = TingYun::Agent::TransactionState.tl_get
             *params = get_metrics_params(:create, model)
-            metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
+            klass_name, metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
               t0 = Time.now
               begin
                 serial     = model.serial(name)
@@ -105,9 +105,9 @@ TingYun::Support::LibraryDetection.defer do
           define_method method do |*args, &block|
             state = TingYun::Agent::TransactionState.tl_get
             *params = get_metrics_params(method, *args, &block)
-            metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
+            klass_name, metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
               t0 = Time.now
               begin
                 send "#{method}_without_tingyun_trace", *args, &block
@@ -149,9 +149,9 @@ TingYun::Support::LibraryDetection.defer do
         def aggregate(*args, &block)
           state = TingYun::Agent::TransactionState.tl_get
           *params = get_metrics_params(:read, *args, &block)
-          metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
+          klass_name, metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
-          TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+          TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
             t0 = Time.now
             begin
               aggregate_without_tingyun_trace(*args, &block)

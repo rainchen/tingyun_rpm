@@ -32,7 +32,12 @@ module TingYun
       def load_instrumentation_files(pattern)
         Dir.glob(pattern) do |file|
           begin
-            require file.to_s
+            if file.to_s.include?('instrumentation/kafka.rb')
+              # (**options) will report syntax error when ruby version under 2.0.0
+              require file.to_s if (defined? RUBY_VERSION) && (TingYun::Support::VersionNumber.new(RUBY_VERSION) >= TingYun::Support::VersionNumber.new('2.0.0'.freeze))
+            else
+              require file.to_s
+            end
           rescue LoadError => e
             TingYun::Agent.logger.warn "Error loading instrumentation file '#{file}':", e
           end

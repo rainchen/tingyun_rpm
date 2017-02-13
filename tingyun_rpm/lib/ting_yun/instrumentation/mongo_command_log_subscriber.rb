@@ -30,12 +30,12 @@ module TingYun
           state.timings.mon_duration = state.timings.mon_duration +  event.duration * 1000
           started_event = operations.delete(event.operation_id)
 
-          base, *other_metrics = metrics(started_event)
+          klass_name, base, *other_metrics = metrics(started_event)
 
           TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
               base, other_metrics, event.duration*1000
           )
-          notice_nosql_statement(state, started_event, base, event.duration)
+          notice_nosql_statement(state, started_event, base, event.duration, klass_name)
         rescue Exception => e
           log_notification_error('completed', e)
         end
@@ -68,8 +68,8 @@ module TingYun
       end
 
       def metrics(event)
-
-        TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB, TingYun::Agent::Datastore::Mongo.transform_operation(event.command_name), event.address.host, event.address.port, event.database_name, collection(event))
+        klass_name, *metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB, TingYun::Agent::Datastore::Mongo.transform_operation(event.command_name), event.address.host, event.address.port, event.database_name, collection(event))
+        return klass_name, metrics
       end
 
       def generate_statement(event)
@@ -80,7 +80,7 @@ module TingYun
         )
       end
 
-      def notice_nosql_statement(state, event, metric, duration)
+      def notice_nosql_statement(state, event, metric, duration, klass_name)
         end_time = Time.now.to_f
 
         stack  = state.traced_method_stack
@@ -91,7 +91,7 @@ module TingYun
         transaction_sampler.notice_nosql_statement(generate_statement(event),duration*1000)
 
         # exit transaction trace node
-        stack.pop_frame(state, frame, metric, end_time)
+        stack.pop_frame(state, frame, metric, end_time, true, klass_name)
       end
 
       def transaction_sampler

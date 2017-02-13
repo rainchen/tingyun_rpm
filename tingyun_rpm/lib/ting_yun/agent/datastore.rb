@@ -10,8 +10,8 @@ module TingYun
       def self.wrap(product, operation, collection = nil, ip_address = nil, port = nil, dbname=nil,  callback = nil )
         return yield unless operation
 
-        metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, ip_address , port, dbname,collection )
-        TingYun::Agent::MethodTracer.trace_execution_scoped(metrics) do
+        klass_name, *metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(product, operation, ip_address , port, dbname,collection )
+        TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
           t0 = Time.now
           begin
             yield

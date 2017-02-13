@@ -63,7 +63,7 @@ module TingYun
 
         def record_summary_metrics(outermost_node_name,end_time)
           unless @frozen_name == outermost_node_name
-            @metrics.record_unscoped(@frozen_name, TingYun::Helper.time_to_millis(end_time.to_f - start_time.to_f))
+            @metrics.record_unscoped(@frozen_name, TingYun::Helper.time_to_f_millis(end_time.to_f - start_time.to_f))
           end
         end
 

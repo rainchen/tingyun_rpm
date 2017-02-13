@@ -59,7 +59,7 @@ module TingYun
         @current_node
       end
 
-      def trace_exit(metric_name, time)
+      def trace_exit(metric_name, time, klass_name)
         if @current_node.is_a?(PlaceholderNode)
           @current_node.depth -= 1
           if @current_node.depth == 0
@@ -67,6 +67,7 @@ module TingYun
           end
         else
           @current_node.metric_name = metric_name
+          @current_node.klass = klass_name
           @current_node.end_trace(time.to_f - @trace_start)
           @current_node = @current_node.parent_node
         end
