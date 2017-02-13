@@ -63,6 +63,7 @@ module TingYun
       @applicationId = nil
       @appSessionKey = nil
       @metric_id_cache = {}
+      @quantile_cache = {}
       close_shared_connection
     end
 
