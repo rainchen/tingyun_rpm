@@ -124,11 +124,5 @@ module TingYun
       raise error
     end
 
-
-
-
-
-
-
   end
 end

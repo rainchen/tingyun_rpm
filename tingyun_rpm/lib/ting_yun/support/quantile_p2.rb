@@ -7,12 +7,11 @@ module TingYun
       def self.support?
         return false if !TingYun::Agent.config[:'nbs.quantile']
         quantile = TingYun::Agent.config[:'nbs.quantile'][1..-2].split(',')
-        return false if quantile.size > quantile.uniq.size
+        return false if quantile.empty? || (quantile.size > quantile.uniq.size)
         quantile.each do |i|
           return false if i.to_i == 0
           return false if i.to_i.to_s != i
         end
-        # TingYun::Agent.config[:'nbs.quantile'] = quantile.map(&:to_i).to_s
         return true
       end
 
