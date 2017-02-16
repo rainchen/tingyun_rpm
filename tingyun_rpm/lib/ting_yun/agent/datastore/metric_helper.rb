@@ -27,7 +27,7 @@ module TingYun
           end
         end
 
-        def self.metric_name1(product, collection, operation)
+        def self.metric_name_others(product, collection, operation)
           collection ||= 'NULL'
           if checkNosql(product)
             "#{product}%2F#{collection}/#{operation}"
@@ -80,7 +80,7 @@ module TingYun
           end
           metrics.unshift metric_name(product, collection, operation,host,port,dbname) if collection
           metrics.unshift  "#{product}/#{host}:#{port}/#{operation}" if product=="Memcached"
-          metrics.unshift  metric_name1(product, collection, operation)
+          metrics.unshift  metric_name_others(product, collection, operation)
           metrics
         end
 
