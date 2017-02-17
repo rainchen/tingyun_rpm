@@ -1,17 +1,14 @@
 # encoding: utf-8
-
+require 'json'
 module TingYun
   module Support
     class QuantileP2
 
       def self.support?
         return false if !TingYun::Agent.config[:'nbs.quantile']
-        quantile = TingYun::Agent.config[:'nbs.quantile'][1..-2].split(',')
-        return false if quantile.empty? || (quantile.size > quantile.uniq.size)
-        quantile.each do |i|
-          return false if i.to_i == 0
-          return false if i.to_i.to_s != i
-        end
+        quantile = TingYun::Agent.config[:'nbs.quantile']
+        quantile = JSON.parse(quantile) rescue false unless quantile.is_a?(Array)
+        return false if !quantile || quantile.empty? || (quantile.size > quantile.uniq.size) || quantile.any? { |i| i.to_i == 0 }
         return true
       end
 

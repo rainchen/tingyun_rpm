@@ -3,6 +3,7 @@ require 'ting_yun/metrics/metric_spec'
 require 'ting_yun/metrics/metric_data'
 require 'ting_yun/support/serialize/encodes'
 require 'ting_yun/support/quantile_p2'
+require 'json'
 
 module TingYun
   class TingYunService
@@ -105,7 +106,7 @@ module TingYun
         if TingYun::Support::QuantileP2.support?
           quantile = TingYun::Agent.config[:'nbs.quantile']
           base.each do |action_name, base_list|
-            qm = TingYun::Support::QuantileP2.new(quantile[1..-2].split(',').map(&:to_i))
+            qm = TingYun::Support::QuantileP2.new(JSON.parse(quantile))
             base_list.each{ |l| qm.add(l) }
             self.quantile_cache[action_name] = qm.markers
           end
