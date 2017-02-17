@@ -5,6 +5,14 @@ module TingYun
     class Transaction
       module InstanceMethod
 
+        def ignore!
+          @ignore_this_transaction = true
+        end
+
+        def ignore?
+          @ignore_this_transaction
+        end
+
         def create_nested_frame(state, category, options)
           @has_children = true
           frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)

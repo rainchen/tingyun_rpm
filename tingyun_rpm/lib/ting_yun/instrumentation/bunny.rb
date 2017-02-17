@@ -70,7 +70,7 @@ TingYun::Support::LibraryDetection.defer do
               state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account?
             end
           rescue => e
-            TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
+            TingYun::Agent.logger.debug("Failed to Bunny call_with_tingyun : ", e)
             call_without_tingyun(*args)
           ensure
             TingYun::Agent::Transaction.stop(state, Time.now, summary_metrics)
