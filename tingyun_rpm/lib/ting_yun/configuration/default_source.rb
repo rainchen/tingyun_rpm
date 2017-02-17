@@ -670,7 +670,7 @@ module TingYun
             :description => 'Controls whether to check on running a transaction whether to respawn the harvest thread.'
         },
         :'nbs.quantile' => {
-            :default => "[50,80,90,95]",
+            :default => "[]",
             :public => true,
             :type => String,
             :allowed_from_server => true,
