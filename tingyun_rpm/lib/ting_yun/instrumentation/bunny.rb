@@ -24,7 +24,7 @@ TingYun::Support::LibraryDetection.defer do
             externel_guid = tingyun_externel_guid
             state.transaction_sample_builder.current_node["externalId"] = externel_guid
             opts[:headers][:TingyunID] = "#{TingYun::Agent.config[:tingyunIdSecret]};c=1;x=#{state.request_guid};e=#{externel_guid}"
-            metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{name}-#{queue_name}%2FProduce"
+            metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{name}-#{queue_name}/Produce"
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq, {}, summary_metrics)  do
               TingYun::Agent.record_metric("#{metric_name}/Byte",payload.bytesize) if payload
@@ -60,7 +60,7 @@ TingYun::Support::LibraryDetection.defer do
           begin
             tingyun_id_secret = args[1]&&args[1][:headers]&&args[1][:headers]["TingyunID"]
             state = TingYun::Agent::TransactionState.tl_get
-            metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{queue_name}%2FConsume"
+            metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{queue_name}/Consume"
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Consume')
             TingYun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/Message/RabbitMQ/#{metric_name}"})
             state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)

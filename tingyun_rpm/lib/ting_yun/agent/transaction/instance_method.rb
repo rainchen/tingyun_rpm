@@ -65,7 +65,7 @@ module TingYun
           unless @frozen_name == outermost_node_name
             time = TingYun::Helper.time_to_millis(end_time.to_f - start_time.to_f)
             @metrics.record_unscoped(@frozen_name, time)
-            if TingYun::Support::QuantileP2.support? && @frozen_name.start_with?('WebAction')
+            if @frozen_name.start_with?('WebAction')
               state.current_transaction.base_quantile_hash[@frozen_name] = time
             end
           end
