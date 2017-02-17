@@ -97,7 +97,7 @@ module TingYun
         if !TingYun::Support::QuantileP2.support? || metric_spec.name.start_with?('BackgroundAction')
           TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
         else
-          quantile = self.quantile_cache[metric_spec.full_name]
+          quantile = self.quantile_cache[metric_spec.full_name] || []
           TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id, quantile)
         end
       end
