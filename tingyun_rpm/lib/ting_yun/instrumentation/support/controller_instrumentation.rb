@@ -202,7 +202,7 @@ module TingYun
 
           state = TingYun::Agent::TransactionState.tl_get
 
-          skip_tracing = !state.is_execution_traced?
+          skip_tracing = !state.execution_traced?
 
           if skip_tracing
             state.current_transaction.ignore! if state.current_transaction
