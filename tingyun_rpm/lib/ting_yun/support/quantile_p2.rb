@@ -117,7 +117,7 @@ module TingYun
             p2_n[i] += 1
           end
 
-          (1..markers_y.length - 1).each do |i|
+          (1..markers_y.length - 2).each do |i|
 
             n_ = markers_x[i] * obsIdx
             di = n_ - p2_n[i]
