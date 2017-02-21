@@ -56,12 +56,6 @@ TingYun::Support::LibraryDetection.defer do
       config.server_middleware do |chain|
         chain.add TingYun::SidekiqInstrumentation
       end
-
-      if config.respond_to?(:error_handlers)
-        config.error_handlers << Proc.new do |error, *_|
-          TingYun::Agent.notice_error(error)
-        end
-      end
     end
   end
 end
