@@ -7,7 +7,7 @@ module TingYun
 
         attr_accessor :agent_attributes, :request_params
         def initialize
-          @agent_attributes  = {}
+          @agent_attributes  = {:httpStatus => 0} #defaul value
           @request_params = {}
         end
 
