@@ -52,7 +52,7 @@ module TingYun
           !category || frame_stack.size == 1 || similar_category?(category)
         end
 
-        WEB_TRANSACTION_CATEGORIES = [:controller, :uri, :rack, :sinatra, :grape, :middleware, :thrift, :action_cable, :message].freeze
+        WEB_TRANSACTION_CATEGORIES = [:controller, :rack, :sinatra, :grape, :action_cable, :message].freeze
 
         def web_category?(category)
           WEB_TRANSACTION_CATEGORIES.include?(category)
