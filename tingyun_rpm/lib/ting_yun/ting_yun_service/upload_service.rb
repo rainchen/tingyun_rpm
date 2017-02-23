@@ -106,7 +106,7 @@ module TingYun
         if TingYun::Support::QuantileP2.support?
           quantile = TingYun::Agent.config[:'nbs.quantile']
           base.each do |action_name, base_list|
-            qm = TingYun::Support::QuantileP2.new(JSON.parse(quantile))
+            qm = TingYun::Support::QuantileP2.new(JSON.parse(quantile).map{|i| i.to_f/100})
             base_list.each{ |l| qm.add(l) }
             self.quantile_cache[action_name] = qm.markers
           end
