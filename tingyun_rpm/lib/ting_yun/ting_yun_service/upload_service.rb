@@ -30,13 +30,13 @@ module TingYun
             :timeFrom => stats_hash.started_at.to_i,
             :timeTo => stats_hash.harvested_at.to_i || Time.now.to_i,
             :interval => 60,
-            :config => {"nbs.quantile" => TingYun::Agent.config[:'nbs.quantile'] },
             :actions => action_array,
             :apdex => adpex_array,
             :components => components_array,
             :general => general_array,
             :errors  => errors_array
         }
+        upload_data.merge!(:config => {"nbs.quantile" => TingYun::Agent.config[:'nbs.quantile']}) if TingYun::Agent.config[:'nbs.quantile']
         result = invoke_remote(:upload, [upload_data])
         self.quantile_cache = {}
         fill_metric_id_cache(result)

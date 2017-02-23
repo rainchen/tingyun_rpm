@@ -668,13 +668,6 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => false,
             :description => 'Controls whether to check on running a transaction whether to respawn the harvest thread.'
-        },
-        :'nbs.quantile' => {
-            :default => "[]",
-            :public => true,
-            :type => String,
-            :allowed_from_server => true,
-            :description => 'temp'
         }
     }.freeze
   end

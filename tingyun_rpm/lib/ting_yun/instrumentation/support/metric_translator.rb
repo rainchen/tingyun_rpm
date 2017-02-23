@@ -25,13 +25,12 @@ module TingYun
             collection = collection_name_from_rename_selector(payload)
           end
 
-          _, *metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB,
+          TingYun::Agent::Datastore::MetricHelper.metrics_for(MONGODB,
                                                               TingYun::Agent::Datastore::Mongo.transform_operation(name),
                                                               host_port[0],
                                                               host_port[1],
                                                               payload[:database],
                                                               collection)
-          metrics
         rescue => e
           TingYun::Agent.logger.debug("Failure during Mongo metric generation", e)
           nil
