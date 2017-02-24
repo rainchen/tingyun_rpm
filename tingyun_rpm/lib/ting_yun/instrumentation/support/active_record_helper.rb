@@ -149,6 +149,8 @@ module TingYun
 
             "postgresql" => "PostgreSQL",
 
+            "postgres" => 'PostgreSQL',
+
             "sqlite3" => "SQLite",
 
             # https://rubygems.org/gems/activerecord-jdbcpostgresql-adapter

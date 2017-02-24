@@ -52,7 +52,7 @@ TingYun::Support::LibraryDetection.defer do
             model      = resource.model
             state = TingYun::Agent::TransactionState.tl_get
             *params = get_metrics_params(:create, model)
-            klass_name, metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
+            klass_name, *metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
             TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
               t0 = Time.now
@@ -105,7 +105,7 @@ TingYun::Support::LibraryDetection.defer do
           define_method method do |*args, &block|
             state = TingYun::Agent::TransactionState.tl_get
             *params = get_metrics_params(method, *args, &block)
-            klass_name, metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
+            klass_name, *metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
             TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
               t0 = Time.now
@@ -149,7 +149,7 @@ TingYun::Support::LibraryDetection.defer do
         def aggregate(*args, &block)
           state = TingYun::Agent::TransactionState.tl_get
           *params = get_metrics_params(:read, *args, &block)
-          klass_name, metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
+          klass_name, *metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
           TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
             t0 = Time.now
