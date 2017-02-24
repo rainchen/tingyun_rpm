@@ -41,7 +41,7 @@ TingYun::Support::LibraryDetection.defer do
             args[1] = (::Module.private_method_defined? :to_resource_url) ? to_resource_url(args[1]) : urify(args[1])
             proxy = no_proxy?(args[1]) ? nil : @proxy
             tingyun_request = TingYun::Http::HttpClientRequest.new(proxy, *args, &block)
-            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{tingyun_request.uri}/http_client%2Fhttp")
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{tingyun_request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/http_client%2Fhttp")
             raise e
           end
         end

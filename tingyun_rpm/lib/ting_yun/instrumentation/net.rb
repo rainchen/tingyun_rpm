@@ -36,7 +36,7 @@ TingYun::Support::LibraryDetection.defer do
           begin
             get_response_without_tingyun(uri_or_host, path , port , &block)
           rescue => e
-            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{uri_or_host.to_s.gsub('/','%2F')}/net%2Fhttp")
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{uri_or_host.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/net%2Fhttp")
             raise e
           end
         end
@@ -47,7 +47,7 @@ TingYun::Support::LibraryDetection.defer do
           begin
             start_without_tingyun(address, *arg, &block)
           rescue => e
-            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{address.to_s.gsub('/','%2F')}/net%2Fhttp")
+            ::TingYun::Instrumentation::Support::ExternalError.handle_error(e, "External/#{address.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/net%2Fhttp")
             raise e
           end
         end

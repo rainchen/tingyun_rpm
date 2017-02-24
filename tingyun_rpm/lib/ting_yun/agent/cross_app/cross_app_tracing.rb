@@ -37,7 +37,7 @@ module TingYun
           response = yield
           capture_exception(response, request)
         rescue => e
-          klass = "External/#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
+          klass = "External/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
           handle_error(e, klass)
         ensure
           finish_trace(state, t0, node, request, response)
@@ -123,8 +123,8 @@ module TingYun
 
       def metrics_for_regular_request( request )
         metrics = []
-        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
-        metrics << "External/#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
+        metrics << "External/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
+        metrics << "External/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
 
         return metrics
       end
@@ -157,7 +157,7 @@ module TingYun
       # +response+.
       def metrics_for_cross_app_response(request, response )
         my_data =  TingYun::Support::Serialize::JSONWrapper.load get_ty_data_header(response).gsub("'",'"')
-        uri = "#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
+        uri = "#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
         metrics = []
         metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
         metrics << "External/#{my_data["action"]}:#{uri}"
