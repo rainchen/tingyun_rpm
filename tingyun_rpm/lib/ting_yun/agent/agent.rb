@@ -10,7 +10,7 @@ require 'ting_yun/agent/dispatcher'
 require 'ting_yun/agent/collector/middle_ware_collector'
 require 'ting_yun/agent/cross_app/cross_app_monitor'
 require 'ting_yun/agent/collector/transaction_sampler'
-
+require 'ting_yun/vm/monotonic_gc_profiler'
 
 # The Agent is a singleton that is instantiated when the plugin is
 # activated.  It collects performance data from ruby applications
@@ -26,7 +26,7 @@ module TingYun
       end
 
       # service for communicating with collector
-      attr_accessor :service, :cross_app_monitor, :middleware
+      attr_accessor :service, :cross_app_monitor, :middleware, :monotonic_gc_profiler
       attr_reader :events
 
       extend ClassMethods
@@ -44,8 +44,11 @@ module TingYun
         @cross_app_monitor = TingYun::Agent::CrossAppMonitor.new(@events)
         @middleware = TingYun::Agent::Collector::MiddleWareCollector.new(@events)
 
+        @monotonic_gc_profiler = TingYun::Vm::MonotonicGCProfiler.new
         init_containers
       end
+
+
 
       def start
         # should hava the vaild app_name, unstart-state and able to start

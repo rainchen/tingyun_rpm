@@ -327,6 +327,13 @@ module TingYun
             :allowed_from_server => true,
             :description => 'Enable or disable Specifies External  request parameters  '
         },
+        :disable_gc_profiler => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'If <code>true</code>, disables the use of GC::Profiler to measure time spent in garbage collection'
+        },
         :agent_log_file_path => {
             :default => 'log/',
             :public => true,
