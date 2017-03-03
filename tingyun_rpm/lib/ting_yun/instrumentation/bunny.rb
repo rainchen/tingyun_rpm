@@ -8,6 +8,7 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     TingYun::Agent.logger.info 'Installing bunny(for rabbitmq) Instrumentation'
+    require 'ting_yun/support/helper'
   end
 
   executes do
@@ -23,8 +24,14 @@ TingYun::Support::LibraryDetection.defer do
             opts[:headers] = {} unless opts[:headers]
             externel_guid = tingyun_externel_guid
             state.transaction_sample_builder.current_node["externalId"] = externel_guid
-            opts[:headers][:TingyunID] = "#{TingYun::Agent.config[:tingyunIdSecret]};c=1;x=#{state.request_guid};e=#{externel_guid}"
-            metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{name}-#{queue_name}/Produce"
+            opts[:headers][:TingyunID] = "#{TingYun::Agent.config[:tingyunIdSecret]};c=1;x=#{state.request_guid};e=#{externel_guid};s=#{TingYun::Helper.time_to_millis(Time.now)}"
+            metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2F"
+            if name.empty?
+              metric_name << "Queue%2F#{queue_name}/Produce"
+            else
+              metric_name << "Exchange%2F#{name}/Produce"
+            end
+
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq, {}, summary_metrics)  do
               TingYun::Agent.record_metric("#{metric_name}/Byte",payload.bytesize) if payload
