@@ -52,7 +52,8 @@ TingYun::Support::LibraryDetection.defer do
             tingyun_id = "#{cross_app_id};c=1;x=#{state.request_guid}"
 
             data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
-            @oprot.write_field_begin("TingyunField", 11, 6)
+            TingYun::Agent.logger.info("thift will send TingyunID : ", tingyun_id)
+            @oprot.write_field_begin("TingyunField", 11, 40000)
             @oprot.write_string(data)
             @oprot.write_field_end
           rescue => e
