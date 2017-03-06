@@ -5,10 +5,11 @@ module TingYun
     class Transaction
       class Attributes
 
-        attr_accessor :agent_attributes, :request_params
+        attr_accessor :agent_attributes, :request_params, :custom_params
         def initialize
           @agent_attributes  = {:httpStatus => 0} #defaul value
           @request_params = {}
+          @custom_params = {}
         end
 
         # no longer to care about the value if nil or not
@@ -20,6 +21,9 @@ module TingYun
           @request_params.merge!(hash) if hash
         end
 
+        def add_custom_params(key, value)
+          @custom_params[key] = value
+        end
       end
     end
   end

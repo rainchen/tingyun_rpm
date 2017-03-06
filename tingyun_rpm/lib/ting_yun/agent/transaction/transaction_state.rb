@@ -18,7 +18,8 @@ module TingYun
                     :client_tingyun_id_secret,
                     :client_req_id,
                     :thrift_return_data,
-                    :extenel_req_id
+                    :extenel_req_id,
+                    :externel_time
 
 
 
@@ -117,6 +118,8 @@ module TingYun
             @client_req_id = m.post_match
           elsif m = e.match(/e=/)
             @extenel_req_id = m.post_match
+          elsif m = e.match(/s=/)
+            @externel_time = m.post_match
           end
         end
       end
@@ -149,6 +152,21 @@ module TingYun
         else
           return false
         end
+      end
+
+      # if you wanna call the method, you must make sure current_transaction is not nil at first
+      # if current_transaction
+      #    add_custom_params(:key1,:value1)
+      #    add_custom_params(:key2,:value2)
+      # end
+      # public api
+      def add_custom_params(key, value)
+        current_transaction.attributes.add_custom_params(key, value)
+      end
+
+      # same to add_custom_params
+      def merge_request_parameters(hash)
+        current_transaction.attributes.merge_request_parameters(hash)
       end
 
     end
