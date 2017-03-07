@@ -1,0 +1,30 @@
+# encoding: utf-8
+
+
+module TingYun
+  module Instrumentation
+    module Support
+      module ExternalHelper
+        def create_tingyun_id(protocol)
+          state = TingYun::Agent::TransactionState.tl_get
+          externel_guid = tingyun_externel_guid
+          state.transaction_sample_builder.current_node["externalId"] = externel_guid
+          cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
+              raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+          "#{cross_app_id};c=1;x=#{state.request_guid};e=#{externel_guid};s=#{TingYun::Helper.time_to_millis(Time.now)};p=#{protocol}"
+        end
+
+        # generate a random 64 bit uuid
+        def tingyun_externel_guid
+          guid = ''
+          16.times do
+            guid << (0..15).map{|i| i.to_s(16)}[rand(16)]
+          end
+          guid
+        end
+      end
+    end
+  end
+end
+
+

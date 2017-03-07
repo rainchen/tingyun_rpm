@@ -13,6 +13,7 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     TingYun::Agent.logger.info 'Installing Thrift Instrumentation'
     require 'ting_yun/support/serialize/json_wrapper'
+    require 'ting_yun/instrumentation/support/external_helper'
   end
 
   executes do
@@ -40,18 +41,15 @@ TingYun::Support::LibraryDetection.defer do
       require 'ting_yun/instrumentation/support/thrift_helper'
 
       include TingYun::Instrumentation::ThriftHelper
-
+      include TingYun::Instrumentation::Support::ExternalHelper
 
         def send_message_args_with_tingyun(args_class, args = {})
           return send_message_args_without_tingyun(args_class, args) unless TingYun::Agent.config[:'nbs.transaction_tracer.thrift'] && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
           begin
             state = TingYun::Agent::TransactionState.tl_get
             return  unless state.execution_traced?
-            cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
-                raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
-            tingyun_id = "#{cross_app_id};c=1;x=#{state.request_guid}"
 
-            data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => tingyun_id)
+            data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => create_tingyun_id("thrift"))
             TingYun::Agent.logger.info("thift will send TingyunID : ", tingyun_id)
             @oprot.write_field_begin("TingyunField", 11, 40000)
             @oprot.write_string(data)

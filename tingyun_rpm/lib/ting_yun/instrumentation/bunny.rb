@@ -9,22 +9,21 @@ TingYun::Support::LibraryDetection.defer do
   executes do
     TingYun::Agent.logger.info 'Installing bunny(for rabbitmq) Instrumentation'
     require 'ting_yun/support/helper'
+    require 'ting_yun/instrumentation/support/external_helper'
   end
 
   executes do
     ::Bunny::Exchange.class_eval do
 
       if public_method_defined? :publish
-
+        include TingYun::Instrumentation::Support::ExternalHelper
         def publish_with_tingyun(payload, opts = {})
           begin
             state = TingYun::Agent::TransactionState.tl_get
-            return publish_without_tingyun(payload, opts) unless state.current_transaction
+            return publish_without_tingyun(payload, opts) unless state.execution_traced?
             queue_name = opts[:routing_key]
             opts[:headers] = {} unless opts[:headers]
-            externel_guid = tingyun_externel_guid
-            state.transaction_sample_builder.current_node["externalId"] = externel_guid
-            opts[:headers][:TingyunID] = "#{TingYun::Agent.config[:tingyunIdSecret]};c=1;x=#{state.request_guid};e=#{externel_guid};s=#{TingYun::Helper.time_to_millis(Time.now)}"
+            opts[:headers][:TingyunID] = create_tingyun_id("mq")
             metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2F"
             if name.empty?
               metric_name << "Queue%2F#{queue_name}/Produce"
@@ -44,14 +43,7 @@ TingYun::Support::LibraryDetection.defer do
         end
 
 
-        # generate a random 64 bit uuid
-         def tingyun_externel_guid
-          guid = ''
-          16.times do
-            guid << (0..15).map{|i| i.to_s(16)}[rand(16)]
-          end
-          guid
-        end
+
 
         alias_method :publish_without_tingyun, :publish
         alias_method :publish, :publish_with_tingyun
