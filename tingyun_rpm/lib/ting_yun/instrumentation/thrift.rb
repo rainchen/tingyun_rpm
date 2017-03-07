@@ -50,7 +50,7 @@ TingYun::Support::LibraryDetection.defer do
             return  unless state.execution_traced?
 
             data = TingYun::Support::Serialize::JSONWrapper.dump("TingyunID" => create_tingyun_id("thrift"))
-            TingYun::Agent.logger.info("thift will send TingyunID : ", tingyun_id)
+            TingYun::Agent.logger.info("thift will send TingyunID : ", data)
             @oprot.write_field_begin("TingyunField", 11, 40000)
             @oprot.write_string(data)
             @oprot.write_field_end
