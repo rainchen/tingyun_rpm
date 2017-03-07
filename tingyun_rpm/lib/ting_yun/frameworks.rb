@@ -2,7 +2,7 @@
 # This file is distributed under Ting Yun's license terms.
 require 'ting_yun/frameworks/instance_methods'
 require 'ting_yun/frameworks/class_methods'
-
+require 'yaml'
 
 module TingYun
   module Frameworks
