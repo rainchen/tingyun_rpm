@@ -80,9 +80,9 @@ module TingYun
           # Default to the class where the method is defined.
           #
           # Example:
-          #  Foo.default_metric_name_code('bar') #=> "Custom/#{Foo.name}/bar"
+          #  Foo.default_metric_name_code('bar') #=> "Tingyun/#{Foo.name}/bar"
           def default_metric_name_code(method_name)
-            "Custom/#{self.name}/#{method_name.to_s}"
+            "Tingyun/#{self.name}/#{method_name.to_s}"
           end
 
           # Checks to see if we have already traced a method with a
@@ -166,7 +166,7 @@ module TingYun
         # metric associated with the call, so if you want to use interpolation
         # evaluated at call time, then single quote the value like this:
         #
-        #     add_method_tracer :foo, 'Custom/#{self.class.name}/foo'
+        #     add_method_tracer :foo, 'Tingyun/#{self.class.name}/foo'
         #
         # This would name the metric according to the class of the runtime
         # intance, as opposed to the class where +foo+ is defined.
@@ -195,14 +195,14 @@ module TingYun
         #   add_method_tracer :foo
         #
         #   # With a custom metric name
-        #   add_method_tracer :foo, 'Custom/#{self.class.name}/foo'
+        #   add_method_tracer :foo, 'Tingyun/#{self.class.name}/foo'
         #
         #   # Instrument foo only for custom dashboards (not in transaction
         #   # traces or breakdown charts)
-        #   add_method_tracer :foo, 'Custom/foo', :push_scope => false
+        #   add_method_tracer :foo, 'Tingyun/foo', :push_scope => false
         #
         #   # Instrument foo in transaction traces only
-        #   add_method_tracer :foo, 'Custom/foo', :metric => false
+        #   add_method_tracer :foo, 'Tingyun/foo', :metric => false
         #
         # @api public
         #
