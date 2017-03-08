@@ -17,118 +17,129 @@ module TingYun
 
         extend self
 
+        def self.included klass
+          klass.extend ClassMethods
+        end
+
+        def self.extended klass
+          klass.extend ClassMethods
+        end
 
 
-        # Add transaction tracing to the given method.  This will treat
-        # the given method as a main entrypoint for instrumentation, just
-        # like controller actions are treated by default.  Useful especially
-        # for background tasks.
-        # Example for background job:
-        #   class Job
-        #     include TingYun::Instrumentation::Support::ControllerInstrumentation
-        #     def run(task)
-        #        ...
-        #     end
-        #     # Instrument run so tasks show up under task.name.  Note single
-        #     # quoting to defer eval to runtime.
-        #     add_transaction_tracer :run, :name => '#{args[0].name}'
-        #   end
-        #
-        # Here's an example of a controller that uses a dispatcher
-        # action to invoke operations which you want treated as top
-        # level actions, so they aren't all lumped into the invoker
-        # action.
-        #
-        #   MyController < ActionController::Base
-        #     include TingYun::Instrumentation::Support::ControllerInstrumentation
-        #     # dispatch the given op to the method given by the service parameter.
-        #     def invoke_operation
-        #       op = params['operation']
-        #       send op
-        #     end
-        #     # Ignore the invoker to avoid double counting
-        #     tingyun_ignore :only => 'invoke_operation'
-        #     # Instrument the operations:
-        #     add_transaction_tracer :print
-        #     add_transaction_tracer :show
-        #     add_transaction_tracer :forward
-        #   end
-        #
-        # Here's an example of how to pass contextual information into the transaction
-        # so it will appear in transaction traces:
-        #
-        #   class Job
-        #    include TingYun::Instrumentation::Support::ControllerInstrumentation
-        #     def process(account)
-        #        ...
-        #     end
-        #     # Include the account name in the transaction details.  Note the single
-        #     # quotes to defer eval until call time.
-        #     add_transaction_tracer :process, :params => '{ :account_name => args[0].name }'
-        #   end
-        #``
-        #
-        # @api public
-        #
-        def add_transaction_tracer(method, options={})
-          options[:name] ||= method.to_s
-          argument_list = generate_argument_list(options)
-          traced_method, punctuation = parse_punctuation(method)
-          with_method_name, without_method_name = build_method_names(traced_method, punctuation)
+        module ClassMethods
+          # Add transaction tracing to the given method.  This will treat
+          # the given method as a main entrypoint for instrumentation, just
+          # like controller actions are treated by default.  Useful especially
+          # for background tasks.
+          # Example for background job:
+          #   class Job
+          #     include TingYun::Instrumentation::Support::ControllerInstrumentation
+          #     def run(task)
+          #        ...
+          #     end
+          #     # Instrument run so tasks show up under task.name.  Note single
+          #     # quoting to defer eval to runtime.
+          #     add_transaction_tracer :run, :name => '#{args[0].name}'
+          #   end
+          #
+          # Here's an example of a controller that uses a dispatcher
+          # action to invoke operations which you want treated as top
+          # level actions, so they aren't all lumped into the invoker
+          # action.
+          #
+          #   MyController < ActionController::Base
+          #     include TingYun::Instrumentation::Support::ControllerInstrumentation
+          #     # dispatch the given op to the method given by the service parameter.
+          #     def invoke_operation
+          #       op = params['operation']
+          #       send op
+          #     end
+          #     # Ignore the invoker to avoid double counting
+          #     tingyun_ignore :only => 'invoke_operation'
+          #     # Instrument the operations:
+          #     add_transaction_tracer :print
+          #     add_transaction_tracer :show
+          #     add_transaction_tracer :forward
+          #   end
+          #
+          # Here's an example of how to pass contextual information into the transaction
+          # so it will appear in transaction traces:
+          #
+          #   class Job
+          #    include TingYun::Instrumentation::Support::ControllerInstrumentation
+          #     def process(account)
+          #        ...
+          #     end
+          #     # Include the account name in the transaction details.  Note the single
+          #     # quotes to defer eval until call time.
+          #     add_transaction_tracer :process, :params => '{ :account_name => args[0].name }'
+          #   end
+          #``
+          #
+          # @api public
+          #
+          def add_transaction_tracer(method, options={})
+            options[:name] ||= method.to_s
+            argument_list = generate_argument_list(options)
+            traced_method, punctuation = parse_punctuation(method)
+            with_method_name, without_method_name = build_method_names(traced_method, punctuation)
 
-          if already_added_transaction_tracer?(self, with_method_name)
-            ::TingYun::Agent.logger.warn("Transaction tracer already in place for class = #{self.name}, method = #{method.to_s}, skipping")
-            return
-          end
+            if already_added_transaction_tracer?(self, with_method_name)
+              ::TingYun::Agent.logger.warn("Transaction tracer already in place for class = #{self.name}, method = #{method.to_s}, skipping")
+              return
+            end
 
-          class_eval <<-EOC
+            class_eval <<-EOC
             def #{with_method_name}(*args,&block)
               perform_action_with_tingyun_trace(#{argument_list.join(',')}) do
                 #{without_method_name}(*args, &block)
               end
             end
-          EOC
+            EOC
 
-          visibility = TingYun::Helper.instance_method_visibility self, method
+            visibility = TingYun::Helper.instance_method_visibility self, method
 
-          alias_method without_method_name, method.to_s
-          alias_method method.to_s, with_method_name
-          send visibility, method
-          send visibility, with_method_name
-          ::TingYun::Agent.logger.debug("Traced transaction: class = #{self.name}, method = #{method.to_s}, options = #{options.inspect}")
-        end
-
-        def already_added_transaction_tracer?(target, with_method_name)
-          if TingYun::Helper.instance_methods_include?(target, with_method_name)
-            true
-          else
-            false
+            alias_method without_method_name, method.to_s
+            alias_method method.to_s, with_method_name
+            send visibility, method
+            send visibility, with_method_name
+            ::TingYun::Agent.logger.debug("Traced transaction: class = #{self.name}, method = #{method.to_s}, options = #{options.inspect}")
           end
-        end
 
-        def parse_punctuation(method)
-          [method.to_s.sub(/([?!=])$/, ''), $1]
-        end
-
-        def build_method_names(traced_method, punctuation)
-          [ "#{traced_method.to_s}_with_tingyun_transaction_trace#{punctuation}",
-            "#{traced_method.to_s}_without_tingyun_transaction_trace#{punctuation}" ]
-        end
-
-        def generate_argument_list(options)
-          options.map do |key, value|
-            value = if value.is_a?(Symbol)
-                      value.inspect
-                    elsif key == :params
-                      value.to_s
-                    else
-                      %Q["#{value.to_s}"]
-                    end
-
-            %Q[:#{key} => #{value}]
+          def already_added_transaction_tracer?(target, with_method_name)
+            if TingYun::Helper.instance_methods_include?(target, with_method_name)
+              true
+            else
+              false
+            end
           end
-        end
 
+          def parse_punctuation(method)
+            [method.to_s.sub(/([?!=])$/, ''), $1]
+          end
+
+          def build_method_names(traced_method, punctuation)
+            [ "#{traced_method.to_s}_with_tingyun_transaction_trace#{punctuation}",
+              "#{traced_method.to_s}_without_tingyun_transaction_trace#{punctuation}" ]
+          end
+
+          def generate_argument_list(options)
+            options.map do |key, value|
+              value = if value.is_a?(Symbol)
+                        value.inspect
+                      elsif key == :params
+                        value.to_s
+                      else
+                        %Q["#{value.to_s}"]
+                      end
+
+              %Q[:#{key} => #{value}]
+            end
+          end
+
+
+
+        end
 
 
 

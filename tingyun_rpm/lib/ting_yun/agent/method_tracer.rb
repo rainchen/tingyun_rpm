@@ -106,6 +106,27 @@ module TingYun
             end
           end
 
+          DEFAULT_SETTINGS = {:push_scope => true, :metric => true, :code_header => "", :code_footer => "" }.freeze
+
+          # Checks the provided options to make sure that they make
+          # sense. Raises an error if the options are incorrect to
+          # assist with debugging, so that errors occur at class
+          # construction time rather than instrumentation run time
+          def validate_options(method_name, options)
+            unless options.is_a?(Hash)
+              raise TypeError.new("Error adding method tracer to #{method_name}: provided options must be a Hash")
+            end
+            options = DEFAULT_SETTINGS.merge(options)
+            check_for_push_scope_and_metric(options)
+            options
+          end
+
+          def check_for_push_scope_and_metric(options)
+            unless options[:push_scope] || options[:metric]
+              raise "Can't add a tracer where push_scope is false and metric is false"
+            end
+          end
+
           # returns an eval-able string that contains the tracing code
           # for a fully traced metric including scoping
           def method_with_push_scope(method_name, metric_name_code, options)
@@ -213,7 +234,7 @@ module TingYun
 
           traced_method = code_to_eval(method_name, metric_name_code, options)
 
-          visibility = TingYun::Support::Helper.instance_method_visibility self, method_name
+          visibility = TingYun::Helper.instance_method_visibility self, method_name
 
           class_eval traced_method, __FILE__, __LINE__
           alias_method _untraced_method_name(method_name, metric_name_code), method_name

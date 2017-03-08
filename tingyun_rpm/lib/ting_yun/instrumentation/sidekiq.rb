@@ -33,7 +33,7 @@ TingYun::Support::LibraryDetection.defer do
         {
             :name => 'perform',
             :class_name => msg['class'],
-            :category => 'BackgroundAction/SidekiqJob'
+            :category => 'BackgroundAction/Sidekiq'
         }
       end
     end
@@ -44,7 +44,7 @@ TingYun::Support::LibraryDetection.defer do
         {
             :name => method_name,
             :class_name => target.name,
-            :category => 'BackgroundAction/SidekiqJob'
+            :category => 'BackgroundAction/Sidekiq'
         }
       rescue => e
         TingYun::Agent.logger.error("Failure during deserializing YAML for Sidekiq::Extensions::DelayedClass", e)
