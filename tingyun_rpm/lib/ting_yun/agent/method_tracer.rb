@@ -7,6 +7,7 @@
 require 'ting_yun/frameworks' unless defined?(TingYun::Frameworks::Framework)
 require 'ting_yun/support/helper'
 require 'ting_yun/agent/method_tracer_helpers'
+require 'ting_yun/agent/transaction/transaction_state'
 
 module TingYun
   module Agent
@@ -163,7 +164,7 @@ module TingYun
           # instrumentation into effectively one method call overhead
           # when the agent is disabled
           def assemble_code_header(method_name, metric_name_code, options)
-            # header = "return #{_untraced_method_name(method_name, metric_name_code)}(*args, &block) unless TingYun::Agent.tl_is_execution_traced?\n"
+            header = "return #{_untraced_method_name(method_name, metric_name_code)}(*args, &block) unless TingYun::Agent::TransactionState.tl_get.execution_traced?\n"
             header += options[:code_header].to_s
             header
           end
