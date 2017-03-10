@@ -200,6 +200,8 @@ module TingYun
           end
 
           private
+
+
           # given a method and a metric, this method returns the
           # traced alias of the method name
           def define_trace_method_name(method_name, metric_name)
