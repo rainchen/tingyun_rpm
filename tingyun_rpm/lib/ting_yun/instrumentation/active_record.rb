@@ -2,7 +2,7 @@
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/active_record_helper'
 require 'ting_yun/support/helper'
-require 'ting_yun/agent/method_tracer'
+require 'ting_yun/agent/method_tracer_helpers'
 require 'ting_yun/agent/collector/transaction_sampler'
 require 'ting_yun/agent/collector/sql_sampler'
 require 'ting_yun/agent/database'
@@ -51,7 +51,7 @@ module TingYun
 
         scoped_metric = metrics.first
 
-        TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
+        TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metrics, {}, nil, klass_name) do
           t0 = Time.now
           begin
             log_without_tingyun_instrumentation(*args, &block)

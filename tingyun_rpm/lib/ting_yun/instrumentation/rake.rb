@@ -13,6 +13,7 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     ::TingYun::Agent.logger.info 'Installing deferred Rake instrumentation'
+    require 'ting_yun/agent/method_tracer_helpers'
   end
 
   executes do
@@ -87,7 +88,7 @@ module TingYun
           task.instance_variable_set(:@__tingyun_instrumented_execute, true)
           task.instance_eval do
             def execute(*args, &block)
-              TingYun::Agent::MethodTracer.trace_execution_scoped("Rake/execute/#{self.name}") do
+              TingYun::Agent::MethodTracerHelpers.trace_execution_scoped("Rake/execute/#{self.name}") do
                 super
               end
             end
@@ -99,7 +100,7 @@ module TingYun
         def self.instrument_invoke_prerequisites_concurrently(task)
           task.instance_eval do
             def invoke_prerequisites_concurrently(*_)
-              TingYun::Agent::MethodTracer.trace_execution_scoped("Rake/execute/multitask") do
+              TingYun::Agent::MethodTracerHelpers.trace_execution_scoped("Rake/execute/multitask") do
                 super
               end
             end

@@ -1,7 +1,7 @@
 # encoding: utf-8
 require 'ting_yun/agent/transaction/transaction_state'
 require 'ting_yun/instrumentation/support/active_record_helper'
-require 'ting_yun/agent/method_tracer'
+require 'ting_yun/agent/method_tracer_helpers'
 
 module TingYun::Instrumentation::DataMapper
 
@@ -54,7 +54,7 @@ TingYun::Support::LibraryDetection.defer do
             *params = get_metrics_params(:create, model)
             klass_name, *metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
+            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metrics, {}, nil, klass_name) do
               t0 = Time.now
               begin
                 serial     = model.serial(name)
@@ -107,7 +107,7 @@ TingYun::Support::LibraryDetection.defer do
             *params = get_metrics_params(method, *args, &block)
             klass_name, *metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
+            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metrics, {}, nil, klass_name) do
               t0 = Time.now
               begin
                 send "#{method}_without_tingyun_trace", *args, &block
@@ -151,7 +151,7 @@ TingYun::Support::LibraryDetection.defer do
           *params = get_metrics_params(:read, *args, &block)
           klass_name, *metrics = ::TingYun::Instrumentation::Support::ActiveRecordHelper.metrics_for_data_mapper(*params)
 
-          TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, {}, nil, klass_name) do
+          TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metrics, {}, nil, klass_name) do
             t0 = Time.now
             begin
               aggregate_without_tingyun_trace(*args, &block)

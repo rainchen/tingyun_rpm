@@ -7,7 +7,7 @@ require 'ting_yun/agent/transaction/transaction_state'
 module TingYun
   module Instrumentation
     module Support
-      module MethodTracer
+      module MethodInstrumentation
 
         # This module contains class methods added to support installing custom
         # metric tracers and executing for individual metrics.
@@ -19,9 +19,9 @@ module TingYun
         # before the agent is initialized you will need to require
         # this file:
         #
-        #     require 'ting_yun/instrumentation/support/method_tracer'
+        #     require 'ting_yun/instrumentation/support/method_instrumentation'
         #     class A
-        #       include TingYun::Instrumentation::Support::MethodTracer
+        #       include TingYun::Instrumentation::Support::MethodInstrumentation
         #       def process
         #         ...
         #       end
@@ -30,13 +30,13 @@ module TingYun
         #
         # To instrument a class method:
         #
-        #     require 'ting_yun/instrumentation/support/method_tracer'
+        #      require 'ting_yun/instrumentation/support/method_instrumentation'
         #     class An
         #       def self.process
         #         ...
         #       end
         #       class << self
-        #         include TingYun::Instrumentation::Support::MethodTracer
+        #         include TingYun::Instrumentation::Support::MethodInstrumentation
         #         add_method_tracer :process
         #       end
         #     end

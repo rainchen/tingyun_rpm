@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'ting_yun/agent/method_tracer'
+require 'ting_yun/agent/method_tracer_helpers'
 require 'ting_yun/instrumentation/support/sinatra_helper'
 
 TingYun::Support::LibraryDetection.defer do
@@ -52,7 +52,7 @@ TingYun::Support::LibraryDetection.defer do
       def render_with_tingyun(*args, &block) # engine, data, options = {}, locals = {}, &block
         scope_name = tingyun_template_metric(*args, &block)
         if scope_name
-          TingYun::Agent::MethodTracer.trace_execution_scoped scope_name do
+          TingYun::Agent::MethodTracerHelpers.trace_execution_scoped scope_name do
             render_without_tingyun(*args, &block)
           end
         else

@@ -23,7 +23,7 @@ module TingYun
 
       def hook_instrument_method(target_class)
         target_class.class_eval do
-          require 'ting_yun/agent/method_tracer'
+          require 'ting_yun/agent/method_tracer_helpers'
 
           def record_mongo_duration(duration)
             state = TingYun::Agent::TransactionState.tl_get
@@ -46,7 +46,7 @@ module TingYun
           def instrument_with_tingyun(name, payload = {}, &block)
             klass_name, *metrics = tingyun_generate_metrics(name, payload)
 
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, payload, method(:record_mongo_duration), klass_name) do
+            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metrics, payload, method(:record_mongo_duration), klass_name) do
               instrument_without_tingyun(name, payload, &block)
             end
           end
@@ -60,7 +60,7 @@ module TingYun
         ::Mongo::Collection.class_eval do
           def save_with_tingyun(doc, opts = {}, &block)
             klass_name, *metrics = tingyun_generate_metrics(:save)
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, opts, method(:record_mongo_duration), klass_name) do
+            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metrics, opts, method(:record_mongo_duration), klass_name) do
               save_without_tingyun(doc, opts, &block)
             end
           end
@@ -70,7 +70,7 @@ module TingYun
 
           def ensure_index_with_tingyun(spec, opts = {}, &block)
             klass_name, *metrics = tingyun_generate_metrics(:ensureIndex)
-            TingYun::Agent::MethodTracer.trace_execution_scoped(metrics, opts, method(:record_mongo_duration), klass_name) do
+            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(metrics, opts, method(:record_mongo_duration), klass_name) do
               ensure_index_without_tingyun(spec, opts, &block)
             end
           end
