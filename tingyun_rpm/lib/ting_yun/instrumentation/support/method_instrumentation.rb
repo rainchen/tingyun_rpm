@@ -125,18 +125,61 @@ module TingYun
              end"
           end
 
+          # Add a method tracer to the specified method.
           #
+          # By default, this will cause invocations of the traced method to be
+          # recorded in transaction traces, and in a metric named after the class
+          # and method. It will also make the method show up in transaction-level
+          # breakdown charts and tables.
           #
-          #   第一个参数是需要跟踪的方法，第二个是需要在报表上显示的方法metric_name. 默认值“tingyun/class_name/method_name”
-          #   options接受4个参数，默认值
-          #   {:scope => true, :metric => true, :before_code=> "", :after_code => "" }
+          # === Overriding the metric name
           #
-          #   scope为false的时候，只有general的数据
+          # +metric_name+ is a string that is eval'd to get the name of the
+          # metric associated with the call, so if you want to use interpolation
+          # evaluated at call time, then single quote the value like this:
           #
-          #   metirc为false的时候，数据只会在actionTraceData存在
+          #     add_method_tracer :foo, 'tingyun/#{self.class.name}/foo'
           #
+          # This would name the metric according to the class of the runtime
+          # intance, as opposed to the class where +foo+ is defined.
           #
-          #   before_code 和 after_code是可执行的Ruby代码。分别在被监测的方法开始前和结束后执行4
+          # If not provided, the metric name will be <tt>tingyun/ClassName/method_name</tt>.
+          #
+          # @param [Symbol] method_name the name of the method to trace
+          # @param [String] metric_name the metric name to record calls to
+          #   the traced method under. This may be either a static string, or Ruby
+          #   code to be evaluated at call-time in order to determine the metric
+          #   name dynamically.
+          # @param [Hash] options additional options controlling how the method is
+          #   traced.
+          # @option options [Boolean] :scope (true) If false, the traced method will
+          #   not appear in transaction traces(the components) or breakdown charts, and it will
+          #   only be visible in custom dashboards(the generals).
+          # @option options [Boolean] :metric (true) If false, the traced method will
+          #   only appear in transaction traces, but no metrics will be recorded
+          #   for it.
+          # @option options [String] :before_code ('') Ruby code to be inserted and run
+          #   before the tracer begins timing.
+          # @option options [String] :after_code ('') Ruby code to be inserted and run
+          #   after the tracer stops timing.
+          #
+          # @example
+          #   add_method_tracer :foo
+          #
+          #   # With a custom metric name
+          #   add_method_tracer :foo, 'tingyun/#{self.class.name}/foo'
+          #
+          #   # Instrument foo only for custom dashboards (not in transaction
+          #   # traces or breakdown charts)
+          #   add_method_tracer :foo, 'tingyun/foo', :scope => false
+          #
+          #   # Instrument foo in transaction traces only
+          #   add_method_tracer :foo, 'tingyun/foo', :metric => false
+          #
+          # @api public
+          #
+
+
           def add_method_tracer(method_name, metric_name = nil, opt={})
             return unless method_exists?(method_name)
             metric_name ||= default_metric_name(method_name)
