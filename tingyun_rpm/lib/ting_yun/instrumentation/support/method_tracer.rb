@@ -1,11 +1,47 @@
 # encoding: utf-8
+require 'ting_yun/frameworks' unless defined?(TingYun::Frameworks::Framework)
 require 'ting_yun/support/helper'
 require 'ting_yun/agent/method_tracer_helpers'
+require 'ting_yun/agent/transaction/transaction_state'
 
 module TingYun
   module Instrumentation
     module Support
       module MethodTracer
+
+        # This module contains class methods added to support installing custom
+        # metric tracers and executing for individual metrics.
+        #
+        # == Examples
+        #
+        # When the agent initializes, it extends Module with these methods.
+        # However if you want to use the API in code that might get loaded
+        # before the agent is initialized you will need to require
+        # this file:
+        #
+        #     require 'ting_yun/instrumentation/support/method_tracer'
+        #     class A
+        #       include TingYun::Instrumentation::Support::MethodTracer
+        #       def process
+        #         ...
+        #       end
+        #       add_method_tracer :process
+        #     end
+        #
+        # To instrument a class method:
+        #
+        #     require 'ting_yun/instrumentation/support/method_tracer'
+        #     class An
+        #       def self.process
+        #         ...
+        #       end
+        #       class << self
+        #         include TingYun::Instrumentation::Support::MethodTracer
+        #         add_method_tracer :process
+        #       end
+        #     end
+        #
+        # @api public
 
         def self.included(klass)
           klass.extend ClassMethods
@@ -38,34 +74,14 @@ module TingYun
             ::TingYun::Agent.logger.error("Attempt to trace a method twice with the same metric: Method = #{method_name}, Metric Name = #{metric_name}") if exists
             exists
           end
-          #
-          #
-          #   第一个参数是需要跟踪的方法，第二个是需要在报表上显示的方法metric_name. 默认值“tingyun/class_name/method_name”
-          #   options接受4个参数，默认值
-          #   {:scope => true, :metric => true, :before_code=> "", :after_code => "" }
-          #
-          #   scope为false的时候，只有general的数据
-          #
-          #   metirc为false的时候，数据只会在actionTraceData存在
-          #
-          #
-          #   before_code 和 after_code是可执行的Ruby代码。分别在被监测的方法开始前和结束后执行4
-          def add_method_tracer(method_name,metric_name,opt={})
-            return unless method_exists?(method_name)
-            metric_name ||= default_metric_name(method_name)
-            return if traced_method_exists?(method_name, metric_name)
 
-            traced_method = tingyun_eval(method_name, metric_name,opt)
-
-            visibility = TingYun::Helper.instance_method_visibility self, method_name
-            class_eval traced_method, __FILE__, __LINE__
-            alias_method method_name, define_trace_method_name(method_name, metric_name)
-            alias_method define_untrace_method_name(method_name, metric_name), method_name
-            send visibility, method_name
-            send visibility, define_untrace_method_name(method_name, metric_name)
-            ::TingYun::Agent.logger.debug("Traced method: class = #{self.name},"+
-                                              "method = #{method_name}, "+
-                                              "metric = '#{metric_name}'")
+          def tingyun_eval(method_name, metric_name, options)
+            options = validate_options(method_name, options)
+            if options[:scope]
+              define_method_with_scope(method_name, metric_name, options)
+            else
+              define_method_without_scope(method_name,metric_name, options)
+            end
           end
 
           DEFAULT_SETTINGS = {:scope => true, :metric => true, :before_code => "", :after_code => "" }.freeze
@@ -81,32 +97,23 @@ module TingYun
             options
           end
 
-          def tingyun_eval(method_name, metric_name, options)
-            options = validate_options(method_name, options)
-            if options[:scope]
-              define_method_with_scope(method_name, metric_name, options)
-            else
-              define_method_without_scope(method_name,metric_name, options)
-            end
-          end
-
           def define_method_with_scope(method_name,metric_name,options)
             "def #{define_trace_method_name(method_name,metric_name)}(*args, &block)
                 #{options[:before_code]}
+
                 result = ::TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(\"#{metric_name}\",
                         :metric => #{options[:metric]}) do
                   #{define_untrace_method_name(method_name, metric_name)}(*args, &block)
                 end
                 #{options[:after_code]}
                 result
-             end
-            "
+             end"
           end
 
           def define_method_without_scope(method_name,metric_name,options)
             "def #{define_trace_method_name(method_name,metric_name)}(*args, &block)
                 return #{define_untrace_method_name(method_name, metric_name)}(*args, &block) unless TingYun::Agent::TransactionState.tl_get.execution_traced?\n
-                #{options[:before_code]}
+            #{options[:before_code]}
                 t0 = Time.now
                 begin
                   #{define_untrace_method_name(method_name, metric_name)}(*args, &block)\n
@@ -115,20 +122,50 @@ module TingYun
                   ::TingYun::Agent.record_metric(\"#{metric_name}\", duration)
                   #{options[:after_code]}
                 end
-             end
-            "
+             end"
+          end
+
+          #
+          #
+          #   第一个参数是需要跟踪的方法，第二个是需要在报表上显示的方法metric_name. 默认值“tingyun/class_name/method_name”
+          #   options接受4个参数，默认值
+          #   {:scope => true, :metric => true, :before_code=> "", :after_code => "" }
+          #
+          #   scope为false的时候，只有general的数据
+          #
+          #   metirc为false的时候，数据只会在actionTraceData存在
+          #
+          #
+          #   before_code 和 after_code是可执行的Ruby代码。分别在被监测的方法开始前和结束后执行4
+          def add_method_tracer(method_name, metric_name = nil, opt={})
+            return unless method_exists?(method_name)
+            metric_name ||= default_metric_name(method_name)
+            return if traced_method_exists?(method_name, metric_name)
+
+            traced_method = tingyun_eval(method_name, metric_name,opt)
+
+            visibility = TingYun::Helper.instance_method_visibility self, method_name
+            class_eval traced_method, __FILE__, __LINE__
+
+            alias_method define_untrace_method_name(method_name, metric_name), method_name
+            alias_method method_name, define_trace_method_name(method_name, metric_name)
+            send visibility, method_name
+            send visibility, define_trace_method_name(method_name, metric_name)
+            ::TingYun::Agent.logger.debug("Traced method: class = #{self.name},"+
+                                              "method = #{method_name}, "+
+                                              "metric = '#{metric_name}'")
           end
 
           private
           # given a method and a metric, this method returns the
           # traced alias of the method name
           def define_trace_method_name(method_name, metric_name)
-            "#{_sanitize_name(method_name)}_with_scope_#{_sanitize_name(metric_name)}"
+            "#{_sanitize_name(method_name)}_with_trace_#{_sanitize_name(metric_name)}"
           end
           # given a method and a metric, this method returns the
           # untraced alias of the method name
           def define_untrace_method_name(method_name, metric_name)
-            "#{_sanitize_name(method_name)}_without_scope_#{_sanitize_name(metric_name)}"
+            "#{_sanitize_name(method_name)}_without_trace_#{_sanitize_name(metric_name)}"
           end
 
           # makes sure that method names do not contain characters that
