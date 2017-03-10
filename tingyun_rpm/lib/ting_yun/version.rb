@@ -6,14 +6,14 @@ module TingYun
 
     MAJOR = 1
 
-    MINOR = 2
+    MINOR = 3
 
     TINY = 0
 
 
-    PRE = 1
 
 
-    STRING = [MAJOR, MINOR, TINY, PRE].compact.join('.')
+
+    STRING = [MAJOR, MINOR, TINY].compact.join('.')
   end
 end
