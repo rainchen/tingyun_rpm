@@ -101,7 +101,7 @@ module TingYun
           }
           custom_param[:httpStatus] = int(attributes.agent_attributes[:httpStatus]) if attributes.agent_attributes[:httpStatus]
           custom_param[:entryTrace] = attributes.agent_attributes[:entryTrace] if attributes.agent_attributes[:entryTrace]
-          custom_param.merge attributes.custom_params
+          custom_param.merge! attributes.custom_params
           custom_param
         end
 
