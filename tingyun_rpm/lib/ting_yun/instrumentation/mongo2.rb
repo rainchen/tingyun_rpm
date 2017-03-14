@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'ting_yun/agent'
-require 'ting_yun/agent/method_tracer'
+require 'ting_yun/instrumentation/support/method_instrumentation'
 
 module TingYun
   module Instrumentation

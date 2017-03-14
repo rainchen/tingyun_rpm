@@ -71,7 +71,6 @@ module TingYun
 
           result
         rescue Exception => e
-
           TingYun::Agent.notice_error(e)
           raise e
         ensure
