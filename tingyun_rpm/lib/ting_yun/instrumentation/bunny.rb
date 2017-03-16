@@ -2,7 +2,7 @@ TingYun::Support::LibraryDetection.defer do
   named :bunny
 
   depends_on do
-    defined?(::Bunny::VERSION) && TingYun::Agent.config[:'nbs.mq.conume']
+    defined?(::Bunny::VERSION)
   end
 
 
@@ -53,7 +53,7 @@ TingYun::Support::LibraryDetection.defer do
 
     ::Bunny::Consumer.class_eval do
 
-      if public_method_defined? :call
+      if public_method_defined? :call && TingYun::Agent.config[:'nbs.mq.conume']
 
         def call_with_tingyun(*args)
           begin
