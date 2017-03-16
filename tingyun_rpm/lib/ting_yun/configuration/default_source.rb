@@ -675,6 +675,13 @@ module TingYun
             :type => String,
             :allowed_from_server => true,
             :description => 'Quantile'
+        },
+        :'nbs.mq.conume' => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable the  mq feature'
         }
     }.freeze
   end

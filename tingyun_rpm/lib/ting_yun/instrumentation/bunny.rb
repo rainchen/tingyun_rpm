@@ -2,7 +2,7 @@ TingYun::Support::LibraryDetection.defer do
   named :bunny
 
   depends_on do
-    defined?(::Bunny::VERSION) && !TingYun::Agent.config[:disable_rabbitmq]
+    defined?(::Bunny::VERSION) && TingYun::Agent.config[:'nbs.mq.conume']
   end
 
 
@@ -33,7 +33,7 @@ TingYun::Support::LibraryDetection.defer do
 
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq, {}, summary_metrics)  do
-              TingYun::Agent.record_metric("#{metric_name}/Byte",payload.bytesize) if payload
+              TingYun::Agent.record_metric("#{metric_name}%2FByte",payload.bytesize) if payload
               publish_without_tingyun(payload, opts)
             end
           rescue => e
@@ -65,8 +65,8 @@ TingYun::Support::LibraryDetection.defer do
             TingYun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/RabbitMQ/Queue%2F#{queue_name}/Consume"})
             state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
             TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMq, {}, summary_metrics)  do
-              TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}/Byte",args[2].bytesize) if args[2]
-              TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}/Wait", TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i) rescue nil
+              TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]
+              TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FWait", TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i) rescue nil
               if state.current_transaction
                 state.add_custom_params("message.byte",args[2].bytesize)
                 state.add_custom_params("message.wait",TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i)
