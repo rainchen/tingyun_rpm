@@ -80,7 +80,7 @@ module TingYun
             if TingYun::Agent.config[:'nbs.auto_action_naming']
               @metric_name ||= "WebAction/Rails/#{metric_path}%2F#{metric_action}"
             else
-              "WebAction/URI/#{uri.gsub(/\//,'%2F')}"
+              "WebAction/URI/#{uri[1..-1].gsub(/\//,'%2F')}"
             end
           end
         end

@@ -26,6 +26,7 @@ module TingYun
 
       SUBTRANSACTION_PREFIX = 'Nested/'.freeze
       CONTROLLER_PREFIX = 'WebAction/'.freeze
+      BACKGROUND_PREFIX = 'BackgroundAction/'.freeze
       RAKE_TRANSACTION_PREFIX     = 'BackgroundAction/Rake'.freeze
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
       RACK_PREFIX = 'Rack/'.freeze
@@ -34,6 +35,7 @@ module TingYun
       GRAPE_PREFIX = 'WebAction/Grape/'.freeze
       RAKE_PREFIX = 'WebAction/Rake'.freeze
       CABLE_PREFIX = 'WebAction/ActionCable'.freeze
+
 
       EMPTY_SUMMARY_METRICS = [].freeze
       MIDDLEWARE_SUMMARY_METRICS = ['Middleware/all'.freeze].freeze

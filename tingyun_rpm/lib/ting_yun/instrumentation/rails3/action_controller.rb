@@ -17,7 +17,7 @@ module TingYun
           if find_rule(request.request_method.upcase, request.path, request.env, request.filtered_parameters)
             return "Rails/#{namespace}/#{name(request.path.slice(1..-1), request.env, request.filtered_parameters, request.cookies)}"
           else
-            return  "URL/#{self.env["PATH_INFO"].gsub(/\//,'%2F')}" unless TingYun::Agent.config[:'nbs.auto_action_naming']
+            return  "URL/#{self.env["PATH_INFO"][1..-1].gsub(/\//,'%2F')}" unless TingYun::Agent.config[:'nbs.auto_action_naming']
 
             action = action_name_override || action_name
             if action_name_override || self.class.action_methods.include?(action)

@@ -117,7 +117,7 @@ module TingYun
         end
 
         def nested_transaction_name(name)
-          if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(RAKE_TRANSACTION_PREFIX)
+          if name.start_with?(CONTROLLER_PREFIX) || name.start_with?(BACKGROUND_PREFIX)
             "#{SUBTRANSACTION_PREFIX}#{name}"
           else
             name
