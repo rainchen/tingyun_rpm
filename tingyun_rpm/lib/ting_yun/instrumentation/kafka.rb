@@ -78,7 +78,7 @@ TingYun::Support::LibraryDetection.defer do
         end
       end
 
-      if public_method_defined?(:each_message)&& TingYun::Agent.config[:'nbs.mq.conume']
+      if public_method_defined?(:each_message)
         alias_method :each_message_without_tingyun, :each_message
 
         def each_message(*args, **options, &block)
@@ -108,7 +108,7 @@ TingYun::Support::LibraryDetection.defer do
 
     if defined?(::Kafka::Consumer)
       Kafka::Consumer.class_eval do
-        if public_method_defined?(:each_message) && TingYun::Agent.config[:'nbs.mq.conume']
+        if public_method_defined?(:each_message)
           alias_method :each_message_without_tingyun, :each_message
           def each_message(*args, **options, &block)
             wrap_block = Proc.new do |message|
@@ -138,7 +138,7 @@ TingYun::Support::LibraryDetection.defer do
           end
         end
 
-        if public_method_defined?(:each_batch) && TingYun::Agent.config[:'nbs.mq.conume']
+        if public_method_defined?(:each_batch)
           alias_method :each_batch_without_tingyun, :each_batch
           def each_batch(*args, **options, &block)
             wrap_block = Proc.new do |batch|

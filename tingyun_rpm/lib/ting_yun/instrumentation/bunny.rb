@@ -53,7 +53,7 @@ TingYun::Support::LibraryDetection.defer do
 
     ::Bunny::Consumer.class_eval do
 
-      if public_method_defined?(:call) && TingYun::Agent.config[:'nbs.mq.conume']
+      if public_method_defined?(:call)
 
         def call_with_tingyun(*args)
           begin
@@ -116,7 +116,7 @@ TingYun::Support::LibraryDetection.defer do
     end
 
     ::Bunny::Channel.class_eval do
-      if public_method_defined?(:basic_get)&& TingYun::Agent.config[:'nbs.mq.conume']
+      if public_method_defined?(:basic_get)
         def basic_get_with_tingyun(*args)
           begin
             state = TingYun::Agent::TransactionState.tl_get
