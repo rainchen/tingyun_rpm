@@ -62,12 +62,13 @@ module TingYun
           if request
             cross_app = response_is_cross_app?(response)
 
-            metrics = metrics_for(request, response, cross_app)
+            metrics = metrics_for(request)
             node_name = metrics.pop
-            scoped_metric = metrics.pop
-
-            ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, scoped_metric, metrics, duration)
-
+            ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, node_name, metrics, duration)
+            if cross_app
+              metrics_cross_app = metrics_for_cross_app(request, response)
+              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, duration)
+            end
             if node
               node.name = node_name
               add_transaction_trace_info(request, response, cross_app)
@@ -94,40 +95,25 @@ module TingYun
       end
 
 
-      def metrics_for(request, response, cross_app)
+      def metrics_for_cross_app(request, response)
+        my_data =  TingYun::Support::Serialize::JSONWrapper.load get_ty_data_header(response).gsub("'",'"')
+        metrics = ["ExternalTransaction/NULL/#{my_data["id"]}",
+                   "ExternalTransaction/http/#{my_data["id"]}",
+                   "ExternalTransaction/http:sync/#{my_data["id"]}"]
+        metrics << "ExternalTransaction/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'').gsub('/','%2F')}"
+      end
 
+      def metrics_for(request)
         metrics = [ "External/NULL/ALL" ]
-
         if TingYun::Agent::Transaction.recording_web_transaction?
           metrics << "External/NULL/AllWeb"
         else
           metrics << "External/NULL/AllBackground"
         end
-
-        if cross_app
-          begin
-            metrics.concat metrics_for_cross_app_response( request, response )
-          rescue => err
-            # Fall back to regular metrics if there's a problem with x-process metrics
-            TingYun::Agent.logger.debug "%p while fetching x-process metrics: %s" %
-                                            [ err.class, err.message ]
-            metrics.concat metrics_for_regular_request( request )
-          end
-        else
-          metrics.concat metrics_for_regular_request( request )
-        end
-
+        metrics << "External/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
         return metrics
       end
 
-
-      def metrics_for_regular_request( request )
-        metrics = []
-        metrics << "External/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
-        metrics << "External/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
-
-        return metrics
-      end
 
 
       def cross_app_enabled?
@@ -153,17 +139,7 @@ module TingYun
         return true
       end
 
-      # Return the set of metric objects appropriate for the given cross app
-      # +response+.
-      def metrics_for_cross_app_response(request, response )
-        my_data =  TingYun::Support::Serialize::JSONWrapper.load get_ty_data_header(response).gsub("'",'"')
-        uri = "#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
-        metrics = []
-        metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
-        metrics << "External/#{my_data["action"]}:#{uri}"
 
-        return metrics
-      end
 
       def get_ty_data_header(response)
         if defined?(::HTTP) && defined?(::HTTP::Message) && response.class == ::HTTP::Message

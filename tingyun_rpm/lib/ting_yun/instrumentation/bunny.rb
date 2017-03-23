@@ -23,7 +23,7 @@ TingYun::Support::LibraryDetection.defer do
             return publish_without_tingyun(payload, opts) unless state.execution_traced?
             queue_name = opts[:routing_key]
             opts[:headers] = {} unless opts[:headers]
-            opts[:headers][:TingyunID] = create_tingyun_id("mq")
+            opts[:headers]['X-Tingyun-Id'] = create_tingyun_id("mq")
             metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2F"
             if name.empty?
               metric_name << "Queue%2F#{queue_name}/Produce"
@@ -58,7 +58,7 @@ TingYun::Support::LibraryDetection.defer do
         def call_with_tingyun(*args)
           begin
             headers = args[1]&&args[1][:headers].clone
-            tingyun_id_secret = headers["TingyunID"]
+            tingyun_id_secret = headers["X-Tingyun-Id"]
             state = TingYun::Agent::TransactionState.tl_get
             metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{queue_name}/Consume"
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Consume')
@@ -71,7 +71,7 @@ TingYun::Support::LibraryDetection.defer do
                 state.add_custom_params("message.byte",args[2].bytesize)
                 state.add_custom_params("message.wait",TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i)
                 state.add_custom_params("message.routingkey",queue_name)
-                headers.delete("TingyunID")
+                headers.delete("X-Tingyun-Id")
                 state.merge_request_parameters(headers)
               end
               call_without_tingyun(*args)

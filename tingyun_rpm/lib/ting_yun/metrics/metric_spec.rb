@@ -8,7 +8,7 @@
 module TingYun
   module Metrics
     class MetricSpec
-      attr_accessor :name, :scope, :calleeId, :calleeName, :full_name
+      attr_accessor :name, :scope, :full_name
 
       # the maximum length of a metric name or metric scope
       MAX_LENGTH = 255
@@ -85,8 +85,6 @@ module TingYun
 
       def to_hash
         hash =  { 'name' => name }
-        hash['calleeId'] = calleeId if calleeId
-        hash['calleeName'] = calleeName if calleeName
         unless scope.empty?
           hash['parent'] = scope
         end
