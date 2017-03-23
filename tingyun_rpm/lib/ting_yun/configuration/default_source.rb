@@ -681,6 +681,13 @@ module TingYun
             :public => true,
             :type => Boolean,
             :allowed_from_server => true,
+            :description => 'Enable or disable the  mq conume feature'
+        },
+        :'nbs.mq.enabled' => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
             :description => 'Enable or disable the  mq feature'
         }
     }.freeze

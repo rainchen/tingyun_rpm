@@ -2,7 +2,7 @@ TingYun::Support::LibraryDetection.defer do
   named :bunny
 
   depends_on do
-    defined?(::Bunny::VERSION) && false
+    defined?(::Bunny::VERSION) && TingYun::Agent.config[:'nbs.mq.enabled']
   end
 
 
