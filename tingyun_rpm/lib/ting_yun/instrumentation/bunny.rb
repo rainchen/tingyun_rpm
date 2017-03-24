@@ -99,7 +99,7 @@ TingYun::Support::LibraryDetection.defer do
       def build_payload(state)
         timings = state.timings
         payload = {
-            :applicationId => state.client_tingyun_id_secret.spilt('|')[1],
+            :applicationId => state.client_tingyun_id_secret.split('|')[1],
             :transactionId => state.client_transaction_id,
             :externalId => state.extenel_req_id,
             :time => {
