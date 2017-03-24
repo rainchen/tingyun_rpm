@@ -59,19 +59,20 @@ TingYun::Support::LibraryDetection.defer do
           return call_without_tingyun(*args) unless TingYun::Agent.config[:'nbs.mq.enabled']
           begin
             headers = args[1][:headers].clone rescue {}
-            tingyun_id_secret = headers["TingyunID"]
+            tingyun_id_secret = headers["X-Tingyun-Id"]
             state = TingYun::Agent::TransactionState.tl_get
             metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{queue_name}/Consume"
-            TingYun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/RabbitMQ/Queue%2F#{queue_name}/Consume"})
             state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
+            TingYun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/RabbitMQ/Queue%2F#{queue_name}/Consume"})
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Consume')
             TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMq, {}, summary_metrics)  do
-              TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]
+              TingYun::Agent.record_metric("MessageRabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]
               TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FWait", TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i) rescue nil
               if state.current_transaction
                 state.add_custom_params("message.byte",args[2].bytesize)
                 state.add_custom_params("message.wait",TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i)
                 state.add_custom_params("message.routingkey",queue_name)
+                state.current_transaction.attributes.add_agent_attribute(:tx_id, state.client_transaction_id)
                 headers.delete("X-Tingyun-Id")
                 state.merge_request_parameters(headers)
               end
@@ -98,7 +99,7 @@ TingYun::Support::LibraryDetection.defer do
       def build_payload(state)
         timings = state.timings
         payload = {
-            :applicationId => TingYun::Agent.config[:tingyunIdSecret].split('|')[1],
+            :applicationId => state.client_tingyun_id_secret.spilt('|')[1],
             :transactionId => state.client_transaction_id,
             :externalId => state.extenel_req_id,
             :time => {
