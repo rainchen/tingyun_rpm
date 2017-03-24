@@ -87,7 +87,7 @@ module TingYun
         end
 
         def merge(hash)
-          @params.merge hash
+          params.merge! hash
         end
 
         def each_call(&blk)
