@@ -24,7 +24,7 @@ TingYun::Support::LibraryDetection.defer do
     begin
       require 'kafka'
       defined?(::Kafka)  &&
-          TingYun::Instrumentation::Kafka.version_support? &&  TingYun::Agent.config[:'nbs.mq.enabled']
+          TingYun::Instrumentation::Kafka.version_support?
     rescue LoadError
       false
     end

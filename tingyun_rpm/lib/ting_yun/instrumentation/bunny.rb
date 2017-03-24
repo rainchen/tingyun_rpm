@@ -2,7 +2,7 @@ TingYun::Support::LibraryDetection.defer do
   named :bunny
 
   depends_on do
-    defined?(::Bunny::VERSION) && TingYun::Agent.config[:'nbs.mq.enabled']
+    defined?(::Bunny::VERSION)
   end
 
 
@@ -23,7 +23,7 @@ TingYun::Support::LibraryDetection.defer do
             return publish_without_tingyun(payload, opts) unless state.execution_traced?
             queue_name = opts[:routing_key]
             opts[:headers] = {} unless opts[:headers]
-            opts[:headers][:TingyunID] = create_tingyun_id("mq")
+            opts[:headers]["X-Tingyun-Id"] = create_tingyun_id("mq")
             metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2F"
             if name.empty?
               metric_name << "Queue%2F#{queue_name}/Produce"
@@ -56,6 +56,7 @@ TingYun::Support::LibraryDetection.defer do
       if public_method_defined?(:call)
 
         def call_with_tingyun(*args)
+          return call_without_tingyun(*args) unless TingYun::Agent.config[:'nbs.mq.enabled']
           begin
             headers = args[1][:headers].clone rescue {}
             tingyun_id_secret = headers["TingyunID"]
@@ -71,7 +72,7 @@ TingYun::Support::LibraryDetection.defer do
                 state.add_custom_params("message.byte",args[2].bytesize)
                 state.add_custom_params("message.wait",TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i)
                 state.add_custom_params("message.routingkey",queue_name)
-                headers.delete("TingyunID")
+                headers.delete("X-Tingyun-Id")
                 state.merge_request_parameters(headers)
               end
               call_without_tingyun(*args)
@@ -118,6 +119,7 @@ TingYun::Support::LibraryDetection.defer do
     ::Bunny::Channel.class_eval do
       if public_method_defined?(:basic_get)
         def basic_get_with_tingyun(*args)
+          return basic_get_without_tingyun(*args) unless TingYun::Agent.config[:'nbs.mq.enabled']
           begin
             state = TingYun::Agent::TransactionState.tl_get
             metric_name = "#{@connection.host}:#{@connection.port}%2FQueue%2F#{args[0]}/Consume"
