@@ -169,6 +169,9 @@ module TingYun
         current_transaction.attributes.merge_request_parameters(hash)
       end
 
+      def add_current_node_params(hash)
+        transaction_sample_builder.current_node.merge hash if transaction_sample_builder
+      end
     end
   end
 end

@@ -33,6 +33,7 @@ TingYun::Support::LibraryDetection.defer do
 
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq, {}, summary_metrics)  do
+              state.add_current_node_params(:txId=>state.request_guid, :externalId=>state.extenel_req_id)
               TingYun::Agent.record_metric("#{metric_name}%2FByte",payload.bytesize) if payload
               publish_without_tingyun(payload, opts)
             end
