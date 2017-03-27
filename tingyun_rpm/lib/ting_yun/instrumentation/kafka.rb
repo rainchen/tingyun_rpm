@@ -24,7 +24,7 @@ TingYun::Support::LibraryDetection.defer do
     begin
       require 'kafka'
       defined?(::Kafka)  &&
-          TingYun::Instrumentation::Kafka.version_support? 
+          TingYun::Instrumentation::Kafka.version_support? && false
     rescue LoadError
       false
     end
