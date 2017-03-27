@@ -8,7 +8,7 @@ module TingYun
         def create_tingyun_id(protocol)
           state = TingYun::Agent::TransactionState.tl_get
           externel_guid = tingyun_externel_guid
-          state.transaction_sample_builder.current_node["externalId"] = externel_guid
+          state.extenel_req_id = externel_guid
           cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
               raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
           "#{cross_app_id};c=1;x=#{state.request_guid};e=#{externel_guid};s=#{TingYun::Helper.time_to_millis(Time.now)};p=#{protocol}"

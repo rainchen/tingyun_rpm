@@ -676,7 +676,7 @@ module TingYun
             :allowed_from_server => true,
             :description => 'Quantile'
         },
-        :'nbs.mq.conume' => {
+        :'nbs.mq.enabled' => {
             :default => false,
             :public => true,
             :type => Boolean,

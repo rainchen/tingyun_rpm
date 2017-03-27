@@ -86,6 +86,10 @@ module TingYun
           @params = p
         end
 
+        def merge(hash)
+          params.merge! hash
+        end
+
         def each_call(&blk)
           blk.call self
 
