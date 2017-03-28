@@ -22,18 +22,16 @@ TingYun::Support::LibraryDetection.defer do
             state = TingYun::Agent::TransactionState.tl_get
             return publish_without_tingyun(payload, opts) unless state.execution_traced?
             queue_name = opts[:routing_key]
-            opts[:headers] = {} unless opts[:headers]
-            opts[:headers]["X-Tingyun-Id"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
             metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2F"
             if name.empty?
               metric_name << "Queue%2F#{queue_name}/Produce"
             else
               metric_name << "Exchange%2F#{name}/Produce"
             end
-
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq, {}, summary_metrics)  do
-              state.add_current_node_params(:txId=>state.request_guid, :externalId=>state.extenel_req_id)
+              opts[:headers] = {} unless opts[:headers]
+              opts[:headers]["X-Tingyun-Id"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
               TingYun::Agent.record_metric("#{metric_name}%2FByte",payload.bytesize) if payload
               publish_without_tingyun(payload, opts)
             end
