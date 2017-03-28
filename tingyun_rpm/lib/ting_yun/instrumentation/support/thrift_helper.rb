@@ -43,7 +43,6 @@ module TingYun
       end
 
       def metrics operate
-        state = TingYun::Agent::TransactionState.tl_get
         metrics = if tingyun_host.nil?
                     ["External/thrift:%2F%2F#{operate}/#{operate}"]
                   else
@@ -56,17 +55,15 @@ module TingYun
         else
           metrics << "External/NULL/AllBackground"
         end
-
-
-        my_data = state.thrift_return_data
-
-
-        if my_data && TingYun::Agent.config[:'nbs.transaction_tracer.thrift'] && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
-          uri = "thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{operate}"
-          metrics << "cross_app;#{my_data["id"]};#{my_data["action"]};#{uri}"
-        end
         return metrics
+      end
 
+      def metrics_for_cross_app(my_data)
+        metrics = ["ExternalTransaction/NULL/#{my_data["id"]}",
+                    "ExternalTransaction/thrift/#{my_data["id"]}",
+                    "ExternalTransaction/thrift:sync/#{my_data["id"]}",
+                    "ExternalTransaction/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{operate}/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'').gsub('/','%2F')}"]
+        return metrics
       end
     end
   end

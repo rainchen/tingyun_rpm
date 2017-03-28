@@ -28,6 +28,9 @@ TingYun::Support::LibraryDetection.defer do
             if data.include?("TingyunTxData")
               my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
               TingYun::Agent::TransactionState.process_thrift_data(my_data["TingyunTxData"])
+              metrics_cross_app = metrics_for_cross_app(my_data["TingyunTxData"])
+              state = TingYun::Agent::TransactionState.tl_get
+              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, 0)
             end
           end
         end
