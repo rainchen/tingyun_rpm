@@ -64,14 +64,17 @@ module TingYun
 
             metrics = metrics_for(request)
             node_name = metrics.pop
-            ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, node_name, metrics, duration)
+            tx_data = TingYun::Support::Serialize::JSONWrapper.load(get_ty_data_header(response).gsub("'",'"')) || {}
+            net_block_duration = tx_data["time"]? duration - tx_data["time"]["duration"] : duration
+            ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, node_name, metrics, duration, net_block_duration)
             if cross_app
               metrics_cross_app = metrics_for_cross_app(request, response)
-              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, duration)
+              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, duration, net_block_duration)
             end
+
             if node
               node.name = node_name
-              add_transaction_trace_info(request, response, cross_app)
+              add_transaction_trace_info(request, response, cross_app, tx_data)
             end
           end
         rescue => err
@@ -85,12 +88,11 @@ module TingYun
       end
 
 
-      def add_transaction_trace_info(request, response, cross_app)
+      def add_transaction_trace_info(request, response, cross_app, tx_data)
         state = TingYun::Agent::TransactionState.tl_get
         ::TingYun::Agent::Collector::TransactionSampler.add_node_info(:uri => TingYun::Agent::HTTPClients::URIUtil.filter_uri(request.uri))
         if cross_app
-          ::TingYun::Agent::Collector::TransactionSampler.tl_builder.set_txId_and_txData(state.client_transaction_id || state.request_guid,
-                                                                                         TingYun::Support::Serialize::JSONWrapper.load(get_ty_data_header(response).gsub("'",'"')))
+          ::TingYun::Agent::Collector::TransactionSampler.tl_builder.set_txId_and_txData(state.client_transaction_id || state.request_guid, tx_data)
         end
       end
 
@@ -143,9 +145,9 @@ module TingYun
 
       def get_ty_data_header(response)
         if defined?(::HTTP) && defined?(::HTTP::Message) && response.class == ::HTTP::Message
-          response.header[TY_DATA_HEADER].first rescue nil
+          response.header[TY_DATA_HEADER].first rescue ""
         else
-          response[TY_DATA_HEADER] rescue nil
+          response[TY_DATA_HEADER] rescue ""
         end
       end
     end

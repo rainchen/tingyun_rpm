@@ -28,13 +28,12 @@ TingYun::Support::LibraryDetection.defer do
             if data.include?("TingyunTxData")
               my_data = TingYun::Support::Serialize::JSONWrapper.load data.gsub("'",'"')
               TingYun::Agent::TransactionState.process_thrift_data(my_data["TingyunTxData"])
-              metrics_cross_app = metrics_for_cross_app(my_data["TingyunTxData"])
-              state = TingYun::Agent::TransactionState.tl_get
-              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, 0)
+
             end
           end
         end
       end
+
 
       alias :skip_without_tingyun :skip
       alias :skip  :skip_with_tingyun
@@ -128,8 +127,14 @@ TingYun::Support::LibraryDetection.defer do
           duration = TingYun::Helper.time_to_millis(t1 - t0)
 
           TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
-              other_metrics.pop, other_metrics, duration
+              node_name, other_metrics, duration
           )
+          my_data = state.thrift_return_data
+          if my_data
+            metrics_cross_app = metrics_for_cross_app(operate, my_data)
+            net_block_duration = duration - my_data["time"]["duration"]
+            ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, duration, net_block_duration)
+          end
           if node
             node.name = node_name
             ::TingYun::Agent::Collector::TransactionSampler.add_node_info(:uri => "thrift:#{tingyun_host}:#{tingyun_port}/#{operate}")

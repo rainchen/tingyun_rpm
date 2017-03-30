@@ -123,7 +123,7 @@ module TingYun
         @max_call_time = value if value > @max_call_time
         @total_exclusive_time += exclusive_time
 
-        @sum_of_squares += (value * value)
+        @sum_of_squares += (exclusive_time * exclusive_time)
         self
       end
 
