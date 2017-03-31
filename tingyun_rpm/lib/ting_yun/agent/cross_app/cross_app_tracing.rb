@@ -65,11 +65,12 @@ module TingYun
             metrics = metrics_for(request)
             node_name = metrics.pop
             tx_data = TingYun::Support::Serialize::JSONWrapper.load(get_ty_data_header(response).gsub("'",'"')) || {}
-            net_block_duration = tx_data["time"]? duration - tx_data["time"]["duration"] : duration
+            net_block_duration = tx_data["time"]? duration - tx_data["time"]["duration"]- tx_data["time"]["qu"] : duration
             ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, node_name, metrics, duration, net_block_duration)
             if cross_app
+              net_block_duration = duration - tx_data["time"]["duration"]- tx_data["time"]["qu"]
               metrics_cross_app = metrics_for_cross_app(request, response)
-              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, duration, net_block_duration)
+              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, tx_data["time"]["duration"], net_block_duration)
             end
 
             if node
@@ -100,8 +101,7 @@ module TingYun
       def metrics_for_cross_app(request, response)
         my_data =  TingYun::Support::Serialize::JSONWrapper.load get_ty_data_header(response).gsub("'",'"')
         metrics = ["ExternalTransaction/NULL/#{my_data["id"]}",
-                   "ExternalTransaction/http/#{my_data["id"]}",
-                   "ExternalTransaction/http:sync/#{my_data["id"]}"]
+                   "ExternalTransaction/http/#{my_data["id"]}"]
         metrics << "ExternalTransaction/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'').gsub('/','%2F')}"
       end
 
@@ -136,7 +136,7 @@ module TingYun
       def response_is_cross_app?( response )
         return false unless response
         return false unless cross_app_enabled?
-        return false unless get_ty_data_header(response)
+        return false if get_ty_data_header(response).empty?
 
         return true
       end

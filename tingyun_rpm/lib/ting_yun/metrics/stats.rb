@@ -119,8 +119,8 @@ module TingYun
       def record_data_point(value, exclusive_time = value)
         @call_count += 1
         @total_call_time += value
-        @min_call_time = value if value < @min_call_time || @call_count == 1
-        @max_call_time = value if value > @max_call_time
+        @min_call_time = exclusive_time if exclusive_time < @min_call_time || @call_count == 1
+        @max_call_time = exclusive_time if exclusive_time > @max_call_time
         @total_exclusive_time += exclusive_time
 
         @sum_of_squares += (exclusive_time * exclusive_time)

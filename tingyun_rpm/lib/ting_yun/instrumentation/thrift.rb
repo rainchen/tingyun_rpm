@@ -125,15 +125,16 @@ TingYun::Support::LibraryDetection.defer do
           t1 = Time.now.to_f
           node_name, *other_metrics = metrics(operate)
           duration = TingYun::Helper.time_to_millis(t1 - t0)
-
+          my_data = state.thrift_return_data || []
+          net_block_duration = my_data["time"]? duration - my_data["time"]["duration"]- my_data["time"]["qu"] : duration
           TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
-              node_name, other_metrics, duration
+              node_name, other_metrics, duration, net_block_duration
           )
-          my_data = state.thrift_return_data
-          if my_data
+
+          if my_data["time"]
             metrics_cross_app = metrics_for_cross_app(operate, my_data)
-            net_block_duration = duration - my_data["time"]["duration"]
-            ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, duration, net_block_duration)
+            net_block_duration = duration - my_data["time"]["duration"]- my_data["time"]["qu"]
+            ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, my_data["time"]["duration"], net_block_duration)
           end
           if node
             node.name = node_name

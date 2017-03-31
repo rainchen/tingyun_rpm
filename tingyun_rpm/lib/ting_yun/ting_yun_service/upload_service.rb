@@ -70,7 +70,7 @@ module TingYun
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             else
               if metric_spec.scope.empty?
-                general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+                general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)  unless metric_spec.name.start_with?("View","Middleware","Nested","Rack")
               else
                 components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
               end
