@@ -68,9 +68,9 @@ module TingYun
             net_block_duration = tx_data["time"]? duration - tx_data["time"]["duration"]- tx_data["time"]["qu"] : duration
             ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, node_name, metrics, duration, net_block_duration)
             if cross_app
-              net_block_duration = duration - tx_data["time"]["duration"]- tx_data["time"]["qu"]
+              _duration =  tx_data["time"]["duration"] + tx_data["time"]["qu"]
               metrics_cross_app = metrics_for_cross_app(request, response)
-              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, tx_data["time"]["duration"], net_block_duration)
+              ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app,duration, _duration)
             end
 
             if node
@@ -147,7 +147,7 @@ module TingYun
         if defined?(::HTTP) && defined?(::HTTP::Message) && response.class == ::HTTP::Message
           response.header[TY_DATA_HEADER].first rescue ""
         else
-          response[TY_DATA_HEADER] rescue ""
+          response[TY_DATA_HEADER] || ""
         end
       end
     end
