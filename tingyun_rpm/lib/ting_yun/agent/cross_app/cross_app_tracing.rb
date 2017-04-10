@@ -147,9 +147,9 @@ module TingYun
 
       def get_ty_data_header(response)
         if defined?(::HTTP) && defined?(::HTTP::Message) && response.class == ::HTTP::Message
-          response.header[TY_DATA_HEADER].first rescue ""
+          response.header[TY_DATA_HEADER].first.to_s rescue ""
         else
-          response[TY_DATA_HEADER] || ""
+          response[TY_DATA_HEADER].to_s rescue ""
         end
       end
     end

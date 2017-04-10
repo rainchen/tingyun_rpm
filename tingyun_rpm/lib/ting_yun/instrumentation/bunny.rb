@@ -22,9 +22,6 @@ TingYun::Support::LibraryDetection.defer do
             state = TingYun::Agent::TransactionState.tl_get
             return publish_without_tingyun(payload, opts) unless state.execution_traced?
             queue_name = opts[:routing_key]
-            opts[:headers] = {} unless opts[:headers]
-
-            opts[:headers]["X-Tingyun-Id"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
 
             metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2F"
             if name.empty?
@@ -32,10 +29,10 @@ TingYun::Support::LibraryDetection.defer do
             else
               metric_name << "Exchange%2F#{name}/Produce"
             end
-
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq, {}, summary_metrics)  do
-              state.add_current_node_params(:txId=>state.request_guid, :externalId=>state.extenel_req_id)
+              opts[:headers] = {} unless opts[:headers]
+              opts[:headers]["X-Tingyun-Id"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
               TingYun::Agent.record_metric("#{metric_name}%2FByte",payload.bytesize) if payload
               publish_without_tingyun(payload, opts)
             end
@@ -68,7 +65,7 @@ TingYun::Support::LibraryDetection.defer do
             state = TingYun::Agent::TransactionState.tl_get
             metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{queue_name}/Consume"
             state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
-            TingYun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/RabbitMQ/Queue%2F#{queue_name}/Consume"})
+            TingYun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/RabbitMQ/Queue%2F#{queue_name}"})
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Consume')
             TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMq, {}, summary_metrics)  do
               TingYun::Agent.record_metric("MessageRabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]
@@ -80,10 +77,10 @@ TingYun::Support::LibraryDetection.defer do
                 state.current_transaction.attributes.add_agent_attribute(:tx_id, state.client_transaction_id)
                 headers.delete("X-Tingyun-Id")
                 state.merge_request_parameters(headers)
-                state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account? && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
               end
               call_without_tingyun(*args)
             end
+            state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account? && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
           rescue => e
             TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
             call_without_tingyun(*args)

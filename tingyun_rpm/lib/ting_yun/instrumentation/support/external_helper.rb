@@ -11,6 +11,7 @@ module TingYun
           state.extenel_req_id = externel_guid
           cross_app_id  = TingYun::Agent.config[:tingyunIdSecret] or
               raise TingYun::Agent::CrossAppTracing::Error, "no tingyunIdSecret configured"
+          state.add_current_node_params(:txId=>state.request_guid, :externalId=>state.extenel_req_id)
           "#{cross_app_id};c=1;x=#{state.request_guid};e=#{externel_guid};s=#{TingYun::Helper.time_to_millis(Time.now)};p=#{protocol}"
         end
 
