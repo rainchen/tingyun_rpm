@@ -54,7 +54,7 @@ module TingYun
       # Helpers
 
       def slow_action_tracer?
-        return app_time_in_seconds > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
+        return app_time_in_millis > TingYun::Agent.config[:'nbs.action_tracer.action_threshold']
       end
 
       def convert_to_milliseconds(value_in_seconds)
