@@ -44,9 +44,9 @@ module TingYun
 
       def metrics operate
         metrics = if tingyun_host.nil?
-                    ["External/thrift:%2F%2F#{operate}/#{operate}"]
+                    ["External/thrift:%2F%2F#{operate}/thrift"]
                   else
-                    ["External/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{operate}"]
+                    ["External/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/thrift"]
                   end
         metrics << "External/NULL/ALL"
 
@@ -61,7 +61,7 @@ module TingYun
       def metrics_for_cross_app(operate,my_data)
         metrics = ["ExternalTransaction/NULL/#{my_data["id"]}",
                    "ExternalTransaction/thrift/#{my_data["id"]}",
-                   "ExternalTransaction/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{operate}/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'').gsub('/','%2F')}"]
+                   "ExternalTransaction/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/thrift/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'').gsub('/','%2F')}"]
         return metrics
       end
 
