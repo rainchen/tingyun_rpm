@@ -31,7 +31,7 @@ TingYun::Support::LibraryDetection.defer do
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
             TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMq, {}, summary_metrics)  do
               opts[:headers] = {} unless opts[:headers]
-              opts[:headers]["X-Tingyun-Id"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
+              opts[:headers]["TingyunID"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
               TingYun::Agent.record_metric("#{metric_name}%2FByte",payload.bytesize) if payload
               publish_without_tingyun(payload, opts)
             end
@@ -58,7 +58,7 @@ TingYun::Support::LibraryDetection.defer do
           return call_without_tingyun(*args) unless TingYun::Agent.config[:'nbs.mq.enabled']
           begin
             headers = args[1][:headers].clone rescue {}
-            tingyun_id_secret = headers["X-Tingyun-Id"]
+            tingyun_id_secret = headers["TingyunID"]
             state = TingYun::Agent::TransactionState.tl_get
             metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{queue_name}/Consume"
             state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
@@ -72,7 +72,7 @@ TingYun::Support::LibraryDetection.defer do
                 state.add_custom_params("message.wait",TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i)
                 state.add_custom_params("message.routingkey",queue_name)
                 state.current_transaction.attributes.add_agent_attribute(:tx_id, state.client_transaction_id)
-                headers.delete("X-Tingyun-Id")
+                headers.delete("TingyunID")
                 state.merge_request_parameters(headers)
               end
               call_without_tingyun(*args)
