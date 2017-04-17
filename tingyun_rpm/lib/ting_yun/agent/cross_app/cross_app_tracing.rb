@@ -66,6 +66,7 @@ module TingYun
             node_name = metrics.pop
             tx_data = TingYun::Support::Serialize::JSONWrapper.load(get_ty_data_header(response).gsub("'",'"')) || {}
             net_block_duration = tx_data["time"]? duration - tx_data["time"]["duration"]- tx_data["time"]["qu"] : duration
+            net_block_duration = net_block_duration + tx_data["time"]["qu"] if net_block_duration < 0
             ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, node_name, metrics, duration, net_block_duration)
             if cross_app
               _duration =  tx_data["time"]["duration"] + tx_data["time"]["qu"]
