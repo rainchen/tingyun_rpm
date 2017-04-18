@@ -64,7 +64,6 @@ module TingYun
         @sql_sampler_transaction_data = nil
         @thrift_return_data = nil
         @timings = nil
-        @client_req_id = nil
       end
 
       # TT's and SQL
