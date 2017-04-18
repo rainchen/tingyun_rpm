@@ -25,8 +25,13 @@ TingYun::Support::LibraryDetection.defer do
 
             metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2F"
             if name.empty?
-              queue_name = "Temp" if queue_name.start_with?("amq.")
-              metric_name << "Queue%2F#{queue_name}/Produce"
+              if queue_name.start_with?("amq.")
+                metric_name << "Queue%2FTemp/Produce"
+              elsif queue_name.include?(".")
+                metric_name << "Topic%2F#{queue_name}/Produce"
+              else
+                metric_name << "Queue%2F#{queue_name}/Produce"
+              end
             else
               metric_name << "Exchange%2F#{name}/Produce"
             end
