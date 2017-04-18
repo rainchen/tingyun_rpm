@@ -8,7 +8,7 @@ module TingYun
 
     MINOR = 3
 
-    TINY = 13
+    TINY = 14
 
 
 

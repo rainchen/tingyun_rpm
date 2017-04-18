@@ -4,6 +4,10 @@ TingYun::Support::LibraryDetection.defer do
   depends_on do
     defined?(::Bunny::VERSION)
   end
+  depends_on do
+    !::TingYun::Agent.config[:disable_rabbitmq]
+  end
+
 
 
   executes do
