@@ -4,6 +4,10 @@ TingYun::Support::LibraryDetection.defer do
   depends_on do
     defined?(::Bunny::VERSION)
   end
+  depends_on do
+    !::TingYun::Agent.config[:disable_rabbitmq]
+  end
+
 
 
   executes do
@@ -22,9 +26,16 @@ TingYun::Support::LibraryDetection.defer do
             state = TingYun::Agent::TransactionState.tl_get
             return publish_without_tingyun(payload, opts) unless state.execution_traced?
             queue_name = opts[:routing_key]
+
             metric_name = "Message RabbitMQ/#{@channel.connection.host}:#{@channel.connection.port}%2F"
             if name.empty?
-              metric_name << "Queue%2F#{queue_name}/Produce"
+              if queue_name.start_with?("amq.")
+                metric_name << "Queue%2FTemp/Produce"
+              elsif queue_name.include?(".")
+                metric_name << "Topic%2F#{queue_name}/Produce"
+              else
+                metric_name << "Queue%2F#{queue_name}/Produce"
+              end
             else
               metric_name << "Exchange%2F#{name}/Produce"
             end
@@ -57,12 +68,27 @@ TingYun::Support::LibraryDetection.defer do
         def call_with_tingyun(*args)
           return call_without_tingyun(*args) unless TingYun::Agent.config[:'nbs.mq.enabled']
           begin
+
             headers = args[1][:headers].clone rescue {}
+
+
             tingyun_id_secret = headers["TingyunID"]
+
             state = TingYun::Agent::TransactionState.tl_get
-            metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{queue_name}/Consume"
+
+            if queue_name.start_with?("amq.")
+              metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2FTemp/Consume"
+              transaction_name = "WebAction/RabbitMQ/Queue%2FTemp"
+            elsif queue_name.include?(".")
+              metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FTopic%2F#{queue_name}/Consume"
+              transaction_name = "WebAction/RabbitMQ/Topic%2F#{queue_name}"
+            else
+              metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2F#{queue_name}/Consume"
+              transaction_name = "WebAction/RabbitMQ/Queue%2F#{queue_name}"
+            end
+
             state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
-            TingYun::Agent::Transaction.start(state,:message, { :transaction_name => "WebAction/RabbitMQ/Queue%2F#{queue_name}"})
+            TingYun::Agent::Transaction.start(state,:message, { :transaction_name => transaction_name})
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Consume')
             TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMq, {}, summary_metrics)  do
               TingYun::Agent.record_metric("MessageRabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]

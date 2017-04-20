@@ -29,7 +29,7 @@ module TingYun
             :type => 'perfMetrics',
             :timeFrom => stats_hash.started_at.to_i,
             :timeTo => stats_hash.harvested_at.to_i || Time.now.to_i,
-            :interval => 60,
+            :interval =>  TingYun::Agent.config[:data_report_period],
             :actions => action_array,
             :apdex => adpex_array,
             :components => components_array,
