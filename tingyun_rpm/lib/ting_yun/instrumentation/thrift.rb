@@ -126,10 +126,10 @@ TingYun::Support::LibraryDetection.defer do
           node_name, *other_metrics = metrics(operate)
           duration = TingYun::Helper.time_to_millis(t1 - t0)
           my_data = state.thrift_return_data || {}
-          net_block_duration = my_data["time"]? duration - my_data["time"]["duration"]- my_data["time"]["qu"] : duration
-          net_block_duration = duration if net_block_duration < 0
+          # net_block_duration = my_data["time"]? duration - my_data["time"]["duration"]- my_data["time"]["qu"] : duration
+          # net_block_duration = duration if net_block_duration < 0
           TingYun::Agent.instance.stats_engine.tl_record_scoped_and_unscoped_metrics(
-              node_name, other_metrics, duration, net_block_duration
+              node_name, other_metrics, duration
           )
 
           if my_data["time"]
