@@ -105,7 +105,7 @@ module TingYun
         my_data =  TingYun::Support::Serialize::JSONWrapper.load get_ty_data_header(response).gsub("'",'"')
         metrics = ["ExternalTransaction/NULL/#{my_data["id"]}",
                    "ExternalTransaction/http/#{my_data["id"]}"]
-        metrics << "ExternalTransaction/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'').gsub('/','%2F')}"
+        metrics << "ExternalTransaction/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'')}"
       end
 
       def metrics_for(request)
