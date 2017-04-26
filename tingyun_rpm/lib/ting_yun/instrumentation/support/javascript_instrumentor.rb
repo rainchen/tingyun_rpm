@@ -11,27 +11,18 @@ module TingYun
         module_function
 
         def browser_timing_header #THREAD_LOCAL_ACCESS
-          return '' unless rum_enable? # unsupport insert script
-
           state = TingYun::Agent::TransactionState.tl_get
           return '' unless insert_js?(state)
-
-          bt_config = browser_timing_config(state)
-
+          bt_config = TingYun::Support::Serialize::JSONWrapper.dump(browser_timing_config(state))
           return '' if bt_config.empty?
-
-          if TingYun::Agent.config[:'nbs.rum.mix_enabled']
-            html_safe_if_needed("<script>(function(w){(w._ty_rum || (w._ty_rum = {})).agent = #{bt_config};})(window);</script>")
-          else
-            html_safe_if_needed("<script>#{browser_instrument("ty_rum.agent=#{bt_config}")}</script>")
-          end
+          html_safe_if_needed("<script>#{browser_instrument("ty_rum.agent=#{bt_config}")}</script>")
         rescue => e
           ::TingYun::Agent.logger.debug "Failure during RUM browser_timing_header construction", e
           ''
         end
 
         def rum_enable?
-           TingYun::Agent.config[:'nbs.rum.enabled']
+          TingYun::Agent.config[:'nbs.rum.enabled']
         end
 
         def insert_js?(state)
@@ -49,6 +40,10 @@ module TingYun
           end
         end
 
+        def mix_js
+
+        end
+
         def browser_timing_config(state)
           timings = state.timings
 
@@ -59,8 +54,8 @@ module TingYun
               :q => timings.queue_time_in_millis,
               :tid => state.trace_id
           }
-          TingYun::Support::Serialize::JSONWrapper.dump(data)
-        end
+          data
+      end
 
         def html_safe_if_needed(string)
           string = string.html_safe if string.respond_to?(:html_safe)
