@@ -40,10 +40,6 @@ module TingYun
           end
         end
 
-        def mix_js
-
-        end
-
         def browser_timing_config(state)
           timings = state.timings
 
