@@ -10,7 +10,7 @@ module TingYun
 
 
 
-    TINY = 33
+    TINY = 34
 
 
 
