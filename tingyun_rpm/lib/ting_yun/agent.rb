@@ -185,5 +185,16 @@ module TingYun
       agent.shutdown if agent
     end
 
+    # if you wanna call the method, you must make sure current_transaction is not nil at first
+    # if current_transaction
+    #    add_custom_params(:key1,:value1)
+    #    add_custom_params(:key2,:value2)
+    # end
+    # public api
+    def add_custom_params(key, value)
+      txn = TingYun::Agent::TransactionState.tl_get.current_transaction
+      txn.attributes.add_custom_params(key, value) if txn
+    end
+
   end
 end

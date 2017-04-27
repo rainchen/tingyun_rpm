@@ -160,12 +160,12 @@ module TingYun
       # end
       # public api
       def add_custom_params(key, value)
-        current_transaction.attributes.add_custom_params(key, value)
+        current_transaction.attributes.add_custom_params(key, value) if current_transaction
       end
 
       # same to add_custom_params
       def merge_request_parameters(hash)
-        current_transaction.attributes.merge_request_parameters(hash)
+        current_transaction.attributes.merge_request_parameters(hash) if current_transaction
       end
 
       def add_current_node_params(hash)
