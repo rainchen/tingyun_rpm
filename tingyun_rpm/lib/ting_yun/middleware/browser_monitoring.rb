@@ -26,15 +26,28 @@ module TingYun
     def traced_call(env)
       result = @app.call(env)   # [status, headers, response]
 
-      js_to_inject = TingYun::Instrumentation::Support::JavascriptInstrument.browser_timing_header
+      if should_instrument?(env, result[0], result[1])
+        if rum_enable? # unsupport insert script
+          if TingYun::Agent.config[:'nbs.rum.mix_enabled']
+            result[1]["Set-Cookie"] = "TINGYUN_DATA=#{manufacture_cookie}"
+            env[ALREADY_INSTRUMENTED_KEY] = true
+            result
+          else
+            js_to_inject = TingYun::Instrumentation::Support::JavascriptInstrument.browser_timing_header
+            if (js_to_inject != '')
+              response_string = auto_instrument_source(result[2], js_to_inject)
 
-      if (js_to_inject != '') && should_instrument?(env, result[0], result[1])
-        response_string = auto_instrument_source(result[2], js_to_inject)
-
-        env[ALREADY_INSTRUMENTED_KEY] = true
-        if response_string
-          response = Rack::Response.new(response_string, result[0], result[1])
-          response.finish
+              env[ALREADY_INSTRUMENTED_KEY] = true
+              if response_string
+                response = Rack::Response.new(response_string, result[0], result[1])
+                response.finish
+              else
+                result
+              end
+            else
+              result
+            end
+          end
         else
           result
         end
@@ -64,6 +77,29 @@ module TingYun
     def is_attachment?(headers)
       headers[CONTENT_DISPOSITION] && headers[CONTENT_DISPOSITION].include?(ATTACHMENT)
     end
+
+    def rum_enable?
+      TingYun::Agent.config[:'nbs.rum.enabled']
+    end
+
+    def manufacture_cookie
+      state = TingYun::Agent::TransactionState.tl_get
+      timings = state.timings
+      "%7Bid%3A%22#{TingYun::Agent.config[:tingyunIdSecret].to_s.gsub("#",'%23').gsub("|",'%7C')}%22%2Cn%3A%22#{state.transaction_name.to_s.gsub("/",'%2F')}%22%2Ctid%3A%22#{state.trace_id}%22%2Cq%3A#{timings.queue_time_in_millis}%2Ca%3A#{timings.app_time_in_millis}%7D"
+    end
+    def browser_timing_config(state)
+      timings = state.timings
+
+      data = {
+          :id => TingYun::Agent.config[:tingyunIdSecret],
+          :n => state.transaction_name ,
+          :a => timings.app_time_in_millis,
+          :q => timings.queue_time_in_millis,
+          :tid => state.trace_id
+      }
+      data
+    end
+
 
     def auto_instrument_source(response, js_to_inject)
       source = gather_source(response)
