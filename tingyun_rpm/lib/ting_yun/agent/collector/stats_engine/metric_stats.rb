@@ -66,6 +66,24 @@ module TingYun
             end
           end
 
+          def tl_record_scoped_metrics(metric_names, value=nil, aux=nil, &blk)
+            state = TingYun::Agent::TransactionState.tl_get
+            record_scoped_metrics(state, metric_names, value, aux, &blk)
+          end
+
+          def record_scoped_metrics(state, metric_names, value=nil, aux=nil,  &blk)
+            txn = state.current_transaction
+
+            if txn
+              txn.metrics.record_scoped(metric_names, value, aux, &blk)
+            else
+              specs = coerce_to_metric_spec_array(metric_names, nil)
+              with_stats_lock do
+                @stats_hash.record(specs, value, aux, &blk)
+              end
+            end
+          end
+
           # Like tl_record_unscoped_metrics, but records a scoped metric as well.
           #
           # This is an internal method, subject to change at any time. Client apps
