@@ -1,10 +1,12 @@
 # encoding: utf-8
 require 'ting_yun/middleware/agent_middleware'
 require 'ting_yun/instrumentation/support/javascript_instrumentor'
-
+require 'ting_yun/support/coerce'
 
 module TingYun
   class BrowserMonitoring < AgentMiddleware
+
+    include TingYun::Support::Coerce
 
     CONTENT_TYPE        = 'Content-Type'.freeze
     TEXT_HTML           = 'text/html'.freeze
@@ -85,7 +87,7 @@ module TingYun
     def manufacture_cookie
       state = TingYun::Agent::TransactionState.tl_get
       timings = state.timings
-      "%7B%22id%22%3A%22#{TingYun::Agent.config[:tingyunIdSecret].to_s.gsub("#",'%23').gsub("|",'%7C')}%22%2C%22n%22%3A%22#{state.transaction_name.to_s.gsub("/",'%2F')}%22%2C%22tid%22%3A%22#{state.trace_id}%22%2C%22q%22%3A#{timings.queue_time_in_millis}%2C%22a%22%3A#{timings.app_time_in_millis}%7D"
+      "%7B%22id%22%3A%22#{TingYun::Support::Coerce.url_encode(TingYun::Agent.config[:tingyunIdSecret].to_s)}%22%2C%22n%22%3A%22#{TingYun::Support::Coerce.url_encode(state.transaction_name.to_s)}%22%2C%22tid%22%3A%22#{state.trace_id}%22%2C%22q%22%3A#{timings.queue_time_in_millis}%2C%22a%22%3A#{timings.app_time_in_millis}%7D"
     end
     def browser_timing_config(state)
       timings = state.timings
