@@ -141,7 +141,7 @@ module TingYun
             trace_options,
             end_time.to_f)
 
-        commit(state, end_time, name) unless ignore(best_name)
+        commit(state, end_time, name)
       end
 
 
