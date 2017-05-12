@@ -17,7 +17,7 @@ TingYun::Support::LibraryDetection.defer do
 
   executes do
     class TingYun::SidekiqInstrumentation
-      include TingYun::I  nstrumentation::Support::ControllerInstrumentation
+      include TingYun::Instrumentation::Support::ControllerInstrumentation
       def call(worker_instance, msg, queue, *_)
         trace_args = if worker_instance.respond_to?(:tingyun_trace_args)
                        worker_instance.tingyun_trace_args(msg, queue)
