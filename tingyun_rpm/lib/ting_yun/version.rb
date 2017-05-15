@@ -6,11 +6,11 @@ module TingYun
 
     MAJOR = 1
 
-    MINOR = 3
+    MINOR = 4
 
 
 
-    TINY = 34
+    TINY = 2
 
 
 
