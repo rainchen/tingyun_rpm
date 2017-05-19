@@ -61,7 +61,7 @@ module TingYun
       def metrics_for_cross_app(operate,my_data)
         metrics = ["ExternalTransaction/NULL/#{my_data["id"]}",
                    "ExternalTransaction/thrift/#{my_data["id"]}",
-                   "ExternalTransaction/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/thrift/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'')}"]
+                   "ExternalTransaction/thrift:%2F%2F#{tingyun_host}:#{tingyun_port}%2F#{operate}/#{my_data["id"]}%2F#{my_data["action"].to_s.gsub(/\/\z/,'')}"]
         return metrics
       end
 
