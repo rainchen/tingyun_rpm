@@ -134,7 +134,7 @@ TingYun::Support::LibraryDetection.defer do
 
           if my_data["time"]
             metrics_cross_app = metrics_for_cross_app(operate, my_data)
-            _duration =  my_data["time"]["duration"] + my_data["time"]["qu"]
+            _duration =  my_data["time"]["duration"] + my_data["time"]["qu"] + 0.1
             ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, metrics_cross_app.pop, metrics_cross_app, _duration)
           end
           if node

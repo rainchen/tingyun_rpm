@@ -10,7 +10,7 @@ module TingYun
 
 
 
-    TINY = 9
+    TINY = 10
 
 
 

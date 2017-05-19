@@ -69,7 +69,7 @@ module TingYun
             # net_block_duration = duration if net_block_duration < 0
             ::TingYun::Agent.instance.stats_engine.record_scoped_and_unscoped_metrics(state, node_name, metrics, duration)
             if cross_app
-              _duration =  tx_data["time"]["duration"] + tx_data["time"]["qu"]
+              _duration =  tx_data["time"]["duration"] + tx_data["time"]["qu"] + 0.1
               metrics_cross_app = metrics_for_cross_app(request, response)
               txn = state.current_transaction
               txn.metrics.record_scoped(metrics_cross_app.pop, duration, _duration)
