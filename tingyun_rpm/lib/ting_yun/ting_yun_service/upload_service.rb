@@ -72,7 +72,7 @@ module TingYun
               if metric_spec.scope.empty?
                 general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)  unless metric_spec.name.start_with?("View","Middleware","Nested","Rack")
               else
-                components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+                components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id) unless metric_spec.name.start_with?("Nested")
               end
             end
 
