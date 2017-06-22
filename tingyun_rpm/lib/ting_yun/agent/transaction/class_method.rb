@@ -130,6 +130,11 @@ module TingYun
           txn.name_last_frame(node_name || name)
           txn.set_default_transaction_name(name, category)
         end
+
+        def set_default_transaction_name!(name) #THREAD_LOCAL_ACCESS
+          txn  = tl_current
+          txn.default_name = name
+        end
       end
     end
   end
