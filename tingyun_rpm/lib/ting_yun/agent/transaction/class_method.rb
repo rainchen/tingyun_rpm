@@ -131,9 +131,9 @@ module TingYun
           txn.set_default_transaction_name(name, category)
         end
 
-        def set_default_transaction_name!(name) #THREAD_LOCAL_ACCESS
+        def set_frozen_transaction_name!(name) #THREAD_LOCAL_ACCESS
           txn  = tl_current
-          txn.default_name = name
+          txn.frozen_name = name
         end
       end
     end
