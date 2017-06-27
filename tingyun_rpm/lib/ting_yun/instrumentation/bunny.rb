@@ -66,7 +66,7 @@ TingYun::Support::LibraryDetection.defer do
       if public_method_defined?(:call)
 
         def call_with_tingyun(*args)
-          return call_without_tingyun(*args) if false
+          return call_without_tingyun(*args) unless TingYun::Agent.config[:'nbs.mq.enabled']
           begin
 
             headers = args[1][:headers].clone rescue {}
