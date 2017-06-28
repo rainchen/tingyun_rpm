@@ -25,6 +25,7 @@ TingYun::Support::LibraryDetection.defer do
                        self.class.default_trace_args(msg)
                      end
         perform_action_with_tingyun_trace(trace_args) do
+          TingYun::Agent.add_custom_params(:job_arguments, msg['args'])
           yield
         end
       end

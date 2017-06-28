@@ -68,22 +68,11 @@ module TingYun
               adpex_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
             elsif metric_spec.name.start_with?('Errors') && metric_spec.scope.empty?
               errors_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-            elsif metric_spec.name.start_with?('cross_app')
-              external =  metric_spec.name.split(';')
-              if metric_spec.scope.empty?
-                metric_spec.name = "ExternalTransaction/NULL/#{external[1]}"
-                general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-              else
-                metric_spec.name = "External/#{external[3]}"
-                metric_spec.calleeId = external[1]
-                metric_spec.calleeName = external[2]
-                components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
-              end
             else
               if metric_spec.scope.empty?
-                general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)
+                general_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id)  unless metric_spec.name.start_with?("View","Middleware","Nested","Rack")
               else
-                components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id) unless metric_spec.name.start_with?('External/NULL')
+                components_array << TingYun::Metrics::MetricData.new(metric_spec, stats, metric_id) unless metric_spec.name.start_with?("Nested")
               end
             end
 

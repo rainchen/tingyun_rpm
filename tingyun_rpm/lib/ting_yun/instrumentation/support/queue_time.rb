@@ -8,6 +8,7 @@ module TingYun
         unless defined?(REQUEST_START_HEADER)
           REQUEST_START_HEADER = 'HTTP_X_REQUEST_START'.freeze
           QUEUE_START_HEADER = 'HTTP_X_QUEUE_START'.freeze
+          X_QUEUE_START           = 'X-QUEUE-START'.freeze
           MIDDLEWARE_START_HEADER = 'HTTP_X_MIDDLEWARE_START'.freeze
           ALL_QUEUE_METRIC = 'WebFrontend/QueueTime'.freeze
           # any timestamps before this are thrown out and the parser
@@ -17,6 +18,7 @@ module TingYun
           CANDIDATE_HEADERS = [
               REQUEST_START_HEADER,
               QUEUE_START_HEADER,
+              X_QUEUE_START,
               MIDDLEWARE_START_HEADER
           ].freeze
 

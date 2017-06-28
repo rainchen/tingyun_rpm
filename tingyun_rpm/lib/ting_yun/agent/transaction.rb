@@ -75,6 +75,7 @@ module TingYun
 
         @has_children = false
         @category = category
+        @is_mq = options[:mq] || false
 
         @guid = client_transaction_id || generate_guid
         @frame_stack = []
@@ -97,6 +98,9 @@ module TingYun
         @request_attributes && @request_attributes.port
       end
 
+      def frozen_name=(name)
+        @frozen_name = name
+      end
 
       def start(state)
         return if !state.execution_traced?
@@ -117,7 +121,7 @@ module TingYun
 
         freeze_name_and_execute
 
-        if @has_children
+        if @has_children or @is_mq
           name = Transaction.nested_transaction_name(outermost_frame.name)
           trace_options = TRACE_OPTIONS_SCOPED
         else

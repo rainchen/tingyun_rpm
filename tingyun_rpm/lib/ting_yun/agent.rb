@@ -63,10 +63,14 @@ module TingYun
     # This method is safe to use from any thread.
     #
     # @api public
-    def record_metric(metric_name, value) #THREAD_LOCAL_ACCESS
+    def record_metric(metric_name, value, is_scoped=false ) #THREAD_LOCAL_ACCESS
       return unless agent
       stats = TingYun::Metrics::Stats.create_from_hash(value) if value.is_a?(Hash)
-      agent.stats_engine.tl_record_unscoped_metrics(metric_name, stats || value)
+      if is_scoped
+        agent.stats_engine.tl_record_scoped_metrics(metric_name, stats || value)
+      else
+        agent.stats_engine.tl_record_unscoped_metrics(metric_name, stats || value)
+      end
     end
 
     # Manual agent configuration and startup/shutdown
@@ -183,6 +187,17 @@ module TingYun
     #
     def shutdown
       agent.shutdown if agent
+    end
+
+    # if you wanna call the method, you must make sure current_transaction is not nil at first
+    # if current_transaction
+    #    add_custom_params(:key1,:value1)
+    #    add_custom_params(:key2,:value2)
+    # end
+    # public api
+    def add_custom_params(key, value)
+      txn = TingYun::Agent::TransactionState.tl_get.current_transaction
+      txn.attributes.add_custom_params(key, value) if txn
     end
 
   end

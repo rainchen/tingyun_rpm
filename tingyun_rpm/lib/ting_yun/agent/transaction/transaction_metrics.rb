@@ -6,6 +6,7 @@ module TingYun
     class TransactionMetrics
       DEFAULT_PROC = Proc.new { |hash, name| hash[name] = TingYun::Metrics::Stats.new }
 
+
       def initialize
         @unscoped = Hash.new(&DEFAULT_PROC)
         @scoped   = Hash.new(&DEFAULT_PROC)

@@ -88,10 +88,12 @@ TingYun::Support::LibraryDetection.defer do
             end
 
             state.save_referring_transaction_info(tingyun_id_secret.split(';')) if cross_app_enabled?(tingyun_id_secret)
-            TingYun::Agent::Transaction.start(state,:message, { :transaction_name => transaction_name})
+
             summary_metrics = TingYun::Agent::Datastore::MetricHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Consume')
-            TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMq, {}, summary_metrics)  do
-              TingYun::Agent.record_metric("MessageRabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]
+
+            TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMq, {:mq=> true}, summary_metrics)  do
+              TingYun::Agent::Transaction.set_frozen_transaction_name!(transaction_name)
+              TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]
               TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FWait", TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i) rescue 0
               if state.current_transaction
                 state.add_custom_params("message.byte",args[2].bytesize)

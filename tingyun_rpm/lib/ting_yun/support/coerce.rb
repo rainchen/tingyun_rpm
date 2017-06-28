@@ -45,6 +45,11 @@ module TingYun
         ""
       end
 
+      def url_encode(s)
+        s.to_s.b.gsub(/[^a-zA-Z0-9_\-.]/n) { |m|
+          sprintf("%%%02X", m.unpack("C")[0])
+        }
+      end
       # Convert a hash into a format acceptable to be included with Transaction
       # event data.
       #
