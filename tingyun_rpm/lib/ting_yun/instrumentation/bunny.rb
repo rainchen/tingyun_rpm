@@ -104,13 +104,11 @@ TingYun::Support::LibraryDetection.defer do
                 state.merge_request_parameters(headers)
               end
               call_without_tingyun(*args)
+              state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account? && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
             end
-            state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account? && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
           rescue => e
             TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
             call_without_tingyun(*args)
-          ensure
-            TingYun::Agent::Transaction.stop(state, Time.now, summary_metrics)
           end
 
         end
