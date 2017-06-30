@@ -95,22 +95,18 @@ TingYun::Support::LibraryDetection.defer do
               TingYun::Agent::Transaction.set_frozen_transaction_name!(transaction_name)
               TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FByte",args[2].bytesize) if args[2]
               TingYun::Agent.record_metric("Message RabbitMQ/#{metric_name}%2FWait", TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i) rescue 0
-              if state.current_transaction
-                state.add_custom_params("message.byte",args[2].bytesize)
-                state.add_custom_params("message.wait",TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i)
-                state.add_custom_params("message.routingkey",queue_name)
-                state.current_transaction.attributes.add_agent_attribute(:tx_id, state.client_transaction_id)
-                headers.delete("TingyunID")
-                state.merge_request_parameters(headers)
-              end
+              state.add_custom_params("message.byte",args[2].bytesize)
+              state.add_custom_params("message.wait",TingYun::Helper.time_to_millis(Time.now)-state.externel_time.to_i)
+              state.add_custom_params("message.routingkey",queue_name)
+              state.current_transaction.attributes.add_agent_attribute(:tx_id, state.client_transaction_id)
+              headers.delete("TingyunID")
+              state.merge_request_parameters(headers)
               call_without_tingyun(*args)
+              state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account? && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
             end
-            state.current_transaction.attributes.add_agent_attribute(:entryTrace, build_payload(state)) if state.same_account? && TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
           rescue => e
             TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
             call_without_tingyun(*args)
-          ensure
-            TingYun::Agent::Transaction.stop(state, Time.now, summary_metrics)
           end
 
         end
