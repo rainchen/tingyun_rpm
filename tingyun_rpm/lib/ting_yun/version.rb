@@ -11,7 +11,7 @@ module TingYun
 
 
 
-    TINY = 1
+    TINY = 2
 
 
 
