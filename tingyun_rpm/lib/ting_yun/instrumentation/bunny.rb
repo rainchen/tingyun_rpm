@@ -76,7 +76,7 @@ TingYun::Support::LibraryDetection.defer do
 
             state = TingYun::Agent::TransactionState.tl_get
 
-            if queue_name. ("amq.")
+            if queue_name.start_with?("amq.")
               metric_name = "#{@channel.connection.host}:#{@channel.connection.port}%2FQueue%2FTemp/Consume"
               transaction_name = "WebAction/RabbitMQ/Queue%2FTemp"
             elsif queue_name.include?(".")
