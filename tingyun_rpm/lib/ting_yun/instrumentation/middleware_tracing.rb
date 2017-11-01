@@ -71,7 +71,7 @@ module TingYun
 
           result
         rescue Exception => e
-          TingYun::Agent.notice_error(e)
+          TingYun::Agent.notice_error(e,:type=>:error)
           raise e
         ensure
           TingYun::Agent::Transaction.stop(state)

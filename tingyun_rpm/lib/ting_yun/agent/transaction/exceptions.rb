@@ -6,6 +6,7 @@ module TingYun
       class Exceptions
         attr_accessor :exceptions
 
+
         def initialize
           @exceptions = {}
         end
@@ -20,7 +21,7 @@ module TingYun
         end
 
         # Do not call this.  Invoke the class method instead.
-        def notice_error(error, options={}) # :nodoc:
+        def notice_error(error, options={}) # :nodoc:11
           if @exceptions[error]
             @exceptions[error].merge! options
           else

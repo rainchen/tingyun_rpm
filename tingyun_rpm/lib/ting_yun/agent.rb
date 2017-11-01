@@ -128,6 +128,10 @@ module TingYun
       nil # don't return a noticed error datastructure. it can only hurt.
     end
 
+    def notice_exception(exception,options={})
+
+    end
+
     # Register this method as a callback for processes that fork
     # jobs.
     #

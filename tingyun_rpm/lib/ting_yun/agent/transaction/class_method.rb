@@ -83,7 +83,7 @@ module TingYun
             # to be absolutely sure we don't report agent problems as app errors
             yield
           rescue => e
-            Transaction.notice_error(e)
+            ::TingYun::Agent.notice_error(e,:type=> :exception)
             raise e
           ensure
             # when kafka consumer in task, drop original web_action

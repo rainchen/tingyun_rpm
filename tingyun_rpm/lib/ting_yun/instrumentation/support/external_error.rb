@@ -19,7 +19,7 @@ module TingYun
             klass = "External/#{request.uri.to_s.gsub('/','%2F')}/#{request.from}"
             set_attributes(e, klass, response.code)
 
-            TingYun::Agent.notice_error(e)
+            TingYun::Agent.notice_error(e,:type=>:exception)
           end
         end
 
@@ -37,7 +37,7 @@ module TingYun
               set_attributes(e, klass, 1000)
           end
 
-          TingYun::Agent.notice_error(e)
+          TingYun::Agent.notice_error(e,:type=>:error)
         end
 
         def set_attributes(exception, klass, code)
