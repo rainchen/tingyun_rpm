@@ -37,7 +37,7 @@ module TingYun
               set_attributes(e, klass, 1000)
           end
 
-          TingYun::Agent.notice_error(e,:type=>:error)
+          TingYun::Agent.notice_error(e,:type=>:exception)
         end
 
         def set_attributes(exception, klass, code)

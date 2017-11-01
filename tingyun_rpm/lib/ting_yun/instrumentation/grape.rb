@@ -28,6 +28,8 @@ TingYun::Support::LibraryDetection.defer do
           run_without_tingyun(*args)
         rescue => e
           TingYun::Agent.logger.info("Error getting Grape Endpoint Name. Error: #{e.message}. Options: #{self.options.inspect}")
+          TingYun::Agent.notice_error(e,:type=>:exception)
+          raise e
         end
 
       end
