@@ -72,9 +72,9 @@ module TingYun
           @current_node = @current_node.parent_node
         end
         if error
-          @current_node["exception"] = {"message": error.message,
-                                        "class": error.class.to_s,
-                                        "stacktrace": error.backtrace
+          @current_node["exception"] = {"message" => error.message,
+                                        "class" => error.class.to_s,
+                                        "stacktrace"=>error.backtrace
           }
         end
 
