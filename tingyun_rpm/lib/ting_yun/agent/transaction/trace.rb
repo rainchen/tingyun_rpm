@@ -8,7 +8,7 @@ module TingYun
     class Transaction
       class Trace
 
-        attr_accessor :root_node, :node_count, :threshold, :guid, :attributes, :start_time, :finished
+        attr_accessor :root_node, :node_count, :threshold, :guid, :attributes, :start_time, :finished, :array_size
 
         def initialize(start_time)
           @start_time = start_time
@@ -50,7 +50,7 @@ module TingYun
               encoder.encode(trace_tree),
               attributes.agent_attributes[:tx_id],
               guid
-          ]
+          ] + array_size
         end
 
         def prepare_to_send!

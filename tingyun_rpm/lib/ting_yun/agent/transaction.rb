@@ -154,7 +154,7 @@ module TingYun
         assign_agent_attributes
 
 
-        TingYun::Agent.instance.transaction_sampler.on_finishing_transaction(state, self, end_time)
+        TingYun::Agent.instance.transaction_sampler.on_finishing_transaction(state, self, end_time,@exceptions.errors_and_exceptions)
 
         TingYun::Agent.instance.sql_sampler.on_finishing_transaction(state, @frozen_name)
 

@@ -13,7 +13,6 @@ module TingYun
         yield
       rescue => e
         ::TingYun::Agent.logger.error("Caught exception in #{code_area}.", e)
-        ::TingYun::Agent.notice_error(e, method: code_area, path: "ting_yun/agent/method_tracer_helpers",:type=> :exception)
       end
 
       def trace_execution_scoped_header(state, t0)

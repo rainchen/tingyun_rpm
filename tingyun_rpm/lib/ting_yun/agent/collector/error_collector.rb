@@ -89,11 +89,12 @@ module TingYun
         end
         include Metric
 
-        attr_reader :error_trace_array, :external_error_array
+        attr_reader :error_trace_array, :external_error_array,:exception_error_array
 
         def initialize
           @error_trace_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
           @external_error_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
+          @exception_error_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
         end
 
         # See TingYun::Agent.notice_error for options and commentary
@@ -105,7 +106,12 @@ module TingYun
           if noticed_error.is_external_error
             external_error_array.add_to_error_queue(noticed_error)
           else
-            error_trace_array.add_to_error_queue(noticed_error)
+            if noticed_error.type && noticed_error.type == :exception
+              exception_error_array.add_to_error_queue(noticed_error)
+            else
+              error_trace_array.add_to_error_queue(noticed_error)
+            end
+
           end
         rescue => e
           ::TingYun::Agent.logger.warn("Failure when capturing error '#{exception}':", e)
@@ -120,7 +126,7 @@ module TingYun
         #
         def increment_error_count(exception,state, type)
           txn = state.current_transaction
-          if type==:exception
+          if type && type==:exception
             exception_metric_names = aggregated_exception_metric_names(txn)
             exception_aggregated_type = aggregated_exception_type_count(exception,txn)
             exception_metric_names << exception_aggregated_type if exception_aggregated_type
@@ -147,12 +153,25 @@ module TingYun
         EMPTY_STRING = ''.freeze
 
         def create_noticed_error(exception, options)
-          attributes = options[:attributes]
-          error_metric = attributes.agent_attributes[:metric_name] || EMPTY_STRING
-          noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
-          noticed_error.attributes  = attributes
-          noticed_error.stack_trace = extract_stack_trace(exception)
-          noticed_error
+          if options[:type] && options[:type]==:exception
+            attributes = options[:attributes]
+            attributes.add_agent_attribute(:httpStatus,0)
+            error_metric = attributes.agent_attributes[:metric_name] || EMPTY_STRING
+            noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
+            noticed_error.attributes  = attributes
+            noticed_error.stack_trace = extract_stack_trace(exception) if ::TingYun::Agent.config[:enable_exception_stack]
+            noticed_error.type = options[:type]
+            noticed_error
+          else
+            attributes = options[:attributes]
+            error_metric = attributes.agent_attributes[:metric_name] || EMPTY_STRING
+            noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
+            noticed_error.attributes  = attributes
+            noticed_error.stack_trace = extract_stack_trace(exception)
+            noticed_error.type = options[:type]
+            noticed_error
+          end
+
         end
 
 

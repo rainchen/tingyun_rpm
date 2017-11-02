@@ -16,7 +16,7 @@ module TingYun
 
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :is_external_error, :external_metric_name, :code, :trace
+                      :count_error, :is_external_error, :external_metric_name, :code, :trace, :type
 
         attr_reader :exception_id, :is_internal
 

@@ -37,6 +37,13 @@ module TingYun
             return true
           end
         end
+
+        def errors_and_exceptions
+          exceptions = @exceptions.select{|k,v| v[:type]==:exception} .size
+          errors = @exceptions.size - exceptions
+          [errors,exceptions]
+        end
+
       end
     end
   end

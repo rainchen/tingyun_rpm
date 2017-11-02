@@ -136,6 +136,14 @@ module TingYun
       invoke_remote(:upload, [upload_data], :encoder=> json)
     end
 
+    def exception_data(unsent_exceptions)
+      upload_data = {
+          :type => 'exceptionTraceData',
+          :exceptions => unsent_exceptions
+      }
+      invoke_remote(:upload, [upload_data], :encoder=> json)
+    end
+
 
     def action_trace_data(traces)
       upload_data = {

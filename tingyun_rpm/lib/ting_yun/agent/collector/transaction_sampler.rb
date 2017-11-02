@@ -62,7 +62,7 @@ module TingYun
           end
         end
 
-        def on_finishing_transaction(state, txn, time=Time.now.to_f)
+        def on_finishing_transaction(state, txn, time=Time.now.to_f, sizes)
           last_builder = state.transaction_sample_builder
           return unless last_builder && TingYun::Agent.config[:'nbs.action_tracer.enabled']
 
@@ -70,6 +70,7 @@ module TingYun
 
           final_trace = last_builder.trace
           final_trace.attributes = txn.attributes
+          final_trace.array_size = sizes
 
 
           @lock.synchronize do
