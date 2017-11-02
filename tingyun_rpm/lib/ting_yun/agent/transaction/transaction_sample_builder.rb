@@ -74,7 +74,7 @@ module TingYun
         if error
           @current_node["exception"] = {"message" => error.message,
                                         "class" => error.class.to_s,
-                                        "stacktrace"=>error.backtrace
+                                        "stacktrace"=> error.backtrace
           }
         end
 

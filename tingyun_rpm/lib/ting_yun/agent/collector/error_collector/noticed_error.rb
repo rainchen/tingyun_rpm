@@ -84,7 +84,8 @@ module TingYun
              string(exception_class_name),
              count_error,
              string(metric_name),
-             encoder.encode(error_params)
+             encoder.encode(error_params),
+             attributes.agent_attributes[:trace_id]
             ]
           else
             [timestamp.to_i,
@@ -94,7 +95,8 @@ module TingYun
              string(message),
              count_error,
              string(attributes.agent_attributes[:request_path]||metric_name),
-             encoder.encode(error_params)
+             encoder.encode(error_params),
+             attributes.agent_attributes[:trace_id]
             ]
           end
         end

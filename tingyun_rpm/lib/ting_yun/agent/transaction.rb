@@ -151,7 +151,7 @@ module TingYun
 
       def commit(state, end_time, outermost_node_name)
 
-        assign_agent_attributes
+        assign_agent_attributes(state)
 
 
         TingYun::Agent.instance.transaction_sampler.on_finishing_transaction(state, self, end_time,@exceptions.errors_and_exceptions)

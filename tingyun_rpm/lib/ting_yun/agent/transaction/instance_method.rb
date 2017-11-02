@@ -79,7 +79,7 @@ module TingYun
           end
         end
 
-        def assign_agent_attributes
+        def assign_agent_attributes(state)
 
           @attributes.add_agent_attribute(:threadName,  "pid-#{$$}");
 
@@ -89,7 +89,7 @@ module TingYun
 
           @attributes.add_agent_attribute(:tx_id,  @guid);
           @attributes.add_agent_attribute(:metric_name,  best_name);
-
+          @attributes.add_agent_attribute(:trace_id, state.trace_id || "0")
         end
 
 
