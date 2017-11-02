@@ -123,7 +123,7 @@ module TingYun
     #
     # @api public
     #
-    def notice_error(exception, options={})
+    def notice_error(exception, options={:type =>:error})
       TingYun::Agent::Transaction.notice_error(exception, options)
       nil # don't return a noticed error datastructure. it can only hurt.
     end
