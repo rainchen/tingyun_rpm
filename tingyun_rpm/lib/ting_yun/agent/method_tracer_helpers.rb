@@ -22,12 +22,12 @@ module TingYun
         end
       end
 
-      def trace_execution_scoped_footer(state, t0, first_name, metric_names, expected_frame, options, t1=Time.now.to_f, klass_name=nil)
+      def trace_execution_scoped_footer(state, t0, first_name, metric_names, expected_frame, options, t1=Time.now.to_f, klass_name=nil, error = nil)
         log_errors(:trace_execution_scoped_footer) do
           if expected_frame
             stack = state.traced_method_stack
             create_metrics = options.has_key?(:metric) ? options[:metric] : true
-            frame = stack.pop_frame(state, expected_frame, first_name, t1, create_metrics, klass_name)
+            frame = stack.pop_frame(state, expected_frame, first_name, t1, create_metrics, klass_name, error)
 
             if create_metrics
               duration = (t1 - t0)*1000
@@ -80,7 +80,7 @@ module TingYun
           if callback
             callback.call(elapsed_time)
           end
-          trace_execution_scoped_footer(state, start_time, first_name, metric_names, expected_scope, options, Time.now.to_f, klass_name)
+          trace_execution_scoped_footer(state, start_time, first_name, metric_names, expected_scope, options, Time.now.to_f, klass_name,e)
         end
       end
 

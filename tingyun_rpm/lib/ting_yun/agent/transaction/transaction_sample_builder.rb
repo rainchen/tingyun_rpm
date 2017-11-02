@@ -59,7 +59,7 @@ module TingYun
         @current_node
       end
 
-      def trace_exit(metric_name, time, klass_name)
+      def trace_exit(metric_name, time, klass_name, error = nil)
         if @current_node.is_a?(PlaceholderNode)
           @current_node.depth -= 1
           if @current_node.depth == 0
@@ -71,6 +71,13 @@ module TingYun
           @current_node.end_trace(time.to_f - @trace_start)
           @current_node = @current_node.parent_node
         end
+        if error
+          @current_node["exception"] = {"message": error.message,
+                                        "class": error.class.to_s,
+                                        "stacktrace": error.backtrace
+          }
+        end
+
       end
 
       def finish_trace(time=Time.now.to_f)
