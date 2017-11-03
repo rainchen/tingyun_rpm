@@ -105,6 +105,7 @@ module TingYun
           noticed_error = create_noticed_error(exception, options)
           if noticed_error.is_external_error
             external_error_array.add_to_error_queue(noticed_error)
+            exception_error_array.add_to_error_queue(noticed_error) if noticed_error.type && noticed_error.type == :exception
           else
             if noticed_error.type && noticed_error.type == :exception
               exception_error_array.add_to_error_queue(noticed_error)
