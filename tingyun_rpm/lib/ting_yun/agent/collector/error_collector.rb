@@ -59,12 +59,21 @@ module TingYun
             metric_names
           end
 
-          def action_metric_name(txn)
-            "#{ERRORS_ACTION}#{txn.best_name}" if txn
+          def action_metric_name(txn,exception)
+            if exception.respond_to? :tingyun_klass
+              "#{ERRORS_ACTION}#{exception.tingyun_klass}"
+            else
+              "#{ERRORS_ACTION}#{txn.best_name||"error"}"
+            end
+
           end
 
-          def aggregated_type_count(type,txn)
-            "#{ERRORS_TYPE}#{type}/#{txn.best_name}" if txn
+          def aggregated_type_count(exception,txn)
+            if exception.respond_to? :tingyun_klass
+              "#{ERRORS_TYPE}#{exception.tingyun_code}/#{exception.tingyun_klass}"
+            else
+              "#{ERRORS_TYPE}#{exception.class.to_s}/#{txn.best_name||"error"}"
+            end
           end
           def aggregated_exception_metric_names(txn)
             metric_names = [EXCEPTIONS_ALL]
@@ -78,12 +87,20 @@ module TingYun
 
             metric_names
           end
-          def action_exception_metric_name(txn)
-            "#{EXCEPTIONS_ACTION}#{txn.best_name}" if txn
+          def action_exception_metric_name(txn,exception)
+            if exception.respond_to? :tingyun_klass
+              "#{EXCEPTIONS_ACTION}#{exception.tingyun_klass}"
+            else
+              "#{EXCEPTIONS_ACTION}#{txn.best_name||"error"}"
+            end
           end
 
-          def aggregated_exception_type_count(type,txn)
-            "#{EXCEPTIONS_TYPE}#{type}/#{txn.best_name}" if txn
+          def aggregated_exception_type_count(exception,txn)
+            if exception.respond_to? :tingyun_klass
+              "#{EXCEPTIONS_TYPE}#{exception.tingyun_code}/#{exception.tingyun_klass}"
+            else
+              "#{EXCEPTIONS_TYPE}#{exception.class.to_s}/#{txn.best_name||"error"}"
+            end
           end
 
         end
@@ -101,7 +118,7 @@ module TingYun
         def notice_error(exception, options={})
           tag_exception(exception)
           state = ::TingYun::Agent::TransactionState.tl_get
-          increment_error_count(exception.class.to_s,state,options[:type])
+          increment_error_count(exception,state,options[:type])
           noticed_error = create_noticed_error(exception, options)
           if noticed_error.is_external_error
             external_error_array.add_to_error_queue(noticed_error)
@@ -131,7 +148,7 @@ module TingYun
             exception_metric_names = aggregated_exception_metric_names(txn)
             exception_aggregated_type = aggregated_exception_type_count(exception,txn)
             exception_metric_names << exception_aggregated_type if exception_aggregated_type
-            exception_action_metric = action_exception_metric_name(txn)
+            exception_action_metric = action_exception_metric_name(txn,exception)
             exception_metric_names << exception_action_metric if exception_action_metric
             stats_engine = TingYun::Agent.agent.stats_engine
             stats_engine.record_unscoped_metrics(state, exception_metric_names) do |stats|
@@ -141,7 +158,7 @@ module TingYun
             metric_names = aggregated_metric_names(txn)
             aggregated_type = aggregated_type_count(exception,txn)
             metric_names << aggregated_type if aggregated_type
-            action_metric = action_metric_name(txn)
+            action_metric = action_metric_name(txn,exception)
             metric_names << action_metric if action_metric
 
             stats_engine = TingYun::Agent.agent.stats_engine
