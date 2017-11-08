@@ -48,7 +48,6 @@ TingYun::Support::LibraryDetection.defer do
             end
           rescue => e
             TingYun::Agent.logger.error("Failed to Bunny publish_with_tingyun : ", e)
-            TingYun::Agent.notice_error(e,:type=>:exception)
             publish_without_tingyun(payload, opts)
           end
         end
@@ -107,7 +106,6 @@ TingYun::Support::LibraryDetection.defer do
             end
           rescue => e
             TingYun::Agent.logger.error("Failed to Bunny call_with_tingyun : ", e)
-            TingYun::Agent.notice_error(e,:type=>:exception)
             call_without_tingyun(*args)
           end
 
@@ -155,7 +153,6 @@ TingYun::Support::LibraryDetection.defer do
             end
           rescue =>e
             TingYun::Agent.logger.error("Failed to Bunny basic_get_with_tingyun : ", e)
-            TingYun::Agent.notice_error(e,:type=>:exception)
             basic_get_without_tingyun(*args)
           ensure
             TingYun::Agent::Transaction.stop(state, Time.now, summary_metrics)
