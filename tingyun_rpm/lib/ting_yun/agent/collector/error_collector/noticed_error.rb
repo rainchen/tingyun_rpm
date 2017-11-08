@@ -105,7 +105,13 @@ module TingYun
               :params => custom_params
           }
           if is_external_error
-            hash[:stacktrace] = trace
+
+            if options[:type]==:exception
+              hash[:stacktrace] = trace if ::TingYun::Agent.config[:'nbs.exception.stack_enabled']
+            else
+              hash[:stacktrace] = trace
+            end
+
           else
             hash[:stacktrace] = stack_trace
             hash[:requestParams] = request_params
