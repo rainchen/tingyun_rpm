@@ -31,7 +31,7 @@ module TingYun
 
         #collector error
         def had_error?
-          if @exceptions.empty?
+          if @exceptions.select{|k,v| v[:type]==:error} .size == 0
             return false
           else
             return true

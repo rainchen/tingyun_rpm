@@ -106,7 +106,7 @@ module TingYun
           }
           if is_external_error
 
-            if options[:type]==:exception
+            if type==:exception
               hash[:stacktrace] = trace if ::TingYun::Agent.config[:'nbs.exception.stack_enabled']
             else
               hash[:stacktrace] = trace
