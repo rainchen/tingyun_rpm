@@ -5,7 +5,7 @@ module TingYun
   module VERSION
     MAJOR = 1
     MINOR = 4
-    TINY = 4
+    TINY = 5
     STRING = [MAJOR, MINOR, TINY].compact.join('.')
   end
 end

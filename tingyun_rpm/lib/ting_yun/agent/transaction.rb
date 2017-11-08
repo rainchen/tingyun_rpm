@@ -31,7 +31,7 @@ module TingYun
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
       RACK_PREFIX = 'Rack/'.freeze
       SINATRA_PREFIX = 'WebAction/Sinatra/'.freeze
-      MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
+      MIDDLEWARE_PREFIX = 'WebAction/Middleware/Rack/'.freeze
       GRAPE_PREFIX = 'WebAction/Grape/'.freeze
       RAKE_PREFIX = 'WebAction/Rake'.freeze
       CABLE_PREFIX = 'WebAction/ActionCable'.freeze
