@@ -21,8 +21,8 @@ TingYun::Support::LibraryDetection.defer do
           name = ["Grape",
                   self.options[:method].first,
                   self.options[:for].to_s,
-                  self.namespace.sub(%r{\A/}, ''), # removing leading slashes
-                  self.options[:path].first.sub(%r{\A/}, ''),
+                  self.namespace.to_s.sub(%r{\A/}, ''), # removing leading slashes
+                  self.options[:path].first.to_s.sub(%r{\A/}, ''),
           ].compact.select{ |n| n.to_s unless n.to_s.empty? }.join("/")
           TingYun::Agent::Transaction.set_default_transaction_name(name, :controller)
           run_without_tingyun(*args)
@@ -32,7 +32,7 @@ TingYun::Support::LibraryDetection.defer do
           raise e
         end
 
-      end
+      en
       alias run_without_tingyun run
       alias run run_with_tingyun
     end

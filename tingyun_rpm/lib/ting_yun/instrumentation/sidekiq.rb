@@ -48,7 +48,6 @@ TingYun::Support::LibraryDetection.defer do
             :category => 'BackgroundAction/Sidekiq'
         }
       rescue => e
-        TingYun::Agent.notice_error(e,:type=>:exception)
         TingYun::Agent.logger.error("Failure during deserializing YAML for Sidekiq::Extensions::DelayedClass", e)
         TingYun::SidekiqInstrumentation.default_trace_args(msg)
       end
