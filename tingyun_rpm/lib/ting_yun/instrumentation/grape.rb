@@ -32,7 +32,7 @@ TingYun::Support::LibraryDetection.defer do
           raise e
         end
 
-      en
+      end
       alias run_without_tingyun run
       alias run run_with_tingyun
     end
