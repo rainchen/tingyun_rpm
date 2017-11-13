@@ -6,7 +6,7 @@ module TingYun
   module Agent
     module Collector
       class ErrorTraceArray
-        def initialize(capacity,type)
+        def initialize(capacity)
           @capacity = capacity
           @lock = Mutex.new
           @errors = []

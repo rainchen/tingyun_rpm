@@ -31,7 +31,7 @@ module TingYun
 
         #collector error
         def had_error?
-          @is_empty ||= count_errors == 0? false : true
+          @have ||= count_errors == 0? false : true
         end
 
         def errors_and_exceptions
