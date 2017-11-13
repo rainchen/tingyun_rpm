@@ -20,7 +20,6 @@ module TingYun
             set_attributes(e, klass, response.code)
 
             TingYun::Agent.notice_error(e,:type=>:exception)
-            raise e
           end
         end
 
