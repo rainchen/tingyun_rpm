@@ -31,19 +31,17 @@ module TingYun
 
         #collector error
         def had_error?
-          if @exceptions.select{|k,v| v[:type]==:error} .size == 0
-            return false
-          else
-            return true
-          end
+          @is_empty ||= count_errors == 0? false : true
         end
 
         def errors_and_exceptions
-          exceptions = @exceptions.select{|k,v| v[:type]==:exception} .size
-          errors = @exceptions.size - exceptions
-          [errors,exceptions]
+          errors = count_errors
+          [errors, exceptions.size - count_errors]
         end
 
+        def count_errors
+          @count_errors ||=  exceptions.select{|k,v| v[:type]==:error} .size
+        end
       end
     end
   end
