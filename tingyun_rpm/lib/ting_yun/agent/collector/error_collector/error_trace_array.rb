@@ -6,11 +6,13 @@ module TingYun
   module Agent
     module Collector
       class ErrorTraceArray
-        def initialize(capacity)
+        def initialize(capacity,type)
           @capacity = capacity
           @lock = Mutex.new
           @errors = []
         end
+
+
 
         def enabled?
           ::TingYun::Agent.config[:'nbs.error_collector.enabled']

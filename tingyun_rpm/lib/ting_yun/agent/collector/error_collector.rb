@@ -109,7 +109,7 @@ module TingYun
         attr_reader :error_trace_array, :external_error_array,:exception_error_array
 
         def initialize
-          @error_trace_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
+          @error_trace_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTHm)
           @external_error_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
           @exception_error_array = ::TingYun::Agent::Collector::ErrorTraceArray.new(MAX_ERROR_QUEUE_LENGTH)
         end
@@ -122,14 +122,12 @@ module TingYun
           noticed_error = create_noticed_error(exception, options)
           if noticed_error.is_external_error
             external_error_array.add_to_error_queue(noticed_error)
-            exception_error_array.add_to_error_queue(noticed_error) if noticed_error.type && noticed_error.type == :exception
+          end
+          noticed_error.is_external_error = nil #必须擦除is_external_error的标记，才能入array
+          if noticed_error.type && noticed_error.type == :exception
+             exception_error_array.add_to_error_queue(noticed_error)
           else
-            if noticed_error.type && noticed_error.type == :exception
-              exception_error_array.add_to_error_queue(noticed_error)
-            else
-              error_trace_array.add_to_error_queue(noticed_error)
-            end
-
+            error_trace_array.add_to_error_queue(noticed_error)
           end
         rescue => e
           ::TingYun::Agent.logger.warn("Failure when capturing error '#{exception}':", e)
