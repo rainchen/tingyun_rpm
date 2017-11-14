@@ -118,16 +118,19 @@ module TingYun
           tag_exception(exception)
           state = ::TingYun::Agent::TransactionState.tl_get
           increment_error_count(exception,state,options[:type])
-          noticed_error = create_noticed_error(exception, options)
+          _error = create_noticed_error(exception, options)
+          noticed_error = _error.clone
           if noticed_error.is_external_error
-            external_error_array.add_to_error_queue(noticed_error)
+            noticed_error.is_external_error = nil
+            external_error_array.add_to_error_queue(_error)
           end
-          noticed_error.is_external_error = nil #必须擦除is_external_error的标记，才能入array
           if noticed_error.type && noticed_error.type == :exception
              exception_error_array.add_to_error_queue(noticed_error)
           else
             error_trace_array.add_to_error_queue(noticed_error)
           end
+
+
         rescue => e
           ::TingYun::Agent.logger.warn("Failure when capturing error '#{exception}':", e)
           nil
