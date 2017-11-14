@@ -143,7 +143,7 @@ module TingYun
           txn = state.current_transaction
           if type && type==:exception
             exception_metric_names = aggregated_exception_metric_names(txn)
-            exception_metric_names.aggregated_exception_type_count(exception,txn)
+            exception_metric_names.concat aggregated_exception_type_count(exception,txn)
             exception_metric_names.concat action_exception_metric_names(txn,exception)
             stats_engine = TingYun::Agent.agent.stats_engine
             stats_engine.record_unscoped_metrics(state, exception_metric_names) do |stats|
