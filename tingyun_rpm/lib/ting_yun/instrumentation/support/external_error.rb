@@ -14,7 +14,7 @@ module TingYun
         module_function
 
         def capture_exception(response,request)
-          if response && response.code =~ /^[4,5][0-9][0-9]$/ && response.code!='401'
+          if response && response.code.to_s =~ /^[4,5][0-9][0-9]$/ && response.code.to_s!='401'
             e = TingYun::Support::Exception::InternalServerError.new("#{response.code}: #{response.message}")
             klass = "External/#{request.uri.to_s.gsub(/\/\z/,'').gsub('/','%2F')}/#{request.from}"
             set_attributes(e, klass, response.code)
