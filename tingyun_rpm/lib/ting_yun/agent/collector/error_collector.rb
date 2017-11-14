@@ -86,18 +86,15 @@ module TingYun
 
             metric_names
           end
-          def action_exception_metric_names(txn,exception)
-            names = ["#{EXCEPTIONS_ACTION}#{txn.best_name||"error"}"]
-            if exception.respond_to? :tingyun_klass
-              names << "#{EXCEPTIONS_ACTION}#{exception.tingyun_klass}"
-            end
-            names
+          def action_exception_metric_names(txn)
+            "#{EXCEPTIONS_ACTION}#{txn.best_name||"error"}"
           end
 
           def aggregated_exception_type_count(exception,txn)
-            names = ["#{EXCEPTIONS_TYPE}#{exception.class.to_s}/#{txn.best_name||"error"}"]
             if exception.respond_to? :tingyun_klass
-              names << "#{EXCEPTIONS_TYPE}#{exception.tingyun_code}/#{exception.tingyun_klass}"
+              names = "#{EXCEPTIONS_TYPE}External #{exception.class.to_s}/#{txn.best_name||"error"}"
+            else
+              names = "#{EXCEPTIONS_TYPE}#{exception.class.to_s}/#{txn.best_name||"error"}"
             end
             names
           end
@@ -146,8 +143,8 @@ module TingYun
           txn = state.current_transaction
           if type && type==:exception
             exception_metric_names = aggregated_exception_metric_names(txn)
-            exception_metric_names.concat aggregated_exception_type_count(exception,txn)
-            exception_metric_names.concat action_exception_metric_names(txn,exception)
+            exception_metric_names << aggregated_exception_type_count(exception,txn)
+            exception_metric_names << action_exception_metric_names(txn)
             stats_engine = TingYun::Agent.agent.stats_engine
             stats_engine.record_unscoped_metrics(state, exception_metric_names) do |stats|
               stats.increment_count
