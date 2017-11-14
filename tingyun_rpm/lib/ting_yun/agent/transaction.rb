@@ -117,7 +117,7 @@ module TingYun
 
 
 
-      def stop(state, end_time, outermost_frame, summary_metrics = [])
+      def stop(state, end_time, outermost_frame, summary_metrics = [],error= nil)
 
         freeze_name_and_execute
 
@@ -135,7 +135,7 @@ module TingYun
           summary_metrics_with_exclusive_time = EMPTY_SUMMARY_METRICS
         end
         summary_metrics_with_exclusive_time = summary_metrics unless summary_metrics.empty?
-
+binding.pry
         TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
             state,
             start_time.to_f,
@@ -143,7 +143,8 @@ module TingYun
             summary_metrics_with_exclusive_time,
             outermost_frame,
             trace_options,
-            end_time.to_f)
+            end_time.to_f,
+            error)
 
         commit(state, end_time, name)
       end
