@@ -92,7 +92,7 @@ module TingYun
 
           def aggregated_exception_type_count(exception,txn)
             if exception.respond_to? :tingyun_klass
-              names = "#{EXCEPTIONS_TYPE}External #{exception.class.to_s}/#{txn.best_name}"
+              names = "#{EXCEPTIONS_TYPE}External #{exception.tingyun_code}/#{txn.best_name}"
             else
               names = "#{EXCEPTIONS_TYPE}#{exception.class.to_s}/#{txn.best_name}"
             end

@@ -74,7 +74,7 @@ module TingYun
           TingYun::Agent.notice_error(e,:type=>:error)
           raise e
         ensure
-          TingYun::Agent::Transaction.stop(state,e)
+          TingYun::Agent::Transaction.stop(state)
         end
       end
 

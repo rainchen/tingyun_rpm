@@ -117,7 +117,7 @@ module TingYun
 
 
 
-      def stop(state, end_time, outermost_frame, summary_metrics = [],error= nil)
+      def stop(state, end_time, outermost_frame, summary_metrics = [])
 
         freeze_name_and_execute
 
@@ -143,8 +143,7 @@ module TingYun
             summary_metrics_with_exclusive_time,
             outermost_frame,
             trace_options,
-            end_time.to_f,
-            error)
+            end_time.to_f)
 
         commit(state, end_time, name)
       end
