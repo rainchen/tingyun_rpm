@@ -60,7 +60,7 @@ module TingYun
           end
 
           def action_metric_names(txn,exception)
-            names =  ["#{ERRORS_ACTION}#{txn.best_name||"error"}"]
+            names =  ["#{ERRORS_ACTION}#{txn.best_name}"]
             if exception.respond_to? :tingyun_klass
               names <<  "#{ERRORS_ACTION}#{exception.tingyun_klass}"
             end
@@ -68,7 +68,7 @@ module TingYun
           end
 
           def aggregated_type_count(exception,txn)
-            names  =  ["#{ERRORS_TYPE}#{exception.class.to_s}/#{txn.best_name||"error"}"]
+            names  =  ["#{ERRORS_TYPE}#{exception.class.to_s}/#{txn.best_name}"]
             if exception.respond_to? :tingyun_klass
               names << "#{ERRORS_TYPE}#{exception.tingyun_code}/#{exception.tingyun_klass}"
             end
@@ -87,14 +87,14 @@ module TingYun
             metric_names
           end
           def action_exception_metric_names(txn)
-            "#{EXCEPTIONS_ACTION}#{txn.best_name||"error"}"
+            "#{EXCEPTIONS_ACTION}#{txn.best_name}"
           end
 
           def aggregated_exception_type_count(exception,txn)
             if exception.respond_to? :tingyun_klass
-              names = "#{EXCEPTIONS_TYPE}External #{exception.class.to_s}/#{txn.best_name||"error"}"
+              names = "#{EXCEPTIONS_TYPE}External #{exception.class.to_s}/#{txn.best_name}"
             else
-              names = "#{EXCEPTIONS_TYPE}#{exception.class.to_s}/#{txn.best_name||"error"}"
+              names = "#{EXCEPTIONS_TYPE}#{exception.class.to_s}/#{txn.best_name}"
             end
             names
           end

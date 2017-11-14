@@ -135,7 +135,7 @@ module TingYun
           summary_metrics_with_exclusive_time = EMPTY_SUMMARY_METRICS
         end
         summary_metrics_with_exclusive_time = summary_metrics unless summary_metrics.empty?
-binding.pry
+
         TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
             state,
             start_time.to_f,
