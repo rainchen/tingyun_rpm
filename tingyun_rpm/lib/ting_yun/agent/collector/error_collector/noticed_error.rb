@@ -85,7 +85,7 @@ module TingYun
             [timestamp.to_i,
              string(external_metric_name),
              int(code),
-             string(exception_class_name),
+             string(code),
              count_error,
              string(metric_name),
              encoder.encode(error_params)

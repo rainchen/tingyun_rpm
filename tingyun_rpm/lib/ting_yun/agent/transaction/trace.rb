@@ -110,6 +110,10 @@ module TingYun
           attributes.request_params
         end
 
+        def add_errors(errors)
+          root_node.add_errors(errors) unless errors.empty?
+        end
+
         HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
         GUID_LENGTH = 16
 

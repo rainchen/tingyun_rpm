@@ -110,6 +110,16 @@ module TingYun
           TingYun::Agent::Database.explain_sql(statement)
         end
 
+        def add_errors(errors)
+          self["exception"] ||= []
+          errors.each do |error|
+            self["exception"] << {"message" => error.message,
+                                   "class" => error.class.to_s,
+                                   "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
+                                  }
+          end
+        end
+
         protected
         def parent_node=(s)
           @parent_node = s

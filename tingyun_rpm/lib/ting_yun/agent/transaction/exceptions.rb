@@ -35,13 +35,20 @@ module TingYun
         end
 
         def errors_and_exceptions
-          errors = count_errors
-          [errors, exceptions.size - count_errors]
+          [count_errors, exceptions.size - count_errors]
         end
 
         def count_errors
-          @count_errors ||=  exceptions.select{|k,v| v[:type]==:error} .size
+          @count_errors ||=  errors.size
         end
+
+        def errors
+          @errors ||= exceptions.select{|k,v| v[:type]==:error}
+        end
+        def exceptions
+          @exceptions ||= exceptions.select{|k,v| v[:type]==:exception}
+        end
+
       end
     end
   end
