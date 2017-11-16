@@ -27,7 +27,7 @@ module TingYun
           @stack_trace = []
           @count_error = 1
           @exception_id = exception.object_id
-          @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
+          @exception_class_name = exception.is_a?(Exception)? exception.is_a?(TingYun::Support::Exception::InternalServerError)? exception.tingyun_code : exception.class.name : 'Error'
           @is_external_error = exception.respond_to?(:tingyun_external)? exception.tingyun_external : false
           if @is_external_error
             @external_metric_name = exception.tingyun_klass
@@ -85,7 +85,7 @@ module TingYun
             [timestamp.to_i,
              string(external_metric_name),
              int(code),
-             string(code),
+             string(exception_class_name),
              count_error,
              string(metric_name),
              encoder.encode(error_params)
