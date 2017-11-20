@@ -22,6 +22,7 @@ module TingYun
           @metric_name     = metric_name || UNKNOWN_NODE_NAME
           @called_nodes    = nil
           @count           = 1
+          self["exception"] ||= []
         end
 
         def add_called_node(s)
@@ -41,11 +42,11 @@ module TingYun
 
 
         def pre_metric_name(metric_name)
-         @name ||= if metric_name.start_with?('Database ')
-            "#{metric_name.split('/')[0]}%2F#{metric_name.split('%2F')[-1]}"
-          else
-            metric_name
-          end
+          @name ||= if metric_name.start_with?('Database ')
+                      "#{metric_name.split('/')[0]}%2F#{metric_name.split('%2F')[-1]}"
+                    else
+                      metric_name
+                    end
         end
 
         def to_array
@@ -57,7 +58,7 @@ module TingYun
            TingYun::Support::Coerce.string(klass)||TingYun::Support::Coerce.string(pre_metric_name(metric_name)),
            TingYun::Support::Coerce.string(method)||'',
            params] +
-           [(@called_nodes ? @called_nodes.map{|s| s.to_array} : [])]
+              [(@called_nodes ? @called_nodes.map{|s| s.to_array} : [])]
         end
 
         def custom_params
@@ -110,14 +111,11 @@ module TingYun
           TingYun::Agent::Database.explain_sql(statement)
         end
 
-        def add_errors(errors)
-          self["exception"] ||= []
-          errors.each do |error|
-            self["exception"] << {"message" => error.message,
-                                   "class" => error.class.to_s,
-                                   "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
-                                  }
-          end
+        def add_errors(error)
+          self["exception"] << {"message" => error.message,
+                                "class" => error.class.to_s,
+                                "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
+          }
         end
 
         protected

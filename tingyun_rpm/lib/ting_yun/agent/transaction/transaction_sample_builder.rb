@@ -72,13 +72,14 @@ module TingYun
           @current_node = @current_node.parent_node
         end
         if error
-          @current_node["exception"] ||=[]
-          @current_node["exception"] << {"message" => error.message,
-                                        "class" => error.class.to_s,
-                                        "stacktrace"=> error.backtrace
-          }
+          unless trace.e_set.member? error.object_id
+            trace.e_set.add error.object_id
+            @current_node["exception"] << {"message" => error.message,
+                                           "class" => error.class.to_s,
+                                           "stacktrace"=> error.backtrace
+            }
+          end
         end
-
       end
 
       def finish_trace(time=Time.now.to_f)

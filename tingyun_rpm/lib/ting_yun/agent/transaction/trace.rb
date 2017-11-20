@@ -1,14 +1,15 @@
-  # encoding: utf-8
+# encoding: utf-8
 require 'ting_yun/agent/transaction/trace_node'
 require 'ting_yun/support/helper'
 require 'ting_yun/support/coerce'
 require 'ting_yun/agent/database'
+require 'set'
 module TingYun
   module Agent
     class Transaction
       class Trace
 
-        attr_accessor :root_node, :node_count, :threshold, :guid, :attributes, :start_time, :finished, :array_size
+        attr_accessor :root_node, :node_count, :threshold, :guid, :attributes, :start_time, :finished, :array_size,:e_set
 
         def initialize(start_time)
           @start_time = start_time
@@ -16,6 +17,7 @@ module TingYun
           @prepared = false
           @guid = generate_guid
           @root_node = TingYun::Agent::Transaction::TraceNode.new(0.0, "ROOT")
+          @e_set = Set.new
         end
 
         def create_node(time_since_start, metric_name = nil)
@@ -31,7 +33,7 @@ module TingYun
         EMPTY_STRING = ''.freeze
 
         include TingYun::Support::Coerce
-        
+
         def trace_tree
           [
               @start_time.round,
@@ -111,7 +113,12 @@ module TingYun
         end
 
         def add_errors(errors)
-          root_node.add_errors(errors) unless errors.empty?
+          errors.each do |error|
+            unless @e_set.member? error.object_id
+              @e_set.add error.object_id
+              root_node.add_error(error)
+            end
+          end
         end
 
         HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
