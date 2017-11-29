@@ -121,6 +121,15 @@ module TingYun
           end
         end
 
+        def add_errors_to_current_node(error)
+          unless @e_set.member? error.object_id
+            @e_set.add error.object_id
+            state = TingYun::Agent::TransactionState.tl_get
+            state.transaction_sample_builder.current_node.add_error(error)
+          end
+        end
+
+
         HEX_DIGITS = (0..15).map{|i| i.to_s(16)}
         GUID_LENGTH = 16
 

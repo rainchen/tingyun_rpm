@@ -111,7 +111,7 @@ module TingYun
           TingYun::Agent::Database.explain_sql(statement)
         end
 
-        def add_errors(error)
+        def add_error(error)
           self["exception"] << {"message" => error.message,
                                 "class" => error.class.to_s,
                                 "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
