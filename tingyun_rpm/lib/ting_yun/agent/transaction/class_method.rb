@@ -27,7 +27,7 @@ module TingYun
           txn = state.current_transaction
           if txn
             txn.exceptions.notice_error(e, options)
-            state.transaction_sample_builder.trace.add_errors_to_current_node(e) if options[:type]==:exception rescue nil
+            state.transaction_sample_builder.trace.add_errors_to_current_node(e) rescue nil
           elsif TingYun::Agent.instance
             TingYun::Agent.instance.error_collector.notice_error(e, options)
           end
