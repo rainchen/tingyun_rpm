@@ -112,9 +112,11 @@ module TingYun
         end
 
         def add_error(error)
-          if error.is_a?(TingYun::Support::Exception::InternalServerError)
+          if error.respond_to?(:tingyun_external)
             self["exception"] << {"message" => error.message,
-                                  "class" => error.tingyun_code}
+                                  "class" => error.tingyun_code,
+                                  "stacktrace"=> error.tingyun_trace
+                                  }
           else
             self["exception"] << {"message" => error.message,
                                   "class" => error.class.to_s,
