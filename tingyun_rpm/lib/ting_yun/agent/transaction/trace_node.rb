@@ -112,10 +112,15 @@ module TingYun
         end
 
         def add_error(error)
-          self["exception"] << {"message" => error.message,
-                                "class" => error.class.to_s,
-                                "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
-          }
+          if error.is_a?(TingYun::Support::Exception::InternalServerError)
+            self["exception"] << {"message" => error.message,
+                                  "class" => error.tingyun_code}
+          else
+            self["exception"] << {"message" => error.message,
+                                  "class" => error.class.to_s,
+                                  "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
+            }
+          end
         end
 
         protected
