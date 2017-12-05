@@ -167,8 +167,7 @@ module TingYun
         def create_noticed_error(exception, options)
           if options[:type] && options[:type]==:exception
             attributes = options[:attributes]
-            attributes.add_agent_attribute(:httpStatus,0)
-            error_metric = attributes.agent_attributes[:metric_name] || EMPTY_STRING
+            error_metric = options[:attributes].agent_attributes[:metric_name] || EMPTY_STRING
             noticed_error = TingYun::Agent::Collector::NoticedError.new(error_metric, exception)
             noticed_error.attributes  = attributes
             noticed_error.stack_trace = extract_stack_trace(exception) if ::TingYun::Agent.config[:'nbs.exception.stack_enabled']
