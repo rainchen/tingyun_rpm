@@ -682,6 +682,13 @@ module TingYun
             :type => Boolean,
             :allowed_from_server => true,
             :description => 'Enable or disable the  mq feature'
+        },
+        :'nbs.exception.stack_enabled' => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => true,
+            :description => 'Enable or disable the  exception trace'
         }
     }.freeze
   end

@@ -16,7 +16,7 @@ module TingYun
 
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :is_external_error, :external_metric_name, :code, :trace
+                      :count_error, :is_external_error, :external_metric_name, :code, :trace, :type
 
         attr_reader :exception_id, :is_internal
 
@@ -27,11 +27,15 @@ module TingYun
           @stack_trace = []
           @count_error = 1
           @exception_id = exception.object_id
-          @exception_class_name = exception.is_a?(Exception) ? exception.class.name : 'Error'
+          @exception_class_name = exception.is_a?(Exception)? exteneral_error?(exception)? "External #{exception.tingyun_code}" : exception.class.name : 'Error'
           @is_external_error = exception.respond_to?(:tingyun_external)? exception.tingyun_external : false
           if @is_external_error
             @external_metric_name = exception.tingyun_klass
-            @code = exception.tingyun_code
+            if type==:exception
+              @code = 0
+            else
+              @code = exception.tingyun_code
+            end
             @trace = exception.tingyun_trace
           end
           # It's critical that we not hold onto the exception class constant in this
@@ -94,7 +98,8 @@ module TingYun
              string(message),
              count_error,
              string(attributes.agent_attributes[:request_path]||metric_name),
-             encoder.encode(error_params)
+             encoder.encode(error_params),
+             attributes.agent_attributes[:trace_id]
             ]
           end
         end
@@ -104,7 +109,7 @@ module TingYun
               :params => custom_params
           }
           if is_external_error
-            hash[:stacktrace] = trace
+              hash[:stacktrace] = trace
           else
             hash[:stacktrace] = stack_trace
             hash[:requestParams] = request_params
@@ -126,6 +131,10 @@ module TingYun
         def request_params
           return {}  unless TingYun::Agent.config['nbs.capture_params']
           attributes.request_params
+        end
+
+        def exteneral_error? exception
+           exception.is_a?(TingYun::Support::Exception::InternalServerError) or exception.is_a?(::Thrift::ApplicationException)
         end
 
       end

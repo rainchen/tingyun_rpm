@@ -31,7 +31,7 @@ module TingYun
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
       RACK_PREFIX = 'Rack/'.freeze
       SINATRA_PREFIX = 'WebAction/Sinatra/'.freeze
-      MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
+      MIDDLEWARE_PREFIX = 'Middleware/'.freeze
       GRAPE_PREFIX = 'WebAction/Grape/'.freeze
       RAKE_PREFIX = 'WebAction/Rake'.freeze
       CABLE_PREFIX = 'WebAction/ActionCable'.freeze
@@ -151,20 +151,20 @@ module TingYun
 
       def commit(state, end_time, outermost_node_name)
 
-        assign_agent_attributes
+        assign_agent_attributes(state)
 
 
-        TingYun::Agent.instance.transaction_sampler.on_finishing_transaction(state, self, end_time)
+        TingYun::Agent.instance.transaction_sampler.on_finishing_transaction(state, self, end_time,@exceptions)
 
         TingYun::Agent.instance.sql_sampler.on_finishing_transaction(state, @frozen_name)
 
-        record_summary_metrics(state, outermost_node_name, end_time)
+        record_summary_metrics(state, outermost_node_name, end_time) unless @exceptions.had_error?
         @apdex.record_apdex(@frozen_name, end_time, @exceptions.had_error?)
         @exceptions.record_exceptions(@attributes)
 
 
         TingYun::Agent.instance.stats_engine.merge_transaction_metrics!(@metrics, best_name)
-        TingYun::Agent.instance.stats_engine.record_base_quantile(@base_quantile_hash) if @exceptions.exceptions.empty?
+        TingYun::Agent.instance.stats_engine.record_base_quantile(@base_quantile_hash) unless @exceptions.had_error?
       end
 
     end

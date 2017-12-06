@@ -228,8 +228,8 @@ module TingYun
             begin
               yield
             rescue => e
-              ::TingYun::Agent.notice_error(e)
-              raise
+              ::TingYun::Agent.notice_error(e,:type=> :exception)
+              raise e
             end
           ensure
             TingYun::Agent::Transaction.stop(state)

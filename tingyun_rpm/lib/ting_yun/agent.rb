@@ -123,10 +123,12 @@ module TingYun
     #
     # @api public
     #
-    def notice_error(exception, options={})
+    def notice_error(exception, options={:type =>:exception})
       TingYun::Agent::Transaction.notice_error(exception, options)
       nil # don't return a noticed error datastructure. it can only hurt.
     end
+
+
 
     # Register this method as a callback for processes that fork
     # jobs.

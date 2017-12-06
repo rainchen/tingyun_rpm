@@ -27,6 +27,7 @@ module TingYun
           txn = state.current_transaction
           if txn
             txn.exceptions.notice_error(e, options)
+            state.transaction_sample_builder.trace.add_errors_to_current_node(e) rescue nil
           elsif TingYun::Agent.instance
             TingYun::Agent.instance.error_collector.notice_error(e, options)
           end
@@ -83,7 +84,7 @@ module TingYun
             # to be absolutely sure we don't report agent problems as app errors
             yield
           rescue => e
-            Transaction.notice_error(e)
+            ::TingYun::Agent.notice_error(e,:type=> :exception)
             raise e
           ensure
             # when kafka consumer in task, drop original web_action
