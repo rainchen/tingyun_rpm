@@ -105,6 +105,7 @@ module TingYun
         end
 
         def error_params
+          return {} if type ==:exception
           hash = {
               :params => custom_params
           }
