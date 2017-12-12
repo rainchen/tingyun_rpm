@@ -118,7 +118,7 @@ module TingYun
                                   }
           else
             self["exception"] << {"message" => error.message,
-                                  "class" => error.class.to_s,
+                                  "class" => error.class.name ,
                                   "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
             }
           end
