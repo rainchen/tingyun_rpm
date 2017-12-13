@@ -29,10 +29,11 @@ module TingYun
           @exception_id = exception.object_id
           @exception_class_name = exception.is_a?(Exception)? exteneral_error?(exception)? "External #{exception.tingyun_code}" : exception.class.name : 'Error'
           @is_external_error = exception.respond_to?(:tingyun_external)? exception.tingyun_external : false
-          @code = type==:exception ? 0 : attributes.agent_attributes[:httpStatus]
           if @is_external_error
             @external_metric_name = exception.tingyun_klass
-            @code = exception.tingyun_code
+            unless type==:exception
+              @code = exception.tingyun_code
+            end
             @trace = exception.tingyun_trace
           end
           # It's critical that we not hold onto the exception class constant in this
