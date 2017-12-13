@@ -116,6 +116,7 @@ module TingYun
         end
 
         def custom_params
+          return {} if type ==:exception
           hash = {:threadName => string(attributes.agent_attributes[:threadName])}
           hash[:httpStatus] = int(code)
           hash[:referer] = string(attributes.agent_attributes[:referer]) || ''
