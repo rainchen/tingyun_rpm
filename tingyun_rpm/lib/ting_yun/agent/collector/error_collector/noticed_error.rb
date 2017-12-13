@@ -16,7 +16,7 @@ module TingYun
 
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :is_external_error, :external_metric_name, :code, :trace, :type
+                      :count_error, :is_external_error, :external_metric_name, :code, :trace, :type, :http_code
 
         attr_reader :exception_id, :is_internal
 
@@ -32,7 +32,7 @@ module TingYun
           @code = 0
           if @is_external_error
             @external_metric_name = exception.tingyun_klass
-            @code = exception.tingyun_code
+            @http_code = exception.tingyun_code
             @trace = exception.tingyun_trace
           end
           # It's critical that we not hold onto the exception class constant in this
@@ -81,7 +81,7 @@ module TingYun
           if  is_external_error
             [timestamp.to_i,
              string(external_metric_name),
-             int(code),
+             int(http_code),
              string(exception_class_name),
              count_error,
              string(metric_name),
