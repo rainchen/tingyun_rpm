@@ -117,10 +117,16 @@ module TingYun
                                   "class" => "External #{error.tingyun_code}"
                                   }
           else
-            self["exception"] << {"message" => error.message,
-                                  "class" => error.class.name ,
-                                  "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
-            }
+            if ::TingYun::Agent.config[:'nbs.exception.stack_enabled']
+              self["exception"] << {"message" => error.message,
+                                    "class" => error.class.name ,
+                                    "stacktrace"=> error.backtrace.reject! { |t| t.include?('tingyun_rpm') }
+              }
+            else
+              self["exception"] << {"message" => error.message,
+                                    "class" => error.class.name 
+              }
+            end
           end
         end
 
