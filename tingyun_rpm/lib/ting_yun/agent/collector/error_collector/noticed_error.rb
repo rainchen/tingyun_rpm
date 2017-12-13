@@ -31,9 +31,7 @@ module TingYun
           @is_external_error = exception.respond_to?(:tingyun_external)? exception.tingyun_external : false
           if @is_external_error
             @external_metric_name = exception.tingyun_klass
-            unless type==:exception
-              @code = exception.tingyun_code
-            end
+            @code = exception.tingyun_code
             @trace = exception.tingyun_trace
           end
           # It's critical that we not hold onto the exception class constant in this
