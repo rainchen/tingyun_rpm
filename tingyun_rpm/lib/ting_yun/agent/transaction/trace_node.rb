@@ -124,7 +124,7 @@ module TingYun
               }
             else
               self["exception"] << {"message" => error.message,
-                                    "class" => error.class.name 
+                                    "class" => error.class.name
               }
             end
           end
