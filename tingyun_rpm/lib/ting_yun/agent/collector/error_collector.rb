@@ -180,6 +180,7 @@ module TingYun
             noticed_error.attributes  = attributes
             noticed_error.stack_trace = extract_stack_trace(exception)
             noticed_error.type = options[:type]
+            noticed_error.code = attributes.agent_attributes[:httpStatus]
             noticed_error
           end
 

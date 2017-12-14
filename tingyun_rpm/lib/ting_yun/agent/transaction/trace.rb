@@ -121,10 +121,9 @@ module TingYun
           end
         end
 
-        def add_errors_to_current_node(error)
+        def add_errors_to_current_node(state, error)
           unless @e_set.member? error.object_id
             @e_set.add error.object_id
-            state = TingYun::Agent::TransactionState.tl_get
             state.transaction_sample_builder.current_node.add_error(error)
           end
         end

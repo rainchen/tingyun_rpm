@@ -16,7 +16,7 @@ module TingYun
 
         attr_accessor :metric_name, :timestamp, :message, :exception_class_name,
                       :stack_trace, :attributes_from_notice_error, :attributes,
-                      :count_error, :is_external_error, :external_metric_name, :code, :trace, :type
+                      :count_error, :is_external_error, :external_metric_name, :code, :trace, :type, :http_code
 
         attr_reader :exception_id, :is_internal
 
@@ -29,13 +29,10 @@ module TingYun
           @exception_id = exception.object_id
           @exception_class_name = exception.is_a?(Exception)? exteneral_error?(exception)? "External #{exception.tingyun_code}" : exception.class.name : 'Error'
           @is_external_error = exception.respond_to?(:tingyun_external)? exception.tingyun_external : false
+          @code = 0
           if @is_external_error
             @external_metric_name = exception.tingyun_klass
-            if type==:exception
-              @code = 0
-            else
-              @code = exception.tingyun_code
-            end
+            @http_code = exception.tingyun_code
             @trace = exception.tingyun_trace
           end
           # It's critical that we not hold onto the exception class constant in this
@@ -84,7 +81,7 @@ module TingYun
           if  is_external_error
             [timestamp.to_i,
              string(external_metric_name),
-             int(code),
+             int(http_code),
              string(exception_class_name),
              count_error,
              string(metric_name),
@@ -93,7 +90,7 @@ module TingYun
           else
             [timestamp.to_i,
              string(metric_name),
-             int(attributes.agent_attributes[:httpStatus]),
+             int(code),
              string(exception_class_name),
              string(message),
              count_error,
@@ -118,13 +115,10 @@ module TingYun
         end
 
         def custom_params
+          return {} if type ==:exception
           hash = {:threadName => string(attributes.agent_attributes[:threadName])}
-          if is_external_error
-            hash[:httpStatus] = int(code)
-          else
-            hash[:httpStatus] = int(attributes.agent_attributes[:httpStatus])
-            hash[:referer] = string(attributes.agent_attributes[:referer]) || ''
-          end
+          hash[:httpStatus] = int(code)
+          hash[:referer] = string(attributes.agent_attributes[:referer]) || ''
           hash
         end
 
