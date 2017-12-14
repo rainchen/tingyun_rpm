@@ -5,7 +5,7 @@ require 'ting_yun/agent/transaction/trace'
 
 module TingYun
   module Agent
-    class TransactionSampleBuilder
+    class  TransactionSampleBuilder
 
       class PlaceholderNode
         attr_reader :parent_node

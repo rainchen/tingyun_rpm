@@ -34,7 +34,7 @@ module TingYun
         end
 
 
-        def stop(state, end_time = Time.now, summary_metric_names=[])
+        def stop(state, end_time = Time.now.to_f, summary_metric_names=[])
 
           txn = state.current_transaction
 
@@ -60,12 +60,12 @@ module TingYun
 
             TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
                 state,
-                nested_frame.start_time.to_f,
+                nested_frame.start_time,
                 nested_name,
                 summary_metrics,
                 nested_frame,
                 NESTED_TRACE_STOP_OPTIONS,
-                end_time.to_f)
+                end_time)
 
           end
 

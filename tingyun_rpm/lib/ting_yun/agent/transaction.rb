@@ -66,7 +66,7 @@ module TingYun
 
 
       def initialize(category, client_transaction_id, options)
-        @start_time = Time.now
+        @start_time = Time.now.to_f
 
         @exceptions = TingYun::Agent::Transaction::Exceptions.new
         @metrics = TingYun::Agent::TransactionMetrics.new
@@ -138,12 +138,12 @@ module TingYun
 
         TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
             state,
-            start_time.to_f,
+            start_time,
             name,
             summary_metrics_with_exclusive_time,
             outermost_frame,
             trace_options,
-            end_time.to_f)
+            end_time)
 
         commit(state, end_time, name)
       end
