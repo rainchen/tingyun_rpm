@@ -101,10 +101,6 @@ module TingYun
           else
             txn = start_new_transaction(state, category, options)
           end
-
-          # merge params every step into here
-          txn.attributes.merge_request_parameters(options[:filtered_params])
-
           txn
         rescue => e
           TingYun::Agent.logger.error("Exception during Transaction.start", e)

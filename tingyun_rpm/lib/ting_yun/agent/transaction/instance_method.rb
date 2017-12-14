@@ -14,6 +14,10 @@ module TingYun
         end
 
         def create_nested_frame(state, category, options)
+
+          if options[:filtered_params] && !options[:filtered_params].empty?
+            attributes.merge_request_parameters(options[:filtered_params])
+          end
           @has_children = true
           frame_stack.push TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_header(state, Time.now.to_f)
           name_last_frame(options[:transaction_name])
