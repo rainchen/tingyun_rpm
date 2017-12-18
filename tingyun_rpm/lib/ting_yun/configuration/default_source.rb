@@ -634,12 +634,19 @@ module TingYun
             :allowed_from_server => true,
             :description => 'trace ID of crossing apps'
         },
+        :'naming.rules_enabled' => {
+            :default => false,
+            :public => true,
+            :type => Boolean,
+            :allowed_from_server => false,
+            :description => 'Enable or disable of the naming.rules function'
+        },
         :'nbs.naming.rules' => {
             :default => "[]",
             :public => true,
             :type => String,
             :allowed_from_server => true,
-            :description => 'defined nme rule '
+            :description => 'defined name rule '
         },
         :disable_rake => {
             :default => true,

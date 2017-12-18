@@ -29,9 +29,9 @@ module TingYun
       BACKGROUND_PREFIX = 'BackgroundAction/'.freeze
       RAKE_TRANSACTION_PREFIX     = 'BackgroundAction/Rake'.freeze
       TASK_PREFIX = 'OtherTransaction/Background/'.freeze
-      RACK_PREFIX = 'Rack/'.freeze
+      RACK_PREFIX = 'WebAction/Rack/'.freeze
       SINATRA_PREFIX = 'WebAction/Sinatra/'.freeze
-      MIDDLEWARE_PREFIX = 'Middleware/'.freeze
+      MIDDLEWARE_PREFIX = 'Middleware/Rack/'.freeze
       GRAPE_PREFIX = 'WebAction/Grape/'.freeze
       RAKE_PREFIX = 'WebAction/Rake'.freeze
       CABLE_PREFIX = 'WebAction/ActionCable'.freeze
@@ -66,7 +66,7 @@ module TingYun
 
 
       def initialize(category, client_transaction_id, options)
-        @start_time = Time.now.to_f
+        @start_time = Time.now
 
         @exceptions = TingYun::Agent::Transaction::Exceptions.new
         @metrics = TingYun::Agent::TransactionMetrics.new
@@ -138,12 +138,12 @@ module TingYun
 
         TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
             state,
-            start_time,
+            start_time.to_f,
             name,
             summary_metrics_with_exclusive_time,
             outermost_frame,
             trace_options,
-            end_time)
+            end_time.to_f)
 
         commit(state, end_time, name)
       end
