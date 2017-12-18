@@ -135,7 +135,7 @@ module TingYun
           unless @frozen_name
             @frozen_name = best_name
           end
-
+          @frozen_name = CONTROLLER_PREFIX + @frozen_name unless @frozen_name.start_with? CONTROLLER_PREFIX,BACKGROUND_PREFIX
           yield if block_given?
         end
 
