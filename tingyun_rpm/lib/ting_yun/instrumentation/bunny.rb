@@ -155,7 +155,7 @@ TingYun::Support::LibraryDetection.defer do
             TingYun::Agent.logger.error("Failed to Bunny basic_get_with_tingyun : ", e)
             basic_get_without_tingyun(*args)
           ensure
-            TingYun::Agent::Transaction.stop(state, Time.now, summary_metrics)
+            TingYun::Agent::Transaction.stop(state, Time.now.to_f, summary_metrics)
           end
         end
 

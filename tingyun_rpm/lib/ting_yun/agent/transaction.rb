@@ -129,18 +129,18 @@ module TingYun
           trace_options = TRACE_OPTIONS_UNSCOPED
         end
 
-        if name.start_with?(MIDDLEWARE_PREFIX)
-          summary_metrics_with_exclusive_time = MIDDLEWARE_SUMMARY_METRICS
-        else
-          summary_metrics_with_exclusive_time = EMPTY_SUMMARY_METRICS
-        end
-        summary_metrics_with_exclusive_time = summary_metrics unless summary_metrics.empty?
+        # if name.start_with?(MIDDLEWARE_PREFIX)
+        #   summary_metrics_with_exclusive_time = MIDDLEWARE_SUMMARY_METRICS
+        # else
+        #   summary_metrics_with_exclusive_time = EMPTY_SUMMARY_METRICS
+        # end
+        # summary_metrics_with_exclusive_time = summary_metrics unless summary_metrics.empty?
 
         TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
             state,
             start_time,
             name,
-            summary_metrics_with_exclusive_time,
+            nil,
             outermost_frame,
             trace_options,
             end_time)

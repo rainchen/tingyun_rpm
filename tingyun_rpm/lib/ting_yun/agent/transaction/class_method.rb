@@ -88,7 +88,7 @@ module TingYun
             raise e
           ensure
             # when kafka consumer in task, drop original web_action
-            Transaction.stop(state, Time.now, summary_metrics) if state.current_transaction
+            Transaction.stop(state, Time.now.to_f, summary_metrics) if state.current_transaction
           end
         end
 
