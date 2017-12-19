@@ -49,20 +49,20 @@ module TingYun
             txn.stop(state, end_time, nested_frame, summary_metric_names)
             state.reset
           else
-            nested_name = nested_transaction_name(nested_frame.name)
+            nested_name = Transaction.nested_transaction_name nested_frame.name
 
-            if nested_name.start_with?(MIDDLEWARE_PREFIX)
-              summary_metrics = MIDDLEWARE_SUMMARY_METRICS
-            else
-              summary_metrics = EMPTY_SUMMARY_METRICS
-            end
-            summary_metrics = summary_metric_names unless summary_metric_names.empty?
+            # if nested_name.start_with?(MIDDLEWARE_PREFIX)
+            #   summary_metrics = MIDDLEWARE_SUMMARY_METRICS
+            # else
+            #   summary_metrics = EMPTY_SUMMARY_METRICS
+            # end
+            # summary_metrics = summary_metric_names unless summary_metric_names.empty?
 
             TingYun::Agent::MethodTracerHelpers.trace_execution_scoped_footer(
                 state,
                 nested_frame.start_time,
                 nested_name,
-                summary_metrics,
+                nil,
                 nested_frame,
                 NESTED_TRACE_STOP_OPTIONS,
                 end_time)
