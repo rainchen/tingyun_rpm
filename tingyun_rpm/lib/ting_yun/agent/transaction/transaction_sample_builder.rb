@@ -28,21 +28,21 @@ module TingYun
 
       attr_reader :current_node, :trace
 
-      def initialize(time=Time.now)
-        @trace = TingYun::Agent::Transaction::Trace.new(time.to_f)
-        @trace_start = time.to_f
+      def initialize(time=Time.now.to_f)
+        @trace = TingYun::Agent::Transaction::Trace.new(time)
+        @trace_start = time
         @current_node = @trace.root_node
       end
 
       def trace_entry(time)
         if @trace.node_count == 0
-          node = @trace.create_node(time.to_f - @trace_start)
+          node = @trace.create_node(time - @trace_start)
           @trace.root_node = node
           @current_node = node
           return @current_node
         end
         if @trace.node_count < node_limit
-          node = @trace.create_node(time.to_f - @trace_start)
+          node = @trace.create_node(time - @trace_start)
           @current_node.add_called_node(node)
           @current_node = node
 
@@ -68,7 +68,7 @@ module TingYun
         else
           @current_node.metric_name = metric_name
           @current_node.klass = klass_name
-          @current_node.end_trace(time.to_f - @trace_start)
+          @current_node.end_trace(time - @trace_start)
           @current_node = @current_node.parent_node
         end
         if error

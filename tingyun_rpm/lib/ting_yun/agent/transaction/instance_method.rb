@@ -75,7 +75,7 @@ module TingYun
 
         def record_summary_metrics(state, outermost_node_name,end_time)
           unless @frozen_name == outermost_node_name
-            time = (end_time.to_f - start_time.to_f) * 1000
+            time = (end_time - start_time) * 1000
             @metrics.record_unscoped(@frozen_name, time)
             if @frozen_name.start_with?('WebAction')
               state.current_transaction.base_quantile_hash[@frozen_name] = time

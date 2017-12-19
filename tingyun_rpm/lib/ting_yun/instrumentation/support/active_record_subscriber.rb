@@ -58,7 +58,7 @@ module TingYun
           transaction_sampler.notice_sql(event.payload[:sql], config, event.duration,
                                          state, @explainer, event.payload[:binds], event.payload[:name])
           # exit transaction trace node
-          stack.pop_frame(state, frame, base, event.end, true, metric)
+          stack.pop_frame(state, frame, base, event.end.to_f, true, metric)
         end
 
         def record_metrics(event, config)

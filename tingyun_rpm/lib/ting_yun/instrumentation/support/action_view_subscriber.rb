@@ -31,7 +31,7 @@ module TingYun
 
           if event.recordable?
             stack = state.traced_method_stack
-            frame = stack.pop_frame(state, event.frame, event.metric_name, event.end)
+            frame = stack.pop_frame(state, event.frame, event.metric_name, event.end.to_f)
             record_metrics(event, frame)
           end
         rescue => e
