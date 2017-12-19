@@ -49,7 +49,7 @@ module TingYun
           stack  = state.traced_method_stack
           state.timings.sql_duration = state.timings.sql_duration + event.duration
           # enter transaction trace node
-          frame = stack.push_frame(state, :active_record, event.time)
+          frame = stack.push_frame(state, :active_record, event.time.to_f)
 
           sql_sampler.notice_sql(event.payload[:sql], base, config,
                                  TingYun::Helper.milliseconds_to_seconds(event.duration),

@@ -18,7 +18,7 @@ module TingYun
 
           if event.recordable?
             stack = state.traced_method_stack
-            event.frame = stack.push_frame(state, :action_view, event.time)
+            event.frame = stack.push_frame(state, :action_view, event.time.to_f)
           end
         rescue => e
           log_notification_error(e, name, 'start')
