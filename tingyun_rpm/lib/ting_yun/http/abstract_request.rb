@@ -1,4 +1,5 @@
 # encoding: utf-8
+require 'ting_yun/support/http_clients/uri_util'
 module TingYun
   module Http
     class AbstractRequest

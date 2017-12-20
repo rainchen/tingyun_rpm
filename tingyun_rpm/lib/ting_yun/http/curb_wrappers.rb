@@ -1,8 +1,8 @@
 # encoding: utf-8
 require 'ting_yun/http/abstract_request'
 
-module TingYun
-  module Http
+    module TingYun
+      module Http
 
 
     class CurbRequest
