@@ -202,5 +202,9 @@ module TingYun
       txn.attributes.add_custom_params(key, value) if txn
     end
 
+    def tl_is_execution_traced?
+      TingYun::Agent::TransactionState.tl_get.execution_traced?
+    end
+
   end
 end
