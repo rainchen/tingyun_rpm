@@ -18,6 +18,10 @@ module TingYun
         CURB
       end
 
+      def from
+        "curb%2Fhttp"
+      end
+
       def host_from_header
         self[LHOST] || self[UHOST]
       end
@@ -39,7 +43,7 @@ module TingYun
       end
 
       def uri
-        @uri ||= @curlobj.url
+        @uri ||= TingYun::Agent::HTTPClients::URIUtil.parse_and_normalize_url(@curlobj.url)
       end
     end
 

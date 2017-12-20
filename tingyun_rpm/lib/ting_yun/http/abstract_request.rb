@@ -12,6 +12,10 @@ module TingYun
         raise NotImplementedError, ERROR_MESSAGE + ':[]= method'
       end
 
+      def from
+        raise NotImplementedError, ERROR_MESSAGE + ':from method'
+      end
+
 
     end
   end

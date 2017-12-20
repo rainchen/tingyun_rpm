@@ -12,6 +12,7 @@ TingYun::Support::LibraryDetection.defer do
     ::TingYun::Agent.logger.info 'Installing Curb instrumentation'
     require 'ting_yun/agent/cross_app/cross_app_tracing'
     require 'ting_yun/agent/method_tracer_helpers'
+    require 'ting_yun/http/curb_wrappers'
   end
 
 
@@ -108,7 +109,7 @@ TingYun::Support::LibraryDetection.defer do
                 self.requests.first.respond_to?(:_ty_serial) &&
                 self.requests.first._ty_serial
 
-        trace_execution_scoped("External/Multiple/Curb::Multi/perform") do
+        TingYun::Agent::MethodTracerHelpers.trace_execution_scoped("External/Multiple/Curb::Multi/perform") do
           perform_without_tingyun(&blk)
         end
       end
@@ -166,7 +167,7 @@ TingYun::Support::LibraryDetection.defer do
         request._ty_original_on_complete = original_callback
         request.on_complete do |finished_request|
           begin
-            TingYun::Agent::CrossAppTracing.finish_trace( t0, segment, wrapped_request, wrapped_response )
+            TingYun::Agent::CrossAppTracing.finish_trace(TingYun::Agent::TransactionState.tl_get,t0, segment, wrapped_request, wrapped_response )
           ensure
             # Make sure the existing completion callback is run, and restore the
             # on_complete callback to how it was before.
