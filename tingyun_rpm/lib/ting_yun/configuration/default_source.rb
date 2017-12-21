@@ -662,6 +662,13 @@ module TingYun
             :allowed_from_server => false,
             :description => 'Specify an array of Rake tasks to automatically instrument.'
         },
+        :'rake.black.tasks' => {
+            :default => [],
+            :public => true,
+            :type => Array,
+            :allowed_from_server => false,
+            :description => 'Specify an array of Rake tasks to automatically uninstrument.'
+        },
         :'nbs.transaction_tracer.thrift' =>{
             :default => true,
             :public => true,
