@@ -51,6 +51,7 @@ module TingYun
       end
 
       def finish_trace(state, t0, node, request, response)
+
         t1 = Time.now.to_f
         duration = (t1- t0) * 1000
         state.timings.external_duration = duration

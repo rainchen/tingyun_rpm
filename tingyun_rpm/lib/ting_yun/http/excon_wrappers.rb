@@ -5,6 +5,7 @@ module TingYun
   module Http
 
       class ExconHTTPResponse
+
         def initialize(response)
           @response = response
           # Since HTTP headers are case-insensitive, we normalize all of them to
@@ -15,6 +16,7 @@ module TingYun
             @normalized_headers[key.upcase] = val
           end
         end
+
 
         def [](key)
           @normalized_headers[key.upcase]

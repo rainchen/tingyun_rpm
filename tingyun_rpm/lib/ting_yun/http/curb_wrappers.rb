@@ -49,7 +49,6 @@ require 'ting_yun/http/abstract_request'
 
 
     class CurbResponse < AbstractRequest
-
       def initialize(curlobj)
         @headers = {}
         @curlobj = curlobj
