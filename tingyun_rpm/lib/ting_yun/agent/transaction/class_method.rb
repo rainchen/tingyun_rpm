@@ -62,7 +62,7 @@ module TingYun
                 state,
                 nested_frame.start_time,
                 nested_name,
-                nil,
+                EMPTY_SUMMARY_METRICS,
                 nested_frame,
                 NESTED_TRACE_STOP_OPTIONS,
                 end_time)

@@ -140,7 +140,7 @@ module TingYun
             state,
             start_time,
             name,
-            nil,
+            EMPTY_SUMMARY_METRICS,
             outermost_frame,
             trace_options,
             end_time)
