@@ -59,8 +59,8 @@ module TingYun
         end
 
         def self.should_trace? name
-          return ::TingYun::Agent.config[:'rake.tasks'].include? name if ::TingYun::Agent.config[:'rake.tasks'].any?
-          return !TingYun::Agent.config[:'rake.black.tasks'].include? name if ::TingYun::Agent.config[:'rake.black.tasks'].any?
+          return ::TingYun::Agent.config[:'rake.tasks'].include?(name) if ::TingYun::Agent.config[:'rake.tasks'].any?
+          return !TingYun::Agent.config[:'rake.black.tasks'].include?(name) if ::TingYun::Agent.config[:'rake.black.tasks'].any?
           return false
         end
 
