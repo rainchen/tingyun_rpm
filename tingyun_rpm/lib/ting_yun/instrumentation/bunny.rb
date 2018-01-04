@@ -40,7 +40,7 @@ TingYun::Support::LibraryDetection.defer do
               metric_name << "Exchange%2F#{name}/Produce"
             end
             summary_metrics = TingYun::Instrumentation::Support::ExternalHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
-            TingYun::Agent::Transaction.wrap(state, metric_name , :RabbitMQ, {}, summary_metrics)  do
+            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(summary_metrics, {}, nil, metric_name) do
               opts[:headers] = {} unless opts[:headers]
               opts[:headers]["TingyunID"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
               TingYun::Agent.record_metric("#{metric_name}%2FByte",payload.bytesize) if payload
@@ -148,7 +148,7 @@ TingYun::Support::LibraryDetection.defer do
             state = TingYun::Agent::TransactionState.tl_get
             metric_name = "#{@connection.host}:#{@connection.port}%2FQueue%2F#{args[0]}/Consume"
             summary_metrics = TingYun::Instrumentation::Support::ExternalHelper.metrics_for_message('RabbitMQ', "#{connection.host}:#{connection.port}", 'Consume')
-            TingYun::Agent::Transaction.wrap(state, "Message RabbitMQ/#{metric_name}" , :RabbitMQ, {}, summary_metrics)  do
+            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(summary_metrics, {}, nil, "Message RabbitMQ/#{metric_name}") do
               basic_get_without_tingyun(*args)
             end
           rescue =>e
