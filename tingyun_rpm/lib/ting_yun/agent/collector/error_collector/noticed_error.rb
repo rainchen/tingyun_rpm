@@ -128,7 +128,11 @@ module TingYun
         end
 
         def exteneral_error? exception
+          if defined? ::Thrift::ApplicationException
            exception.is_a?(TingYun::Support::Exception::InternalServerError) or exception.is_a?(::Thrift::ApplicationException)
+          else
+            exception.is_a?(TingYun::Support::Exception::InternalServerError)
+          end
         end
 
       end
