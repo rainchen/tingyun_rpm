@@ -40,7 +40,7 @@ TingYun::Support::LibraryDetection.defer do
               metric_name << "Exchange%2F#{name}/Produce"
             end
             summary_metrics = TingYun::Instrumentation::Support::ExternalHelper.metrics_for_message('RabbitMQ', "#{@channel.connection.host}:#{@channel.connection.port}", 'Produce')
-            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(summary_metrics, {}, nil, metric_name) do
+            TingYun::Agent::MethodTracerHelpers.trace_execution_scoped(summary_metrics.unshift(metric_name), {}, nil, metric_name) do
               opts[:headers] = {} unless opts[:headers]
               opts[:headers]["TingyunID"] = create_tingyun_id("mq")  if TingYun::Agent.config[:'nbs.transaction_tracer.enabled']
               TingYun::Agent.record_metric("#{metric_name}%2FByte",payload.bytesize) if payload
