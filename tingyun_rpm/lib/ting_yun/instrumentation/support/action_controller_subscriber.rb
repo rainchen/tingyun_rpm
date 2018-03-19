@@ -75,7 +75,7 @@ module TingYun
 
         def metric_name
           if TingYun::Agent.config[:'naming.rules_enabled'] && find_rule(method, uri, request.header, params)
-            @metric_name =  "WebAction/Rails/#{namespace}/#{name(uri, request.header, params, request.cookie)}"
+            @metric_name =  "WebAction/#{namespace}/#{name(uri, request.header, params, request.cookie)}"
           else
             if TingYun::Agent.config[:'nbs.auto_action_naming']
               @metric_name ||= "WebAction/Rails/#{metric_path}%2F#{metric_action}"
